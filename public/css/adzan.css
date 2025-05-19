@@ -1,0 +1,571 @@
+.adzan-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    /* Warna hitam dengan transparansi 90% */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    border: 12px solid #d4af37;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.adzan-popup-content {
+    text-align: center;
+    color: white;
+    width: 100%;
+    max-width: 90vw;
+}
+
+.adzan {
+    font-size: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.adzan-title {
+    font-size: 9rem;
+    color: #d4af37;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.progress-container {
+    width: 80%;
+    max-width: 600px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    margin: 0 auto 1rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: #d4af37;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.countdown {
+    font-size: 9rem;
+    font-weight: bold;
+}
+
+.iqomah-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    display: flex;
+    /* Membuat dua kolom: kiri (konten), kanan (gambar) */
+    flex-direction: row;
+    z-index: 9999;
+    border: 12px solid #d4af37;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.iqomah-popup-content {
+    flex: 1;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.iqomah-progress-container {
+    width: 80%;
+    max-width: 600px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 100px;
+    margin: 0 auto 1rem;
+    overflow: hidden;
+}
+
+.iqomah-progress-bar {
+    height: 100%;
+    background-color: #d4af37;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.iqomah-countdown {
+    font-size: 7rem;
+    font-weight: bold;
+}
+
+.iqomah-title {
+    font-size: 7rem;
+    color: #d4af37;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+.iqomah-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    height: 100%;
+}
+
+.iqomah-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.adzan-image-display {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    /* Warna hitam dengan transparansi 90% */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    border: 12px solid #d4af37;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.adzan-image-display img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.friday-info-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    display: flex;
+    /* Membuat dua kolom: kiri (konten), kanan (gambar) */
+    flex-direction: row;
+    z-index: 9999;
+    border: 12px solid #d4af37;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.friday-info-content {
+    flex: 1;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.friday-date {
+    margin-bottom: 2rem;
+    font-size: 3.5rem;
+    font-weight: bold;
+}
+
+.friday-officials {
+    font-size: 1.5rem;
+}
+
+.friday-image-display {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9998;
+    box-sizing: border-box;
+}
+
+.friday-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    height: 100%;
+}
+
+.friday-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.responsive-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    align-items: center;
+}
+
+.responsive-table td {
+    padding: 8px 12px;
+    border: none;
+    vertical-align: top;
+    text-align: left;
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+
+/* Tablet Landscape (992px - 1199px) */
+@media screen and (max-width: 1199px) {
+    .adzan-title {
+        font-size: 7rem;
+    }
+
+    .countdown {
+        font-size: 7rem;
+    }
+
+    .iqomah-title {
+        font-size: 5rem;
+    }
+
+    .iqomah-countdown {
+        font-size: 5rem;
+    }
+
+    .friday-date {
+        font-size: 3rem;
+    }
+}
+
+/* Tablet Portrait (768px - 991px) */
+@media screen and (max-width: 991px) {
+
+    /* Adzan Popup */
+    .adzan-popup {
+        border: 8px solid #d4af37;
+        padding: 0.5rem;
+    }
+
+    .adzan-title {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .countdown {
+        font-size: 5rem;
+    }
+
+    .adzan {
+        font-size: 2.5rem;
+    }
+
+    /* Iqomah & Friday - Stack vertically */
+    .iqomah-popup,
+    .friday-info-popup {
+        flex-direction: column;
+        border: 8px solid #d4af37;
+    }
+
+    .iqomah-popup-content,
+    .friday-info-content {
+        flex: none;
+        height: 50%;
+        padding: 1rem;
+    }
+
+    .iqomah-image,
+    .friday-image {
+        flex: none;
+        height: 50%;
+    }
+
+    .iqomah-title {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .iqomah-countdown {
+        font-size: 4rem;
+    }
+
+    .friday-date {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .friday-officials {
+        font-size: 1.2rem;
+    }
+
+    /* Progress containers */
+    .progress-container,
+    .iqomah-progress-container {
+        width: 90%;
+        height: 35px;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        border: 8px solid #d4af37;
+        padding: 0.5rem;
+    }
+
+    .adzan-image-display img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* Mobile Landscape (576px - 767px) */
+@media screen and (max-width: 767px) {
+
+    /* Adzan Popup */
+    .adzan-popup {
+        border: 6px solid #d4af37;
+        padding: 0.25rem;
+    }
+
+    .adzan-title {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .countdown {
+        font-size: 3.5rem;
+    }
+
+    .adzan {
+        font-size: 2rem;
+    }
+
+    /* Iqomah & Friday */
+    .iqomah-popup,
+    .friday-info-popup {
+        border: 6px solid #d4af37;
+    }
+
+    .iqomah-popup-content,
+    .friday-info-content {
+        padding: 0.5rem;
+    }
+
+    .iqomah-title {
+        font-size: 3rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .iqomah-countdown {
+        font-size: 3rem;
+    }
+
+    .friday-date {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .friday-officials {
+        font-size: 1rem;
+    }
+
+    /* Progress containers */
+    .progress-container,
+    .iqomah-progress-container {
+        width: 95%;
+        height: 30px;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        border: 6px solid #d4af37;
+        padding: 0.25rem;
+    }
+
+    .adzan-image-display img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Table responsiveness */
+    .responsive-table td {
+        padding: 6px 8px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile Portrait (up to 575px) */
+@media screen and (max-width: 575px) {
+
+    /* Adzan Popup */
+    .adzan-popup {
+        border: 4px solid #d4af37;
+        padding: 0.125rem;
+    }
+
+    .adzan-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .countdown {
+        font-size: 2.5rem;
+    }
+
+    .adzan {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    /* Iqomah & Friday */
+    .iqomah-popup,
+    .friday-info-popup {
+        border: 4px solid #d4af37;
+    }
+
+    .iqomah-popup-content,
+    .friday-info-content {
+        padding: 0.25rem;
+    }
+
+    .iqomah-title {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .iqomah-countdown {
+        font-size: 2rem;
+    }
+
+    .friday-date {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .friday-officials {
+        font-size: 0.8rem;
+    }
+
+    /* Progress containers */
+    .progress-container,
+    .iqomah-progress-container {
+        width: 98%;
+        height: 25px;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        border: 4px solid #d4af37;
+        padding: 0.125rem;
+    }
+
+    .adzan-image-display img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Table responsiveness */
+    .responsive-table td {
+        padding: 4px 6px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra Small Mobile (up to 320px) */
+@media screen and (max-width: 320px) {
+    .adzan-title {
+        font-size: 2rem;
+    }
+
+    .countdown {
+        font-size: 2rem;
+    }
+
+    .adzan {
+        font-size: 1.2rem;
+    }
+
+    .iqomah-title {
+        font-size: 1.5rem;
+    }
+
+    .iqomah-countdown {
+        font-size: 1.5rem;
+    }
+
+    .friday-date {
+        font-size: 1.2rem;
+    }
+
+    .friday-officials {
+        font-size: 0.7rem;
+    }
+
+    .progress-container,
+    .iqomah-progress-container {
+        height: 20px;
+    }
+}
+
+/* Orientation specific styles */
+@media screen and (orientation: landscape) and (max-height: 480px) {
+
+    /* For landscape mobile devices */
+    .iqomah-popup,
+    .friday-info-popup {
+        flex-direction: row;
+    }
+
+    .iqomah-popup-content,
+    .friday-info-content {
+        height: 100%;
+        flex: 1;
+    }
+
+    .iqomah-image,
+    .friday-image {
+        height: 100%;
+        flex: 1;
+    }
+
+    .iqomah-title {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .iqomah-countdown {
+        font-size: 2rem;
+    }
+
+    .friday-date {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .friday-officials {
+        font-size: 0.8rem;
+    }
+}

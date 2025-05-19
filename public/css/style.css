@@ -1,0 +1,575 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #000;
+  color: white;
+  overflow: auto;
+}
+
+.container {
+  position: relative;
+  /* Untuk elemen yang menggunakan position absolute */
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas:
+    "right-content"
+    "footer";
+  height: 100vh;
+  width: 100vw;
+  border: 12px solid #d4af37;
+  background-color: #004080;
+  overflow: hidden;
+  /* Mencegah scrollbar pada container */
+}
+
+/* Prayer Times Section - Sekarang mengapung */
+/* Prayer Times Section - Dengan sudut melengkung */
+/* Prayer Times Section dengan border radius besar */
+.prayer-times {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 370px;
+  height: 100%;
+  z-index: 10;
+  background-color: rgb(0, 64, 128);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+  border-radius: 42%;
+  /* border-radius: 20%; */
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-top-right-radius: 55%;
+  /* Sudut kanan atas melengkung besar */
+  border-bottom-right-radius: 53%;
+  /* Sudut kanan bawah melengkung besar */
+  padding-right: 0px;
+  /* Padding yang lebih besar untuk menyesuaikan dengan radius */
+  overflow: hidden;
+  /* Penting: mencegah child elements melewati border */
+}
+
+
+/* Prayer time items */
+.prayer-time {
+  display: flex;
+  align-items: center;
+  padding: 0px 25px;
+  padding-top: 20px;
+  padding-bottom: 15px;
+  padding-right: 60px;
+  /* Tambahan padding kanan untuk mengikuti lengkungan */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  /* Memastikan lebar penuh dalam container */
+  box-sizing: border-box;
+  /* Memastikan padding termasuk dalam width */
+  position: relative;
+  /* Untuk memposisikan elemen dengan tepat */
+}
+
+/* Menyesuaikan border untuk prayer-time terakhir */
+.prayer-times .prayer-time:last-child {
+  border-bottom: none;
+  /* Menghilangkan border pada elemen terakhir */
+}
+
+.prayer-icon {
+  margin-right: 20px;
+  color: white;
+}
+
+.prayer-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.prayer-name {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.prayer-time-value {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: white;
+}
+
+.prayer-time.active {
+  background-color: rgba(0, 51, 102, 1);
+}
+
+.prayer-time.active .prayer-name,
+.prayer-time.active .prayer-time-value {
+  color: #ff0000;
+}
+
+.prayer-time.active .prayer-icon {
+  color: #ff0000;
+}
+
+/* Style for the next prayer time */
+.prayer-time.next-prayer .prayer-name,
+.prayer-time.next-prayer .prayer-time-value {
+  color: #ffeb3b;
+}
+
+.prayer-time.next-prayer {
+  background-color: rgba(0, 51, 102, 0.6);
+}
+
+.prayer-time.next-prayer .prayer-icon {
+  color: #ffeb3b;
+}
+
+/* Center Content - Clock */
+.floating-clock {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-136%);
+  z-index: 20;
+  /* Lebih tinggi agar selalu di atas */
+  background-color: transparent;
+}
+
+.clock-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clock {
+  position: relative;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background-color: #003366;
+  box-shadow: 5px 10px 30px rgba(0, 0, 0, 1);
+  overflow: hidden;
+  /* To make sure canvas stays within circle */
+}
+
+.clock canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.clock-text {
+  position: absolute;
+  bottom: 30%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 1rem;
+  color: white;
+  font-weight: 500;
+  z-index: 2;
+  /* Make sure text is above canvas */
+}
+
+/* Right Content - Sekarang Full */
+.right-content {
+  grid-area: right-content;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to bottom, #4a6fa5, #004080);
+  margin-left: 0;
+  /* Tidak ada margin lagi karena prayer-times sudah floating */
+}
+
+.mosque-info {
+  padding: 20px;
+  padding-top: 8px;
+  padding-right: 20px;
+  text-align: right;
+  margin-left: 200px;
+  /* Memberikan ruang untuk prayer-times */
+}
+
+.mosque-info h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1px;
+  margin-top: 5px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.mosque-name-highlight {
+  color: #ffeb3b;
+}
+
+.mosque-address {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.date-info {
+  background-color: #003366;
+  padding: 10px 20px;
+  margin-left: 0px;
+  /* Memberikan ruang untuk prayer-times */
+}
+
+.date-info ul {
+  list-style: none;
+}
+
+.date-item {
+  display: flex;
+  align-items: center;
+  font-size: 1.4rem;
+  justify-content: flex-end;
+}
+
+.day-name {
+  font-weight: 600;
+  color: #ffeb3b;
+  margin-right: 5px;
+}
+
+.mosque-image {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin-left: 293px;
+  /* Other existing styles */
+}
+
+.countdown-timer {
+  display: flex;
+  align-items: center;
+  background-color: #0066cc;
+  padding: 10px 20px;
+  border-radius: 30px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.countdown-icon {
+  margin-right: 10px;
+  margin-top: 5px;
+}
+
+.countdown-text {
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Footer */
+.footer-message {
+  grid-area: footer;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 2rem;
+  overflow: hidden;
+  height: 70px;
+  /* Tetapkan tinggi footer */
+  z-index: 5;
+  /* Lebih rendah dari prayer-times */
+  position: relative;
+  /* Untuk z-index bekerja */
+}
+
+.scrolling-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scrollText 60s linear infinite;
+  padding-left: 100%;
+  margin-left: 375px;
+  /* Mulai dari setelah prayer-times untuk desktop */
+}
+
+.scrolling-text p {
+  display: inline-block;
+  margin: 0;
+  color: #ffeb3b;
+}
+
+/* Bullet separator styling */
+.scrolling-text p span.separator {
+  display: inline-block;
+  margin: 0 12px;
+  color: white;
+}
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .prayer-times {
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-radius: 0;
+    /* Hilangkan lengkungan pada tampilan mobile */
+    padding-right: 0;
+  }
+
+  .prayer-time {
+    padding-right: 20px;
+    /* Reset padding pada mobile */
+  }
+
+  .mosque-info,
+  .date-info,
+  .mosque-image {
+    margin-left: 0;
+  }
+
+  .mosque-info h1 {
+    font-size: 2rem;
+    order: 1;
+  }
+
+  .mosque-address {
+    font-size: 1rem;
+    order: 2;
+  }
+
+  .date-info {
+    text-align: center;
+    order: 2;
+  }
+
+  .container {
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "right-content"
+      "prayer-times"
+      "center-content"
+      "footer";
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .footer-message {
+    margin-left: 0;
+    /* Reset margin pada footer untuk tampilan mobile */
+  }
+
+  .mosque-info {
+    text-align: center;
+  }
+
+  .mosque-image {
+    height: 500px;
+  }
+
+  .countdown-timer {
+    position: static;
+    margin: 180px 50px 20px 20px;
+    width: fit-content;
+  }
+
+  .floating-clock {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
+@media (max-width: 900px) {
+  .floating-clock {
+    top: 25%;
+    transform: translateX(-90%) scale(0.8);
+  }
+}
+
+@media (max-width: 768px) {
+  .prayer-times {
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-radius: 0;
+    /* Hilangkan lengkungan pada tampilan mobile */
+    padding-right: 0;
+  }
+
+  .prayer-time {
+    padding-right: 20px;
+    /* Reset padding pada mobile */
+  }
+
+  .mosque-info,
+  .date-info,
+  .mosque-image {
+    margin-left: 0;
+  }
+
+  .mosque-info h1 {
+    font-size: 2rem;
+    order: 1;
+  }
+
+  .mosque-address {
+    font-size: 1rem;
+    order: 2;
+  }
+
+  .date-info {
+    text-align: center;
+    order: 2;
+  }
+
+  .container {
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "right-content"
+      "prayer-times"
+      "center-content"
+      "footer";
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .footer-message {
+    margin-left: 0;
+    /* Reset margin pada footer untuk tampilan mobile */
+  }
+
+  .mosque-info {
+    text-align: center;
+  }
+
+  .mosque-image {
+    height: 500px;
+  }
+
+  .countdown-timer {
+    position: static;
+    margin: 180px 50px 20px 20px;
+    width: fit-content;
+  }
+
+  .floating-clock {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
+@media (max-width: 480px) {
+  .prayer-times {
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-radius: 0;
+    padding-right: 0;
+    padding-left: 0;
+    order: 3;
+  }
+
+  .prayer-time {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .prayer-name {
+    font-size: 0.7rem;
+  }
+
+  .prayer-time-value {
+    font-size: 1.2rem;
+  }
+
+  .mosque-info,
+  .date-info,
+  .mosque-image {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .mosque-info h1 {
+    font-size: 1rem;
+    order: 1;
+  }
+
+  .mosque-address {
+    font-size: 0.5rem;
+    order: 2;
+  }
+
+  .date-info {
+    text-align: center;
+    order: 2;
+  }
+
+  .date-item {
+    font-size: 0.6rem;
+    justify-content: center;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 100vh;
+    padding: 10px;
+  }
+
+  .mosque-image {
+    height: 250px;
+    object-fit: cover;
+    aspect-ratio: 16 / 9;
+    /* Sesuaikan rasio */
+    /* atau lebih besar dari 10px */
+  }
+
+  .countdown-timer {
+    margin-top: 130px;
+    /* agar makin terpisah */
+    position: static;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: fit-content;
+  }
+
+  .countdown-text {
+    font-size: 0.6rem;
+  }
+
+  .countdown-icon {
+    display: none;
+  }
+
+  .floating-clock {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .footer-message {
+    display: none;
+  }
+}
