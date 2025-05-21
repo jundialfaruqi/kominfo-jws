@@ -70,6 +70,85 @@ Route::middleware('auth')->group(function () {
     })->name('logout');
 });
 
+// API route untuk mendapatkan data profil masjid
+Route::get('/api/profil/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'name' => $profil->name,
+                'address' => $profil->address
+            ]
+        ]);
+    }
+    return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan'], 404);
+})->name('api.profil');
+
+// API route untuk mendapatkan data marquee
+Route::get('/api/marquee/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $marquee = \App\Models\Marquee::where('user_id', $profil->user_id)->first();
+        if ($marquee) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'marquee1' => $marquee->marquee1,
+                    'marquee2' => $marquee->marquee2,
+                    'marquee3' => $marquee->marquee3,
+                    'marquee4' => $marquee->marquee4,
+                    'marquee5' => $marquee->marquee5,
+                    'marquee6' => $marquee->marquee6
+                ]
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+})->name('api.marquee');
+
+// API route untuk mendapatkan data slide
+Route::get('/api/slides/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $slides = \App\Models\Slides::where('user_id', $profil->user_id)->first();
+        if ($slides) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'slide1' => $slides->slide1,
+                    'slide2' => $slides->slide2,
+                    'slide3' => $slides->slide3,
+                    'slide4' => $slides->slide4,
+                    'slide5' => $slides->slide5,
+                    'slide6' => $slides->slide6
+                ]
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+})->name('api.slides');
+
+// API route untuk mendapatkan data petugas jumat
+Route::get('/api/petugas/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $petugas = \App\Models\Petugas::where('user_id', $profil->user_id)->first();
+        if ($petugas) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'hari' => $petugas->hari,
+                    'khatib' => $petugas->khatib,
+                    'imam' => $petugas->imam,
+                    'muadzin' => $petugas->muadzin
+                ]
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+})->name('api.petugas');
+
 // Public route for accessing specific mosque page by slug
 // This must be the last route to avoid conflicts with named routes
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

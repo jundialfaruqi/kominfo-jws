@@ -109,7 +109,6 @@
                 </ul>
             </div>
 
-
             <div class="mosque-image">
                 <!-- Hidden inputs to store slide URLs -->
                 @if ($slides)
@@ -201,6 +200,12 @@
         <div class="friday-info-content">
             <div id="fridayDate" class="friday-date"></div>
             <div id="fridayOfficials" class="friday-officials"></div>
+            <!-- Hidden inputs untuk data petugas -->
+            @if ($petugas)
+                <input type="hidden" id="khatib" value="{{ $petugas->khatib }}">
+                <input type="hidden" id="imam" value="{{ $petugas->imam }}">
+                <input type="hidden" id="muadzin" value="{{ $petugas->muadzin }}">
+            @endif
         </div>
         <div class="friday-image">
             <img id="currentFridayImage" src="{{ asset('images/other/matikan-hp.jpg') }}" alt="Friday Image">

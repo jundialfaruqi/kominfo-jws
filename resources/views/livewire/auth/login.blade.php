@@ -1,17 +1,17 @@
 <div>
-    <div class="row g-0 flex-fill">
-        <div class="col-12 col-lg-6 col-xl-4 border-top-wide border-primary d-flex flex-column justify-content-center">
-            <div class="container container-tight my-5 px-lg-5">
-                {{-- <div class="text-center">
-                    <a href="." class="navbar-brand navbar-brand-autodark"><img
-                            src="{{ asset('theme/static/logo.png') }}" height="150" alt="Logo"></a>
-                </div> --}}
-                {{-- <h1 class="h3 text-center text-uppercase">
-                    Login
-                </h1> --}}
-                {{-- <div class="text-center small text-muted mb-5">
-                    Jl. Abdul Rahman Hamid, Bencah Lesung, Kec. Tenayan Raya, Pekanbaru, Riau
-                </div> --}}
+    <div class="row min-vh-100 g-0">
+        <div class="col-12 col-lg-6 col-xl-4 d-flex flex-column justify-content-center align-items-center">
+            <div class="w-100 px-4" style="max-width: 100%; width: 100%;">
+                <div class="text-center">
+                    {{-- <a href="." class="navbar-brand navbar-brand-autodark"><img
+                            src="{{ asset('theme/static/logo.png') }}" height="150" alt="Logo"></a> --}}
+                </div>
+                <h1 class="h1 text-center mb-3 px-3 ">
+                    JWS Login Admin
+                </h1>
+                <div class="text-center small text-muted mb-5">
+                    {{-- Jl. Abdul Rahman Hamid, Bencah Lesung, Kec. Tenayan Raya, Pekanbaru, Riau --}}
+                </div>
                 <form wire:submit="login" autocomplete="off" novalidate>
                     <div class="mb-3 px-3">
                         <label class="form-label">

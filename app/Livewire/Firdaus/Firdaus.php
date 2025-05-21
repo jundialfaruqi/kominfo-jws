@@ -61,31 +61,31 @@ class Firdaus extends Component
 
 
                 /* Untuk testing hari jum'at*/
-                // $date = new \DateTime($response['serverTime']); // Ambil waktu asli
+                $date = new \DateTime($response['serverTime']); // Ambil waktu asli
 
-                // // Set waktu ke Jumat pukul 12:00 siang
-                // // Jika hari ini belum Jumat, majukan ke Jumat minggu ini
-                // // Jika sudah lewat Jumat minggu ini, majukan ke Jumat minggu depan
-                // $dayOfWeek = (int) $date->format('w'); // 0 = Minggu, 5 = Jumat
-                // $targetDay = 5; // Jumat
+                // Set waktu ke Jumat pukul 12:00 siang
+                // Jika hari ini belum Jumat, majukan ke Jumat minggu ini
+                // Jika sudah lewat Jumat minggu ini, majukan ke Jumat minggu depan
+                $dayOfWeek = (int) $date->format('w'); // 0 = Minggu, 5 = Jumat
+                $targetDay = 5; // Jumat
 
-                // $daysToAdd = ($targetDay - $dayOfWeek + 7) % 7;
-                // if ($daysToAdd === 0 && (int)$date->format('H') >= 12) {
-                //     // Sudah hari Jumat lewat jam 12 siang, geser ke Jumat depan
-                //     $daysToAdd = 7;
-                // }
+                $daysToAdd = ($targetDay - $dayOfWeek + 7) % 7;
+                if ($daysToAdd === 0 && (int)$date->format('H') >= 12) {
+                    // Sudah hari Jumat lewat jam 12 siang, geser ke Jumat depan
+                    $daysToAdd = 7;
+                }
 
-                // $date->modify("+$daysToAdd days");
-                // $date->setTime(5, 12, 0); // Set jam ke 12:00 siang
+                $date->modify("+$daysToAdd days");
+                $date->setTime(5, 12, 110); // Set jam ke 12:00 siang
 
-                // $this->serverTime = $date->format('Y-m-d H:i:s');
-                // $this->serverTimestamp = $date->getTimestamp() * 1000;
+                $this->serverTime = $date->format('Y-m-d H:i:s');
+                $this->serverTimestamp = $date->getTimestamp() * 1000;
 
 
                 $this->serverTime = $response['serverTime']; // mengambil waktu server
-                $this->serverTimestamp = strtotime($this->serverTime) * 1000; // mengubah waktu server ke timestamp
-                // $this->serverTimestamp = (strtotime($this->serverTime) + (4 * 3600) + (41 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
-                // $this->serverTimestamp = (strtotime($this->serverTime) - (1 * 60 * 60 + 30 * 60)) * 1000;
+                // $this->serverTimestamp = strtotime($this->serverTime) * 1000; // mengubah waktu server ke timestamp
+                // $this->serverTimestamp = (strtotime($this->serverTime) + (2 * 3600) + (39 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
+                // $this->serverTimestamp = (strtotime($this->serverTime) - (7 * 60 * 60 + 17 * 60)) * 1000;
 
                 // Ambil tanggal, bulan, dan tahun hari ini
                 $tanggalHariIni         = date('Y-m-d', strtotime($this->serverTime));
@@ -282,14 +282,54 @@ class Firdaus extends Component
         $prayerName = $activePrayer['name'];
         $prayerTime = $activePrayer['time'];
 
-        // Convert times to timestamps for comparison
-        $currentTimeStamp = strtotime("1970-01-01 {$currentTime}:00");
-        $prayerTimeStamp = strtotime("1970-01-01 {$prayerTime}:00");
+        // Skip if the active prayer is Shuruq
+        if (strtolower($prayerName) === 'shuruq') {
+            return null;
+        }
+
+        // Use specific dates to handle day transitions correctly
+        $today = date('Y-m-d');
+        $tomorrow = date('Y-m-d', strtotime('+1 day'));
+        $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+        // Current timestamp with today's date
+        $currentTimeStamp = strtotime("{$today} {$currentTime}:00");
+
+        // Initialize prayer timestamp with today's date by default
+        $prayerDay = $today;
+
+        // Special handling for Shubuh when current time is between midnight and Shubuh
+        // This happens when activeIndex is 0 (Shubuh) and current time is after midnight
+        if ($this->activeIndex === 0 && substr($currentTime, 0, 2) < 12 && substr($prayerTime, 0, 2) < 12) {
+            // If current time is after midnight but before Shubuh, Shubuh is from today
+            if (strtotime("{$today} {$currentTime}:00") < strtotime("{$today} {$prayerTime}:00")) {
+                $prayerDay = $today;
+            } else {
+                // Shubuh has already passed, so the next one is tomorrow
+                $prayerDay = $tomorrow;
+            }
+        }
+        // Special handling for Isya when current time is after Isya
+        else if ($prayerName === 'Isya' && substr($currentTime, 0, 2) >= 18) {
+            // If current time is after 6 PM and prayer is Isya, Isya is from today
+            $prayerDay = $today;
+        }
+        // Special handling when crossing midnight
+        else if (substr($currentTime, 0, 2) < 12 && substr($prayerTime, 0, 2) > 12) {
+            // Current time is AM but prayer time is PM, prayer is from yesterday
+            $prayerDay = $yesterday;
+        } else if (substr($currentTime, 0, 2) > 12 && substr($prayerTime, 0, 2) < 12) {
+            // Current time is PM but prayer time is AM, prayer is from tomorrow
+            $prayerDay = $tomorrow;
+        }
+
+        // Calculate prayer timestamp with the correct day
+        $prayerTimeStamp = strtotime("{$prayerDay} {$prayerTime}:00");
 
         // Calculate elapsed time in seconds
         $elapsedSeconds = $currentTimeStamp - $prayerTimeStamp;
 
-        // Only process if we're within the relevant timeframes
+        // Only process if we're within the relevant timeframes (0-10 minutes after prayer time)
         if ($elapsedSeconds < 0 || $elapsedSeconds > 600) { // 10 minutes max (for Iqomah)
             return null;
         }
@@ -298,7 +338,8 @@ class Firdaus extends Component
         $status = [
             'prayerName' => $prayerName,
             'prayerTime' => $prayerTime,
-            'elapsedSeconds' => $elapsedSeconds
+            'elapsedSeconds' => $elapsedSeconds,
+            'prayerDay' => $prayerDay // Add the day information for debugging if needed
         ];
 
         // Adzan phase (0-3 minutes)
@@ -314,7 +355,6 @@ class Firdaus extends Component
             $iqomahElapsedSeconds = $elapsedSeconds - 180;
             $status['remainingSeconds'] = 420 - $iqomahElapsedSeconds; // 7 minutes duration
             $status['progress'] = ($iqomahElapsedSeconds / 420) * 100;
-
             // Special case for final image
             if ($status['remainingSeconds'] <= 0) {
                 $status['phase'] = 'final';
