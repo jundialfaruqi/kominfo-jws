@@ -116,7 +116,7 @@
                                                     @if ($logo_masjid)
                                                         <div class="card p-5">
                                                             <div class="img-responsive img-responsive-21x9"
-                                                                style="background-image: url('{{ $logo_masjid->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                                style="background-image: url('{{ $logo_masjid->temporaryUrl() }}'); background-size: contain; background-position: center;">
                                                             </div>
                                                         </div>
                                                     @elseif($temp_logo)

@@ -110,7 +110,7 @@
             </div>
 
             <div class="mosque-image">
-                {{ $this->serverTime }}
+                {{-- {{ $this->serverTime }} --}}
 
                 <!-- Hidden inputs to store slide URLs -->
                 @if ($slides)
