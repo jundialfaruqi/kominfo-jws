@@ -196,8 +196,8 @@ body {
 }
 
 .mosque-info {
-  padding: 20px;
-  padding-top: 8px;
+  padding: 16px;
+  padding-top: 4px;
   padding-right: 20px;
   display: flex;
   flex-direction: row-reverse;
@@ -211,21 +211,40 @@ body {
 
 .logo-container {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  margin-left: 15px;
+  margin-left: 2px;
   /* Mengubah dari margin-right ke margin-left */
   margin-right: 0;
 }
 
 .logo {
-  height: 50px;
+  height: 80px;
   width: auto;
-  margin: 0 5px;
+  margin-left: 10px;
+  margin-top: 20px;
   object-fit: contain;
 }
 
+/* .logopemerintah {
+  height: 80px;
+  width: auto;
+  margin-left: 10px;
+  margin-top: 20px;
+  object-fit: contain;
+} */
+
+/* .logomasjid {
+  height: 80px;
+  width: auto;
+  margin-left: 10px;
+  margin-right: 5px;
+  margin-top: 20px;
+  object-fit: contain;
+} */
+
 .mosque-text {
-  text-align: right;
+  text-align: end;
 }
 
 .mosque-info h1 {
