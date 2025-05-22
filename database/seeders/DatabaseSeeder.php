@@ -27,6 +27,13 @@ class DatabaseSeeder extends Seeder
             'address' => 'Pekanbaru',
         ]);
 
+        $this->call([
+            ProfilSeeder::class,
+            JadwalSholatSeeder::class,
+            AdzanSeeder::class,
+            MarqueeSeeder::class,
+        ]);
+
         // User::factory()->create([
         //     'name' => 'User',
         //     'email' => 'user@mail.com',

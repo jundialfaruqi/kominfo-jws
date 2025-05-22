@@ -110,6 +110,8 @@
             </div>
 
             <div class="mosque-image">
+                {{ $this->serverTime }}
+
                 <!-- Hidden inputs to store slide URLs -->
                 @if ($slides)
                     <input type="hidden" id="slide1" value="{{ $slides->slide1 }}">

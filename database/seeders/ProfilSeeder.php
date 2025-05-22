@@ -13,6 +13,12 @@ class ProfilSeeder extends Seeder
      */
     public function run(): void
     {
-        Profil::factory(50)->create();
+        Profil::create([
+            'name' => 'Masjid Al-Azhar',
+            'address' => 'Jl. Raya Bogor',
+            'phone' => '08123456789',
+            'slug' => 'masjid-al-azhar',
+            'user_id' => 1,
+        ]);
     }
 }

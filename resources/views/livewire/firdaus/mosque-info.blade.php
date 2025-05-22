@@ -1,6 +1,16 @@
 <div>
     <div class="mosque-info">
-        <h1><span class="mosque-name-highlight">{{ $profil->name }}</span></h1>
-        <p class="mosque-address">{{ $profil->address }}</p>
+        <div class="logo-container">
+            @if ($profil->logo_masjid)
+                <img src="{{ asset($profil->logo_masjid) }}" alt="Logo Masjid" class="logo logo-masjid">
+            @endif
+            @if ($profil->logo_pemerintah)
+                <img src="{{ asset($profil->logo_pemerintah) }}" alt="Logo Pemerintah" class="logo logo-pemerintah">
+            @endif
+        </div>
+        <div class="mosque-text">
+            <h1><span class="mosque-name-highlight">{{ $profil->name }}</span></h1>
+            <p class="mosque-address">{{ $profil->address }}</p>
+        </div>
     </div>
 </div>

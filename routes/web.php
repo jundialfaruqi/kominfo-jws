@@ -78,7 +78,9 @@ Route::get('/api/profil/{slug}', function ($slug) {
             'success' => true,
             'data' => [
                 'name' => $profil->name,
-                'address' => $profil->address
+                'address' => $profil->address,
+                'logo_masjid' => $profil->logo_masjid,
+                'logo_pemerintah' => $profil->logo_pemerintah
             ]
         ]);
     }

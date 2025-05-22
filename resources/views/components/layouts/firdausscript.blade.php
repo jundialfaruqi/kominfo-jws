@@ -31,6 +31,23 @@
                     // Perbarui nama dan alamat masjid
                     $('.mosque-name-highlight').text(response.data.name);
                     $('.mosque-address').text(response.data.address);
+
+                    // Perbarui logo masjid dan pemerintah
+                    $('.logo-container').empty(); // Hapus logo yang ada
+
+                    // Tambahkan logo masjid jika ada
+                    if (response.data.logo_masjid) {
+                        $('.logo-container').append(
+                            `<img src="${response.data.logo_masjid}" alt="Logo Masjid" class="logo logo-masjid">`
+                        );
+                    }
+
+                    // Tambahkan logo pemerintah jika ada
+                    if (response.data.logo_pemerintah) {
+                        $('.logo-container').append(
+                            `<img src="${response.data.logo_pemerintah}" alt="Logo Pemerintah" class="logo logo-pemerintah">`
+                        );
+                    }
                 }
             },
             error: function(xhr, status, error) {
