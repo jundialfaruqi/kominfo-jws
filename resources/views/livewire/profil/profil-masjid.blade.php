@@ -114,12 +114,16 @@
                                                     <label class="form-label">Logo Masjid</label>
                                                     <!-- Photo logo masjid-->
                                                     @if ($logo_masjid)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $logo_masjid->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-5">
+                                                            <div class="img-responsive img-responsive-21x9"
+                                                                style="background-image: url('{{ $logo_masjid->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($temp_logo)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($temp_logo) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-5">
+                                                            <div class="img-responsive img-responsive-21x9"
+                                                                style="background-image: url('{{ asset($temp_logo) }}'); background-size: contain; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="logo_masjid"
@@ -149,12 +153,16 @@
                                                     <label class="form-label">Logo Pemerintah</label>
                                                     <!-- Photo logo pemerintah -->
                                                     @if ($logo_pemerintah)
-                                                        <div class="img-responsive img-responsive-21x9 card-img-top rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $logo_pemerintah->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-5">
+                                                            <div class="img-responsive img-responsive-21x9 card-img-top"
+                                                                style="background-image: url('{{ $logo_pemerintah->temporaryUrl() }}'); background-size: contain; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($temp_logo_pemerintah)
-                                                        <div class="img-responsive img-responsive-21x9 card-img-top rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($temp_logo_pemerintah) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-5">
+                                                            <div class="img-responsive img-responsive-21x9 card-img-top"
+                                                                style="background-image: url('{{ asset($temp_logo_pemerintah) }}'); background-size: contain; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="logo_pemerintah"

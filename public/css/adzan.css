@@ -129,6 +129,8 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.5s ease-in-out;
+    will-change: opacity;
 }
 
 .adzan-image-display {
@@ -183,18 +185,18 @@
 
 .friday-date {
     margin-bottom: 2rem;
-    font-size: 1rem;
+    font-size: 1.5rem;
     font-weight: bold;
 }
 
 .friday-officials {
     font-size: 1.5rem;
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.5s ease-in;
     will-change: opacity;
 }
 
 .currentFridayImage {
-    transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.5s ease-in;
     will-change: opacity;
 }
 
@@ -210,6 +212,8 @@
     align-items: center;
     z-index: 9998;
     box-sizing: border-box;
+    transition: opacity 0.5s ease-in;
+    will-change: opacity;
 }
 
 .friday-image {
@@ -219,12 +223,16 @@
     align-items: center;
     background-color: black;
     height: 100%;
+    transition: opacity 0.5s ease-in;
+    will-change: opacity;
 }
 
 .friday-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: opacity 0.5s ease-in;
+    will-change: opacity;
 }
 
 .responsive-table {

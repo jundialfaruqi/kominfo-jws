@@ -7,12 +7,6 @@
 <!-- Locale Indonesia -->
 <script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 
-{{-- Axios --}}
-{{-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> --}}
-
-<!-- Custom script kamu -->
-{{-- <script data-navigate-once src="{{ asset('js/script.js') }}"></script> --}}
-
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
@@ -305,13 +299,13 @@
 
         function updateScrollingText(marqueeData) {
             const $scrollingTextElement = $('.scrolling-text');
-            
+
             // Simpan posisi animasi saat ini
             let currentPosition = 0;
             if ($scrollingTextElement.length) {
                 const computedStyle = window.getComputedStyle($scrollingTextElement[0]);
                 const transform = computedStyle.getPropertyValue('transform');
-                
+
                 if (transform && transform !== 'none') {
                     // Ekstrak nilai translateX dari matrix transform
                     const matrix = transform.match(/matrix\((.*?)\)/);
@@ -347,29 +341,29 @@
             if (!$scrollingTextElement.length || marqueeTexts.length === 0) return;
 
             const combinedText = marqueeTexts.join(' <span class="separator">•</span> ');
-            
+
             // Hentikan animasi sementara
             $scrollingTextElement.css('animation', 'none');
-            
+
             // Update konten
             $scrollingTextElement.html(`<p>${combinedText}</p>`);
-            
+
             // Force reflow untuk menerapkan perubahan
             if ($scrollingTextElement[0]) {
                 $scrollingTextElement[0].offsetHeight;
             }
-            
+
             // Hitung durasi animasi berdasarkan panjang teks
             // Semakin panjang teks, semakin lama durasinya
             const textLength = combinedText.length;
             const baseDuration = 60; // Durasi dasar dalam detik
             const calculatedDuration = Math.max(baseDuration, textLength / 10); // Minimal 60 detik
-            
+
             // Hitung persentase progres animasi saat ini
             const containerWidth = $scrollingTextElement.parent().width();
             const textWidth = $scrollingTextElement.find('p').width();
             const totalDistance = textWidth + containerWidth;
-            
+
             // Jika posisi saat ini adalah 0, gunakan offset waktu server
             let animationProgress;
             if (currentPosition === 0) {
@@ -382,7 +376,7 @@
                 // Jika tidak, hitung berdasarkan posisi translateX saat ini
                 animationProgress = Math.abs(currentPosition) / totalDistance;
             }
-            
+
             // Terapkan animasi dengan posisi yang dipertahankan
             $scrollingTextElement.css({
                 'animation': `scrollText ${calculatedDuration}s linear infinite`,
@@ -718,12 +712,63 @@
         let iqomahSliderStartTime = localStorage.getItem('iqomahSliderStartTime') ? parseInt(localStorage
             .getItem('iqomahSliderStartTime')) : null;
 
+        function updateIqomahImages() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) {
+                console.error('Tidak dapat menentukan slug dari URL');
+                return;
+            }
+
+            console.log('Memperbarui gambar Iqomah untuk slug:', slug);
+
+            $.ajax({
+                url: `/api/adzan/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Respons API adzan untuk Iqomah:', response);
+                    if (response.success) {
+                        // Simpan nilai sebelumnya untuk perbandingan
+                        const previousAdzan = [];
+                        for (let i = 1; i <= 6; i++) {
+                            previousAdzan.push($(`#adzan${i}`).val() || '');
+                        }
+
+                        // Perbarui nilai input hidden untuk adzan
+                        $('#adzan1').val(response.data.adzan1);
+                        $('#adzan2').val(response.data.adzan2);
+                        $('#adzan3').val(response.data.adzan3);
+                        $('#adzan4').val(response.data.adzan4);
+                        $('#adzan5').val(response.data.adzan5);
+                        $('#adzan6').val(response.data.adzan6);
+
+                        // Perbarui array iqomahImages global
+                        window.iqomahImages = ['/images/other/doa-setelah-azan.png'];
+                        for (let i = 1; i <= 6; i++) {
+                            const adzanValue = $(`#adzan${i}`).val();
+                            if (adzanValue) {
+                                window.iqomahImages.push(adzanValue);
+                            }
+                        }
+
+                        console.log('Gambar Iqomah diperbarui, jumlah gambar:', window.iqomahImages
+                            .length);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saat mengambil data adzan untuk Iqomah:', error, xhr
+                        .responseText);
+                }
+            });
+        }
+
         function startIqomahImageSlider() {
-            const iqomahImages = ['/images/other/doa-setelah-azan.png'];
+            // Gunakan variabel global untuk iqomahImages agar bisa diakses dari updateIqomahImages()
+            window.iqomahImages = ['/images/other/doa-setelah-azan.png'];
             for (let i = 1; i <= 6; i++) {
                 const adzanElement = $(`#adzan${i}`);
                 if (adzanElement.val()) {
-                    iqomahImages.push(adzanElement.val());
+                    window.iqomahImages.push(adzanElement.val());
                 }
             }
 
@@ -734,26 +779,39 @@
                 localStorage.setItem('iqomahSliderStartTime', iqomahSliderStartTime);
             }
 
-            const now = getCurrentTimeFromServer().getTime();
-            const elapsedMs = now - iqomahSliderStartTime;
-            const elapsedSeconds = Math.floor(elapsedMs / 1000);
-            const currentIndex = Math.floor(elapsedSeconds / 10) % iqomahImages.length;
+            // Variabel untuk melacak indeks gambar saat ini
+            let lastIndex = -1;
 
-            $iqomahImageElement.attr('src', iqomahImages[currentIndex]);
+            // Fungsi untuk memperbarui gambar berdasarkan waktu server
+            function updateIqomahImage() {
+                if (!window.iqomahImages || window.iqomahImages.length === 0) return;
 
-            const msUntilNextChange = 10000 - (elapsedMs % 10000);
+                const now = getCurrentTimeFromServer().getTime();
+                const elapsedMs = now - iqomahSliderStartTime;
+                const elapsedSeconds = Math.floor(elapsedMs / 1000);
+                const currentIndex = Math.floor(elapsedSeconds / 10) % window.iqomahImages.length;
 
-            setTimeout(() => {
-                const nextIndex = (currentIndex + 1) % iqomahImages.length;
-                $iqomahImageElement.attr('src', iqomahImages[nextIndex]);
-                iqomahImageSliderInterval = setInterval(() => {
-                    const currentTime = getCurrentTimeFromServer().getTime();
-                    const elapsedMs = currentTime - iqomahSliderStartTime;
-                    const elapsedSeconds = Math.floor(elapsedMs / 1000);
-                    const imageIndex = Math.floor(elapsedSeconds / 10) % iqomahImages.length;
-                    $iqomahImageElement.attr('src', iqomahImages[imageIndex]);
-                }, 10000);
-            }, msUntilNextChange);
+                // Hanya perbarui gambar jika indeks berubah
+                if (currentIndex !== lastIndex) {
+                    lastIndex = currentIndex;
+
+                    // Transisi mulus dengan opacity
+                    $iqomahImageElement.css('opacity', '0');
+                    setTimeout(() => {
+                        $iqomahImageElement.attr('src', window.iqomahImages[currentIndex]);
+                        $iqomahImageElement.css('opacity', '1');
+                    }, 250);
+                }
+            }
+
+            // Update gambar pertama kali
+            updateIqomahImage();
+
+            // Set interval untuk update gambar setiap 1 detik untuk sinkronisasi yang lebih baik
+            if (iqomahImageSliderInterval) {
+                clearInterval(iqomahImageSliderInterval);
+            }
+            iqomahImageSliderInterval = setInterval(updateIqomahImage, 1000);
         }
 
         function showIqomahPopup(prayerTimeStr, isRestored = false) {
@@ -945,12 +1003,62 @@
             }
         }
 
+        function updateFridayImages() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) {
+                console.error('Tidak dapat menentukan slug dari URL');
+                return;
+            }
+
+            console.log('Memperbarui gambar Friday untuk slug:', slug);
+
+            $.ajax({
+                url: `/api/adzan/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Respons API adzan:', response);
+                    if (response.success) {
+                        // Simpan nilai sebelumnya untuk perbandingan
+                        const previousAdzan = [];
+                        for (let i = 1; i <= 6; i++) {
+                            previousAdzan.push($(`#adzan${i}`).val() || '');
+                        }
+
+                        // Perbarui nilai input hidden untuk adzan
+                        $('#adzan1').val(response.data.adzan1);
+                        $('#adzan2').val(response.data.adzan2);
+                        $('#adzan3').val(response.data.adzan3);
+                        $('#adzan4').val(response.data.adzan4);
+                        $('#adzan5').val(response.data.adzan5);
+                        $('#adzan6').val(response.data.adzan6);
+
+                        // Perbarui array fridayImages global
+                        window.fridayImages = ['/images/other/doa-setelah-azan.png'];
+                        for (let i = 1; i <= 6; i++) {
+                            const adzanValue = $(`#adzan${i}`).val();
+                            if (adzanValue) {
+                                window.fridayImages.push(adzanValue);
+                            }
+                        }
+
+                        console.log('Gambar Friday diperbarui, jumlah gambar:', window.fridayImages
+                            .length);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saat mengambil data adzan:', error, xhr.responseText);
+                }
+            });
+        }
+
         function startFridayImageSlider() {
-            const fridayImages = ['/images/other/doa-setelah-azan.png'];
+            // Gunakan variabel global untuk fridayImages agar bisa diakses dari updateFridayImages()
+            window.fridayImages = ['/images/other/doa-setelah-azan.png'];
             for (let i = 1; i <= 6; i++) {
                 const adzanElement = $(`#adzan${i}`);
                 if (adzanElement.val()) {
-                    fridayImages.push(adzanElement.val());
+                    window.fridayImages.push(adzanElement.val());
                 }
             }
 
@@ -961,26 +1069,39 @@
                 localStorage.setItem('fridaySliderStartTime', fridaySliderStartTime);
             }
 
-            const now = getCurrentTimeFromServer().getTime();
-            const elapsedMs = now - fridaySliderStartTime;
-            const elapsedSeconds = Math.floor(elapsedMs / 1000);
-            const currentIndex = Math.floor(elapsedSeconds / 10) % fridayImages.length;
+            // Variabel untuk melacak indeks gambar saat ini
+            let lastIndex = -1;
 
-            $fridayImageElement.attr('src', fridayImages[currentIndex]);
+            // Fungsi untuk memperbarui gambar berdasarkan waktu server
+            function updateFridayImage() {
+                if (!window.fridayImages || window.fridayImages.length === 0) return;
 
-            const msUntilNextChange = 10000 - (elapsedMs % 10000);
+                const now = getCurrentTimeFromServer().getTime();
+                const elapsedMs = now - fridaySliderStartTime;
+                const elapsedSeconds = Math.floor(elapsedMs / 1000);
+                const currentIndex = Math.floor(elapsedSeconds / 10) % window.fridayImages.length;
 
-            setTimeout(() => {
-                const nextIndex = (currentIndex + 1) % fridayImages.length;
-                $fridayImageElement.attr('src', fridayImages[nextIndex]);
-                fridayImageSliderInterval = setInterval(() => {
-                    const currentTime = getCurrentTimeFromServer().getTime();
-                    const elapsedMs = currentTime - fridaySliderStartTime;
-                    const elapsedSeconds = Math.floor(elapsedMs / 1000);
-                    const imageIndex = Math.floor(elapsedSeconds / 10) % fridayImages.length;
-                    $fridayImageElement.attr('src', fridayImages[imageIndex]);
-                }, 10000);
-            }, msUntilNextChange);
+                // Hanya perbarui gambar jika indeks berubah
+                if (currentIndex !== lastIndex) {
+                    lastIndex = currentIndex;
+
+                    // Transisi mulus dengan opacity
+                    $fridayImageElement.css('opacity', '0');
+                    setTimeout(() => {
+                        $fridayImageElement.attr('src', window.fridayImages[currentIndex]);
+                        $fridayImageElement.css('opacity', '1');
+                    }, 250);
+                }
+            }
+
+            // Update gambar pertama kali
+            updateFridayImage();
+
+            // Set interval untuk update gambar setiap 1 detik untuk sinkronisasi yang lebih baik
+            if (fridayImageSliderInterval) {
+                clearInterval(fridayImageSliderInterval);
+            }
+            fridayImageSliderInterval = setInterval(updateFridayImage, 1000);
         }
 
         function displayFridayInfoPopup(data, isRestored = false) {
@@ -989,48 +1110,18 @@
             const $officialsElement = $('#fridayOfficials');
             const now = getCurrentTimeFromServer();
 
-            if (typeof moment !== 'undefined') {
-                moment.locale('id');
-                const hari = moment(now).format('dddd');
-                const tanggalMasehi = moment(now).format('D MMMM YYYY');
-                let formattedDate = `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
+            // Update tanggal dan officials dengan transisi mulus
+            updateFridayInfoContent();
 
-                if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
-                    const bulanHijriyahID = [
-                        'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
-                        'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
-                    ];
-                    const hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
-                    formattedDate += ` / ${hijri}`;
-                }
-
-                $dateElement.html(formattedDate);
-            } else {
-                $dateElement.text(data.date);
+            // Tampilkan popup jika belum ditampilkan
+            if ($popup.css('display') !== 'flex') {
+                $popup.css('display', 'flex');
             }
 
-            let officialsHtml = '<table class="responsive-table">';
-            if (data.khatib) {
-                officialsHtml +=
-                    `<tr><td style="font-weight: bold;">KHATIB</td><td>:</td><td>${data.khatib}</td></tr>`;
+            // Mulai slider gambar jika belum dimulai
+            if (!fridayImageSliderInterval) {
+                startFridayImageSlider();
             }
-            if (data.imam) {
-                officialsHtml +=
-                    `<tr><td style="font-weight: bold;">IMAM</td><td>:</td><td>${data.imam}</td></tr>`;
-            }
-            if (data.muadzin) {
-                officialsHtml +=
-                    `<tr><td style="font-weight: bold;">MUADZIN</td><td>:</td><td>${data.muadzin}</td></tr>`;
-            }
-            officialsHtml += '</table>';
-
-            $officialsElement.html(officialsHtml);
-            $popup.css('display', 'flex');
-
-            startFridayImageSlider();
 
             if (!isRestored) {
                 const now = getCurrentTimeFromServer().getTime();
@@ -1264,7 +1355,7 @@
                             $('#slide5').val() || '',
                             $('#slide6').val() || ''
                         ];
-                        
+
                         // Perbarui nilai input hidden untuk slide
                         $('#slide1').val(response.data.slide1);
                         $('#slide2').val(response.data.slide2);
@@ -1272,7 +1363,7 @@
                         $('#slide4').val(response.data.slide4);
                         $('#slide5').val(response.data.slide5);
                         $('#slide6').val(response.data.slide6);
-                        
+
                         // Perbarui slideUrls global jika ada
                         if (window.slideUrls) {
                             window.slideUrls = [
@@ -1283,7 +1374,7 @@
                                 response.data.slide5 || '',
                                 response.data.slide6 || ''
                             ].filter(url => url.trim() !== '');
-                            
+
                             console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
                         }
                     }
@@ -1310,48 +1401,41 @@
 
             if (window.slideUrls.length === 0) return;
 
-            // Simpan waktu mulai animasi
-            let animationStartTime = getCurrentTimeFromServer().getTime();
-            let currentSlideIndex = 0;
-            let slideDuration;
-
             function updateSlide() {
                 if (window.slideUrls.length === 0) return;
-                
+
+                // Gunakan waktu server untuk sinkronisasi
                 const now = getCurrentTimeFromServer();
-                const currentTime = now.getTime();
-                
-                // Hitung durasi per slide berdasarkan jumlah slide
-                slideDuration = Math.floor(60000 / window.slideUrls.length);
-                
-                // Hitung indeks slide berdasarkan waktu yang berlalu sejak animasi dimulai
-                const elapsedMs = (currentTime - animationStartTime) % (slideDuration * window.slideUrls.length);
-                const newSlideIndex = Math.floor(elapsedMs / slideDuration) % window.slideUrls.length;
-                
-                // Hanya update jika indeks slide berubah untuk menghindari flickering
-                if (newSlideIndex !== currentSlideIndex) {
-                    currentSlideIndex = newSlideIndex;
-                    
-                    // Gunakan transisi CSS untuk perubahan yang mulus
-                    $mosqueImageElement.css({
-                        'transition': 'background-image 0.5s ease-in-out',
-                        'background-image': `url("${window.slideUrls[currentSlideIndex]}")`,
-                        'background-size': 'cover',
-                        'background-position': 'center'
-                    });
-                }
+
+                // Hitung durasi per slide (10 detik per slide)
+                const slideDuration = 10000; // 10 detik
+
+                // Hitung indeks slide berdasarkan waktu server
+                // Gunakan menit dan detik untuk menentukan indeks slide
+                // Ini memastikan semua device menampilkan slide yang sama pada waktu yang sama
+                const totalSeconds = (now.getMinutes() * 60) + now.getSeconds();
+                const totalSlideTime = slideDuration * window.slideUrls.length;
+                const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) % totalSlideTime;
+                const slideIndex = Math.floor(cyclePosition / slideDuration);
+
+                // Perbarui gambar dengan transisi mulus
+                $mosqueImageElement.css({
+                    'background-image': `url("${window.slideUrls[slideIndex]}")`,
+                    'background-size': 'cover',
+                    'background-position': 'center',
+                    'transition': 'background-image 0.5s ease-in-out'
+                });
             }
 
             // Update slide pertama kali
             updateSlide();
-            
-            // Set interval untuk update slide setiap 100ms untuk animasi yang lebih mulus
-            setInterval(updateSlide, 100);
+
+            // Set interval untuk update slide setiap 1 detik
+            setInterval(updateSlide, 1000);
         }
 
         manageSlideDisplay();
         updateScrollingText();
-        // setInterval(updateScrollingText, 60000);
         checkAndRestoreSessions();
         checkAndRestoreFridayInfo();
         checkAndRestoreAdzanImage();
@@ -1377,8 +1461,6 @@
         setInterval(updateDate, 60000);
         checkDayChange();
         setInterval(checkDayChange, 60000);
-        // initMarquee();
-        // Inisialisasi pembaruan teks marquee
         updateMarqueeText();
 
         setTimeout(function() {
@@ -1416,20 +1498,16 @@
                         const previousKhatib = $('#khatib').val();
                         const previousImam = $('#imam').val();
                         const previousMuadzin = $('#muadzin').val();
-                        
+
                         // Perbarui nilai input hidden untuk petugas
                         $('#khatib').val(response.data.khatib);
                         $('#imam').val(response.data.imam);
                         $('#muadzin').val(response.data.muadzin);
-                        
+
                         // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
                         if ($('#fridayInfoPopup').is(':visible')) {
                             updateFridayInfoContent();
                         }
-                        // if env app debug true
-                        // if (process.env.APP_DEBUG === 'true') {
-                        //     console.log('Data petugas Jumat diperbarui');
-                        // }
                         console.log('Data petugas Jumat diperbarui');
                     }
                 },
@@ -1439,12 +1517,67 @@
             });
         }
 
-        // Jadwalkan pembaruan informasi masjid, marquee, dan slide setiap 30 detik
+        // Tambahkan fungsi updateFridayInfoContent
+        function updateFridayInfoContent() {
+            const $popup = $('#fridayInfoPopup');
+            const $dateElement = $('#fridayDate');
+            const $officialsElement = $('#fridayOfficials');
+            const now = getCurrentTimeFromServer();
+
+            // Update tanggal
+            if (typeof moment !== 'undefined') {
+                moment.locale('id');
+                const hari = moment(now).format('dddd');
+                const tanggalMasehi = moment(now).format('D MMMM YYYY');
+                // let formattedDate = `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
+                let formattedDate = `<span class="day-name">${hari}</span>, <br />${tanggalMasehi}`;
+
+
+                if (typeof moment().iDate === 'function') {
+                    const hijriDate = moment(now).iDate();
+                    const hijriMonth = moment(now).iMonth();
+                    const hijriYear = moment(now).iYear();
+                    const bulanHijriyahID = [
+                        'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
+                        'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
+                    ];
+                    const hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
+                    formattedDate += ` / ${hijri}`;
+                }
+
+                $dateElement.html(formattedDate);
+            }
+
+            // Update data petugas
+            let officialsHtml = '<table class="responsive-table">';
+            const khatib = $('#khatib').val();
+            const imam = $('#imam').val();
+            const muadzin = $('#muadzin').val();
+
+            if (khatib) {
+                officialsHtml +=
+                    `<tr><td style="font-weight: bold;">KHATIB</td><td>:</td><td>${khatib}</td></tr>`;
+            }
+            if (imam) {
+                officialsHtml += `<tr><td style="font-weight: bold;">IMAM</td><td>:</td><td>${imam}</td></tr>`;
+            }
+            if (muadzin) {
+                officialsHtml +=
+                    `<tr><td style="font-weight: bold;">MUADZIN</td><td>:</td><td>${muadzin}</td></tr>`;
+            }
+            officialsHtml += '</table>';
+
+            $officialsElement.html(officialsHtml);
+        }
+
+        // Jadwalkan pembaruan informasi masjid, marquee, slide, dan Friday images setiap 30 detik
         setInterval(function() {
-            updateMosqueInfo();
-            updateMarqueeText();
-            updateSlides();
-            updateFridayOfficials(); // Tambahkan update petugas Jumat
+            updateMosqueInfo(); // Tambahkan pembaruan informasi masjid
+            updateMarqueeText(); // Tambahkan pembaruan marquee
+            updateSlides(); // Tambahkan pembaruan slide
+            updateFridayOfficials(); // Tambahkan pembaruan informasi petugas Jumat
+            updateFridayImages(); // Tambahkan pembaruan gambar Friday
+            updateIqomahImages(); // Tambahkan pembaruan gambar Iqomah
         }, 30000);
     });
 </script>

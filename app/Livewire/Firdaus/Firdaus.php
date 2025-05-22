@@ -61,31 +61,30 @@ class Firdaus extends Component
 
 
                 /* Untuk testing hari jum'at*/
-                $date = new \DateTime($response['serverTime']); // Ambil waktu asli
-
                 // Set waktu ke Jumat pukul 12:00 siang
                 // Jika hari ini belum Jumat, majukan ke Jumat minggu ini
                 // Jika sudah lewat Jumat minggu ini, majukan ke Jumat minggu depan
-                $dayOfWeek = (int) $date->format('w'); // 0 = Minggu, 5 = Jumat
-                $targetDay = 5; // Jumat
+                // $date = new \DateTime($response['serverTime']); // Ambil waktu asli
+                // $dayOfWeek = (int) $date->format('w'); // 0 = Minggu, 5 = Jumat
+                // $targetDay = 5; // Jumat
 
-                $daysToAdd = ($targetDay - $dayOfWeek + 7) % 7;
-                if ($daysToAdd === 0 && (int)$date->format('H') >= 12) {
-                    // Sudah hari Jumat lewat jam 12 siang, geser ke Jumat depan
-                    $daysToAdd = 7;
-                }
+                // $daysToAdd = ($targetDay - $dayOfWeek + 7) % 7;
+                // if ($daysToAdd === 0 && (int)$date->format('H') >= 12) {
+                //     // Sudah hari Jumat lewat jam 12 siang, geser ke Jumat depan
+                //     $daysToAdd = 7;
+                // }
 
-                $date->modify("+$daysToAdd days");
-                $date->setTime(5, 12, 110); // Set jam ke 12:00 siang
+                // $date->modify("+$daysToAdd days");
+                // $date->setTime(5, 12, 110); // Set jam ke 12:00 siang
 
-                $this->serverTime = $date->format('Y-m-d H:i:s');
-                $this->serverTimestamp = $date->getTimestamp() * 1000;
+                // $this->serverTime = $date->format('Y-m-d H:i:s');
+                // $this->serverTimestamp = $date->getTimestamp() * 1000;
 
 
                 $this->serverTime = $response['serverTime']; // mengambil waktu server
-                // $this->serverTimestamp = strtotime($this->serverTime) * 1000; // mengubah waktu server ke timestamp
-                // $this->serverTimestamp = (strtotime($this->serverTime) + (2 * 3600) + (39 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
-                // $this->serverTimestamp = (strtotime($this->serverTime) - (7 * 60 * 60 + 17 * 60)) * 1000;
+                $this->serverTimestamp = strtotime($this->serverTime) * 1000; // mengubah waktu server ke timestamp
+                // $this->serverTimestamp = (strtotime($this->serverTime) + (1 * 3600) + (57 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
+                // $this->serverTimestamp = (strtotime($this->serverTime) - (7 * 60 * 60 + 17 * 60)) * 1000; // Uji waktu server - 7 jam 17 menit
 
                 // Ambil tanggal, bulan, dan tahun hari ini
                 $tanggalHariIni         = date('Y-m-d', strtotime($this->serverTime));
@@ -287,47 +286,82 @@ class Firdaus extends Component
             return null;
         }
 
-        // Use specific dates to handle day transitions correctly
-        $today = date('Y-m-d');
-        $tomorrow = date('Y-m-d', strtotime('+1 day'));
-        $yesterday = date('Y-m-d', strtotime('-1 day'));
+        // Use DateTime objects for all date calculations for consistency and accuracy
+        $serverDate = new \DateTime($this->serverTime);
+        $today = $serverDate->format('Y-m-d');
 
-        // Current timestamp with today's date
-        $currentTimeStamp = strtotime("{$today} {$currentTime}:00");
+        // Create DateTime objects for comparison rather than using string manipulation
+        $currentDateTime = new \DateTime("{$today} {$currentTime}");
+        $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
 
-        // Initialize prayer timestamp with today's date by default
+        // Initialize prayer day with today by default
         $prayerDay = $today;
 
-        // Special handling for Shubuh when current time is between midnight and Shubuh
-        // This happens when activeIndex is 0 (Shubuh) and current time is after midnight
-        if ($this->activeIndex === 0 && substr($currentTime, 0, 2) < 12 && substr($prayerTime, 0, 2) < 12) {
-            // If current time is after midnight but before Shubuh, Shubuh is from today
-            if (strtotime("{$today} {$currentTime}:00") < strtotime("{$today} {$prayerTime}:00")) {
+        // Extract hour for condition checks (using DateTime format is more reliable than substr)
+        $currentHour = (int)$currentDateTime->format('H');
+        // Define time periods for clearer logic
+        $isEarlyMorning = $currentHour >= 0 && $currentHour < 6;  // Midnight to 6am
+        $isMorning = $currentHour >= 6 && $currentHour < 12;      // 6am to noon
+        $isAfternoon = $currentHour >= 12 && $currentHour < 18;   // Noon to 6pm
+        $isEvening = $currentHour >= 18;                          // 6pm to midnight
+
+        // Create day variation objects
+        $tomorrowDate = (clone $serverDate)->modify('+1 day');
+        $tomorrow = $tomorrowDate->format('Y-m-d');
+
+        $yesterdayDate = (clone $serverDate)->modify('-1 day');
+        $yesterday = $yesterdayDate->format('Y-m-d');
+
+        // Determine correct prayer day based on prayer name and current time period
+        if ($prayerName === 'Shubuh') {
+            if ($isEarlyMorning) {
+                // After midnight but before/at Shubuh time
+                $prayerDateTime->setTime(
+                    (int)substr($prayerTime, 0, 2),
+                    (int)substr($prayerTime, 3, 2)
+                );
+
+                if ($currentDateTime < $prayerDateTime) {
+                    // Current time is before Shubuh time - Shubuh is today
+                    $prayerDay = $today;
+                } else {
+                    // Current time is after Shubuh time - next Shubuh is tomorrow
+                    $prayerDay = $tomorrow;
+                }
+            } else {
+                // Current time is after early morning, Shubuh is tomorrow
+                $prayerDay = $tomorrow;
+            }
+        } else if ($prayerName === 'Isya') {
+            if ($isEarlyMorning) {
+                // After midnight, before dawn - Isya is from yesterday
+                $prayerDay = $yesterday;
+            } else if ($isEvening) {
+                // Evening time - Isya is today
                 $prayerDay = $today;
             } else {
-                // Shubuh has already passed, so the next one is tomorrow
+                // Morning/Afternoon - Isya is today (next one)
+                $prayerDay = $today;
+            }
+        } else {
+            // Handle other prayer times based on prayer hour
+            $prayerHour = (int)substr($prayerTime, 0, 2);
+
+            if ($isEarlyMorning && $prayerHour >= 18) {
+                // Current time is early morning but prayer is evening prayer from yesterday
+                $prayerDay = $yesterday;
+            } else if (($isEvening || $isAfternoon) && $prayerHour < 6) {
+                // Current time is evening/afternoon but prayer is early morning prayer for tomorrow
                 $prayerDay = $tomorrow;
             }
         }
-        // Special handling for Isya when current time is after Isya
-        else if ($prayerName === 'Isya' && substr($currentTime, 0, 2) >= 18) {
-            // If current time is after 6 PM and prayer is Isya, Isya is from today
-            $prayerDay = $today;
-        }
-        // Special handling when crossing midnight
-        else if (substr($currentTime, 0, 2) < 12 && substr($prayerTime, 0, 2) > 12) {
-            // Current time is AM but prayer time is PM, prayer is from yesterday
-            $prayerDay = $yesterday;
-        } else if (substr($currentTime, 0, 2) > 12 && substr($prayerTime, 0, 2) < 12) {
-            // Current time is PM but prayer time is AM, prayer is from tomorrow
-            $prayerDay = $tomorrow;
-        }
 
-        // Calculate prayer timestamp with the correct day
-        $prayerTimeStamp = strtotime("{$prayerDay} {$prayerTime}:00");
+        // Recalculate timestamps with correct day
+        $prayerFullDateTime = new \DateTime("{$prayerDay} {$prayerTime}");
+        $currentFullDateTime = new \DateTime("{$today} {$currentTime}");
 
         // Calculate elapsed time in seconds
-        $elapsedSeconds = $currentTimeStamp - $prayerTimeStamp;
+        $elapsedSeconds = $currentFullDateTime->getTimestamp() - $prayerFullDateTime->getTimestamp();
 
         // Only process if we're within the relevant timeframes (0-10 minutes after prayer time)
         if ($elapsedSeconds < 0 || $elapsedSeconds > 600) { // 10 minutes max (for Iqomah)

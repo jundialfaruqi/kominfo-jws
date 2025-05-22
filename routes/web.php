@@ -149,6 +149,28 @@ Route::get('/api/petugas/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.petugas');
 
+// API route untuk mendapatkan data adzan
+Route::get('/api/adzan/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $adzan = \App\Models\Adzan::where('user_id', $profil->user_id)->first();
+        if ($adzan) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'adzan1' => $adzan->adzan1,
+                    'adzan2' => $adzan->adzan2,
+                    'adzan3' => $adzan->adzan3,
+                    'adzan4' => $adzan->adzan4,
+                    'adzan5' => $adzan->adzan5,
+                    'adzan6' => $adzan->adzan6
+                ]
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+})->name('api.adzan');
+
 // Public route for accessing specific mosque page by slug
 // This must be the last route to avoid conflicts with named routes
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

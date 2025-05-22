@@ -6,8 +6,8 @@
                     {{-- <a href="." class="navbar-brand navbar-brand-autodark"><img
                             src="{{ asset('theme/static/logo.png') }}" height="150" alt="Logo"></a> --}}
                 </div>
-                <h1 class="h1 text-center mb-3 px-3 ">
-                    JWS Login Admin
+                <h1 class="h1 text-center mb-3 px-3">
+                    JWS Login
                 </h1>
                 <div class="text-center small text-muted mb-5">
                     {{-- Jl. Abdul Rahman Hamid, Bencah Lesung, Kec. Tenayan Raya, Pekanbaru, Riau --}}
