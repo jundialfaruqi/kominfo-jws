@@ -10,7 +10,7 @@ class MosqueInfo extends Component
 {
     #[Title('Mosque Info')]
 
-    // New properties for related models
+    // New properties for related modelss
     public $profil;
 
     public function mount($slug)
