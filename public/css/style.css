@@ -212,6 +212,7 @@ body {
 .logo-container {
   display: flex;
   flex-direction: row;
+  /* ganti ke class flex-direction: row-reverse; jika ingin memindahkan logo pemko ke kiri dan logo masjid ke kanan */
   align-items: center;
   margin-left: 2px;
   /* Mengubah dari margin-right ke margin-left */

@@ -173,6 +173,16 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.adzan');
 
+Route::get('/server-time', function () {
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'timestamp' => time(),
+            'serverTime' => date('Y-m-d H:i:s')
+        ]
+    ]);
+});
+
 // Public route for accessing specific mosque page by slug
 // This must be the last route to avoid conflicts with named routes
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

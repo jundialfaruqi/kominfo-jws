@@ -1,11 +1,11 @@
 <!-- Moment.js core -->
-<script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
 
 <!-- Moment Hijri -->
-<script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
 
 <!-- Locale Indonesia -->
-<script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -58,8 +58,8 @@
 
     $(document).ready(function() {
         // Ambil waktu server dari input hidden
-        const serverTimestamp = parseInt($('#server-timestamp').val());
-        const pageLoadTimestamp = Date.now();
+        let serverTimestamp = parseInt($('#server-timestamp').val());
+        let pageLoadTimestamp = Date.now();
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
@@ -81,6 +81,26 @@
         function getCurrentTimeFromServer() {
             const elapsed = Date.now() - pageLoadTimestamp;
             return new Date(serverTimestamp + elapsed);
+        }
+
+        // Fungsi untuk memperbarui waktu server secara berkala
+        function fetchServerTime() {
+            $.ajax({
+                url: '/server-time',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // Perbarui timestamp server dan waktu halaman dimuat
+                        serverTimestamp = response.data.timestamp * 1000;
+                        pageLoadTimestamp = Date.now();
+                        console.log('Server time updated:', new Date(serverTimestamp));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching server time:', error);
+                }
+            });
         }
 
         // Mendapatkan jadwal sholat secara dinamis jika diperlukan
@@ -1596,5 +1616,9 @@
             updateFridayImages(); // Tambahkan pembaruan gambar Friday
             updateIqomahImages(); // Tambahkan pembaruan gambar Iqomah
         }, 30000);
+
+        // Perbarui waktu server setiap 60 detik
+        fetchServerTime(); // Panggil sekali saat halaman dimuat untuk sinkronisasi awal
+        setInterval(fetchServerTime, 60000); // Perbarui setiap 1 menit
     });
 </script>

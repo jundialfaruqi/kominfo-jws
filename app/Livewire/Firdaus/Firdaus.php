@@ -83,7 +83,7 @@ class Firdaus extends Component
 
                 $this->serverTime = $response['serverTime']; // mengambil waktu server
                 $this->serverTimestamp = strtotime($this->serverTime) * 1000; // mengubah waktu server ke timestamp
-                // $this->serverTimestamp = (strtotime($this->serverTime) + (1 * 3600) + (57 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
+                // $this->serverTimestamp = (strtotime($this->serverTime) + (1 * 3600) + (10 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
                 // $this->serverTimestamp = (strtotime($this->serverTime) - (7 * 60 * 60 + 17 * 60)) * 1000; // Uji waktu server - 7 jam 17 menit
 
                 // Ambil tanggal, bulan, dan tahun hari ini
@@ -290,19 +290,15 @@ class Firdaus extends Component
         $serverDate = new \DateTime($this->serverTime);
         $today = $serverDate->format('Y-m-d');
 
-        // Create DateTime objects for comparison rather than using string manipulation
+        // Create DateTime objects for comparison
         $currentDateTime = new \DateTime("{$today} {$currentTime}");
         $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
 
-        // Initialize prayer day with today by default
-        $prayerDay = $today;
-
-        // Extract hour for condition checks (using DateTime format is more reliable than substr)
+        // Extract hour for condition checks
         $currentHour = (int)$currentDateTime->format('H');
+
         // Define time periods for clearer logic
         $isEarlyMorning = $currentHour >= 0 && $currentHour < 6;  // Midnight to 6am
-        $isMorning = $currentHour >= 6 && $currentHour < 12;      // 6am to noon
-        $isAfternoon = $currentHour >= 12 && $currentHour < 18;   // Noon to 6pm
         $isEvening = $currentHour >= 18;                          // 6pm to midnight
 
         // Create day variation objects
@@ -311,6 +307,9 @@ class Firdaus extends Component
 
         $yesterdayDate = (clone $serverDate)->modify('-1 day');
         $yesterday = $yesterdayDate->format('Y-m-d');
+
+        // Initialize prayer day with today by default
+        $prayerDay = $today;
 
         // Determine correct prayer day based on prayer name and current time period
         if ($prayerName === 'Shubuh') {
@@ -332,10 +331,43 @@ class Firdaus extends Component
                 // Current time is after early morning, Shubuh is tomorrow
                 $prayerDay = $tomorrow;
             }
-        } else if ($prayerName === 'Isya') {
+        } else if ($prayerName === 'Isya' || $prayerName === "Jum'at") {
+            // PERBAIKAN UTAMA: Logika khusus untuk Isya dan Jumat
             if ($isEarlyMorning) {
-                // After midnight, before dawn - Isya is from yesterday
-                $prayerDay = $yesterday;
+                // Setelah tengah malam (00:00 - 06:00)
+                // Periksa apakah masih dalam rentang waktu aktif Isya kemarin
+
+                // Ambil waktu Shubuh hari ini untuk menentukan batas akhir periode Isya
+                $shubuhToday = null;
+                foreach ($this->prayerTimes as $prayer) {
+                    if ($prayer['name'] === 'Shubuh') {
+                        $shubuhToday = $prayer['time'];
+                        break;
+                    }
+                }
+
+                if ($shubuhToday) {
+                    $shubuhDateTime = new \DateTime("{$today} {$shubuhToday}");
+
+                    // Jika waktu sekarang sudah lewat Shubuh, Isya kemarin sudah tidak aktif
+                    if ($currentDateTime >= $shubuhDateTime) {
+                        return null; // Isya kemarin sudah berakhir
+                    }
+
+                    // Jika belum Shubuh, cek apakah masih dalam rentang maksimal 30 menit setelah Isya
+                    $isyaYesterday = new \DateTime("{$yesterday} {$prayerTime}");
+                    $maxIsyaEnd = clone $isyaYesterday;
+                    $maxIsyaEnd->modify('+30 minutes'); // Maksimal 30 menit setelah Isya
+
+                    // Jika waktu sekarang sudah lewat batas maksimal Isya, tidak aktif lagi
+                    if ($currentDateTime > $maxIsyaEnd) {
+                        return null;
+                    }
+
+                    $prayerDay = $yesterday;
+                } else {
+                    return null; // Tidak ada data Shubuh
+                }
             } else if ($isEvening) {
                 // Evening time - Isya is today
                 $prayerDay = $today;
@@ -344,14 +376,14 @@ class Firdaus extends Component
                 $prayerDay = $today;
             }
         } else {
-            // Handle other prayer times based on prayer hour
+            // Handle other prayer times
             $prayerHour = (int)substr($prayerTime, 0, 2);
 
             if ($isEarlyMorning && $prayerHour >= 18) {
                 // Current time is early morning but prayer is evening prayer from yesterday
                 $prayerDay = $yesterday;
-            } else if (($isEvening || $isAfternoon) && $prayerHour < 6) {
-                // Current time is evening/afternoon but prayer is early morning prayer for tomorrow
+            } else if ($isEvening && $prayerHour < 6) {
+                // Current time is evening but prayer is early morning prayer for tomorrow
                 $prayerDay = $tomorrow;
             }
         }
@@ -363,9 +395,22 @@ class Firdaus extends Component
         // Calculate elapsed time in seconds
         $elapsedSeconds = $currentFullDateTime->getTimestamp() - $prayerFullDateTime->getTimestamp();
 
-        // Only process if we're within the relevant timeframes (0-10 minutes after prayer time)
-        if ($elapsedSeconds < 0 || $elapsedSeconds > 600) { // 10 minutes max (for Iqomah)
+        // PERBAIKAN: Batasan waktu yang lebih ketat
+        // Untuk Isya dan Jumat, batasi maksimal 30 menit (1800 detik)
+        // Untuk waktu sholat lainnya, tetap 10 menit (600 detik)
+        $maxDuration = ($prayerName === 'Isya' || $prayerName === "Jum'at") ? 1800 : 600;
+
+        // Only process if we're within the relevant timeframes
+        if ($elapsedSeconds < 0 || $elapsedSeconds > $maxDuration) {
             return null;
+        }
+
+        // PERBAIKAN TAMBAHAN: Cek khusus untuk periode dini hari
+        if ($isEarlyMorning && ($prayerName === 'Isya' || $prayerName === "Jum'at")) {
+            // Jika sudah lewat jam 2 pagi, Isya kemarin dianggap sudah berakhir
+            if ($currentHour >= 2) {
+                return null;
+            }
         }
 
         // Determine which phase we're in
@@ -373,7 +418,7 @@ class Firdaus extends Component
             'prayerName' => $prayerName,
             'prayerTime' => $prayerTime,
             'elapsedSeconds' => $elapsedSeconds,
-            'prayerDay' => $prayerDay // Add the day information for debugging if needed
+            'prayerDay' => $prayerDay
         ];
 
         // Adzan phase (0-3 minutes)
@@ -382,13 +427,15 @@ class Firdaus extends Component
             $status['remainingSeconds'] = 180 - $elapsedSeconds;
             $status['progress'] = ($elapsedSeconds / 180) * 100;
         }
-        // Iqomah phase (3-10 minutes)
-        else if ($elapsedSeconds <= 600) { // 10 minutes
+        // Iqomah phase (3-10 minutes for regular prayers, 3-30 minutes for Isya/Jumat)
+        else if ($elapsedSeconds <= $maxDuration) {
             $status['phase'] = 'iqomah';
             // Iqomah starts at 3 minutes after prayer time
             $iqomahElapsedSeconds = $elapsedSeconds - 180;
-            $status['remainingSeconds'] = 420 - $iqomahElapsedSeconds; // 7 minutes duration
-            $status['progress'] = ($iqomahElapsedSeconds / 420) * 100;
+            $iqomahDuration = $maxDuration - 180;
+            $status['remainingSeconds'] = $iqomahDuration - $iqomahElapsedSeconds;
+            $status['progress'] = ($iqomahElapsedSeconds / $iqomahDuration) * 100;
+
             // Special case for final image
             if ($status['remainingSeconds'] <= 0) {
                 $status['phase'] = 'final';
@@ -396,7 +443,7 @@ class Firdaus extends Component
         }
 
         // Special handling for Friday
-        if ($this->currentDayOfWeek == 5 && $prayerName == "Jum'at" && $elapsedSeconds <= 600) {
+        if ($this->currentDayOfWeek == 5 && $prayerName == "Jum'at" && $elapsedSeconds <= $maxDuration) {
             $status['isFriday'] = true;
         }
 
