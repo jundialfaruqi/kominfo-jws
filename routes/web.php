@@ -9,6 +9,7 @@ use App\Livewire\Profil\ProfilMasjid;
 use App\Livewire\Slides\Slide;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profil;
+use Illuminate\Support\Facades\Http;
 
 // Redirect the base URL to login page
 Route::get('/', function () {
@@ -185,4 +186,43 @@ Route::get('/server-time', function () {
 
 // Public route for accessing specific mosque page by slug
 // This must be the last route to avoid conflicts with named routes
+Route::get('/api/prayer-status/{slug}', function ($slug) {
+    try {
+        // Get the Firdaus component instance
+        $firdaus = new \App\Livewire\Firdaus\Firdaus();
+        $firdaus->mount($slug);
+
+        // Get current server time
+        $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+        if (!$response->successful()) {
+            return response()->json(['success' => false, 'message' => 'Server time unavailable']);
+        }
+
+        $serverTime = $response['serverTime'];
+
+        // Convert UTC time to Asia/Jakarta timezone
+        $utcDateTime = new DateTime($serverTime, new DateTimeZone('UTC'));
+        $jakartaDateTime = $utcDateTime->setTimezone(new DateTimeZone('Asia/Jakarta'));
+        $currentTime = $jakartaDateTime->format('H:i');
+
+        // Get prayer status using reflection to call private method
+        $reflection = new ReflectionClass($firdaus);
+        $method = $reflection->getMethod('calculateActivePrayerTimeStatus');
+        $method->setAccessible(true);
+        $status = $method->invoke($firdaus, $currentTime);
+
+        return response()->json([
+            'success' => true,
+            'data' => $status,
+            'current_time_jakarta' => $jakartaDateTime->format('Y-m-d H:i:s'), // Optional: untuk debugging
+            'timezone' => 'Asia/Jakarta'
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error calculating prayer status: ' . $e->getMessage()
+        ]);
+    }
+});
+
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

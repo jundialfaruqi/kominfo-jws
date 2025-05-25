@@ -6,9 +6,8 @@
                     class="prayer-time {{ $loop->index === $activeIndex ? 'active' : '' }} {{ $loop->index === $nextPrayerIndex ? 'next-prayer' : '' }}">
                     <div class="prayer-icon">
                         @if ($prayer['icon'] === 'sun')
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-sun">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun">
                                 <circle cx="12" cy="12" r="4" />
                                 <path d="M12 2v2" />
                                 <path d="M12 20v2" />
@@ -20,9 +19,8 @@
                                 <path d="m19.07 4.93-1.41 1.41" />
                             </svg>
                         @elseif ($prayer['icon'] === 'sunrise')
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-sunrise">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M3 17h1m16 0h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7m-9.7 5.7a4 4 0 0 1 8 0" />
@@ -30,9 +28,8 @@
                                 <path d="M12 9v-6l3 3m-6 0l3 -3" />
                             </svg>
                         @elseif ($prayer['icon'] === 'hazemoon')
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-haze-moon">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M3 16h18" />
@@ -41,9 +38,9 @@
                                     d="M8.296 16c-2.268 -1.4 -3.598 -4.087 -3.237 -6.916c.443 -3.48 3.308 -6.083 6.698 -6.084v.006h.296c-1.991 1.916 -2.377 5.03 -.918 7.405c1.459 2.374 4.346 3.33 6.865 2.275a6.888 6.888 0 0 1 -2.777 3.314" />
                             </svg>
                         @elseif ($prayer['icon'] === 'sunset')
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-haze">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-haze">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M3 12h1" />
                                 <path d="M12 3v1" />
@@ -55,9 +52,8 @@
                                 <path d="M3 20h18" />
                             </svg>
                         @elseif ($prayer['icon'] === 'sunwind')
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-sun-wind">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M14.468 10a4 4 0 1 0 -5.466 5.46" />
@@ -71,9 +67,8 @@
                                 <path d="M12 16h5.714l.253 0a2 2 0 0 1 2.033 2a2 2 0 0 1 -2 2h-.286" />
                             </svg>
                         @elseif ($prayer['icon'] === 'moon')
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-moon-stars">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path
@@ -94,7 +89,7 @@
         <!-- Floating Clock -->
         <div class="floating-clock">
             <div class="clock-container">
-                <canvas id="analogClock" width="324" height="324"></canvas>
+                <canvas id="analogClock" width="300" height="300"></canvas>
                 <div class="clock-text">Loading...</div>
             </div>
         </div>
@@ -123,9 +118,9 @@
                 @endif
                 <div class="countdown-timer">
                     <div class="countdown-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="lucide lucide-clock">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-clock">
                             <circle cx="12" cy="12" r="10" />
                             <polyline points="12 6 12 12 16 14" />
                         </svg>

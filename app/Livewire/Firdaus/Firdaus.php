@@ -82,6 +82,9 @@ class Firdaus extends Component
 
 
                 $this->serverTime = $response['serverTime']; // mengambil waktu server
+                $serverDateTime = new \DateTime($this->serverTime);
+                $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+                $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
                 $this->serverTimestamp = strtotime($this->serverTime) * 1000; // mengubah waktu server ke timestamp
                 // $this->serverTimestamp = (strtotime($this->serverTime) + (1 * 3600) + (10 * 60)) * 1000; // Uji waktu server + 1 jam 41 menit
                 // $this->serverTimestamp = (strtotime($this->serverTime) - (7 * 60 * 60 + 17 * 60)) * 1000; // Uji waktu server - 7 jam 17 menit
@@ -272,182 +275,107 @@ class Firdaus extends Component
      */
     private function calculateActivePrayerTimeStatus($currentTime)
     {
-        if (empty($this->prayerTimes) || $this->activeIndex < 0) {
+        if (empty($this->prayerTimes)) {
             return null;
         }
 
-        // Get active prayer time
-        $activePrayer = $this->prayerTimes[$this->activeIndex];
-        $prayerName = $activePrayer['name'];
-        $prayerTime = $activePrayer['time'];
-
-        // Skip if the active prayer is Shuruq
-        if (strtolower($prayerName) === 'shuruq') {
+        // Get fresh server time from API
+        $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+        if (!$response->successful()) {
             return null;
         }
 
-        // Use DateTime objects for all date calculations for consistency and accuracy
-        $serverDate = new \DateTime($this->serverTime);
-        $today = $serverDate->format('Y-m-d');
+        $serverTime = $response['serverTime'];
+        $serverDateTime = new \DateTime($serverTime);
+        $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+        $currentTimeFormatted = $serverDateTime->format('H:i');
 
-        // Create DateTime objects for comparison
-        $currentDateTime = new \DateTime("{$today} {$currentTime}");
-        $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
+        // Get today's prayer schedule from API
+        $today = $serverDateTime->format('Y-m-d');
+        $month = $serverDateTime->format('m');
+        $year = $serverDateTime->format('Y');
 
-        // Extract hour for condition checks
-        $currentHour = (int)$currentDateTime->format('H');
-
-        // Define time periods for clearer logic
-        $isEarlyMorning = $currentHour >= 0 && $currentHour < 6;  // Midnight to 6am
-        $isEvening = $currentHour >= 18;                          // 6pm to midnight
-
-        // Create day variation objects
-        $tomorrowDate = (clone $serverDate)->modify('+1 day');
-        $tomorrow = $tomorrowDate->format('Y-m-d');
-
-        $yesterdayDate = (clone $serverDate)->modify('-1 day');
-        $yesterday = $yesterdayDate->format('Y-m-d');
-
-        // Initialize prayer day with today by default
-        $prayerDay = $today;
-
-        // Determine correct prayer day based on prayer name and current time period
-        if ($prayerName === 'Shubuh') {
-            if ($isEarlyMorning) {
-                // After midnight but before/at Shubuh time
-                $prayerDateTime->setTime(
-                    (int)substr($prayerTime, 0, 2),
-                    (int)substr($prayerTime, 3, 2)
-                );
-
-                if ($currentDateTime < $prayerDateTime) {
-                    // Current time is before Shubuh time - Shubuh is today
-                    $prayerDay = $today;
-                } else {
-                    // Current time is after Shubuh time - next Shubuh is tomorrow
-                    $prayerDay = $tomorrow;
-                }
-            } else {
-                // Current time is after early morning, Shubuh is tomorrow
-                $prayerDay = $tomorrow;
-            }
-        } else if ($prayerName === 'Isya' || $prayerName === "Jum'at") {
-            // PERBAIKAN UTAMA: Logika khusus untuk Isya dan Jumat
-            if ($isEarlyMorning) {
-                // Setelah tengah malam (00:00 - 06:00)
-                // Periksa apakah masih dalam rentang waktu aktif Isya kemarin
-
-                // Ambil waktu Shubuh hari ini untuk menentukan batas akhir periode Isya
-                $shubuhToday = null;
-                foreach ($this->prayerTimes as $prayer) {
-                    if ($prayer['name'] === 'Shubuh') {
-                        $shubuhToday = $prayer['time'];
-                        break;
-                    }
-                }
-
-                if ($shubuhToday) {
-                    $shubuhDateTime = new \DateTime("{$today} {$shubuhToday}");
-
-                    // Jika waktu sekarang sudah lewat Shubuh, Isya kemarin sudah tidak aktif
-                    if ($currentDateTime >= $shubuhDateTime) {
-                        return null; // Isya kemarin sudah berakhir
-                    }
-
-                    // Jika belum Shubuh, cek apakah masih dalam rentang maksimal 30 menit setelah Isya
-                    $isyaYesterday = new \DateTime("{$yesterday} {$prayerTime}");
-                    $maxIsyaEnd = clone $isyaYesterday;
-                    $maxIsyaEnd->modify('+30 minutes'); // Maksimal 30 menit setelah Isya
-
-                    // Jika waktu sekarang sudah lewat batas maksimal Isya, tidak aktif lagi
-                    if ($currentDateTime > $maxIsyaEnd) {
-                        return null;
-                    }
-
-                    $prayerDay = $yesterday;
-                } else {
-                    return null; // Tidak ada data Shubuh
-                }
-            } else if ($isEvening) {
-                // Evening time - Isya is today
-                $prayerDay = $today;
-            } else {
-                // Morning/Afternoon - Isya is today (next one)
-                $prayerDay = $today;
-            }
-        } else {
-            // Handle other prayer times
-            $prayerHour = (int)substr($prayerTime, 0, 2);
-
-            if ($isEarlyMorning && $prayerHour >= 18) {
-                // Current time is early morning but prayer is evening prayer from yesterday
-                $prayerDay = $yesterday;
-            } else if ($isEvening && $prayerHour < 6) {
-                // Current time is evening but prayer is early morning prayer for tomorrow
-                $prayerDay = $tomorrow;
-            }
-        }
-
-        // Recalculate timestamps with correct day
-        $prayerFullDateTime = new \DateTime("{$prayerDay} {$prayerTime}");
-        $currentFullDateTime = new \DateTime("{$today} {$currentTime}");
-
-        // Calculate elapsed time in seconds
-        $elapsedSeconds = $currentFullDateTime->getTimestamp() - $prayerFullDateTime->getTimestamp();
-
-        // PERBAIKAN: Batasan waktu yang lebih ketat
-        // Untuk Isya dan Jumat, batasi maksimal 30 menit (1800 detik)
-        // Untuk waktu sholat lainnya, tetap 10 menit (600 detik)
-        $maxDuration = ($prayerName === 'Isya' || $prayerName === "Jum'at") ? 1800 : 600;
-
-        // Only process if we're within the relevant timeframes
-        if ($elapsedSeconds < 0 || $elapsedSeconds > $maxDuration) {
-            return null;
-        }
-
-        // PERBAIKAN TAMBAHAN: Cek khusus untuk periode dini hari
-        if ($isEarlyMorning && ($prayerName === 'Isya' || $prayerName === "Jum'at")) {
-            // Jika sudah lewat jam 2 pagi, Isya kemarin dianggap sudah berakhir
-            if ($currentHour >= 2) {
+        try {
+            $prayerResponse = Http::get("https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/pekanbaru/{$year}/{$month}.json");
+            if (!$prayerResponse->successful()) {
                 return null;
             }
+
+            $prayerData = $prayerResponse->json();
+            $dayOfMonth = (int)$serverDateTime->format('d');
+            $todayPrayers = $prayerData[$dayOfMonth - 1] ?? null;
+
+            if (!$todayPrayers) {
+                return null;
+            }
+        } catch (\Exception $e) {
+            return null;
         }
 
-        // Determine which phase we're in
-        $status = [
-            'prayerName' => $prayerName,
-            'prayerTime' => $prayerTime,
-            'elapsedSeconds' => $elapsedSeconds,
-            'prayerDay' => $prayerDay
-        ];
+        // Check each prayer time
+        $prayerNames = ['Shubuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'];
 
-        // Adzan phase (0-3 minutes)
-        if ($elapsedSeconds <= 180) { // 3 minutes
-            $status['phase'] = 'adzan';
-            $status['remainingSeconds'] = 180 - $elapsedSeconds;
-            $status['progress'] = ($elapsedSeconds / 180) * 100;
+        // Add Friday prayer if today is Friday
+        if ($serverDateTime->format('N') == 5) {
+            $prayerNames = ['Shubuh', 'Dzuhur', "Jum'at", 'Ashar', 'Maghrib', 'Isya'];
         }
-        // Iqomah phase (3-10 minutes for regular prayers, 3-30 minutes for Isya/Jumat)
-        else if ($elapsedSeconds <= $maxDuration) {
-            $status['phase'] = 'iqomah';
-            // Iqomah starts at 3 minutes after prayer time
-            $iqomahElapsedSeconds = $elapsedSeconds - 180;
-            $iqomahDuration = $maxDuration - 180;
-            $status['remainingSeconds'] = $iqomahDuration - $iqomahElapsedSeconds;
-            $status['progress'] = ($iqomahElapsedSeconds / $iqomahDuration) * 100;
 
-            // Special case for final image
-            if ($status['remainingSeconds'] <= 0) {
-                $status['phase'] = 'final';
+        foreach ($prayerNames as $prayerName) {
+            $prayerTimeKey = strtolower($prayerName);
+            if ($prayerName === "Jum'at") {
+                $prayerTimeKey = 'dzuhur'; // Use Dzuhur time for Friday prayer
+            }
+
+            $prayerTime = $todayPrayers[$prayerTimeKey] ?? null;
+            if (!$prayerTime) {
+                continue;
+            }
+
+            // Create DateTime objects for comparison
+            $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
+            $prayerDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+            $currentDateTime = new \DateTime("{$today} {$currentTimeFormatted}");
+            $currentDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+
+            // Calculate elapsed seconds since prayer time
+            $elapsedSeconds = $currentDateTime->getTimestamp() - $prayerDateTime->getTimestamp();
+
+            // Check if we're in the active prayer window
+            if ($elapsedSeconds >= 0 && $elapsedSeconds <= 660) { // 11 minutes total (3 adzan + 7 iqomah + 1 final)
+                $status = [
+                    'prayerName' => $prayerName,
+                    'prayerTime' => $prayerTime,
+                    'elapsedSeconds' => $elapsedSeconds,
+                    'serverTime' => $serverTime
+                ];
+
+                // Determine phase based on elapsed time
+                if ($elapsedSeconds <= 180) { // 0-3 minutes: Adzan phase
+                    $status['phase'] = 'adzan';
+                    $status['remainingSeconds'] = 180 - $elapsedSeconds;
+                    $status['progress'] = ($elapsedSeconds / 180) * 100;
+                } elseif ($elapsedSeconds <= 600) { // 3-10 minutes: Iqomah phase
+                    $status['phase'] = 'iqomah';
+                    $iqomahElapsed = $elapsedSeconds - 180;
+                    $status['remainingSeconds'] = 420 - $iqomahElapsed; // 7 minutes iqomah
+                    $status['progress'] = ($iqomahElapsed / 420) * 100;
+                } elseif ($elapsedSeconds <= 660) { // 10-11 minutes: Final phase
+                    $status['phase'] = 'final';
+                    $finalElapsed = $elapsedSeconds - 600;
+                    $status['remainingSeconds'] = 60 - $finalElapsed; // 1 minute final
+                    $status['progress'] = ($finalElapsed / 60) * 100;
+                }
+
+                // Special flag for Friday prayer
+                if ($prayerName === "Jum'at") {
+                    $status['isFriday'] = true;
+                }
+
+                return $status;
             }
         }
 
-        // Special handling for Friday
-        if ($this->currentDayOfWeek == 5 && $prayerName == "Jum'at" && $elapsedSeconds <= $maxDuration) {
-            $status['isFriday'] = true;
-        }
-
-        return $status;
+        return null;
     }
 
     public function render()
