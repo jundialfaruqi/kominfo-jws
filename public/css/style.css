@@ -884,7 +884,6 @@ body {
   }
 }
 
-/* Laptop (1920x1200) */
 @media (min-width: 1920px) and (min-height: 1200px) {
   .container {
     border: 20px solid #d4af37;
@@ -1241,103 +1240,6 @@ body {
   }
 }
 
-
-@media (min-height: 600px) {
-  .prayer-times {
-    border-top-right-radius: 45%;
-    border-bottom-right-radius: 45%;
-  }
-}
-
-@media (min-height: 700px) {
-  .prayer-times {
-    border-top-right-radius: 45%;
-    border-bottom-right-radius: 45%;
-  }
-}
-
-@media (min-height: 800px) {
-  .prayer-times {
-    border-top-right-radius: 45%;
-    border-bottom-right-radius: 45%;
-  }
-}
-
-@media (max-width: 1200px) {
-  .prayer-times {
-    position: static;
-    width: 100%;
-    height: auto;
-    box-shadow: none;
-    border-radius: 0;
-    /* Hilangkan lengkungan pada tampilan mobile */
-    padding-right: 0;
-  }
-
-  .prayer-time {
-    padding-right: 20px;
-    /* Reset padding pada mobile */
-  }
-
-  .mosque-info,
-  .date-info,
-  .mosque-image {
-    margin-left: 0;
-  }
-
-  .mosque-info h1 {
-    font-size: 2rem;
-    order: 1;
-  }
-
-  .mosque-address {
-    font-size: 1rem;
-    order: 2;
-  }
-
-  .date-info {
-    text-align: center;
-    order: 2;
-  }
-
-  .container {
-    grid-template-rows: auto auto auto auto;
-    grid-template-areas:
-      "right-content"
-      "prayer-times"
-      "center-content"
-      "footer";
-    overflow-y: auto;
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .footer-message {
-    margin-left: 0;
-    /* Reset margin pada footer untuk tampilan mobile */
-  }
-
-  .mosque-info {
-    text-align: center;
-  }
-
-  .mosque-image {
-    height: 500px;
-  }
-
-  .countdown-timer {
-    position: static;
-    margin: 180px 50px 20px 20px;
-    width: fit-content;
-  }
-
-  .floating-clock {
-    position: absolute;
-    left: -9999px;
-  }
-}
-
-/* Untuk layar yang lebih besar */
 @media (min-width: 1500px) and (min-height: 900px) {
   * {
     margin: 0;
@@ -1470,7 +1372,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-130%, -50%);
+    transform: translate(-128%, -50%);
     z-index: 20;
     /* Lebih tinggi agar selalu di atas */
     background-color: transparent;
@@ -1702,6 +1604,80 @@ body {
   }
 }
 
+@media (max-width: 1200px) {
+  .prayer-times {
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-radius: 0;
+    /* Hilangkan lengkungan pada tampilan mobile */
+    padding-right: 0;
+  }
+
+  .prayer-time {
+    padding-right: 20px;
+    /* Reset padding pada mobile */
+  }
+
+  .mosque-info,
+  .date-info,
+  .mosque-image {
+    margin-left: 0;
+  }
+
+  .mosque-info h1 {
+    font-size: 2rem;
+    order: 1;
+  }
+
+  .mosque-address {
+    font-size: 1rem;
+    order: 2;
+  }
+
+  .date-info {
+    text-align: center;
+    order: 2;
+  }
+
+  .container {
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "right-content"
+      "prayer-times"
+      "center-content"
+      "footer";
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .footer-message {
+    margin-left: 0;
+    /* Reset margin pada footer untuk tampilan mobile */
+  }
+
+  .mosque-info {
+    text-align: center;
+  }
+
+  .mosque-image {
+    height: 500px;
+  }
+
+  .countdown-timer {
+    position: static;
+    margin: 180px 50px 20px 20px;
+    width: fit-content;
+  }
+
+  .floating-clock {
+    position: absolute;
+    left: -9999px;
+  }
+}
+
 @media (max-width: 768px) {
   .prayer-times {
     position: static;
@@ -1785,6 +1761,27 @@ body {
   .floating-clock {
     position: absolute;
     left: -9999px;
+  }
+}
+
+@media (min-height: 800px) {
+  .prayer-times {
+    border-top-right-radius: 45%;
+    border-bottom-right-radius: 45%;
+  }
+}
+
+@media (min-height: 700px) {
+  .prayer-times {
+    border-top-right-radius: 45%;
+    border-bottom-right-radius: 45%;
+  }
+}
+
+@media (min-height: 600px) {
+  .prayer-times {
+    border-top-right-radius: 45%;
+    border-bottom-right-radius: 45%;
   }
 }
 
