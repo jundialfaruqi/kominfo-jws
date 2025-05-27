@@ -1,11 +1,11 @@
 <!-- Moment.js core -->
-<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+<script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
 
 <!-- Moment Hijri -->
-<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
+<script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
 
 <!-- Locale Indonesia -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
+<script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -58,10 +58,13 @@
 
     $(document).ready(function() {
         // Ambil waktu server dari input hidden
-        let serverTimestamp = parseInt($('#server-timestamp').val());
-        let pageLoadTimestamp = Date.now();
+        const serverTimestamp = parseInt($('#server-timestamp').val());
+        const pageLoadTimestamp = Date.now();
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
+
+        // Inisialisasi pembaruan informasi masjid
+        updateMosqueInfo();
 
         // Get active prayer time status if available
         let activePrayerStatus = null;
@@ -80,26 +83,6 @@
             return new Date(serverTimestamp + elapsed);
         }
 
-        // Fungsi untuk memperbarui waktu server secara berkala
-        function fetchServerTime() {
-            $.ajax({
-                url: '/server-time',
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        // Perbarui timestamp server dan waktu halaman dimuat
-                        serverTimestamp = response.data.timestamp * 1000;
-                        pageLoadTimestamp = Date.now();
-                        console.log('Server time updated:', new Date(serverTimestamp));
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching server time:', error);
-                }
-            });
-        }
-
         // Mendapatkan jadwal sholat secara dinamis jika diperlukan
         async function fetchPrayerTimes() {
             try {
@@ -116,24 +99,8 @@
                         url,
                         method: 'GET'
                     });
-
-                    // Update data tanpa refresh halaman
-                    console.log("Data bulan baru tersedia, memperbarui data di background...");
-
-                    // Update current month dan year
-                    currentMonth = month;
-                    currentYear = year;
-
-                    // Update prayer times dengan data baru
-                    if (response && response[now.getDate()]) {
-                        const todayPrayer = response[now.getDate()];
-                        // Update prayer times display
-                        updatePrayerTimesDisplay(todayPrayer);
-                    }
-
-                    // Update background data
-                    updateDataInBackground();
-
+                    console.log("Data bulan baru tersedia, memuat ulang halaman...");
+                    location.reload();
                     return response;
                 }
                 return null;
@@ -141,23 +108,6 @@
                 console.error("Error saat mengambil jadwal sholat:", error);
                 return null;
             }
-        }
-
-        // Fungsi baru untuk update prayer times display
-        function updatePrayerTimesDisplay(prayerData) {
-            // Update hidden inputs dengan data baru
-            $('#current-month').val(currentMonth);
-            $('#current-year').val(currentYear);
-
-            // Update prayer times di UI
-            const prayerNames = ['shubuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
-            prayerNames.forEach(prayer => {
-                if (prayerData[prayer]) {
-                    $(`.prayer-time[data-prayer="${prayer}"]`).text(prayerData[prayer]);
-                }
-            });
-
-            console.log('Prayer times display updated');
         }
 
         // Canvas-based Analog Clock
@@ -503,97 +453,12 @@
         let isShuruqAlarmPlaying = false;
         let shuruqAlarmTimeout = null;
 
-        let currentPrayerStatus = null;
-        let isAdzanActive = false;
-        let isIqomahActive = false;
-        let isFinalActive = false;
-        let isFridayActive = false;
-
         let adzanStartTime = localStorage.getItem('adzanStartTime') ? parseInt(localStorage.getItem(
             'adzanStartTime')) : null;
         let iqomahStartTime = localStorage.getItem('iqomahStartTime') ? parseInt(localStorage.getItem(
             'iqomahStartTime')) : null;
         let currentPrayerName = localStorage.getItem('currentPrayerName') || null;
         let currentPrayerTime = localStorage.getItem('currentPrayerTime') || null;
-
-        function fetchPrayerStatus() {
-            const slug = window.location.pathname.replace(/^\//, ''); // Fixed: remove leading slash
-
-            $.ajax({
-                url: `/api/prayer-status/${slug}`,
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success && response.data) {
-                        handlePrayerStatusUpdate(response.data);
-                    } else {
-                        // No active prayer status
-                        clearAllPrayerStates();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching prayer status:', error);
-                }
-            });
-        }
-
-        // Handle prayer status updates
-        function handlePrayerStatusUpdate(status) {
-            const {
-                phase,
-                prayerName,
-                prayerTime,
-                isFriday
-            } = status;
-
-            // Clear previous states
-            clearAllPrayerStates();
-
-            currentPrayerStatus = status;
-
-            switch (phase) {
-                case 'adzan':
-                    if (!isAdzanActive) {
-                        isAdzanActive = true;
-                        showAdzanPopup(prayerName, prayerTime);
-                    }
-                    break;
-
-                case 'iqomah':
-                    if (!isIqomahActive) {
-                        isIqomahActive = true;
-                        showIqomahPopup(prayerTime);
-                    }
-                    break;
-
-                case 'final':
-                    if (!isFinalActive) {
-                        isFinalActive = true;
-                        showFinalAdzanImage();
-                    }
-                    break;
-            }
-
-            // Handle Friday prayer info
-            if (isFriday && !isFridayActive) {
-                isFridayActive = true;
-                showFridayInfo();
-            }
-        }
-
-        // Clear all prayer states
-        function clearAllPrayerStates() {
-            isAdzanActive = false;
-            isIqomahActive = false;
-            isFinalActive = false;
-            isFridayActive = false;
-
-            // Hide all popups
-            $('#adzanPopup').css('display', 'none');
-            $('#iqomahPopup').css('display', 'none');
-            $('#adzanImageDisplay').css('display', 'none');
-            $('#fridayInfoPopup').css('display', 'none');
-        }
 
         function checkAndRestoreSessions() {
             const now = getCurrentTimeFromServer().getTime();
@@ -728,28 +593,16 @@
             keysToRemove.forEach(key => localStorage.removeItem(key));
         }
 
-        // Fungsi untuk memperbarui data tanpa refresh halaman
-        function updateDataInBackground() {
-            // Update prayer times
-            fetchPrayerStatus();
-
-            // Update mosque info
-            updateMosqueInfo();
-
-            // Update marquee text
-            updateMarqueeText();
-
-            // Update slides
-            updateSlides();
-
-            // Update Friday officials
-            updateFridayOfficials();
-
-            // Update images
-            updateFridayImages();
-            updateIqomahImages();
-
-            console.log('Data updated in background without page refresh');
+        function checkDayChange() {
+            const now = getCurrentTimeFromServer();
+            const currentDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            const storedDate = localStorage.getItem('lastCheckedDate');
+            console.log('Checking day change...', currentDate, storedDate);
+            if (currentDate !== storedDate) {
+                clearAllAdzanStates();
+                localStorage.setItem('lastCheckedDate', currentDate);
+                location.reload();
+            }
         }
 
         function clearShuruqAlarmState() {
@@ -799,11 +652,8 @@
             const scheduleYear = parseInt($('#current-year').val());
 
             if (scheduleMonth !== serverMonth || scheduleYear !== serverYear) {
-                console.log('Jadwal tidak sesuai dengan tanggal server, memperbarui data di background...');
-
-                // Ganti location.reload() dengan background update
-                updateDataInBackground();
-                fetchPrayerTimes();
+                console.log('Jadwal tidak sesuai dengan tanggal server, memuat ulang halaman...');
+                location.reload();
                 return;
             }
 
@@ -1569,32 +1419,29 @@
             if (window.slideUrls.length === 0) return;
 
             function updateSlide() {
-                if (!window.slideUrls || window.slideUrls.length === 0) return;
+                if (window.slideUrls.length === 0) return;
 
                 // Gunakan waktu server untuk sinkronisasi
                 const now = getCurrentTimeFromServer();
+
+                // Hitung durasi per slide (10 detik per slide)
                 const slideDuration = 10000; // 10 detik
+
+                // Hitung indeks slide berdasarkan waktu server
+                // Gunakan menit dan detik untuk menentukan indeks slide
+                // Ini memastikan semua device menampilkan slide yang sama pada waktu yang sama
                 const totalSeconds = (now.getMinutes() * 60) + now.getSeconds();
                 const totalSlideTime = slideDuration * window.slideUrls.length;
                 const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) % totalSlideTime;
                 const slideIndex = Math.floor(cyclePosition / slideDuration);
 
-                // Cek apakah slide index berubah
-                if (window.currentSlideIndex !== slideIndex) {
-                    window.currentSlideIndex = slideIndex;
-
-                    // Preload image untuk menghindari loading delay
-                    const img = new Image();
-                    img.onload = function() {
-                        // Update background setelah image loaded
-                        $mosqueImageElement.css({
-                            'background-image': `url("${window.slideUrls[slideIndex]}")`,
-                            'background-size': 'cover',
-                            'background-position': 'center'
-                        });
-                    };
-                    img.src = window.slideUrls[slideIndex];
-                }
+                // Perbarui gambar dengan transisi mulus
+                $mosqueImageElement.css({
+                    'background-image': `url("${window.slideUrls[slideIndex]}")`,
+                    'background-size': 'cover',
+                    'background-position': 'center',
+                    'transition': 'background-image 0.5s ease-in-out'
+                });
             }
 
             // Update slide pertama kali
@@ -1606,8 +1453,6 @@
 
         manageSlideDisplay();
         updateScrollingText();
-        fetchPrayerStatus(); // Initial check
-        setInterval(fetchPrayerStatus, 30000);
         checkAndRestoreSessions();
         checkAndRestoreFridayInfo();
         checkAndRestoreAdzanImage();
@@ -1631,6 +1476,8 @@
         setInterval(handlePrayerTimes, 1000);
         updateDate();
         setInterval(updateDate, 60000);
+        checkDayChange();
+        setInterval(checkDayChange, 60000);
         updateMarqueeText();
 
         setTimeout(function() {
@@ -1643,7 +1490,7 @@
                 `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const storedMonthYear = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
             if (currentMonthYear !== storedMonthYear) {
-                console.log("Bulan/tahun berubah, memperbarui jadwal sholat di background");
+                console.log("Bulan/tahun berubah, memperbarui jadwal sholat");
                 fetchPrayerTimes();
             }
         }, 60000);
@@ -1740,12 +1587,14 @@
             $officialsElement.html(officialsHtml);
         }
 
-        // Perbarui waktu server setiap 60 detik
-        fetchServerTime(); // Panggil sekali saat halaman dimuat untuk sinkronisasi awal
-        setInterval(fetchServerTime, 60000); // Perbarui setiap 1 menit
-
-        // Update background data
-        updateDataInBackground();
-        setInterval(updateDataInBackground, 60000); // Perbarui setiap 1 menit
+        // Jadwalkan pembaruan informasi masjid, marquee, slide, dan Friday images setiap 30 detik
+        setInterval(function() {
+            updateMosqueInfo(); // Tambahkan pembaruan informasi masjid
+            updateMarqueeText(); // Tambahkan pembaruan marquee
+            updateSlides(); // Tambahkan pembaruan slide
+            updateFridayOfficials(); // Tambahkan pembaruan informasi petugas Jumat
+            updateFridayImages(); // Tambahkan pembaruan gambar Friday
+            updateIqomahImages(); // Tambahkan pembaruan gambar Iqomah
+        }, 30000);
     });
 </script>
