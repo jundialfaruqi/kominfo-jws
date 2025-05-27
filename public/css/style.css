@@ -498,7 +498,7 @@ body {
   }
 }
 
-/* Laptop (1366x768) */
+/* Laptop (1366x768) Tampilan sudah oke dan sesuai */
 @media (min-width: 1366px) and (min-height: 768px) {
   * {
     margin: 0;
@@ -727,7 +727,7 @@ body {
   }
 
   .logo {
-    height: 80px;
+    height: 82px;
     width: auto;
     margin-left: 10px;
     margin-top: 20px;

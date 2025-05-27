@@ -105,7 +105,6 @@
             </div>
 
             <div class="mosque-image">
-                {{-- {{ $this->serverTime }} --}}
 
                 <!-- Hidden inputs to store slide URLs -->
                 @if ($slides)
@@ -149,6 +148,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Hidden inputs for prayer times and other data -->
     <input type="hidden" id="server-timestamp" value="{{ $serverTimestamp }}">
     <input type="hidden" id="prayer-times" value='@json($jadwalSholat)'>
     <input type="hidden" id="current-month" value="{{ $currentMonth }}">

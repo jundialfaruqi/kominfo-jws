@@ -63,9 +63,6 @@
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
-        // Inisialisasi pembaruan informasi masjid
-        updateMosqueInfo();
-
         // Get active prayer time status if available
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -119,24 +116,24 @@
                         url,
                         method: 'GET'
                     });
-                    
+
                     // Update data tanpa refresh halaman
                     console.log("Data bulan baru tersedia, memperbarui data di background...");
-                    
+
                     // Update current month dan year
                     currentMonth = month;
                     currentYear = year;
-                    
+
                     // Update prayer times dengan data baru
                     if (response && response[now.getDate()]) {
                         const todayPrayer = response[now.getDate()];
                         // Update prayer times display
                         updatePrayerTimesDisplay(todayPrayer);
                     }
-                    
+
                     // Update background data
                     updateDataInBackground();
-                    
+
                     return response;
                 }
                 return null;
@@ -151,7 +148,7 @@
             // Update hidden inputs dengan data baru
             $('#current-month').val(currentMonth);
             $('#current-year').val(currentYear);
-            
+
             // Update prayer times di UI
             const prayerNames = ['shubuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
             prayerNames.forEach(prayer => {
@@ -159,7 +156,7 @@
                     $(`.prayer-time[data-prayer="${prayer}"]`).text(prayerData[prayer]);
                 }
             });
-            
+
             console.log('Prayer times display updated');
         }
 
@@ -735,41 +732,24 @@
         function updateDataInBackground() {
             // Update prayer times
             fetchPrayerStatus();
-            
+
             // Update mosque info
             updateMosqueInfo();
-            
+
             // Update marquee text
             updateMarqueeText();
-            
+
             // Update slides
             updateSlides();
-            
+
             // Update Friday officials
             updateFridayOfficials();
-            
+
             // Update images
             updateFridayImages();
             updateIqomahImages();
-            
-            console.log('Data updated in background without page refresh');
-        }
 
-        function checkDayChange() {
-            const now = getCurrentTimeFromServer();
-            const currentDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-            const storedDate = localStorage.getItem('lastCheckedDate');
-            console.log('Checking day change...', currentDate, storedDate);
-            if (currentDate !== storedDate) {
-                clearAllAdzanStates();
-                localStorage.setItem('lastCheckedDate', currentDate);
-                
-                // Ganti location.reload() dengan background update
-                updateDataInBackground();
-                
-                // Update prayer times untuk hari baru
-                fetchPrayerTimes();
-            }
+            console.log('Data updated in background without page refresh');
         }
 
         function clearShuruqAlarmState() {
@@ -820,7 +800,7 @@
 
             if (scheduleMonth !== serverMonth || scheduleYear !== serverYear) {
                 console.log('Jadwal tidak sesuai dengan tanggal server, memperbarui data di background...');
-                
+
                 // Ganti location.reload() dengan background update
                 updateDataInBackground();
                 fetchPrayerTimes();
@@ -1589,29 +1569,32 @@
             if (window.slideUrls.length === 0) return;
 
             function updateSlide() {
-                if (window.slideUrls.length === 0) return;
+                if (!window.slideUrls || window.slideUrls.length === 0) return;
 
                 // Gunakan waktu server untuk sinkronisasi
                 const now = getCurrentTimeFromServer();
-
-                // Hitung durasi per slide (10 detik per slide)
                 const slideDuration = 10000; // 10 detik
-
-                // Hitung indeks slide berdasarkan waktu server
-                // Gunakan menit dan detik untuk menentukan indeks slide
-                // Ini memastikan semua device menampilkan slide yang sama pada waktu yang sama
                 const totalSeconds = (now.getMinutes() * 60) + now.getSeconds();
                 const totalSlideTime = slideDuration * window.slideUrls.length;
                 const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) % totalSlideTime;
                 const slideIndex = Math.floor(cyclePosition / slideDuration);
 
-                // Perbarui gambar dengan transisi mulus
-                $mosqueImageElement.css({
-                    'background-image': `url("${window.slideUrls[slideIndex]}")`,
-                    'background-size': 'cover',
-                    'background-position': 'center',
-                    'transition': 'background-image 0.5s ease-in-out'
-                });
+                // Cek apakah slide index berubah
+                if (window.currentSlideIndex !== slideIndex) {
+                    window.currentSlideIndex = slideIndex;
+
+                    // Preload image untuk menghindari loading delay
+                    const img = new Image();
+                    img.onload = function() {
+                        // Update background setelah image loaded
+                        $mosqueImageElement.css({
+                            'background-image': `url("${window.slideUrls[slideIndex]}")`,
+                            'background-size': 'cover',
+                            'background-position': 'center'
+                        });
+                    };
+                    img.src = window.slideUrls[slideIndex];
+                }
             }
 
             // Update slide pertama kali
@@ -1648,8 +1631,6 @@
         setInterval(handlePrayerTimes, 1000);
         updateDate();
         setInterval(updateDate, 60000);
-        checkDayChange();
-        setInterval(checkDayChange, 60000);
         updateMarqueeText();
 
         setTimeout(function() {
@@ -1759,18 +1740,12 @@
             $officialsElement.html(officialsHtml);
         }
 
-        // Jadwalkan pembaruan informasi masjid, marquee, slide, dan Friday images setiap 30 detik
-        setInterval(function() {
-            updateMosqueInfo(); // Tambahkan pembaruan informasi masjid
-            updateMarqueeText(); // Tambahkan pembaruan marquee
-            updateSlides(); // Tambahkan pembaruan slide
-            updateFridayOfficials(); // Tambahkan pembaruan informasi petugas Jumat
-            updateFridayImages(); // Tambahkan pembaruan gambar Friday
-            updateIqomahImages(); // Tambahkan pembaruan gambar Iqomah
-        }, 30000);
-
         // Perbarui waktu server setiap 60 detik
         fetchServerTime(); // Panggil sekali saat halaman dimuat untuk sinkronisasi awal
         setInterval(fetchServerTime, 60000); // Perbarui setiap 1 menit
+
+        // Update background data
+        updateDataInBackground();
+        setInterval(updateDataInBackground, 60000); // Perbarui setiap 1 menit
     });
 </script>

@@ -273,7 +273,7 @@ class Firdaus extends Component
      * @param string $currentTime Current time in HH:MM format
      * @return array|null Status information or null if no active prayer time
      */
-    private function calculateActivePrayerTimeStatus($currentTime)
+    private function calculateActivePrayerTimeStatus()
     {
         if (empty($this->prayerTimes)) {
             return null;
