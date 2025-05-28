@@ -174,7 +174,7 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.adzan');
 
-Route::get('/server-time', function () {
+Route::get('/api/server-time/', function () {
     return response()->json([
         'success' => true,
         'data' => [

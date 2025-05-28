@@ -57,14 +57,56 @@
     }
 
     $(document).ready(function() {
-        // Ambil waktu server dari input hidden
-        const serverTimestamp = parseInt($('#server-timestamp').val());
-        const pageLoadTimestamp = Date.now();
+        // Definisikan variabel global
+        let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
+        let pageLoadTimestamp = Date.now();
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
-        // Inisialisasi pembaruan informasi masjid
-        updateMosqueInfo();
+        // Fungsi untuk menyinkronkan waktu server
+        function syncServerTime() {
+            const startTime = Date.now();
+            $.ajax({
+                url: '/api/server-time',
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success && response.timestamp) {
+                        const endTime = Date.now();
+                        const latency = (endTime - startTime) / 2;
+                        serverTimestamp = parseInt(response.timestamp) + latency;
+                        pageLoadTimestamp = endTime;
+                        console.log('Waktu server diperbarui:', new Date(serverTimestamp)
+                            .toISOString());
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saat menyinkronkan waktu server:', error);
+                    console.warn('Menggunakan waktu lokal sebagai cadangan');
+                    serverTimestamp = Date.now();
+                    pageLoadTimestamp = Date.now();
+                }
+            });
+        }
+
+        // Fungsi untuk mendapatkan waktu server
+        function getCurrentTimeFromServer() {
+            if (!serverTimestamp || !pageLoadTimestamp) {
+                console.warn('serverTimestamp atau pageLoadTimestamp tidak tersedia, menggunakan waktu lokal');
+                return new Date();
+            }
+            const elapsed = Date.now() - pageLoadTimestamp;
+            return new Date(serverTimestamp + elapsed);
+        }
+
+        // Sinkronkan waktu server setiap 30 Detik
+        setInterval(() => {
+            console.log('[SYNC] Memanggil syncServerTime pada:', new Date().toLocaleTimeString(
+                'id-ID', {
+                    timeZone: 'Asia/Jakarta'
+                }));
+            syncServerTime();
+        }, 30000);
 
         // Get active prayer time status if available
         let activePrayerStatus = null;
