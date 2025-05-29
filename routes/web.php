@@ -166,7 +166,8 @@ Route::get('/api/adzan/{slug}', function ($slug) {
                     'adzan3' => $adzan->adzan3,
                     'adzan4' => $adzan->adzan4,
                     'adzan5' => $adzan->adzan5,
-                    'adzan6' => $adzan->adzan6
+                    'adzan6' => $adzan->adzan6,
+                    'adzan15' => $adzan->adzan15,
                 ]
             ]);
         }

@@ -981,6 +981,51 @@
             localStorage.removeItem('adzanImageSrc');
         }
 
+        function updateAdzanImages() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) {
+                console.error('Tidak dapat menentukan slug dari URL');
+                return;
+            }
+            console.log('Memperbarui gambar Adzan untuk slug:', slug);
+            $.ajax({
+                url: `/api/adzan/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Respons API adzan untuk Adzan15:', response);
+                    if (response.success) {
+                        // Simpan nilai lama untuk perbandingan
+                        const oldAdzan15 = $('#adzan15').val();
+
+                        // Update nilai baru
+                        $('#adzan15').val(response.data.adzan15);
+
+                        // Jika gambar sedang ditampilkan dan ada perubahan, perbarui gambar
+                        if ($('#adzanImageDisplay').is(':visible') && oldAdzan15 !== response.data
+                            .adzan15) {
+                            const $imageElement = $('#currentAdzanImage');
+                            // Transisi mulus dengan opacity
+                            $imageElement.css('opacity', '0');
+                            setTimeout(() => {
+                                $imageElement.attr('src', response.data.adzan15);
+                                $imageElement.css('opacity', '1');
+                                // Update localStorage juga
+                                adzanImageSrc = response.data.adzan15;
+                                localStorage.setItem('adzanImageSrc', adzanImageSrc);
+                            }, 250);
+                        }
+
+                        console.log('Gambar Adzan15 diperbarui');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saat mengambil data adzan untuk Adzan Images:', error, xhr
+                        .responseText);
+                }
+            });
+        }
+
         function displayAdzanImage(imageSrc, isRestored = false) {
             const $imageDisplay = $('#adzanImageDisplay');
             const $imageElement = $('#currentAdzanImage');
@@ -1637,6 +1682,7 @@
             updateFridayOfficials(); // Tambahkan pembaruan informasi petugas Jumat
             updateFridayImages(); // Tambahkan pembaruan gambar Friday
             updateIqomahImages(); // Tambahkan pembaruan gambar Iqomah
+            updateAdzanImages(); // Tambahkan pembaruan gambar Adzan
         }, 30000);
     });
 </script>

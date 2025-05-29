@@ -6,7 +6,8 @@
                     <li class="list-inline-item">
                         <span class="badge badge-lg bg-white shadow-sm rounded-3">
                             &copy; 2025
-                            <a wire:navigate href="{{ route('dashboard.index') }}" class="link-secondary">JWS</a>
+                            <a wire:navigate href="{{ route('dashboard.index') }}" class="link-secondary">JWS |
+                                Dikembangkan oleh Tim Programmer Diskominfo Kota Pekanbaru</a>
                         </span>
                     </li>
                 </ul>
