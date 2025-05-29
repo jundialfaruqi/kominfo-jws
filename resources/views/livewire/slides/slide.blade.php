@@ -71,16 +71,20 @@
 
                                             <div class="row g-2 mb-3">
                                                 <!-- Gambar Slide 1 -->
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 1</label>
                                                     <!-- Gambar Slide 1 -->
                                                     @if ($slide1)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $slide1->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $slide1->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_slide1)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_slide1) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_slide1) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="slide1" class="mt-2 text-center">
@@ -107,7 +111,7 @@
                                                             16:9 (Rekomendasi : 1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('slide1') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('slide1') is-invalid @enderror"
                                                         wire:model="slide1" accept="image/*">
                                                     @error('slide1')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -115,16 +119,20 @@
                                                 </div>
 
                                                 <!-- Gambar Slide 2 -->
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 2</label>
                                                     <!-- Gambar Slide 2 -->
                                                     @if ($slide2)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $slide2->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $slide2->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_slide2)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_slide2) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_slide2) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="slide2" class="mt-2 text-center">
@@ -151,7 +159,7 @@
                                                             16:9 (Rekomendasi : 1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('slide2') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('slide2') is-invalid @enderror"
                                                         wire:model="slide2" accept="image/*">
                                                     @error('slide2')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -159,16 +167,20 @@
                                                 </div>
 
                                                 <!-- Gambar Slide 3 -->
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 3</label>
                                                     <!-- Gambar Slide 3 -->
                                                     @if ($slide3)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $slide3->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $slide3->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_slide3)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_slide3) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_slide3) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="slide3" class="mt-2 text-center">
@@ -195,7 +207,7 @@
                                                             16:9 (Rekomendasi : 1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('slide3') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('slide3') is-invalid @enderror"
                                                         wire:model="slide3" accept="image/*">
                                                     @error('slide3')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -203,16 +215,20 @@
                                                 </div>
 
                                                 <!-- Gambar Slide 4 -->
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 4</label>
                                                     <!-- Gambar Slide 4 -->
                                                     @if ($slide4)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $slide4->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $slide4->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_slide4)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_slide4) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_slide4) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="slide4" class="mt-2 text-center">
@@ -239,7 +255,7 @@
                                                             16:9 (Rekomendasi : 1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('slide4') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('slide4') is-invalid @enderror"
                                                         wire:model="slide4" accept="image/*">
                                                     @error('slide4')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -247,16 +263,20 @@
                                                 </div>
 
                                                 <!-- Gambar Slide 5 -->
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 5</label>
                                                     <!-- Gambar Slide 5 -->
                                                     @if ($slide5)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $slide5->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $slide5->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_slide5)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_slide5) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_slide5) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="slide5" class="mt-2 text-center">
@@ -283,7 +303,7 @@
                                                             16:9 (Rekomendasi : 1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('slide5') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('slide5') is-invalid @enderror"
                                                         wire:model="slide5" accept="image/*">
                                                     @error('slide5')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -292,16 +312,20 @@
                                                 </div>
 
                                                 <!-- Gambar Slide 6 -->
-                                                <div class="col-md-6 mb-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 6</label>
                                                     <!-- Gambar Slide 6 -->
                                                     @if ($slide6)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $slide6->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $slide6->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_slide6)
-                                                        <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_slide6) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_slide6) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="slide6" class="mt-2 text-center">
@@ -328,7 +352,7 @@
                                                             16:9 (Rekomendasi : 1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('slide6') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('slide6') is-invalid @enderror"
                                                         wire:model="slide6" accept="image/*">
                                                     @error('slide6')
                                                         <div class="invalid-feedback">{{ $message }}</div>

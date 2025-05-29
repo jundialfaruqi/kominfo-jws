@@ -73,7 +73,7 @@
                                             @endif
                                             <div class="row g-2 mb-3">
                                                 <!-- Gambar Adzan 1 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slider 1</label>
                                                     <!-- Gambar Adzan 1 -->
                                                     @if ($adzan1)
@@ -111,7 +111,7 @@
                                                     @enderror
                                                 </div>
                                                 <!-- Gambar Adzan 2 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slider 2</label>
                                                     <!-- Gambar Adzan 2 -->
                                                     @if ($adzan2)
@@ -149,7 +149,7 @@
                                                     @enderror
                                                 </div>
                                                 <!-- Gambar Adzan 3 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slider 3</label>
                                                     <!-- Gambar Adzan 3 -->
                                                     @if ($adzan3)
@@ -187,7 +187,7 @@
                                                     @enderror
                                                 </div>
                                                 <!-- Gambar Adzan 4 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slider 4</label>
                                                     <!-- Gambar Adzan 4 -->
                                                     @if ($adzan4)
@@ -226,7 +226,7 @@
                                                     @enderror
                                                 </div>
                                                 <!-- Gambar Adzan 5 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slider 5</label>
                                                     <!-- Gambar Adzan 5 -->
                                                     @if ($adzan5)
@@ -265,7 +265,7 @@
                                                     @enderror
                                                 </div>
                                                 <!-- Gambar Adzan 6 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slider 6</label>
                                                     <!-- Gambar Adzan 6 -->
                                                     @if ($adzan6)
@@ -306,7 +306,7 @@
                                                 </div>
 
                                                 <!-- Gambar Adzan 15 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Setelah Iqomah</label>
                                                     <!-- Gambar Adzan 15 -->
                                                     @if ($adzan15)
