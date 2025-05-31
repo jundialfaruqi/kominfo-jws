@@ -747,9 +747,11 @@
                 localStorage.setItem('adzanStartTime', adzanStartTime);
                 localStorage.setItem('currentPrayerName', prayerName);
                 localStorage.setItem('currentPrayerTime', prayerTimeStr);
+                currentPrayerName = prayerName; // Pastikan variabel global diperbarui
+                currentPrayerTime = prayerTimeStr;
             }
 
-            const duration = 3 * 60;
+            const duration = 3 * 60; // Durasi adzan 3 menit
             let lastUpdateTime = getCurrentTimeFromServer().getTime();
             isAdzanPlaying = true;
 
@@ -761,9 +763,18 @@
                 if (timeLeft <= 0) {
                     $popup.css('display', 'none');
                     isAdzanPlaying = false;
-                    if (prayerName === "Jum'at") {
+                    if (prayerName === "Jum'at" && now.getDay() === 5) {
+                        // Setelah adzan Jum'at, mulai slider gambar #adzan7 hingga #adzan12
+                        updateFridayImages(); // Pastikan data terbaru
+                        startFridayImageSlider();
+                        // Tampilkan popup atau elemen untuk slider (misalnya, #fridayInfoPopup)
+                        const $fridayPopup = $('#fridayInfoPopup');
+                        if ($fridayPopup.length) {
+                            $fridayPopup.css('display', 'flex');
+                        }
                         clearAdzanState();
                     } else {
+                        // Untuk adzan lain, lanjutkan ke fase iqomah
                         showIqomahPopup(prayerTimeStr);
                     }
                     return;
@@ -990,7 +1001,7 @@
                 adzanImageEndTime && adzanImageSrc) {
                 console.log('Restoring Adzan final image');
                 displayAdzanImage(adzanImageSrc, true);
-            } else if (adzanImageEndTime && now >= adzanImageEndTime) {
+            } else {
                 clearAdzanImageState();
             }
         }
@@ -1145,7 +1156,7 @@
                 dataType: 'json',
                 success: function(response) {
                     console.log('Respons API adzan:', response);
-                    if (response.success) {
+                    if (response.success && response.data) {
                         // Simpan nilai sebelumnya untuk perbandingan
                         const previousAdzan = [];
                         for (let i = 7; i <= 12; i++) {
@@ -1153,16 +1164,18 @@
                         }
 
                         // Perbarui nilai input hidden untuk adzan
-                        $('#adzan7').val(response.data.adzan7);
-                        $('#adzan8').val(response.data.adzan8);
-                        $('#adzan9').val(response.data.adzan9);
-                        $('#adzan10').val(response.data.adzan10);
-                        $('#adzan11').val(response.data.adzan11);
-                        $('#adzan12').val(response.data.adzan12);
+                        const adzanKeys = ['adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11',
+                            'adzan12'
+                        ];
+                        adzanKeys.forEach(key => {
+                            if (response.data[key]) {
+                                $(`#${key}`).val(response.data[key]);
+                            }
+                        });
 
                         // Perbarui array fridayImages global
                         window.fridayImages = ['/images/other/doa-setelah-azan.png'];
-                        for (let i = 1; i <= 6; i++) {
+                        for (let i = 7; i <= 12; i++) {
                             const adzanValue = $(`#adzan${i}`).val();
                             if (adzanValue) {
                                 window.fridayImages.push(adzanValue);
@@ -1180,26 +1193,30 @@
         }
 
         function startFridayImageSlider() {
-            // Gunakan variabel global untuk fridayImages agar bisa diakses dari updateFridayImages()
-            window.fridayImages = ['/images/other/doa-setelah-azan.png'];
-            for (let i = 7; i <= 12; i++) {
-                const adzanElement = $(`#adzan${i}`);
-                if (adzanElement.val()) {
-                    window.fridayImages.push(adzanElement.val());
-                }
+            const $fridayImageElement = $('#currentFridayImage');
+            if (!$fridayImageElement.length) {
+                console.error('Elemen #currentFridayImage tidak ditemukan');
+                return;
             }
 
-            const $fridayImageElement = $('#currentFridayImage');
+            // Pastikan window.fridayImages sudah diisi
+            if (!window.fridayImages || window.fridayImages.length === 0) {
+                window.fridayImages = ['/images/other/doa-setelah-azan.png'];
+                for (let i = 7; i <= 12; i++) {
+                    const adzanElement = $(`#adzan${i}`);
+                    if (adzanElement.length && adzanElement.val()) {
+                        window.fridayImages.push(adzanElement.val());
+                    }
+                }
+            }
 
             if (!fridaySliderStartTime) {
                 fridaySliderStartTime = getCurrentTimeFromServer().getTime();
                 localStorage.setItem('fridaySliderStartTime', fridaySliderStartTime);
             }
 
-            // Variabel untuk melacak indeks gambar saat ini
             let lastIndex = -1;
 
-            // Fungsi untuk memperbarui gambar berdasarkan waktu server
             function updateFridayImage() {
                 if (!window.fridayImages || window.fridayImages.length === 0) return;
 
@@ -1208,11 +1225,8 @@
                 const elapsedSeconds = Math.floor(elapsedMs / 1000);
                 const currentIndex = Math.floor(elapsedSeconds / 10) % window.fridayImages.length;
 
-                // Hanya perbarui gambar jika indeks berubah
                 if (currentIndex !== lastIndex) {
                     lastIndex = currentIndex;
-
-                    // Transisi mulus dengan opacity
                     $fridayImageElement.css('opacity', '0');
                     setTimeout(() => {
                         $fridayImageElement.attr('src', window.fridayImages[currentIndex]);
@@ -1221,14 +1235,25 @@
                 }
             }
 
-            // Update gambar pertama kali
             updateFridayImage();
-
-            // Set interval untuk update gambar setiap 1 detik untuk sinkronisasi yang lebih baik
             if (fridayImageSliderInterval) {
                 clearInterval(fridayImageSliderInterval);
             }
             fridayImageSliderInterval = setInterval(updateFridayImage, 1000);
+
+            // Set durasi tampilan slider (misalnya, 10 menit, sesuai displayFridayInfoPopup)
+            const displayDuration = 600000; // 10 menit
+            setTimeout(() => {
+                const $fridayPopup = $('#fridayInfoPopup');
+                if ($fridayPopup.length) {
+                    $fridayPopup.css('display', 'none');
+                }
+                clearFridayInfoState();
+                if (fridayImageSliderInterval) {
+                    clearInterval(fridayImageSliderInterval);
+                    fridayImageSliderInterval = null;
+                }
+            }, displayDuration);
         }
 
         function displayFridayInfoPopup(data, isRestored = false) {
@@ -1245,15 +1270,11 @@
                 $popup.css('display', 'flex');
             }
 
-            // Mulai slider gambar jika belum dimulai
-            if (!fridayImageSliderInterval) {
-                startFridayImageSlider();
-            }
-
+            // Jika bukan restore, simpan state
             if (!isRestored) {
                 const now = getCurrentTimeFromServer().getTime();
                 fridayInfoStartTime = now;
-                fridayInfoEndTime = now + 600000;
+                fridayInfoEndTime = now + 600000; // 10 menit
                 localStorage.setItem('fridayInfoStartTime', fridayInfoStartTime);
                 localStorage.setItem('fridayInfoEndTime', fridayInfoEndTime);
                 localStorage.setItem('fridayInfoData', JSON.stringify(data));
@@ -1299,6 +1320,7 @@
                         `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
 
                     if (jumatTimeValue === currentTimeFormatted && !isAdzanPlaying && !jumatAdzanShown) {
+                        updateFridayImages(); // Pastikan data gambar terbaru
                         showAdzanPopup('Jum\'at', jumatTimeValue);
                         jumatAdzanShown = true;
                         localStorage.setItem('jumatAdzanShown', 'true');

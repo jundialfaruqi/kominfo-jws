@@ -206,7 +206,7 @@
             @endif
         </div>
         <div class="friday-image">
-            <img id="currentFridayImage" src="{{ asset('images/other/matikan-hp.jpg') }}" alt="Friday Image">
+            <img id="currentFridayImage" src="" alt="Friday Image">
         </div>
     </div>
 
