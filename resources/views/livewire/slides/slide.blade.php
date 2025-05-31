@@ -43,8 +43,8 @@
 
                         <!-- Form untuk tambah/edit slide -->
                         @if ($showForm)
-                            <div class="card-body">
-                                <form wire:submit.prevent="save">
+                            <form wire:submit.prevent="save">
+                                <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             @if (Auth::user()->role === 'Admin')
@@ -56,7 +56,8 @@
                                                         <select
                                                             class="form-select @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option value="">Pilih Admin Masjid</option>
+                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
+                                                            </option>
                                                             @foreach ($users as $user)
                                                                 <option value="{{ $user->id }}">{{ $user->name }}
                                                                 </option>
@@ -361,7 +362,9 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
+                                    style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
                                         @if (Auth::user()->role === 'Admin')
                                             <button type="button" wire:click="cancelForm"
@@ -411,8 +414,8 @@
                                             </span>
                                         </button>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         @endif
 
                         @if (Auth::user()->role === 'Admin')

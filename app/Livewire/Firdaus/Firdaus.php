@@ -65,7 +65,7 @@ class Firdaus extends Component
                 $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
 
                 // Untuk menguji waktu Tambah 1 jam 5 menit
-                // $serverDateTime->modify('+0 hour 31 minutes');
+                // $serverDateTime->modify('+1 hour 50 minutes');
 
                 // Untuk menguji waktu Tambah hari
                 // $serverDateTime->modify('next Friday 12:13:50');
@@ -482,6 +482,12 @@ class Firdaus extends Component
                 'adzan5' => $this->adzan->adzan5,
                 'adzan6' => $this->adzan->adzan6,
                 'adzan15' => $this->adzan->adzan15,
+                'adzan7' => $this->adzan->adzan7,
+                'adzan8' => $this->adzan->adzan8,
+                'adzan9' => $this->adzan->adzan9,
+                'adzan10' => $this->adzan->adzan10,
+                'adzan11' => $this->adzan->adzan11,
+                'adzan12' => $this->adzan->adzan12,
             ] : [],
             'petugasData' => $this->petugas ? [
                 'khatib' => $this->petugas->khatib,

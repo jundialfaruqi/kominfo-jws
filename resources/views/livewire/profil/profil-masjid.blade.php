@@ -40,8 +40,8 @@
 
                         <!-- Form untuk Tambah/Edit Profil Masjid -->
                         @if ($showForm)
-                            <div class="card-body">
-                                <form wire:submit.prevent="save">
+                            <form wire:submit.prevent="save">
+                                <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <div class="row g-2 mb-3">
@@ -50,7 +50,7 @@
                                                 </div>
                                                 <div class="col-md-10">
                                                     <input type="text"
-                                                        class="form-control @error('name') is-invalid @enderror"
+                                                        class="form-control rounded-3 @error('name') is-invalid @enderror"
                                                         wire:model="name" placeholder="Masukkan nama masjid">
                                                     @error('name')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -65,9 +65,10 @@
                                                     </div>
                                                     <div class="col-md-10">
                                                         <select
-                                                            class="form-select @error('userId') is-invalid @enderror"
+                                                            class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option value="">Pilih Admin Masjid</option>
+                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
+                                                            </option>
                                                             @foreach ($users as $user)
                                                                 <option value="{{ $user->id }}">{{ $user->name }}
                                                                 </option>
@@ -86,7 +87,7 @@
                                                 </div>
                                                 <div class="col-md-10">
                                                     <input type="text"
-                                                        class="form-control @error('phone') is-invalid @enderror"
+                                                        class="form-control rounded-3 @error('phone') is-invalid @enderror"
                                                         wire:model="phone" placeholder="Masukkan nomor HP">
                                                     @error('phone')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -100,7 +101,7 @@
                                                     <label class="form-label required">Alamat Masjid</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('address') is-invalid @enderror" wire:model="address" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('address') is-invalid @enderror" wire:model="address" rows="3"
                                                         placeholder="Masukkan alamat masjid"></textarea>
                                                     @error('address')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -114,13 +115,13 @@
                                                     <label class="form-label">Logo Masjid</label>
                                                     <!-- Photo logo masjid-->
                                                     @if ($logo_masjid)
-                                                        <div class="card p-5">
+                                                        <div class="card p-5 rounded-3">
                                                             <div class="img-responsive img-responsive-21x9"
                                                                 style="background-image: url('{{ $logo_masjid->temporaryUrl() }}'); background-size: contain; background-position: center;">
                                                             </div>
                                                         </div>
                                                     @elseif($temp_logo)
-                                                        <div class="card p-5">
+                                                        <div class="card p-5 rounded-3">
                                                             <div class="img-responsive img-responsive-21x9"
                                                                 style="background-image: url('{{ asset($temp_logo) }}'); background-size: contain; background-position: center;">
                                                             </div>
@@ -143,7 +144,7 @@
                                                             1MB</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('logo_masjid') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-3 @error('logo_masjid') is-invalid @enderror"
                                                         wire:model="logo_masjid" accept="image/*">
                                                     @error('logo_masjid')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -153,13 +154,13 @@
                                                     <label class="form-label">Logo Pemerintah</label>
                                                     <!-- Photo logo pemerintah -->
                                                     @if ($logo_pemerintah)
-                                                        <div class="card p-5">
+                                                        <div class="card p-5 rounded-3">
                                                             <div class="img-responsive img-responsive-21x9 card-img-top"
                                                                 style="background-image: url('{{ $logo_pemerintah->temporaryUrl() }}'); background-size: contain; background-position: center;">
                                                             </div>
                                                         </div>
                                                     @elseif($temp_logo_pemerintah)
-                                                        <div class="card p-5">
+                                                        <div class="card p-5 rounded-3">
                                                             <div class="img-responsive img-responsive-21x9 card-img-top"
                                                                 style="background-image: url('{{ asset($temp_logo_pemerintah) }}'); background-size: contain; background-position: center;">
                                                             </div>
@@ -182,7 +183,7 @@
                                                             1MB</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('logo_pemerintah') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-3 @error('logo_pemerintah') is-invalid @enderror"
                                                         wire:model="logo_pemerintah" accept="image/*">
                                                     @error('logo_pemerintah')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -191,7 +192,9 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
+                                    style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
                                         @if (Auth::user()->role === 'Admin')
                                             <button type="button" wire:click="cancelForm"
@@ -241,8 +244,8 @@
                                             </span>
                                         </button>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         @endif
 
                         @if (Auth::user()->role === 'Admin')

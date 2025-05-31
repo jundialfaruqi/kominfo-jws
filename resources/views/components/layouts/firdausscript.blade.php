@@ -120,10 +120,10 @@
         }
 
         // Fungsi untuk ambil waktu sekarang berdasarkan waktu server
-        function getCurrentTimeFromServer() {
-            const elapsed = Date.now() - pageLoadTimestamp;
-            return new Date(serverTimestamp + elapsed);
-        }
+        // function getCurrentTimeFromServer() {
+        //     const elapsed = Date.now() - pageLoadTimestamp;
+        //     return new Date(serverTimestamp + elapsed);
+        // }
 
         // Mendapatkan jadwal sholat secara dinamis jika diperlukan
         async function fetchPrayerTimes() {
@@ -637,7 +637,8 @@
 
         function checkDayChange() {
             const now = getCurrentTimeFromServer();
-            const currentDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            const currentDate =
+                `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             const storedDate = localStorage.getItem('lastCheckedDate');
             console.log('Checking day change...', currentDate, storedDate);
             if (currentDate !== storedDate) {
@@ -646,6 +647,26 @@
                 location.reload();
             }
         }
+
+        function scheduleMidnightCheck() {
+            const now = getCurrentTimeFromServer();
+            // Menentukan waktu tengah malam berikutnya (00:00 hari berikutnya)
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0); // Set ke 00:00 hari berikutnya
+            const timeUntilMidnight = midnight - now; // Waktu hingga tengah malam (dalam milidetik)
+
+            // Menjadwalkan checkDayChange pada tengah malam
+            setTimeout(() => {
+                checkDayChange();
+                // Jadwalkan ulang untuk tengah malam berikutnya
+                scheduleMidnightCheck();
+            }, timeUntilMidnight);
+        }
+
+        // Panggil checkDayChange saat halaman dimuat
+        checkDayChange();
+        // Jadwalkan pemeriksaan pertama untuk tengah malam
+        scheduleMidnightCheck();
 
         function clearShuruqAlarmState() {
             isShuruqAlarmPlaying = false;
@@ -1130,12 +1151,12 @@
                         }
 
                         // Perbarui nilai input hidden untuk adzan
-                        $('#adzan1').val(response.data.adzan1);
-                        $('#adzan2').val(response.data.adzan2);
-                        $('#adzan3').val(response.data.adzan3);
-                        $('#adzan4').val(response.data.adzan4);
-                        $('#adzan5').val(response.data.adzan5);
-                        $('#adzan6').val(response.data.adzan6);
+                        $('#adzan7').val(response.data.adzan7);
+                        $('#adzan8').val(response.data.adzan8);
+                        $('#adzan9').val(response.data.adzan9);
+                        $('#adzan10').val(response.data.adzan10);
+                        $('#adzan11').val(response.data.adzan11);
+                        $('#adzan12').val(response.data.adzan12);
 
                         // Perbarui array fridayImages global
                         window.fridayImages = ['/images/other/doa-setelah-azan.png'];
@@ -1441,7 +1462,7 @@
                 return;
             }
 
-            console.log('Memperbarui slide untuk slug:', slug);
+            console.log('Memeriksa update slide untuk slug:', slug);
 
             $.ajax({
                 url: `/api/slides/${slug}`,
@@ -1460,26 +1481,42 @@
                             $('#slide6').val() || ''
                         ];
 
-                        // Perbarui nilai input hidden untuk slide
-                        $('#slide1').val(response.data.slide1);
-                        $('#slide2').val(response.data.slide2);
-                        $('#slide3').val(response.data.slide3);
-                        $('#slide4').val(response.data.slide4);
-                        $('#slide5').val(response.data.slide5);
-                        $('#slide6').val(response.data.slide6);
+                        // Ambil data slide baru dari response
+                        const newSlides = [
+                            response.data.slide1 || '',
+                            response.data.slide2 || '',
+                            response.data.slide3 || '',
+                            response.data.slide4 || '',
+                            response.data.slide5 || '',
+                            response.data.slide6 || ''
+                        ];
 
-                        // Perbarui slideUrls global jika ada
-                        if (window.slideUrls) {
-                            window.slideUrls = [
-                                response.data.slide1 || '',
-                                response.data.slide2 || '',
-                                response.data.slide3 || '',
-                                response.data.slide4 || '',
-                                response.data.slide5 || '',
-                                response.data.slide6 || ''
-                            ].filter(url => url.trim() !== '');
+                        // Cek apakah ada perubahan dengan membandingkan array
+                        const hasChanges = !previousSlides.every((slide, index) => slide ===
+                            newSlides[index]);
 
-                            console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
+                        if (hasChanges) {
+                            console.log('Perubahan terdeteksi, memperbarui slide...');
+
+                            // Perbarui nilai input hidden untuk slide
+                            $('#slide1').val(newSlides[0]);
+                            $('#slide2').val(newSlides[1]);
+                            $('#slide3').val(newSlides[2]);
+                            $('#slide4').val(newSlides[3]);
+                            $('#slide5').val(newSlides[4]);
+                            $('#slide6').val(newSlides[5]);
+
+                            // Perbarui slideUrls global jika ada
+                            if (window.slideUrls) {
+                                window.slideUrls = newSlides.filter(url => url.trim() !== '');
+                                console.log('Slide diperbarui, jumlah slide:', window.slideUrls
+                                    .length);
+                            }
+
+                            // Opsional: Trigger event atau callback setelah update
+                            $(document).trigger('slidesUpdated', [newSlides]);
+                        } else {
+                            console.log('Tidak ada perubahan pada slide, update diabaikan');
                         }
                     }
                 },
@@ -1563,8 +1600,8 @@
         setInterval(handlePrayerTimes, 1000);
         updateDate();
         setInterval(updateDate, 60000);
-        checkDayChange();
-        setInterval(checkDayChange, 60000);
+        // checkDayChange();
+        // setInterval(checkDayChange, 60000);
         updateMarqueeText();
 
         setTimeout(function() {

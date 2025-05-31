@@ -2261,7 +2261,7 @@ body {
   }
 
   .logo {
-    height: 95px;
+    height: 93px;
     width: auto;
     margin-left: 8px;
     margin-top: 15px;
@@ -2398,10 +2398,348 @@ body {
   }
 }
 
-/* Mobile (320x480) */
-@media (max-width: 480px) {
+/* tablet 900 - 1023 */
+@media (min-width: 900px) and (max-width: 1023px) {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Poppins", sans-serif;
+    background-color: #000;
+    color: white;
+    overflow: auto;
+  }
+
+  .container {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    grid-template-areas:
+      "right-content"
+      "footer";
+    height: 100vh;
+    width: 100vw;
+    border: 10px solid #d4af37;
+    background-color: #004080;
+    overflow: hidden;
+  }
+
+  .prayer-times {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 32vw;
+    height: 100%;
+    z-index: 10;
+    background-color: rgb(0, 64, 128);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
+    border-radius: 42%;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
+    padding-right: 0px;
+    overflow: hidden;
+  }
+
+  .prayer-time {
+    display: flex;
+    align-items: center;
+    padding-right: 45px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prayer-times .prayer-time:last-child {
+    border-bottom: none;
+  }
+
+  .prayer-icon {
+    margin-right: 15px;
+    color: white;
+    width: 28px;
+    height: 28px;
+  }
+
+  .prayer-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .prayer-name {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+
+  .prayer-time-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: white;
+  }
+
+  .prayer-time.active {
+    background-color: rgba(0, 51, 102, 1);
+  }
+
+  .prayer-time.active .prayer-name,
+  .prayer-time.active .prayer-time-value {
+    color: #ff0000;
+  }
+
+  .prayer-time.active .prayer-icon {
+    color: #ff0000;
+  }
+
+  .prayer-time.next-prayer .prayer-name,
+  .prayer-time.next-prayer .prayer-time-value {
+    color: #ffeb3b;
+  }
+
+  .prayer-time.next-prayer {
+    background-color: rgba(0, 51, 102, 0.6);
+  }
+
+  .prayer-time.next-prayer .prayer-icon {
+    color: #ffeb3b;
+  }
+
+  .floating-clock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-130%, -50%);
+    z-index: 20;
+    background-color: transparent;
+  }
+
+  .clock-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .clock {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background-color: #003366;
+    box-shadow: 4px 8px 25px rgba(0, 0, 0, 1);
+    overflow: hidden;
+  }
+
+  .clock canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 4px;
+  }
+
+  #analogClock {
+    width: 200px !important;
+    height: 200px !important;
+  }
+
+  .clock-text {
+    position: absolute;
+    bottom: 30%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: white;
+    font-weight: 500;
+    z-index: 2;
+  }
+
+  .right-content {
+    grid-area: right-content;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to bottom, #4a6fa5, #004080);
+    margin-left: 0;
+  }
+
+  .mosque-info {
+    padding: 12px;
+    padding-top: 3px;
+    padding-right: 15px;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 150px;
+  }
+
+  .logo-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 1.5px;
+    margin-right: 0;
+  }
+
   .logo {
-    display: none;
+    height: 93px;
+    width: auto;
+    margin-left: 8px;
+    margin-top: 15px;
+    object-fit: contain;
+  }
+
+  .mosque-text {
+    text-align: end;
+  }
+
+  .mosque-info h1 {
+    font-size: 1.5rem;
+    margin-bottom: 0.8px;
+    margin-top: 4px;
+    text-shadow: 1.5px 1.5px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .mosque-name-highlight {
+    color: #ffeb3b;
+  }
+
+  .mosque-address {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .date-info {
+    background-color: #003366;
+    padding: 8px 15px;
+    margin-left: 0px;
+  }
+
+  .date-info ul {
+    list-style: none;
+  }
+
+  .date-item {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    justify-content: flex-end;
+  }
+
+  .day-name {
+    font-weight: 600;
+    color: #ffeb3b;
+    margin-right: 4px;
+  }
+
+  .mosque-image {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    margin-left: 0px;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
+  }
+
+  .countdown-timer {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 102, 204, 0.7);
+    padding: 8px 15px;
+    border-radius: 25px;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .countdown-icon {
+    margin-right: 8px;
+    margin-top: 4px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .countdown-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #countdown-value {
+    font-family: monospace;
+    font-size: 1.8rem;
+    font-weight: 1000;
+    min-width: 8ch;
+    display: inline-block;
+    text-align: right;
+  }
+
+  .footer-message {
+    grid-area: footer;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    text-align: center;
+    font-size: 1.5rem;
+    overflow: hidden;
+    height: 55px;
+    z-index: 5;
+    position: relative;
+  }
+
+  .scrolling-text {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scrollText 60s linear infinite;
+    padding-left: 100%;
+    margin-left: 281px;
+    will-change: transform;
+  }
+
+  @keyframes scrollText {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .scrolling-text p {
+    display: inline-block;
+    margin: 0;
+    color: #ffeb3b;
+  }
+
+  .scrolling-text p span.separator {
+    display: inline-block;
+    margin: 0 9px;
+    color: white;
+  }
+}
+
+/* Mobile (768) */
+@media (max-width: 768px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    border: 10px solid #d4af37;
   }
 
   .prayer-times {
@@ -2413,6 +2751,7 @@ body {
     padding-right: 0;
     padding-left: 0;
     order: 3;
+    overflow: visible;
   }
 
   .prayer-time {
@@ -2428,6 +2767,13 @@ body {
     font-size: 1.2rem;
   }
 
+  .prayer-icon {
+    margin-right: 15px;
+    color: white;
+    width: 20px;
+    height: 20px;
+  }
+
   .mosque-info,
   .date-info,
   .mosque-image {
@@ -2435,14 +2781,20 @@ body {
     text-align: center;
   }
 
+  .logo {
+    display: none;
+  }
+
   .mosque-info h1 {
     font-size: 1rem;
     order: 1;
+    text-align: center;
   }
 
   .mosque-address {
     font-size: 0.5rem;
     order: 2;
+    text-align: center;
   }
 
   .date-info {
@@ -2455,12 +2807,119 @@ body {
     justify-content: center;
   }
 
+  .mosque-image {
+    height: 250px;
+    object-fit: contain;
+    aspect-ratio: 16 / 9;
+    /* Sesuaikan rasio */
+    /* atau lebih besar dari 10px */
+  }
+
+  .countdown-timer {
+    margin-top: 150px;
+    /* agar makin terpisah */
+    position: static;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: fit-content;
+  }
+
+  .countdown-text {
+    font-size: 0.6rem;
+  }
+
+  #countdown-value {
+    min-width: 1ch;
+    font-size: 0.6rem;
+  }
+
+  .countdown-icon {
+    display: none;
+  }
+
+  .floating-clock {
+    position: absolute;
+    left: -9999px;
+  }
+
+  .footer-message {
+    display: none;
+  }
+}
+
+/* Mobile (480) */
+@media (max-width: 480px) {
   .container {
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
-    min-height: 100vh;
-    padding: 10px;
+    overflow: auto;
+    border: 10px solid #d4af37;
+  }
+
+  .prayer-times {
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-radius: 0;
+    padding-right: 0;
+    padding-left: 0;
+    order: 3;
+    overflow: visible;
+  }
+
+  .prayer-time {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+
+  .prayer-name {
+    font-size: 0.7rem;
+  }
+
+  .prayer-time-value {
+    font-size: 1.2rem;
+  }
+
+  .prayer-icon {
+    margin-right: 15px;
+    color: white;
+    width: 20px;
+    height: 20px;
+  }
+
+  .mosque-info,
+  .date-info,
+  .mosque-image {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .mosque-info h1 {
+    font-size: 1rem;
+    order: 1;
+    text-align: center;
+  }
+
+  .mosque-address {
+    font-size: 0.5rem;
+    order: 2;
+    text-align: center;
+  }
+
+  .date-info {
+    text-align: center;
+    order: 2;
+  }
+
+  .date-item {
+    font-size: 0.6rem;
+    justify-content: center;
   }
 
   .mosque-image {
