@@ -386,7 +386,7 @@ body {
 
 /* Responsive Design */
 
-/* 4K Ultra HD (3840x2160) */
+/* 4K Ultra HD (3840x2160) sudah fix (3840 x 2160) */
 @media (min-width: 3840px) and (min-height: 2160px) {
   * {
     margin: 0;
@@ -420,7 +420,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 28vw;
+    width: 29vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -453,10 +453,11 @@ body {
   }
 
   .prayer-icon {
-    margin-right: 40px;
+    margin-right: 70px;
+    margin-left: 50px;
     color: white;
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
   }
 
   .prayer-info {
@@ -466,7 +467,7 @@ body {
   }
 
   .prayer-name {
-    font-size: 2.8rem;
+    font-size: 5rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
@@ -474,9 +475,9 @@ body {
   }
 
   .prayer-time-value {
-    font-size: 5.5rem;
+    font-size: 8.5rem;
     font-weight: 700;
-    letter-spacing: 5px;
+    letter-spacing: 8px;
     color: white;
   }
 
@@ -510,7 +511,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-150%, -50%);
+    transform: translate(-165%, -50%);
     z-index: 20;
     background-color: transparent;
   }
@@ -540,8 +541,8 @@ body {
   }
 
   #analogClock {
-    width: 550px !important;
-    height: 550px !important;
+    width: 720px !important;
+    height: 720px !important;
   }
 
   .clock-text {
@@ -584,7 +585,7 @@ body {
   }
 
   .logo {
-    height: 150px;
+    height: 270px;
     width: auto;
     margin-left: 20px;
     margin-top: 40px;
@@ -596,7 +597,7 @@ body {
   }
 
   .mosque-info h1 {
-    font-size: 4.5rem;
+    font-size: 7rem;
     margin-bottom: 2px;
     margin-top: 10px;
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
@@ -607,7 +608,7 @@ body {
   }
 
   .mosque-address {
-    font-size: 2.2rem;
+    font-size: 3.3rem;
     color: rgba(255, 255, 255, 0.8);
   }
 
@@ -639,7 +640,7 @@ body {
     background-size: cover;
     background-position: center;
     position: relative;
-    margin-left: 634px;
+    margin-left: 820px;
     transition: background-image 0.5s ease-in-out;
     will-change: background-image;
   }
@@ -721,7 +722,7 @@ body {
   }
 }
 
-/* 2K QHD (2560x1440) */
+/* 2K QHD (2560x1440) sudah fix di layar (2560 x 1440) */
 @media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
   * {
     margin: 0;
@@ -788,10 +789,11 @@ body {
   }
 
   .prayer-icon {
-    margin-right: 30px;
+    margin-right: 50px;
+    margin-left: 20px;
     color: white;
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
   }
 
   .prayer-info {
@@ -801,7 +803,7 @@ body {
   }
 
   .prayer-name {
-    font-size: 2.2rem;
+    font-size: 2.6rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
@@ -809,7 +811,7 @@ body {
   }
 
   .prayer-time-value {
-    font-size: 4.5rem;
+    font-size: 5.8rem;
     font-weight: 700;
     letter-spacing: 4px;
     color: white;
@@ -845,7 +847,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-150%, -50%);
+    transform: translate(-170%, -50%);
     z-index: 20;
     background-color: transparent;
   }
@@ -875,8 +877,8 @@ body {
   }
 
   #analogClock {
-    width: 430px !important;
-    height: 430px !important;
+    width: 480px !important;
+    height: 480px !important;
   }
 
   .clock-text {
@@ -919,7 +921,7 @@ body {
   }
 
   .logo {
-    height: 120px;
+    height: 175px;
     width: auto;
     margin-left: 15px;
     margin-top: 30px;
@@ -931,7 +933,7 @@ body {
   }
 
   .mosque-info h1 {
-    font-size: 3.5rem;
+    font-size: 4.5rem;
     margin-bottom: 1.5px;
     margin-top: 7px;
     text-shadow: 2.5px 2.5px 5px rgba(0, 0, 0, 0.5);
@@ -942,7 +944,7 @@ body {
   }
 
   .mosque-address {
-    font-size: 1.8rem;
+    font-size: 2.2rem;
     color: rgba(255, 255, 255, 0.8);
   }
 
@@ -1056,7 +1058,7 @@ body {
   }
 }
 
-/* Full HD (1920x1080) (sudah fix di layar 1920x1200) */
+/* Full HD (1920x1080) (sudah fix di layar 1920 x 1200) */
 @media (min-width: 1920px) and (max-width: 2559px) and (min-height: 1080px) {
   * {
     margin: 0;
@@ -1391,7 +1393,7 @@ body {
   }
 }
 
-/* HD (1600x900) */
+/* HD (1600x900) sudah fix (1600 x 900) */
 @media (min-width: 1600px) and (max-width: 1919px) and (min-height: 900px) {
   * {
     margin: 0;
@@ -1515,7 +1517,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-150%, -50%);
+    transform: translate(-168%, -50%);
     z-index: 20;
     background-color: transparent;
   }
@@ -1529,8 +1531,8 @@ body {
 
   .clock {
     position: relative;
-    width: 380px;
-    height: 380px;
+    width: 350px;
+    height: 350px;
     border-radius: 50%;
     background-color: #003366;
     box-shadow: 5px 11px 32px rgba(0, 0, 0, 1);
@@ -1545,8 +1547,8 @@ body {
   }
 
   #analogClock {
-    width: 330px !important;
-    height: 330px !important;
+    width: 300px !important;
+    height: 300px !important;
   }
 
   .clock-text {
@@ -1589,7 +1591,7 @@ body {
   }
 
   .logo {
-    height: 90px;
+    height: 100px;
     width: auto;
     margin-left: 11px;
     margin-top: 22px;
@@ -1726,7 +1728,7 @@ body {
   }
 }
 
-/* Laptop (1366x768) - Referensi yang sudah baik (Sudah FIX di 1536x960) */
+/* Laptop (1366x768) - Referensi yang sudah baik (Sudah FIX di 1536 x 960) */
 @media (min-width: 1366px) and (max-width: 1599px) and (min-height: 768px) {
   * {
     margin: 0;
@@ -2061,7 +2063,7 @@ body {
   }
 }
 
-/* Tablet Landscape (1024x768) */
+/* Tablet Landscape (1024 x 768) (sudah fix 1024 x 768) */
 @media (min-width: 1024px) and (max-width: 1365px) and (min-height: 768px) {
   * {
     margin: 0;
@@ -2095,7 +2097,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 30vw;
+    width: 32vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -2141,7 +2143,7 @@ body {
   }
 
   .prayer-name {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
@@ -2149,7 +2151,7 @@ body {
   }
 
   .prayer-time-value {
-    font-size: 2.3rem;
+    font-size: 2.7rem;
     font-weight: 700;
     letter-spacing: 2px;
     color: white;
@@ -2185,7 +2187,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-130%, -50%);
+    transform: translate(-123%, -50%);
     z-index: 20;
     background-color: transparent;
   }
@@ -2215,8 +2217,8 @@ body {
   }
 
   #analogClock {
-    width: 240px !important;
-    height: 240px !important;
+    width: 255px !important;
+    height: 255px !important;
   }
 
   .clock-text {
@@ -2259,7 +2261,7 @@ body {
   }
 
   .logo {
-    height: 60px;
+    height: 95px;
     width: auto;
     margin-left: 8px;
     margin-top: 15px;
@@ -2396,9 +2398,10 @@ body {
   }
 }
 
+/* Mobile (320x480) */
 @media (max-width: 480px) {
   .logo {
-    height: 30px;
+    display: none;
   }
 
   .prayer-times {
