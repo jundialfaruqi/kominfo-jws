@@ -286,8 +286,13 @@ class ProfilMasjid extends Component
             $profil->address = $this->address;
             $profil->phone   = $this->phone;
 
-            // Generate slug from name
-            $profil->slug = $this->generateSlug($this->name, $this->isEdit ? $this->profileId : null);
+            // Generate slug saat pembuatan dan pembaruan
+            // $profil->slug = $this->generateSlug($this->name, $this->isEdit ? $this->profileId : null);
+
+            // Jika edit, tidak perlu generate slug
+            if (!$this->isEdit) {
+                $profil->slug = $this->generateSlug($this->name);
+            }
 
             // Handle logo masjid upload
             if ($this->logo_masjid) {
