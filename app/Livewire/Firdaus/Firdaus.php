@@ -68,7 +68,7 @@ class Firdaus extends Component
                 // $serverDateTime->modify('+1 hour 50 minutes');
 
                 // Untuk menguji waktu Tambah hari
-                // $serverDateTime->modify('next Friday 12:13:50');
+                // $serverDateTime->modify('next Friday 12:14:41');
 
                 // Gunakan timestamp UTC untuk konsistensi dengan JavaScript
                 $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;

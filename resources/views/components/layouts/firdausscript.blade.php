@@ -637,6 +637,8 @@
 
         function checkDayChange() {
             const now = getCurrentTimeFromServer();
+            // const currentDate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+            // Ini memastikan format seperti 2025-05-01 alih-alih 2025-5-1.
             const currentDate =
                 `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             const storedDate = localStorage.getItem('lastCheckedDate');
@@ -1146,7 +1148,7 @@
                     if (response.success) {
                         // Simpan nilai sebelumnya untuk perbandingan
                         const previousAdzan = [];
-                        for (let i = 1; i <= 6; i++) {
+                        for (let i = 7; i <= 12; i++) {
                             previousAdzan.push($(`#adzan${i}`).val() || '');
                         }
 
@@ -1180,7 +1182,7 @@
         function startFridayImageSlider() {
             // Gunakan variabel global untuk fridayImages agar bisa diakses dari updateFridayImages()
             window.fridayImages = ['/images/other/doa-setelah-azan.png'];
-            for (let i = 1; i <= 6; i++) {
+            for (let i = 7; i <= 12; i++) {
                 const adzanElement = $(`#adzan${i}`);
                 if (adzanElement.val()) {
                     window.fridayImages.push(adzanElement.val());
