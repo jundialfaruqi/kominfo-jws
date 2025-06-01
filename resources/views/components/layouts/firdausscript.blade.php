@@ -1060,9 +1060,18 @@
             });
         }
 
-        function displayAdzanImage(imageSrc, isRestored = false) {
+        function displayAdzanImage(imageSrc, isRestored = false, duration = 60000) {
             const $imageDisplay = $('#adzanImageDisplay');
             const $imageElement = $('#currentAdzanImage');
+
+            if (!$imageDisplay.length || !$imageElement.length) {
+                console.error('Elemen #adzanImageDisplay atau #currentAdzanImage tidak ditemukan');
+                return;
+            }
+
+            if (!isRestored) {
+                clearAdzanImageState();
+            }
 
             $imageElement.attr('src', imageSrc);
             $imageDisplay.css('display', 'flex');
@@ -1070,7 +1079,7 @@
             if (!isRestored) {
                 const now = getCurrentTimeFromServer().getTime();
                 adzanImageStartTime = now;
-                adzanImageEndTime = now + 60000;
+                adzanImageEndTime = now + duration;
                 adzanImageSrc = imageSrc;
 
                 localStorage.setItem('adzanImageStartTime', adzanImageStartTime);
@@ -1090,17 +1099,28 @@
             }
         }
 
-        function showFinalAdzanImage() {
+        function showFinalAdzanImage(duration = 60000) {
+            if (currentPrayerName === "Jum'at" && getCurrentTimeFromServer().getDay() === 5) {
+                console.log('Tidak menampilkan final adzan image untuk adzan Jum\'at');
+                return;
+            }
+
+            // Cek apakah gambar final masih aktif
             if (adzanImageStartTime && adzanImageEndTime) {
                 const currentTime = getCurrentTimeFromServer().getTime();
                 if (currentTime < adzanImageEndTime) {
+                    console.log('Gambar final masih aktif, menunggu selesai');
                     return;
                 }
             }
 
             const $adzan15 = $('#adzan15');
-            if ($adzan15.val()) {
-                displayAdzanImage($adzan15.val());
+            if ($adzan15.length && $adzan15.val()) {
+                displayAdzanImage($adzan15.val(), false, duration);
+            } else {
+                console.warn(
+                    'Elemen #adzan15 tidak ditemukan atau nilainya kosong, menggunakan gambar default');
+                displayAdzanImage('/images/other/doa-setelah-azan.png', false, duration);
             }
         }
 
