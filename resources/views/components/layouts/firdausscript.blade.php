@@ -64,12 +64,13 @@
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
         // Fungsi untuk menyinkronkan waktu server
-        function syncServerTime() {
+        function syncServerTime(callback) {
             const startTime = Date.now();
             $.ajax({
                 url: '/api/server-time',
                 method: 'GET',
                 dataType: 'json',
+                timeout: 5000, // Timeout setelah 5 detik
                 success: function(response) {
                     if (response.success && response.timestamp) {
                         const endTime = Date.now();
@@ -79,12 +80,14 @@
                         console.log('Waktu server diperbarui:', new Date(serverTimestamp)
                             .toISOString());
                     }
+                    if (callback) callback();
                 },
                 error: function(xhr, status, error) {
                     console.error('Error saat menyinkronkan waktu server:', error);
                     console.warn('Menggunakan waktu lokal sebagai cadangan');
                     serverTimestamp = Date.now();
                     pageLoadTimestamp = Date.now();
+                    if (callback) callback();
                 }
             });
         }
@@ -98,6 +101,11 @@
             const elapsed = Date.now() - pageLoadTimestamp;
             return new Date(serverTimestamp + elapsed);
         }
+
+        // Panggil syncServerTime dengan callback
+        syncServerTime(() => {
+            checkAndRestoreSessions();
+        });
 
         // Sinkronkan waktu server setiap 30 Detik
         setInterval(() => {
@@ -503,7 +511,9 @@
         let currentPrayerTime = localStorage.getItem('currentPrayerTime') || null;
 
         function checkAndRestoreSessions() {
-            const now = getCurrentTimeFromServer().getTime();
+            const now = getCurrentTimeFromServer();
+            const nowTime = now.getTime();
+            const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
 
             if (activePrayerStatus) {
                 console.log('Processing active prayer status from server');
@@ -521,7 +531,7 @@
                     console.log(
                         `Active adzan phase detected for ${prayerName}, elapsed: ${elapsedSeconds}s, remaining: ${remainingSeconds}s`
                     );
-                    adzanStartTime = now - (elapsedSeconds * 1000);
+                    adzanStartTime = nowTime - (elapsedSeconds * 1000);
                     localStorage.setItem('adzanStartTime', adzanStartTime);
                     localStorage.setItem('currentPrayerName', prayerName);
                     localStorage.setItem('currentPrayerTime', prayerTime);
@@ -533,7 +543,7 @@
                     console.log(
                         `Active iqomah phase detected for ${prayerName}, elapsed: ${elapsedSeconds}s, remaining: ${remainingSeconds}s`
                     );
-                    adzanStartTime = now - (elapsedSeconds * 1000);
+                    adzanStartTime = nowTime - (elapsedSeconds * 1000);
                     iqomahStartTime = adzanStartTime + (180 * 1000);
                     localStorage.setItem('adzanStartTime', adzanStartTime);
                     localStorage.setItem('iqomahStartTime', iqomahStartTime);
@@ -551,7 +561,6 @@
 
                 if (isFriday) {
                     console.log('Friday prayer info detected');
-                    const now = getCurrentTimeFromServer();
                     const options = {
                         weekday: 'long',
                         day: '2-digit',
@@ -559,11 +568,9 @@
                         year: '2-digit'
                     };
                     const formattedDate = now.toLocaleDateString('id-ID', options);
-
                     const khatib = $('#khatib').val();
                     const imam = $('#imam').val();
                     const muadzin = $('#muadzin').val();
-
                     const fridayData = {
                         date: formattedDate,
                         khatib,
@@ -576,7 +583,7 @@
             }
 
             if (adzanStartTime && !iqomahStartTime) {
-                const adzanElapsedSeconds = (now - adzanStartTime) / 1000;
+                const adzanElapsedSeconds = (nowTime - adzanStartTime) / 1000;
                 const adzanDuration = 3 * 60;
 
                 if (adzanElapsedSeconds < adzanDuration) {
@@ -586,18 +593,133 @@
                     console.log('Adzan finished, starting Iqomah from localStorage');
                     iqomahStartTime = adzanStartTime + (adzanDuration * 1000);
                     localStorage.setItem('iqomahStartTime', iqomahStartTime);
-                    showIqomahPopup(currentPrayerTime, true);
+                    if (currentPrayerName !== "Jum'at" || now.getDay() !== 5) {
+                        showIqomahPopup(currentPrayerTime, true);
+                    } else {
+                        updateFridayImages();
+                        startFridayImageSlider();
+                        const $fridayPopup = $('#fridayInfoPopup');
+                        if ($fridayPopup.length) {
+                            $fridayPopup.css('display', 'flex');
+                        }
+                        clearAdzanState();
+                    }
                 }
             } else if (iqomahStartTime) {
-                const iqomahElapsedSeconds = (now - iqomahStartTime) / 1000;
-                const iqomahDuration = 420;
+                const iqomahElapsedSeconds = (nowTime - iqomahStartTime) / 1000;
+                const iqomahDuration = 420; // 7 menit
+                const finalPhaseDuration = 60; // 1 menit untuk fase final
 
                 if (iqomahElapsedSeconds < iqomahDuration) {
                     console.log('Restoring Iqomah session from localStorage');
                     showIqomahPopup(currentPrayerTime, true);
+                } else if (iqomahElapsedSeconds < iqomahDuration + finalPhaseDuration) {
+                    console.log('Iqomah finished, restoring final phase from localStorage');
+                    showFinalAdzanImage();
                 } else {
-                    console.log('Iqomah finished, clearing state');
+                    console.log('Iqomah and final phase finished, clearing state');
                     clearAdzanState();
+                }
+            } else {
+                // Cek apakah ada waktu shalat yang terlewat dalam 10 menit terakhir
+                const $prayerTimesElements = $('.prayer-time');
+                let prayerToRestore = null;
+                $prayerTimesElements.each(function() {
+                    const $nameElement = $(this).find('.prayer-name');
+                    const $timeElement = $(this).find('.prayer-time-value');
+                    if ($nameElement.length && $timeElement.length) {
+                        const prayerName = $nameElement.text().trim();
+                        const prayerTime = $timeElement.text().trim();
+                        const [hours, minutes] = prayerTime.split(':').map(Number);
+                        const prayerTimeInMinutes = hours * 60 + minutes;
+
+                        // Hitung selisih waktu dari waktu shalat
+                        const timeDiffMinutes = currentTimeInMinutes - prayerTimeInMinutes;
+                        if (timeDiffMinutes >= 0 && timeDiffMinutes <= 10 && !prayerName.toLowerCase()
+                            .includes('shuruq')) {
+                            prayerToRestore = {
+                                name: prayerName,
+                                time: prayerTime,
+                                timeInMinutes: prayerTimeInMinutes
+                            };
+                        }
+                    }
+                });
+
+                if (prayerToRestore) {
+                    console.log(`Waktu shalat ${prayerToRestore.name} terlewat, memulai pemulihan`);
+                    const timeDiffSeconds = (currentTimeInMinutes - prayerToRestore.timeInMinutes) * 60;
+                    const adzanDuration = 3 * 60; // 3 menit
+                    const iqomahDuration = 7 * 60; // 7 menit
+                    const finalPhaseDuration = 60; // 1 menit
+
+                    if (timeDiffSeconds < adzanDuration) {
+                        // Mulai fase adzan
+                        adzanStartTime = nowTime - (timeDiffSeconds * 1000);
+                        localStorage.setItem('adzanStartTime', adzanStartTime);
+                        localStorage.setItem('currentPrayerName', prayerToRestore.name);
+                        localStorage.setItem('currentPrayerTime', prayerToRestore.time);
+                        currentPrayerName = prayerToRestore.name;
+                        currentPrayerTime = prayerToRestore.time;
+                        showAdzanPopup(prayerToRestore.name, prayerToRestore.time, true);
+                    } else if (prayerToRestore.name !== "Jum'at" || now.getDay() !== 5) {
+                        // Hanya mulai fase iqomah atau final untuk shalat selain Jumat
+                        if (timeDiffSeconds < adzanDuration + iqomahDuration) {
+                            // Mulai fase iqomah
+                            adzanStartTime = nowTime - (timeDiffSeconds * 1000);
+                            iqomahStartTime = adzanStartTime + (adzanDuration * 1000);
+                            localStorage.setItem('adzanStartTime', adzanStartTime);
+                            localStorage.setItem('iqomahStartTime', iqomahStartTime);
+                            localStorage.setItem('currentPrayerName', prayerToRestore.name);
+                            localStorage.setItem('currentPrayerTime', prayerToRestore.time);
+                            currentPrayerName = prayerToRestore.name;
+                            currentPrayerTime = prayerToRestore.time;
+                            showIqomahPopup(prayerToRestore.time, true);
+                        } else if (timeDiffSeconds < adzanDuration + iqomahDuration + finalPhaseDuration) {
+                            // Mulai fase final
+                            adzanStartTime = nowTime - (timeDiffSeconds * 1000);
+                            iqomahStartTime = adzanStartTime + (adzanDuration * 1000);
+                            localStorage.setItem('adzanStartTime', adzanStartTime);
+                            localStorage.setItem('iqomahStartTime', iqomahStartTime);
+                            localStorage.setItem('currentPrayerName', prayerToRestore.name);
+                            localStorage.setItem('currentPrayerTime', prayerToRestore.time);
+                            currentPrayerName = prayerToRestore.name;
+                            currentPrayerTime = prayerToRestore.time;
+                            showFinalAdzanImage();
+                        } else {
+                            console.log('Waktu shalat sudah lewat lebih dari 10 menit, tidak ada pemulihan');
+                            clearAdzanState();
+                        }
+                    } else {
+                        // Untuk Jumat, mulai slider gambar dan popup informasi
+                        console.log('Waktu shalat Jumat terlewat, memulai slider gambar Jumat');
+                        adzanStartTime = nowTime - (timeDiffSeconds * 1000);
+                        localStorage.setItem('adzanStartTime', adzanStartTime);
+                        localStorage.setItem('currentPrayerName', prayerToRestore.name);
+                        localStorage.setItem('currentPrayerTime', prayerToRestore.time);
+                        currentPrayerName = prayerToRestore.name;
+                        currentPrayerTime = prayerToRestore.time;
+                        updateFridayImages();
+                        startFridayImageSlider();
+                        const options = {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit'
+                        };
+                        const formattedDate = now.toLocaleDateString('id-ID', options);
+                        const khatib = $('#khatib').val();
+                        const imam = $('#imam').val();
+                        const muadzin = $('#muadzin').val();
+                        const fridayData = {
+                            date: formattedDate,
+                            khatib,
+                            imam,
+                            muadzin
+                        };
+                        displayFridayInfoPopup(fridayData);
+                        clearAdzanState();
+                    }
                 }
             }
         }
@@ -733,6 +855,7 @@
             if (!isRestored) {
                 playBeepSound(3);
                 $progress.css('width', '0%');
+                console.log(`Memutar alarm untuk ${prayerName} pada ${prayerTimeStr}`);
             } else if (activePrayerStatus && activePrayerStatus.phase === 'adzan') {
                 $progress.css('width', `${activePrayerStatus.progress}%`);
             }
@@ -747,15 +870,16 @@
                 localStorage.setItem('adzanStartTime', adzanStartTime);
                 localStorage.setItem('currentPrayerName', prayerName);
                 localStorage.setItem('currentPrayerTime', prayerTimeStr);
-                currentPrayerName = prayerName; // Pastikan variabel global diperbarui
+                currentPrayerName = prayerName;
                 currentPrayerTime = prayerTimeStr;
             }
 
             const duration = 3 * 60; // Durasi adzan 3 menit
             let lastUpdateTime = getCurrentTimeFromServer().getTime();
             isAdzanPlaying = true;
+            let adzanUpdateTimeout = null;
 
-            function updateAdzan(timestamp) {
+            function updateAdzan() {
                 const currentTime = getCurrentTimeFromServer().getTime();
                 const elapsedSeconds = (currentTime - adzanStartTime) / 1000;
                 const timeLeft = duration - elapsedSeconds;
@@ -763,18 +887,19 @@
                 if (timeLeft <= 0) {
                     $popup.css('display', 'none');
                     isAdzanPlaying = false;
+                    if (adzanUpdateTimeout) {
+                        clearTimeout(adzanUpdateTimeout);
+                        adzanUpdateTimeout = null;
+                    }
                     if (prayerName === "Jum'at" && now.getDay() === 5) {
-                        // Setelah adzan Jum'at, mulai slider gambar #adzan7 hingga #adzan12
-                        updateFridayImages(); // Pastikan data terbaru
+                        updateFridayImages();
                         startFridayImageSlider();
-                        // Tampilkan popup atau elemen untuk slider (misalnya, #fridayInfoPopup)
                         const $fridayPopup = $('#fridayInfoPopup');
                         if ($fridayPopup.length) {
                             $fridayPopup.css('display', 'flex');
                         }
                         clearAdzanState();
                     } else {
-                        // Untuk adzan lain, lanjutkan ke fase iqomah
                         showIqomahPopup(prayerTimeStr);
                     }
                     return;
@@ -795,10 +920,10 @@
                     lastUpdateTime = currentTime;
                 }
 
-                requestAnimationFrame(updateAdzan);
+                adzanUpdateTimeout = setTimeout(updateAdzan, 1000);
             }
 
-            requestAnimationFrame(updateAdzan);
+            updateAdzan(); // Mulai pembaruan langsung
         }
 
         let iqomahImageSliderInterval = null;
@@ -938,36 +1063,45 @@
                 localStorage.setItem('iqomahStartTime', iqomahStartTime);
             }
 
-            const duration = 420;
+            const duration = 420; // 7 menit
             let lastUpdateTime = getCurrentTimeFromServer().getTime();
             let isIqomahPlaying = true;
             let hasPlayedFinalBeep = false;
 
-            function updateIqomah() {
-                if (!isIqomahPlaying) return;
+            // Gunakan setInterval untuk update iqomah
+            const iqomahInterval = setInterval(() => {
+                if (!isIqomahPlaying) {
+                    clearInterval(iqomahInterval);
+                    return;
+                }
 
                 const currentTime = getCurrentTimeFromServer().getTime();
                 const elapsedSeconds = (currentTime - iqomahStartTime) / 1000;
                 const timeLeft = duration - elapsedSeconds;
 
+                // Cek apakah waktu untuk memainkan beep
                 if (timeLeft <= 4 && !hasPlayedFinalBeep) {
                     playBeepSound(3);
                     hasPlayedFinalBeep = true;
                 }
 
+                // Cek apakah waktu untuk fase final
                 if (timeLeft <= 0) {
                     $popup.css('display', 'none');
                     isIqomahPlaying = false;
+                    clearInterval(iqomahInterval);
                     clearAdzanState();
                     showFinalAdzanImage();
                     return;
                 }
 
+                // Update progress bar
                 $progress.css({
                     width: `${(elapsedSeconds / duration) * 100}%`,
                     transition: 'width 0.3s linear'
                 });
 
+                // Update countdown
                 if (currentTime - lastUpdateTime >= 1000) {
                     const hours = Math.floor(timeLeft / 3600);
                     const minutes = Math.floor((timeLeft % 3600) / 60);
@@ -977,15 +1111,13 @@
                     );
                     lastUpdateTime = currentTime;
                 }
+            }, 1000);
 
-                requestAnimationFrame(updateIqomah);
-            }
-
-            requestAnimationFrame(updateIqomah);
-
+            // Fungsi untuk membatalkan iqomah
             return function cancelIqomah() {
                 isIqomahPlaying = false;
                 $popup.css('display', 'none');
+                clearInterval(iqomahInterval);
             };
         }
 
@@ -1382,7 +1514,10 @@
             const isFriday = now.getDay() === 5;
 
             const $prayerTimesElements = $('.prayer-time');
-            if (!$prayerTimesElements.length) return;
+            if (!$prayerTimesElements.length) {
+                scheduleNextPrayerCheck();
+                return;
+            }
 
             const prayerTimes = [];
             $prayerTimesElements.each(function(index) {
@@ -1407,7 +1542,10 @@
                 }
             });
 
-            if (!prayerTimes.length) return;
+            if (!prayerTimes.length) {
+                scheduleNextPrayerCheck();
+                return;
+            }
 
             let activePrayerIndex = -1;
             let nextPrayerIndex = -1;
@@ -1478,7 +1616,7 @@
 
                 if ((prayerTimeInMinutes === currentTimeInMinutes ||
                         (prayerTimeInMinutes + 1 === currentTimeInMinutes && now.getSeconds() < 10)) &&
-                    !isAdzanPlaying) {
+                    !isAdzanPlaying && !adzanStartTime) {
                     if (prayer.name.toLowerCase().includes('shuruq') || prayer.name.toLowerCase()
                         .includes('syuruq') || prayer.name.toLowerCase().includes('terbit')) {
                         if (!isShuruqAlarmPlaying) {
@@ -1497,6 +1635,16 @@
             });
 
             showFridayInfo();
+
+            // Jadwalkan panggilan berikutnya
+            scheduleNextPrayerCheck();
+        }
+
+        // Fungsi untuk menjadwalkan pengecekan berikutnya
+        function scheduleNextPrayerCheck() {
+            setTimeout(() => {
+                handlePrayerTimes();
+            }, 1000);
         }
 
         function updateSlides() {
@@ -1621,7 +1769,7 @@
 
         manageSlideDisplay();
         updateScrollingText();
-        checkAndRestoreSessions();
+        // checkAndRestoreSessions();
         checkAndRestoreFridayInfo();
         checkAndRestoreAdzanImage();
 
@@ -1765,5 +1913,16 @@
             updateIqomahImages(); // Tambahkan pembaruan gambar Iqomah
             updateAdzanImages(); // Tambahkan pembaruan gambar Adzan
         }, 30000);
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                console.log('Tab kembali aktif, menyinkronkan waktu server');
+                syncServerTime();
+                checkAndRestoreSessions();
+                checkAndRestoreAdzanImage();
+                checkAndRestoreFridayInfo();
+                handlePrayerTimes();
+            }
+        });
     });
 </script>

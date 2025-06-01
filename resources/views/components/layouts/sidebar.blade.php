@@ -24,8 +24,14 @@
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
                     aria-label="Open user menu">
-                    <span class="avatar avatar-sm rounded-circle"
-                        style="background-image: url({{ asset('theme/static/avatars/000m.jpg') }})"></span>
+                    <span class="avatar avatar-sm rounded-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon icon-1">
+                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                            <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                        </svg>
+                    </span>
                     <div class="d-none d-xl-block ps-2">
                         <div>Admin</div>
                         <div class="mt-1 small text-secondary">Administrator</div>
@@ -42,8 +48,7 @@
             <ul class="navbar-nav pt-lg-3">
                 <li class="nav-item {{ request()->routeIs('dashboard.index') ? 'active' : '' }}">
                     <a wire:navigate class="nav-link" href="{{ route('dashboard.index') }}">
-                        <span
-                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -64,8 +69,7 @@
                 @if (Auth::user()->role === 'Admin')
                     <li class="nav-item {{ request()->routeIs('admin.user.index') ? 'active' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
-                            <span
-                                class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -85,8 +89,7 @@
                 @endif
                 <li class="nav-item {{ request()->routeIs('profilmasjid.index') ? 'active' : '' }}">
                     <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
-                        <span
-                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -113,9 +116,9 @@
                 <li class="nav-item {{ request()->routeIs('slide.index') ? 'active' : '' }}">
                     <a wire:navigate class="nav-link" href="{{ route('slide.index') }}">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-slideshow">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M15 6l.01 0" />
@@ -156,8 +159,7 @@
                 </li>
                 <li class="nav-item {{ request()->routeIs('marquee.index') ? 'active' : '' }}">
                     <a wire:navigate class="nav-link" href="{{ route('marquee.index') }}">
-                        <span
-                            class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round"
