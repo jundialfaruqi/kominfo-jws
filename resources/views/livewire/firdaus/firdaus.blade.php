@@ -86,7 +86,7 @@
             @endforeach
         </div>
 
-        <!-- Floating Clock -->
+        {{-- Floating Clock --}}
         <div class="floating-clock">
             <div class="clock-container">
                 <canvas id="analogClock" width="300" height="300"></canvas>
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <!-- Right Content - sekarang full -->
+        {{-- Right Content - sekarang full --}}
         <div class="right-content">
             @livewire('firdaus.mosque-info', ['slug' => request()->route('slug')])
 
@@ -106,7 +106,7 @@
 
             <div class="mosque-image">
 
-                <!-- Hidden inputs to store slide URLs -->
+                {{-- Hidden inputs to store slide URLs --}}
                 @if ($slides)
                     <input type="hidden" id="slide1" value="{{ $slides->slide1 }}">
                     <input type="hidden" id="slide2" value="{{ $slides->slide2 }}">
@@ -133,7 +133,7 @@
             </div>
         </div>
 
-        <!-- Footer -->
+        {{-- Footer --}}
         <div class="footer-message">
             <div class="scrolling-text">
                 @if ($marquee)
@@ -149,7 +149,7 @@
         </div>
     </div>
 
-    <!-- Hidden inputs for prayer times and other data -->
+    {{-- Hidden inputs for prayer times and other data --}}
     <input type="hidden" id="server-timestamp" value="{{ $serverTimestamp }}">
     <input type="hidden" id="prayer-times" value='@json($jadwalSholat)'>
     <input type="hidden" id="current-month" value="{{ $currentMonth }}">
@@ -157,17 +157,17 @@
     <input type="hidden" id="active-prayer-status"
         value='{{ $activePrayerStatus ? json_encode($activePrayerStatus) : '' }}'>
 
-    <!-- Hidden inputs for adzan data -->
+    {{-- Hidden inputs for adzan data --}}
     @foreach ($adzanData as $key => $value)
         <input type="hidden" id="{{ $key }}" value="{{ $value }}">
     @endforeach
 
-    <!-- Hidden inputs for petugas data -->
+    {{-- Hidden inputs for petugas data --}}
     @foreach ($petugasData as $key => $value)
         <input type="hidden" id="{{ $key }}" value="{{ $value }}">
     @endforeach
 
-    <!-- Adzan Popup -->
+    {{-- Adzan Popup --}}
     <div id="adzanPopup" class="adzan-popup" style="display: none;">
         <div class="adzan-popup-content">
             <div class="adzan">Waktunya Azan</div>
@@ -179,7 +179,7 @@
         </div>
     </div>
 
-    <!-- Iqomah Popup -->
+    {{-- Iqomah Popup --}}
     <div id="iqomahPopup" class="iqomah-popup" style="display: none;">
         <div class="iqomah-popup-content">
             <h2 class="iqomah-title">Iqomah</h2>
@@ -193,12 +193,12 @@
         </div>
     </div>
 
-    <!-- Friday Info Popup -->
+    {{-- Friday Info Popup --}}
     <div id="fridayInfoPopup" class="friday-info-popup" style="display: none;">
         <div class="friday-info-content">
             <div id="fridayDate" class="friday-date"></div>
             <div id="fridayOfficials" class="friday-officials"></div>
-            <!-- Hidden inputs untuk data petugas -->
+            {{-- Hidden inputs untuk data petugas --}}
             @if ($petugas)
                 <input type="hidden" id="khatib" value="{{ $petugas->khatib }}">
                 <input type="hidden" id="imam" value="{{ $petugas->imam }}">
@@ -210,7 +210,7 @@
         </div>
     </div>
 
-    <!-- Adzan Image Display -->
+    {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
         <img id="currentAdzanImage" src="" alt="Adzan Image">
     </div>

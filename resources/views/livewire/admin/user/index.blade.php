@@ -184,7 +184,6 @@
                 }
             });
 
-            // Untuk menampilkan notifikasi
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',

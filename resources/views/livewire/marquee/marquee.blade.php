@@ -202,7 +202,7 @@
                         @endif
 
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination & Search Controls -->
+                            {{-- Pagination & Search Controls --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -228,8 +228,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Table -->
+                            {{-- Table --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -354,7 +353,6 @@
                 }
             });
 
-            // Untuk menampilkan notifikasi
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',

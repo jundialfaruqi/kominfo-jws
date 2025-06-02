@@ -41,7 +41,7 @@
                             @endif
                         </div>
 
-                        <!-- Form untuk tambah/edit slide -->
+                        {{-- Form untuk tambah/edit slide --}}
                         @if ($showForm)
                             <form wire:submit.prevent="save">
                                 <div class="card-body">
@@ -71,10 +71,10 @@
                                             @endif
 
                                             <div class="row g-2 mb-3">
-                                                <!-- Gambar Slide 1 -->
+                                                {{-- Gambar Slide 1 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 1</label>
-                                                    <!-- Gambar Slide 1 -->
+                                                    {{-- Gambar Slide 1 --}}
                                                     @if ($slide1)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -119,10 +119,10 @@
                                                     @enderror
                                                 </div>
 
-                                                <!-- Gambar Slide 2 -->
+                                                {{-- Gambar Slide 2 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 2</label>
-                                                    <!-- Gambar Slide 2 -->
+                                                    {{-- Gambar Slide 2 --}}
                                                     @if ($slide2)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -167,10 +167,10 @@
                                                     @enderror
                                                 </div>
 
-                                                <!-- Gambar Slide 3 -->
+                                                {{-- Gambar Slide 3 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 3</label>
-                                                    <!-- Gambar Slide 3 -->
+                                                    {{-- Gambar Slide 3 --}}
                                                     @if ($slide3)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -215,10 +215,10 @@
                                                     @enderror
                                                 </div>
 
-                                                <!-- Gambar Slide 4 -->
+                                                {{-- Gambar Slide 4 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 4</label>
-                                                    <!-- Gambar Slide 4 -->
+                                                    {{-- Gambar Slide 4 --}}
                                                     @if ($slide4)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -263,10 +263,10 @@
                                                     @enderror
                                                 </div>
 
-                                                <!-- Gambar Slide 5 -->
+                                                {{-- Gambar Slide 5 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 5</label>
-                                                    <!-- Gambar Slide 5 -->
+                                                    {{-- Gambar Slide 5 --}}
                                                     @if ($slide5)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -312,10 +312,10 @@
 
                                                 </div>
 
-                                                <!-- Gambar Slide 6 -->
+                                                {{-- Gambar Slide 6 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Slide 6</label>
-                                                    <!-- Gambar Slide 6 -->
+                                                    {{-- Gambar Slide 6 --}}
                                                     @if ($slide6)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -419,7 +419,7 @@
                         @endif
 
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination & search control -->
+                            {{-- Pagination & search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -446,7 +446,7 @@
                                 </div>
                             </div>
 
-                            <!-- table -->
+                            {{-- table --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -600,7 +600,6 @@
                 }
             });
 
-            // Untuk menampilkan notifikasi
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',

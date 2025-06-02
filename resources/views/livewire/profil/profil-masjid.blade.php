@@ -37,8 +37,7 @@
                                 </div>
                             @endif
                         </div>
-
-                        <!-- Form untuk Tambah/Edit Profil Masjid -->
+                        {{-- Form untuk Tambah/Edit Profil Masjid --}}
                         @if ($showForm)
                             <form wire:submit.prevent="save">
                                 <div class="card-body">
@@ -113,7 +112,7 @@
                                             <div class="row g-2 mb-3">
                                                 <div class="col-md-6 mb-2">
                                                     <label class="form-label">Logo Masjid</label>
-                                                    <!-- Photo logo masjid-->
+                                                    {{-- Photo logo masjid --}}
                                                     @if ($logo_masjid)
                                                         <div class="card p-5 rounded-3">
                                                             <div class="img-responsive img-responsive-21x9"
@@ -152,7 +151,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">Logo Pemerintah</label>
-                                                    <!-- Photo logo pemerintah -->
+                                                    {{-- Photo logo pemerintah --}}
                                                     @if ($logo_pemerintah)
                                                         <div class="card p-5 rounded-3">
                                                             <div class="img-responsive img-responsive-21x9 card-img-top"
@@ -249,7 +248,7 @@
                         @endif
 
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination & Search Controls -->
+                            {{-- Pagination & Search Controls --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -275,8 +274,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Table of mosque profiles -->
+                            {{-- Table of mosque profiles --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -391,7 +389,6 @@
                 }
             });
 
-            // Untuk menampilkan notifikasi
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',

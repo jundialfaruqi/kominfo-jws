@@ -40,7 +40,7 @@
                                 </div>
                             @endif
                         </div>
-                        <!-- form untuk tambah/edit adzan -->
+                        {{-- form untuk tambah/edit adzan --}}
                         @if ($showForm)
                             <form wire:submit.prevent="save">
                                 <div class="card-body">
@@ -74,10 +74,10 @@
                                                 </div>
                                             @endif
                                             <div class="row g-2 mb-3">
-                                                <!-- Gambar Slide Iqomah 1 -->
+                                                {{-- Gambar Slide Iqomah 1 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Iqomah 1</label>
-                                                    <!-- Gambar Slide Iqomah 1 -->
+                                                    {{-- Gambar Slide Iqomah 1 --}}
                                                     @if ($adzan1)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -116,10 +116,10 @@
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Slide Iqomah 2 -->
+                                                {{-- Gambar Slide Iqomah 2 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Iqomah 2</label>
-                                                    <!-- Gambar Slide Iqomah 2 -->
+                                                    {{-- Gambar Slide Iqomah 2 --}}
                                                     @if ($adzan2)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -158,10 +158,10 @@
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Slide Iqomah 3 -->
+                                                {{-- Gambar Slide Iqomah 3 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Iqomah 3</label>
-                                                    <!-- Gambar Slide Iqomah 3 -->
+                                                    {{-- Gambar Slide Iqomah 3 --}}
                                                     @if ($adzan3)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -200,10 +200,10 @@
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Slide Iqomah 4 -->
+                                                {{-- Gambar Slide Iqomah 4 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Iqomah 4</label>
-                                                    <!-- Gambar Slide Iqomah 4 -->
+                                                    {{-- Gambar Slide Iqomah 4 --}}
                                                     @if ($adzan4)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -243,10 +243,10 @@
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Slide Iqomah 5 -->
+                                                {{-- Gambar Slide Iqomah 5 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Iqomah 5</label>
-                                                    <!-- Gambar Slide Iqomah 5 -->
+                                                    {{-- Gambar Slide Iqomah 5 --}}
                                                     @if ($adzan5)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -286,10 +286,10 @@
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Slide Iqomah 6 -->
+                                                {{-- Gambar Slide Iqomah 6 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Iqomah 6</label>
-                                                    <!-- Gambar Slide Iqomah 6 -->
+                                                    {{-- Gambar Slide Iqomah 6 --}}
                                                     @if ($adzan6)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -332,11 +332,11 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Gambar Setelah Iqomah -->
+                                            {{-- Gambar Setelah Iqomah --}}
                                             <div class="row g-2 mb-3">
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Setelah Iqomah</label>
-                                                    <!-- Gambar Setelah Iqomah -->
+                                                    {{-- Gambar Setelah Iqomah --}}
                                                     @if ($adzan15)
                                                         <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
                                                             style="background-image: url('{{ $adzan15->temporaryUrl() }}'); background-size: cover; background-position: center;">
@@ -422,7 +422,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Jum'at 2</label>
-                                                    <!-- Gambar Slide Jum'at 2 -->
+                                                    {{-- Gambar Slide Jum'at 2 --}}
                                                     @if ($adzan8)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -465,7 +465,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Jum'at 3</label>
-                                                    <!-- Gambar Slide Jum'at 3 -->
+                                                    {{-- Gambar Slide Jum'at 3 --}}
                                                     @if ($adzan9)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -508,7 +508,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Jum'at 4</label>
-                                                    <!-- Gambar Slide Jum'at 4 -->
+                                                    {{-- Gambar Slide Jum'at 4 --}}
                                                     @if ($adzan10)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -551,7 +551,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Jum'at 5</label>
-                                                    <!-- Gambar Slide Jum'at 5 -->
+                                                    {{-- Gambar Slide Jum'at 5 --}}
                                                     @if ($adzan11)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -594,7 +594,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Slide Jum'at 6</label>
-                                                    <!-- Gambar Slide Jum'at 6 -->
+                                                    {{-- Gambar Slide Jum'at 6 --}}
                                                     @if ($adzan12)
                                                         <div class="card p-2 rounded-4 shadow-sm border mb-2">
                                                             <div class="img-responsive rounded-3"
@@ -694,7 +694,7 @@
                             </form>
                         @endif
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination & search control -->
+                            {{-- Pagination & search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -720,7 +720,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- table -->
+                            {{-- table --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -951,7 +951,7 @@
                     modal.hide();
                 }
             });
-            // Untuk menampilkan notifikasi
+
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',
