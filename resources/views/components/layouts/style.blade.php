@@ -1,4 +1,8 @@
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.3.2/dist/css/tabler.min.css" />
+<link href="{{ asset('theme/dist/css/tabler.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('theme/dist/css/tabler-flags.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('theme/dist/css/tabler-payments.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('theme/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
+<link href="{{ asset('theme/dist/css/demo.min.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css" />
 <style>
     @import url('https://rsms.me/inter/inter.css');
