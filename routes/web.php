@@ -9,6 +9,7 @@ use App\Livewire\Profil\ProfilMasjid;
 use App\Livewire\Slides\Slide;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Profil;
+use Illuminate\Support\Facades\Http;
 
 // Redirect the base URL to login page
 Route::get('/', function () {
@@ -165,7 +166,14 @@ Route::get('/api/adzan/{slug}', function ($slug) {
                     'adzan3' => $adzan->adzan3,
                     'adzan4' => $adzan->adzan4,
                     'adzan5' => $adzan->adzan5,
-                    'adzan6' => $adzan->adzan6
+                    'adzan6' => $adzan->adzan6,
+                    'adzan15' => $adzan->adzan15,
+                    'adzan7' => $adzan->adzan7,
+                    'adzan8' => $adzan->adzan8,
+                    'adzan9' => $adzan->adzan9,
+                    'adzan10' => $adzan->adzan10,
+                    'adzan11' => $adzan->adzan11,
+                    'adzan12' => $adzan->adzan12,
                 ]
             ]);
         }
@@ -173,6 +181,55 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.adzan');
 
+Route::get('/api/server-time/', function () {
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'timestamp' => time(),
+            'serverTime' => date('Y-m-d H:i:s')
+        ]
+    ]);
+});
+
 // Public route for accessing specific mosque page by slug
 // This must be the last route to avoid conflicts with named routes
+Route::get('/api/prayer-status/{slug}', function ($slug) {
+    try {
+        // Get the Firdaus component instance
+        $firdaus = new \App\Livewire\Firdaus\Firdaus();
+        $firdaus->mount($slug);
+
+        // Get current server time
+        $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+        if (!$response->successful()) {
+            return response()->json(['success' => false, 'message' => 'Server time unavailable']);
+        }
+
+        $serverTime = $response['serverTime'];
+
+        // Convert UTC time to Asia/Jakarta timezone
+        $utcDateTime = new DateTime($serverTime, new DateTimeZone('UTC'));
+        $jakartaDateTime = $utcDateTime->setTimezone(new DateTimeZone('Asia/Jakarta'));
+        $currentTime = $jakartaDateTime->format('H:i');
+
+        // Get prayer status using reflection to call private method
+        $reflection = new ReflectionClass($firdaus);
+        $method = $reflection->getMethod('calculateActivePrayerTimeStatus');
+        $method->setAccessible(true);
+        $status = $method->invoke($firdaus, $currentTime);
+
+        return response()->json([
+            'success' => true,
+            'data' => $status,
+            'current_time_jakarta' => $jakartaDateTime->format('Y-m-d H:i:s'), // Optional: untuk debugging
+            'timezone' => 'Asia/Jakarta'
+        ]);
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error calculating prayer status: ' . $e->getMessage()
+        ]);
+    }
+});
+
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

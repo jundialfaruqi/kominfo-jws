@@ -22,7 +22,7 @@
                     <div class="mb-3">
                         <label class="form-label">Nama<span class="text-danger">*</span></label>
                         <input wire:model="name" type="text"
-                            class="form-control @error('name')
+                            class="form-control rounded-3 @error('name')
                             is-invalid
                         @enderror"
                             placeholder="Masukkan Nama">
@@ -33,7 +33,7 @@
                     <div class="mb-3">
                         <label class="form-label">Email<span class="text-danger">*</span></label>
                         <input wire:model="email" type="email"
-                            class="form-control @error('email')
+                            class="form-control rounded-3 @error('email')
                             is-invalid
                         @enderror"
                             placeholder="Masukkan Email">
@@ -44,7 +44,7 @@
                     <div class="mb-3">
                         <label class="form-label">Telepon<span class="text-danger">*</span></label>
                         <input wire:model="phone" type="text"
-                            class="form-control @error('phone')    
+                            class="form-control rounded-3 @error('phone')    
                             is-invalid
                         @enderror"
                             placeholder="Masukkan Telepon">
@@ -55,7 +55,7 @@
                     <div class="mb-3">
                         <label class="form-label">Alamat<span class="text-danger">*</span></label>
                         <input wire:model="address" type="text"
-                            class="form-control @error('address')
+                            class="form-control rounded-3 @error('address')
                             is-invalid
                         @enderror"
                             placeholder="Masukkan Alamat">
@@ -66,7 +66,7 @@
                     <div class="mb-3">
                         <label class="form-label">Role<span class="text-danger">*</span></label>
                         <select wire:model="role"
-                            class="form-select @error('role')
+                            class="form-select rounded-3 @error('role')
                             is-invalid
                         @enderror">
                             <option class="dropdown-header" selected>Pilih Role</option>
@@ -80,7 +80,7 @@
                     <div class="mb-3">
                         <label class="form-label">Password (Biarkan kosong jika tidak ingin mengubah)</label>
                         <input wire:model="password" type="password"
-                            class="form-control @error('password')
+                            class="form-control rounded-3 @error('password')
                             is-invalid
                         @enderror"
                             placeholder="Masukkan Password">
@@ -91,7 +91,7 @@
                     <div class="mb-3">
                         <label class="form-label">Konfirmasi Password</label>
                         <input wire:model="password_confirmation" type="password"
-                            class="form-control @error('password_confirmation')
+                            class="form-control rounded-3 @error('password_confirmation')
                             is-invalid
                         @enderror"
                             placeholder="Masukkan Konfirmasi Password">
@@ -117,7 +117,8 @@
                     </svg>
                     Batal
                 </a>
-                <button wire:loading.attr="disabled" wire:click="update" type="button" class="btn ms-auto">
+                <button wire:loading.attr="disabled" wire:click="update" type="button"
+                    class="btn ms-auto rounded-3">
                     <span wire:loading.remove wire:target="update">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

@@ -40,8 +40,8 @@
 
                         {{-- form untuk tambah/edit petugas --}}
                         @if ($showForm)
-                            <div class="card-body">
-                                <form wire:submit.prevent="save">
+                            <form wire:submit.prevent="save">
+                                <div class="card-body">
                                     <div class="row mb-3">
                                         @if (Auth::user()->role === 'Admin')
                                             <div class="row g-2 mb-3">
@@ -49,9 +49,11 @@
                                                     <label class="form-label">Admin Masjid</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <select class="form-select @error('userId') is-invalid @enderror"
+                                                    <select
+                                                        class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                         wire:model="userId">
-                                                        <option value="">Pilih Admin Masjid</option>
+                                                        <option class="dropdown-header" selected>Pilih Admin Masjid
+                                                        </option>
                                                         @foreach ($users as $user)
                                                             <option value="{{ $user->id }}">{{ $user->name }}
                                                             </option>
@@ -71,7 +73,7 @@
                                             </div>
                                             <div class="col-md-10">
                                                 <input type="date"
-                                                    class="form-control @error('hari') is-invalid @enderror"
+                                                    class="form-control rounded-3 @error('hari') is-invalid @enderror"
                                                     wire:model="hari">
                                                 @error('hari')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -86,7 +88,7 @@
                                             </div>
                                             <div class="col-md-10">
                                                 <input type="text"
-                                                    class="form-control @error('khatib') is-invalid @enderror"
+                                                    class="form-control rounded-3 @error('khatib') is-invalid @enderror"
                                                     wire:model="khatib" placeholder="Masukkan Nama Khatib">
                                                 @error('khatib')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -101,7 +103,7 @@
                                             </div>
                                             <div class="col-md-10">
                                                 <input type="text"
-                                                    class="form-control @error('imam') is-invalid @enderror"
+                                                    class="form-control rounded-3 @error('imam') is-invalid @enderror"
                                                     wire:model="imam" placeholder="Masukkan Nama imam">
                                                 @error('imam')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -116,7 +118,7 @@
                                             </div>
                                             <div class="col-md-10">
                                                 <input type="text"
-                                                    class="form-control @error('muadzin') is-invalid @enderror"
+                                                    class="form-control rounded-3 @error('muadzin') is-invalid @enderror"
                                                     wire:model="muadzin" placeholder="Masukkan Nama muadzin">
                                                 @error('muadzin')
                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -124,7 +126,9 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
+                                    style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
                                         @if (Auth::user()->role === 'Admin')
                                             <button type="button" wire:click="cancelForm"
@@ -175,12 +179,12 @@
                                             </span>
                                         </button>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         @endif
 
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination and search control -->
+                            {{-- Pagination and search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -206,8 +210,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Table petugas -->
+                            {{-- Table petugas --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -316,7 +319,6 @@
                 }
             });
 
-            // Untuk menampilkan notifikasi
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',

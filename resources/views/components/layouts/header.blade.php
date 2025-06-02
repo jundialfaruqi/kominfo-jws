@@ -2,7 +2,6 @@
     <div class="container-xl">
         <div class="row g-2 align-items-center">
             <div class="col">
-                <!-- Page pre-title -->
                 <div class="page-pretitle align-items-center">
                     Overview
                 </div>
@@ -17,7 +16,6 @@
                     {{ $title }}
                 </h2>
             </div>
-            <!-- Page title actions -->
             <div class="col-auto ms-auto d-none d-md-block">
                 <div class="btn-list">
                     <div class="dropdown">

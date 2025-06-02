@@ -39,8 +39,8 @@
                         </div>
 
                         @if ($showForm)
-                            <div class="card-body">
-                                <form wire:submit.prevent="save">
+                            <form wire:submit.prevent="save">
+                                <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             @if (Auth::user()->role === 'Admin')
@@ -50,9 +50,10 @@
                                                     </div>
                                                     <div class="col-md-10">
                                                         <select
-                                                            class="form-select @error('userId') is-invalid @enderror"
+                                                            class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option value="">Pilih Admin Masjid</option>
+                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
+                                                            </option>
                                                             @foreach ($users as $user)
                                                                 <option value="{{ $user->id }}">{{ $user->name }}
                                                                 </option>
@@ -83,7 +84,7 @@
                                                     <label class="form-label required">Marquee Teks 2</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('marquee2') is-invalid @enderror" wire:model="marquee2" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('marquee2') is-invalid @enderror" wire:model="marquee2" rows="3"
                                                         placeholder="Masukkan Marquee Teks 2"></textarea>
                                                     @error('marquee2')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -96,7 +97,7 @@
                                                     <label class="form-label required">Marquee Teks 3</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('marquee3') is-invalid @enderror" wire:model="marquee3" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('marquee3') is-invalid @enderror" wire:model="marquee3" rows="3"
                                                         placeholder="Masukkan Marquee Teks 3"></textarea>
                                                     @error('marquee3')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -109,7 +110,7 @@
                                                     <label class="form-label required">Marquee Teks 4</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('marquee4') is-invalid @enderror" wire:model="marquee4" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('marquee4') is-invalid @enderror" wire:model="marquee4" rows="3"
                                                         placeholder="Masukkan Marquee Teks 4"></textarea>
                                                     @error('marquee4')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -122,7 +123,7 @@
                                                     <label class="form-label required">Marquee Teks 5</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('marquee5') is-invalid @enderror" wire:model="marquee5" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('marquee5') is-invalid @enderror" wire:model="marquee5" rows="3"
                                                         placeholder="Masukkan Marquee Teks 5"></textarea>
                                                     @error('marquee5')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -135,7 +136,7 @@
                                                     <label class="form-label required">Marquee Teks 6</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('marquee6') is-invalid @enderror" wire:model="marquee6" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('marquee6') is-invalid @enderror" wire:model="marquee6" rows="3"
                                                         placeholder="Masukkan Marquee Teks 6"></textarea>
                                                     @error('marquee6')
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -144,7 +145,9 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
+                                    style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
                                         @if (Auth::user()->role === 'Admin')
                                             <button type="button" wire:click="cancelForm"
@@ -194,12 +197,12 @@
                                             </span>
                                         </button>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         @endif
 
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination & Search Controls -->
+                            {{-- Pagination & Search Controls --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -225,8 +228,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Table -->
+                            {{-- Table --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -351,7 +353,6 @@
                 }
             });
 
-            // Untuk menampilkan notifikasi
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',

@@ -40,13 +40,15 @@
                                 </div>
                             @endif
                         </div>
-                        <!-- form untuk tambah/edit adzan -->
+                        {{-- form untuk tambah/edit adzan --}}
                         @if ($showForm)
-                            <div class="card-body">
-                                <p class="text-muted small px-2">*Gambar yang diupload disini akan ditampilkan di slide
-                                    Iqomah,
-                                    slide shalat jum'at, dan gambar yg muncul setelah iqomah.</p>
-                                <form wire:submit.prevent="save">
+                            <form wire:submit.prevent="save">
+                                <div class="card-body">
+                                    <p class="text-muted small px-2">*Gambar yang diupload disini akan ditampilkan di
+                                        slide
+                                        Iqomah,
+                                        slide shalat jum'at, dan gambar yg muncul setelah iqomah.</p>
+
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             @if (Auth::user()->role === 'Admin')
@@ -72,17 +74,21 @@
                                                 </div>
                                             @endif
                                             <div class="row g-2 mb-3">
-                                                <!-- Gambar Adzan 1 -->
-                                                <div class="col-md-6 mb-2 px-2">
-                                                    <label class="form-label">Slider 1</label>
-                                                    <!-- Gambar Adzan 1 -->
+                                                {{-- Gambar Slide Iqomah 1 --}}
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Iqomah 1</label>
+                                                    {{-- Gambar Slide Iqomah 1 --}}
                                                     @if ($adzan1)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $adzan1->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan1->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_adzan1)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_adzan1) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan1) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="adzan1" class="mt-2 text-center">
@@ -104,23 +110,27 @@
                                                             kualitas gambar terbaik</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan1') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan1') is-invalid @enderror"
                                                         wire:model="adzan1" accept="image/*">
                                                     @error('adzan1')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Adzan 2 -->
-                                                <div class="col-md-6 mb-2 px-2">
-                                                    <label class="form-label">Slider 2</label>
-                                                    <!-- Gambar Adzan 2 -->
+                                                {{-- Gambar Slide Iqomah 2 --}}
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Iqomah 2</label>
+                                                    {{-- Gambar Slide Iqomah 2 --}}
                                                     @if ($adzan2)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $adzan2->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan2->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_adzan2)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_adzan2) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan2) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="adzan2" class="mt-2 text-center">
@@ -142,23 +152,27 @@
                                                             kualitas gambar terbaik</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan2') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan2') is-invalid @enderror"
                                                         wire:model="adzan2" accept="image/*">
                                                     @error('adzan2')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Adzan 3 -->
-                                                <div class="col-md-6 mb-2 px-2">
-                                                    <label class="form-label">Slider 3</label>
-                                                    <!-- Gambar Adzan 3 -->
+                                                {{-- Gambar Slide Iqomah 3 --}}
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Iqomah 3</label>
+                                                    {{-- Gambar Slide Iqomah 3 --}}
                                                     @if ($adzan3)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $adzan3->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan3->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_adzan3)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_adzan3) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan3) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="adzan3" class="mt-2 text-center">
@@ -180,23 +194,27 @@
                                                             kualitas gambar terbaik</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan3') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan3') is-invalid @enderror"
                                                         wire:model="adzan3" accept="image/*">
                                                     @error('adzan3')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Adzan 4 -->
-                                                <div class="col-md-6 mb-2 px-2">
-                                                    <label class="form-label">Slider 4</label>
-                                                    <!-- Gambar Adzan 4 -->
+                                                {{-- Gambar Slide Iqomah 4 --}}
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Iqomah 4</label>
+                                                    {{-- Gambar Slide Iqomah 4 --}}
                                                     @if ($adzan4)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $adzan4->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan4->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_adzan4)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_adzan4) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan4) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="adzan4" class="mt-2 text-center">
@@ -219,23 +237,27 @@
                                                             kualitas gambar terbaik</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan4') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan4') is-invalid @enderror"
                                                         wire:model="adzan4" accept="image/*">
                                                     @error('adzan4')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Adzan 5 -->
-                                                <div class="col-md-6 mb-2 px-2">
-                                                    <label class="form-label">Slider 5</label>
-                                                    <!-- Gambar Adzan 5 -->
+                                                {{-- Gambar Slide Iqomah 5 --}}
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Iqomah 5</label>
+                                                    {{-- Gambar Slide Iqomah 5 --}}
                                                     @if ($adzan5)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $adzan5->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan5->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_adzan5)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_adzan5) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan5) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="adzan5" class="mt-2 text-center">
@@ -258,23 +280,27 @@
                                                             kualitas gambar terbaik</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan5') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan5') is-invalid @enderror"
                                                         wire:model="adzan5" accept="image/*">
                                                     @error('adzan5')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <!-- Gambar Adzan 6 -->
-                                                <div class="col-md-6 mb-2 px-2">
-                                                    <label class="form-label">Slider 6</label>
-                                                    <!-- Gambar Adzan 6 -->
+                                                {{-- Gambar Slide Iqomah 6 --}}
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Iqomah 6</label>
+                                                    {{-- Gambar Slide Iqomah 6 --}}
                                                     @if ($adzan6)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ $adzan6->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan6->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @elseif($tmp_adzan6)
-                                                        <div class="img-responsive img-responsive-21x21 rounded-3 shadow-sm my-2"
-                                                            style="background-image: url('{{ asset($tmp_adzan6) }}'); background-size: cover; background-position: center;">
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan6) }}'); background-size: cover; background-position: center;">
+                                                            </div>
                                                         </div>
                                                     @endif
                                                     <div wire:loading wire:target="adzan6" class="mt-2 text-center">
@@ -297,18 +323,20 @@
                                                             kualitas gambar terbaik</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan6') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan6') is-invalid @enderror"
                                                         wire:model="adzan6" accept="image/*">
                                                     @error('adzan6')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
                                                     @enderror
                                                 </div>
+                                            </div>
 
-                                                <!-- Gambar Adzan 15 -->
-                                                <div class="col-md-6 mb-2 px-2">
+                                            {{-- Gambar Setelah Iqomah --}}
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Gambar Setelah Iqomah</label>
-                                                    <!-- Gambar Adzan 15 -->
+                                                    {{-- Gambar Setelah Iqomah --}}
                                                     @if ($adzan15)
                                                         <div class="img-responsive img-responsive-21x9 rounded-3 shadow-sm my-2"
                                                             style="background-image: url('{{ $adzan15->temporaryUrl() }}'); background-size: cover; background-position: center;">
@@ -345,11 +373,274 @@
                                                         </div>
                                                     @enderror
                                                 </div>
+                                            </div>
 
+                                            {{-- Slide Jum'at --}}
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Jum'at 1</label>
+                                                    <!-- Gambar Slide Jum'at 1 -->
+                                                    @if ($adzan7)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan7->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @elseif($tmp_adzan7)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan7) }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div wire:loading wire:target="adzan7" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Mengupload...</span>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                            untuk memilih
+                                                            gambar</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
+                                                            SVG. Maks:
+                                                            5MB</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
+                                                            kualitas gambar terbaik</small>
+                                                    </div>
+                                                    <input type="file"
+                                                        class="form-control my-2 rounded-4 @error('adzan7') is-invalid @enderror"
+                                                        wire:model="adzan7" accept="image/*">
+                                                    @error('adzan7')
+                                                        <div class="invalid-feedback">{{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Jum'at 2</label>
+                                                    {{-- Gambar Slide Jum'at 2 --}}
+                                                    @if ($adzan8)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan8->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @elseif($tmp_adzan8)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan8) }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div wire:loading wire:target="adzan8" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Mengupload...</span>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                            untuk memilih
+                                                            gambar</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
+                                                            SVG. Maks:
+                                                            5MB</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
+                                                            kualitas gambar terbaik</small>
+                                                    </div>
+                                                    <input type="file"
+                                                        class="form-control my-2 rounded-4 @error('adzan8') is-invalid @enderror"
+                                                        wire:model="adzan8" accept="image/*">
+                                                    @error('adzan8')
+                                                        <div class="invalid-feedback">{{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Jum'at 3</label>
+                                                    {{-- Gambar Slide Jum'at 3 --}}
+                                                    @if ($adzan9)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan9->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @elseif($tmp_adzan9)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan9) }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div wire:loading wire:target="adzan9" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Mengupload...</span>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                            untuk memilih
+                                                            gambar</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
+                                                            SVG. Maks:
+                                                            5MB</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
+                                                            kualitas gambar terbaik</small>
+                                                    </div>
+                                                    <input type="file"
+                                                        class="form-control my-2 rounded-4 @error('adzan9') is-invalid @enderror"
+                                                        wire:model="adzan9" accept="image/*">
+                                                    @error('adzan9')
+                                                        <div class="invalid-feedback">{{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Jum'at 4</label>
+                                                    {{-- Gambar Slide Jum'at 4 --}}
+                                                    @if ($adzan10)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan10->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @elseif($tmp_adzan10)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan10) }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div wire:loading wire:target="adzan10" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Mengupload...</span>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                            untuk memilih
+                                                            gambar</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
+                                                            SVG. Maks:
+                                                            5MB</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
+                                                            kualitas gambar terbaik</small>
+                                                    </div>
+                                                    <input type="file"
+                                                        class="form-control my-2 rounded-4 @error('adzan10') is-invalid @enderror"
+                                                        wire:model="adzan10" accept="image/*">
+                                                    @error('adzan10')
+                                                        <div class="invalid-feedback">{{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Jum'at 5</label>
+                                                    {{-- Gambar Slide Jum'at 5 --}}
+                                                    @if ($adzan11)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan11->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @elseif($tmp_adzan11)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan11) }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div wire:loading wire:target="adzan11" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Mengupload...</span>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                            untuk memilih
+                                                            gambar</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
+                                                            SVG. Maks:
+                                                            5MB</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
+                                                            kualitas gambar terbaik</small>
+                                                    </div>
+                                                    <input type="file"
+                                                        class="form-control my-2 rounded-4 @error('adzan11') is-invalid @enderror"
+                                                        wire:model="adzan11" accept="image/*">
+                                                    @error('adzan11')
+                                                        <div class="invalid-feedback">{{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-2 px-2">
+                                                    <label class="form-label">Slide Jum'at 6</label>
+                                                    {{-- Gambar Slide Jum'at 6 --}}
+                                                    @if ($adzan12)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ $adzan12->temporaryUrl() }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @elseif($tmp_adzan12)
+                                                        <div class="card p-2 rounded-4 shadow-sm border mb-2">
+                                                            <div class="img-responsive rounded-3"
+                                                                style="background-image: url('{{ asset($tmp_adzan12) }}'); background-size: cover; background-position: center;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    <div wire:loading wire:target="adzan12" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Mengupload...</span>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                            untuk memilih
+                                                            gambar</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
+                                                            SVG. Maks:
+                                                            5MB</small>
+                                                    </div>
+                                                    <div class="form-text">
+                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
+                                                            kualitas gambar terbaik</small>
+                                                    </div>
+                                                    <input type="file"
+                                                        class="form-control my-2 rounded-4 @error('adzan12') is-invalid @enderror"
+                                                        wire:model="adzan12" accept="image/*">
+                                                    @error('adzan12')
+                                                        <div class="invalid-feedback">{{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
+                                    style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
                                         @if (Auth::user()->role === 'Admin')
                                             <button type="button" wire:click="cancelForm"
@@ -399,11 +690,11 @@
                                             </span>
                                         </button>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         @endif
                         @if (Auth::user()->role === 'Admin')
-                            <!-- Pagination & search control -->
+                            {{-- Pagination & search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
                                     <div class="text-secondary">
@@ -429,7 +720,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- table -->
+                            {{-- table --}}
                             <div class="table-responsive">
                                 <table class="table card-table table-vcenter table-hover text-nowrap datatable">
                                     <thead>
@@ -660,7 +951,7 @@
                     modal.hide();
                 }
             });
-            // Untuk menampilkan notifikasi
+
             $wire.on('success', message => {
                 iziToast.success({
                     title: 'Berhasil',
