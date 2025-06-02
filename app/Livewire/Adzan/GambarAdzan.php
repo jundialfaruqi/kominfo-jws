@@ -15,7 +15,7 @@ class GambarAdzan extends Component
 {
     use WithPagination, WithFileUploads;
 
-    #[Title('Gambar Adzan')]
+    #[Title('Gambar Slides')]
 
     public $search;
     public $paginate;

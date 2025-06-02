@@ -71,7 +71,7 @@
                                                     <label class="form-label required">Marquee Teks 1</label>
                                                 </div>
                                                 <div class="col-md-10">
-                                                    <textarea class="form-control @error('marquee1') is-invalid @enderror" wire:model="marquee1" rows="3"
+                                                    <textarea class="form-control rounded-3 @error('marquee1') is-invalid @enderror" wire:model="marquee1" rows="3"
                                                         placeholder="Masukkan Marquee Teks 1"></textarea>
                                                     @error('marquee1')
                                                         <div class="invalid-feedback">{{ $message }}</div>

@@ -7,9 +7,9 @@
                         <div class="card-header">
                             <h3 class="card-title d-none d-md-block">
                                 @if ($showForm)
-                                    {{ $isEdit ? 'Ubah Pengaturan Slide Iqomah, azan, tata tertib masjid' : 'Tambah Slide Iqomah, azan, tata tertib masjid Baru' }}
+                                    {{ $isEdit ? 'Ubah Pengaturan Slide' : 'Tambah Slide' }}
                                 @else
-                                    {{ Auth::user()->role === 'Admin' ? 'Daftar Slide Iqomah, azan, tata tertib masjid' : 'Ubah Pengaturan Slide Iqomah, azan, tata tertib masjid' }}
+                                    {{ Auth::user()->role === 'Admin' ? 'Daftar Slide' : 'Ubah Pengaturan Slide' }}
                                 @endif
                             </h3>
                             @if (Auth::user()->role === 'Admin' && !$showForm)
@@ -26,7 +26,7 @@
                                                 <path d="M16 19h6" />
                                                 <path d="M19 16v6" />
                                             </svg>
-                                            Tambah Slide Iqomah, azan, tata tertib masjid
+                                            Tambah Slide
                                         </span>
                                         <span wire:loading wire:target="showAddForm">
                                             <span class="spinner-border spinner-border-sm" role="status"
@@ -44,21 +44,19 @@
                         @if ($showForm)
                             <form wire:submit.prevent="save">
                                 <div class="card-body">
-                                    <p class="text-muted small px-2">*Gambar yang diupload disini akan ditampilkan di
-                                        slide
-                                        Iqomah,
-                                        slide shalat jum'at, dan gambar yg muncul setelah iqomah.</p>
+                                    <p class="text-muted small py-2">Gambar yang diupload disini akan ditampilkan di
+                                        Iqomah, shalat jum'at, dan setelah iqomah.</p>
 
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             @if (Auth::user()->role === 'Admin')
-                                                <div class="row g-2 mb-3">
+                                                <div class="row g-2 mb-5">
                                                     <div class="col-md-2">
                                                         <label class="form-label"> Admin Masjid</label>
                                                     </div>
                                                     <div class="col-md-10">
                                                         <select
-                                                            class="form-select @error('userId') is-invalid @enderror"
+                                                            class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
                                                             <option class="dropdown-header" selected>Pilih Admin Masjid
                                                             </option>
@@ -366,7 +364,7 @@
                                                             1417x800 Piksel)</small>
                                                     </div>
                                                     <input type="file"
-                                                        class="form-control my-2 @error('adzan15') is-invalid @enderror"
+                                                        class="form-control my-2 rounded-4 @error('adzan15') is-invalid @enderror"
                                                         wire:model="adzan15" accept="image/*">
                                                     @error('adzan15')
                                                         <div class="invalid-feedback">{{ $message }}
@@ -727,21 +725,19 @@
                                         <tr>
                                             <th class="w-1">No.</th>
                                             <th>Admin Masjid</th>
-                                            <th>Adzan 1</th>
-                                            <th>Adzan 2</th>
-                                            <th>Adzan 3</th>
-                                            <th>Adzan 4</th>
-                                            <th>Adzan 5</th>
-                                            <th>Adzan 6</th>
-                                            <th>Adzan 7</th>
-                                            <th>Adzan 8</th>
-                                            <th>Adzan 9</th>
-                                            <th>Adzan 10</th>
-                                            <th>Adzan 11</th>
-                                            <th>Adzan 12</th>
-                                            <th>Adzan 13</th>
-                                            <th>Adzan 14</th>
-                                            <th>Adzan 15</th>
+                                            <th>Iqomah 1</th>
+                                            <th>Iqomah 2</th>
+                                            <th>Iqomah 3</th>
+                                            <th>Iqomah 4</th>
+                                            <th>Iqomah 5</th>
+                                            <th>Iqomah 6</th>
+                                            <th>Jum'at 1</th>
+                                            <th>Jum'at 2</th>
+                                            <th>Jum'at 3</th>
+                                            <th>Jum'at 4</th>
+                                            <th>Jum'at 5</th>
+                                            <th>Jum'at 6</th>
+                                            <th>After Iqomah</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -841,22 +837,6 @@
                                                 <td>
                                                     @if ($adzan->adzan12)
                                                         <img src="{{ asset($adzan->adzan12) }}" width="60"
-                                                            class="img-thumbnail">
-                                                    @else
-                                                        <span class="text-gray-400">-</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($adzan->adzan13)
-                                                        <img src="{{ asset($adzan->adzan13) }}" width="60"
-                                                            class="img-thumbnail">
-                                                    @else
-                                                        <span class="text-gray-400">-</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if ($adzan->adzan14)
-                                                        <img src="{{ asset($adzan->adzan14) }}" width="60"
                                                             class="img-thumbnail">
                                                     @else
                                                         <span class="text-gray-400">-</span>
