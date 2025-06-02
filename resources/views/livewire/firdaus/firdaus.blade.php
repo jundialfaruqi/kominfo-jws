@@ -189,7 +189,7 @@
             <div id="iqomahCountdown" class="iqomah-countdown"></div>
         </div>
         <div class="iqomah-image">
-            <img id="currentIqomahImage" src="{{ asset('images/other/matikan-hp.jpg') }}" alt="Iqomah Image">
+            <img id="currentIqomahImage" src="" alt="Iqomah Image">
         </div>
     </div>
 

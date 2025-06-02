@@ -1,12 +1,13 @@
-<!-- Moment.js core -->
+{{-- Moment.js core --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
 
-<!-- Moment Hijri -->
+{{-- Moment Hijri --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
 
-<!-- Locale Indonesia -->
+{{-- Locale Indonesia --}}
 <script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
 
+{{-- jQuery --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
@@ -126,12 +127,6 @@
                 console.error('Error parsing active prayer status:', e);
             }
         }
-
-        // Fungsi untuk ambil waktu sekarang berdasarkan waktu server
-        // function getCurrentTimeFromServer() {
-        //     const elapsed = Date.now() - pageLoadTimestamp;
-        //     return new Date(serverTimestamp + elapsed);
-        // }
 
         // Mendapatkan jadwal sholat secara dinamis jika diperlukan
         async function fetchPrayerTimes() {
@@ -960,8 +955,8 @@
                         $('#adzan5').val(response.data.adzan5);
                         $('#adzan6').val(response.data.adzan6);
 
-                        // Perbarui array iqomahImages global
-                        window.iqomahImages = ['/images/other/doa-setelah-azan.png'];
+                        // Inisialisasi array iqomahImages sebagai array kosong
+                        window.iqomahImages = [];
                         for (let i = 1; i <= 6; i++) {
                             const adzanValue = $(`#adzan${i}`).val();
                             if (adzanValue) {
@@ -971,6 +966,14 @@
 
                         console.log('Gambar Iqomah diperbarui, jumlah gambar:', window.iqomahImages
                             .length);
+
+                        // Jika slider sedang berjalan dan array kosong, hentikan slider
+                        if (window.iqomahImages.length === 0 && iqomahImageSliderInterval) {
+                            clearInterval(iqomahImageSliderInterval);
+                            iqomahImageSliderInterval = null;
+                            $('#currentIqomahImage').css('opacity', '0');
+                            console.log('Slider Iqomah dihentikan karena tidak ada gambar');
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
@@ -981,8 +984,8 @@
         }
 
         function startIqomahImageSlider() {
-            // Gunakan variabel global untuk iqomahImages agar bisa diakses dari updateIqomahImages()
-            window.iqomahImages = ['/images/other/doa-setelah-azan.png'];
+            // Inisialisasi array iqomahImages sebagai array kosong
+            window.iqomahImages = [];
             for (let i = 1; i <= 6; i++) {
                 const adzanElement = $(`#adzan${i}`);
                 if (adzanElement.val()) {
@@ -991,6 +994,13 @@
             }
 
             const $iqomahImageElement = $('#currentIqomahImage');
+
+            // Jika tidak ada gambar, hentikan eksekusi fungsi
+            if (window.iqomahImages.length === 0) {
+                console.warn('Tidak ada gambar Iqomah yang tersedia, slider tidak dimulai');
+                $iqomahImageElement.css('opacity', '0');
+                return;
+            }
 
             if (!iqomahSliderStartTime) {
                 iqomahSliderStartTime = getCurrentTimeFromServer().getTime();
@@ -1002,7 +1012,15 @@
 
             // Fungsi untuk memperbarui gambar berdasarkan waktu server
             function updateIqomahImage() {
-                if (!window.iqomahImages || window.iqomahImages.length === 0) return;
+                if (!window.iqomahImages || window.iqomahImages.length === 0) {
+                    if (iqomahImageSliderInterval) {
+                        clearInterval(iqomahImageSliderInterval);
+                        iqomahImageSliderInterval = null;
+                        $iqomahImageElement.css('opacity', '0');
+                        console.log('Slider Iqomah dihentikan karena tidak ada gambar');
+                    }
+                    return;
+                }
 
                 const now = getCurrentTimeFromServer().getTime();
                 const elapsedMs = now - iqomahSliderStartTime;
@@ -1252,7 +1270,7 @@
             } else {
                 console.warn(
                     'Elemen #adzan15 tidak ditemukan atau nilainya kosong, menggunakan gambar default');
-                displayAdzanImage('/images/other/doa-setelah-azan.png', false, duration);
+                displayAdzanImage('/images/other/lurus-dan-rapatkan-shaf-sholat.png', false, duration);
             }
         }
 
@@ -1325,8 +1343,8 @@
                             }
                         });
 
-                        // Perbarui array fridayImages global
-                        window.fridayImages = ['/images/other/doa-setelah-azan.png'];
+                        // Inisialisasi array fridayImages sebagai array kosong
+                        window.fridayImages = [];
                         for (let i = 7; i <= 12; i++) {
                             const adzanValue = $(`#adzan${i}`).val();
                             if (adzanValue) {
@@ -1336,6 +1354,14 @@
 
                         console.log('Gambar Friday diperbarui, jumlah gambar:', window.fridayImages
                             .length);
+
+                        // Jika slider sedang berjalan dan array kosong, hentikan slider
+                        if (window.fridayImages.length === 0 && fridayImageSliderInterval) {
+                            clearInterval(fridayImageSliderInterval);
+                            fridayImageSliderInterval = null;
+                            $('#currentFridayImage').css('opacity', '0');
+                            console.log('Slider Friday dihentikan karena tidak ada gambar');
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
@@ -1351,15 +1377,20 @@
                 return;
             }
 
-            // Pastikan window.fridayImages sudah diisi
-            if (!window.fridayImages || window.fridayImages.length === 0) {
-                window.fridayImages = ['/images/other/doa-setelah-azan.png'];
-                for (let i = 7; i <= 12; i++) {
-                    const adzanElement = $(`#adzan${i}`);
-                    if (adzanElement.length && adzanElement.val()) {
-                        window.fridayImages.push(adzanElement.val());
-                    }
+            // Inisialisasi array fridayImages sebagai array kosong
+            window.fridayImages = [];
+            for (let i = 7; i <= 12; i++) {
+                const adzanElement = $(`#adzan${i}`);
+                if (adzanElement.length && adzanElement.val()) {
+                    window.fridayImages.push(adzanElement.val());
                 }
+            }
+
+            // Jika tidak ada gambar, hentikan eksekusi fungsi
+            if (window.fridayImages.length === 0) {
+                console.warn('Tidak ada gambar Friday yang tersedia, slider tidak dimulai');
+                $fridayImageElement.css('opacity', '0');
+                return;
             }
 
             if (!fridaySliderStartTime) {
@@ -1370,7 +1401,15 @@
             let lastIndex = -1;
 
             function updateFridayImage() {
-                if (!window.fridayImages || window.fridayImages.length === 0) return;
+                if (!window.fridayImages || window.fridayImages.length === 0) {
+                    if (fridayImageSliderInterval) {
+                        clearInterval(fridayImageSliderInterval);
+                        fridayImageSliderInterval = null;
+                        $fridayImageElement.css('opacity', '0');
+                        console.log('Slider Friday dihentikan karena tidak ada gambar');
+                    }
+                    return;
+                }
 
                 const now = getCurrentTimeFromServer().getTime();
                 const elapsedMs = now - fridaySliderStartTime;
