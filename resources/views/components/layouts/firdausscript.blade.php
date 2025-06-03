@@ -1845,5 +1845,24 @@
                 handlePrayerTimes();
             }
         });
+
+        // Fungsi untuk toggle full screen
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.error('Gagal masuk ke mode full screen:', err);
+                });
+            } else {
+                document.exitFullscreen().catch(err => {
+                    console.error('Gagal keluar dari mode full screen:', err);
+                });
+            }
+        }
+
+        // Event listener untuk double-click
+        $(document).on('dblclick', function() {
+            toggleFullScreen();
+        });
+
     });
 </script>

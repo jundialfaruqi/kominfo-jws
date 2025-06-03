@@ -43,12 +43,12 @@ class Slide extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
-        'slide1' => 'nullable|image|max:5000|mimes:jpg,png,jpeg,webp,gif,svg',
-        'slide2' => 'nullable|image|max:5000|mimes:jpg,png,jpeg,webp,gif,svg',
-        'slide3' => 'nullable|image|max:5000|mimes:jpg,png,jpeg,webp,gif,svg',
-        'slide4' => 'nullable|image|max:5000|mimes:jpg,png,jpeg,webp,gif,svg',
-        'slide5' => 'nullable|image|max:5000|mimes:jpg,png,jpeg,webp,gif,svg',
-        'slide6' => 'nullable|image|max:5000|mimes:jpg,png,jpeg,webp,gif,svg',
+        'slide1' => 'nullable|image|max:15000|mimes:jpg,png,jpeg,webp,gif,svg',
+        'slide2' => 'nullable|image|max:15000|mimes:jpg,png,jpeg,webp,gif,svg',
+        'slide3' => 'nullable|image|max:15000|mimes:jpg,png,jpeg,webp,gif,svg',
+        'slide4' => 'nullable|image|max:15000|mimes:jpg,png,jpeg,webp,gif,svg',
+        'slide5' => 'nullable|image|max:15000|mimes:jpg,png,jpeg,webp,gif,svg',
+        'slide6' => 'nullable|image|max:15000|mimes:jpg,png,jpeg,webp,gif,svg',
     ];
 
     protected $messages = [
@@ -60,12 +60,12 @@ class Slide extends Component
         'slide4.image'    => 'File harus berupa gambar',
         'slide5.image'    => 'File harus berupa gambar',
         'slide6.image'    => 'File harus berupa gambar',
-        'slide1.max'      => 'File gambar terlalu besar. Ukuran file maksimal 5MB!',
-        'slide2.max'      => 'File gambar terlalu besar. Ukuran file maksimal 5MB!',
-        'slide3.max'      => 'File gambar terlalu besar. Ukuran file maksimal 5MB!',
-        'slide4.max'      => 'File gambar terlalu besar. Ukuran file maksimal 5MB!',
-        'slide5.max'      => 'File gambar terlalu besar. Ukuran file maksimal 5MB!',
-        'slide6.max'      => 'File gambar terlalu besar. Ukuran file maksimal 5MB!',
+        'slide1.max'      => 'File gambar terlalu besar. Ukuran file maksimal 15MB!',
+        'slide2.max'      => 'File gambar terlalu besar. Ukuran file maksimal 15MB!',
+        'slide3.max'      => 'File gambar terlalu besar. Ukuran file maksimal 15MB!',
+        'slide4.max'      => 'File gambar terlalu besar. Ukuran file maksimal 15MB!',
+        'slide5.max'      => 'File gambar terlalu besar. Ukuran file maksimal 15MB!',
+        'slide6.max'      => 'File gambar terlalu besar. Ukuran file maksimal 15MB!',
         'slide1.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif,svg',
         'slide2.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif,svg',
         'slide3.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif,svg',
