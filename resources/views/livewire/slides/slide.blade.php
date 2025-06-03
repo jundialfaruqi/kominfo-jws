@@ -102,9 +102,9 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF, SVG.
+                                                            JPG, PNG, JPEG, WEBP, GIF.
                                                             Maks:
-                                                            5MB</small>
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -150,9 +150,9 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF, SVG.
+                                                            JPG, PNG, JPEG, WEBP, GIF.
                                                             Maks:
-                                                            5MB</small>
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -197,10 +197,10 @@
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
-                                                                class="text-danger">*</span>Format: JPG, PNG, GIF,
-                                                            WEBP.
+                                                                class="text-danger">*</span>Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
                                                             Maks:
-                                                            5MB</small>
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -245,10 +245,10 @@
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
-                                                                class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP, GIF, SVG.
+                                                                class="text-danger">*</span>Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
                                                             Maks:
-                                                            5MB</small>
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -293,10 +293,10 @@
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
-                                                                class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP, GIF, SVG.
+                                                                class="text-danger">*</span>Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
                                                             Maks:
-                                                            5MB</small>
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -342,10 +342,10 @@
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
-                                                                class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP, GIF, SVG.
+                                                                class="text-danger">*</span>Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
                                                             Maks:
-                                                            5MB</small>
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span

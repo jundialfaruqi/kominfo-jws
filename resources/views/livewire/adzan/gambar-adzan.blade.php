@@ -99,9 +99,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -141,9 +142,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -183,9 +185,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -226,9 +229,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -269,9 +273,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -312,9 +317,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -355,9 +361,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Rasio gambar 16:9 (Rekomendasi :
@@ -402,9 +409,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -445,9 +453,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -488,9 +497,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -531,9 +541,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -574,9 +585,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
@@ -617,9 +629,10 @@
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, JPEG, GIF, WEBP,
-                                                            SVG. Maks:
-                                                            5MB</small>
+                                                        <small class="text-muted">*Format:
+                                                            JPG, PNG, JPEG, WEBP, GIF.
+                                                            Maks:
+                                                            1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
