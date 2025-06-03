@@ -12,9 +12,9 @@ use App\Models\Profil;
 use Illuminate\Support\Facades\Http;
 
 // Redirect the base URL to login page
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+use App\Livewire\Welcome\Welcome;
+
+Route::get('/', Welcome::class)->name('welcome.index');
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
