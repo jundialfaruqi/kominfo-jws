@@ -16,7 +16,7 @@ use Livewire\Component;
 class Firdaus extends Component
 {
     #[Layout('components.layouts.firdaus')]
-    #[Title('Al-Firdaus')]
+    #[Title('Jadwal Sholat Pekanbaru')]
     public $serverTime; // UTC time from server
     public $serverTimestamp; // timestamp in milliseconds
     public $jadwalSholat = []; // jadwal sholat hari ini

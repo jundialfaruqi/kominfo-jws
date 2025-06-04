@@ -256,7 +256,7 @@
             if ($clockText.length) {
                 const displayHours = now.getHours();
                 $clockText.html(
-                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}<br>KOMINFO`
+                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}<br>DISKOMINFO`
                 );
             }
         }

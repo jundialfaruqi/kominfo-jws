@@ -17,14 +17,15 @@
     <div class="masthead">
         <div class="masthead-content text-white">
             <div class="container-fluid px-4 px-lg-0">
-                <h1 class="fst-italic lh-1 mb-4">Selamat Datang di Website Jadwal Sholat Pekanbaru</h1>
-                <p class="mb-5">Aplikasi yang menanyakan jadwal sholat untuk Kota Pekanbaru dengan pengingat adzan,
-                    iqomah serta dilengkapi dengan kalender hijriah </p>
+                <h1 class="fst-italic lh-1 mb-4">Selamat Datang di Website Resmi Jadwal Sholat Pekanbaru</h1>
+                <p class="mb-5">Aplikasi yang menayangkan jadwal sholat untuk Kota Pekanbaru dengan pengingat adzan,
+                    iqomah serta dilengkapi dengan kalender hijriah. Aplikasi ini di kembangkan dan dikelola oleh
+                    Diskominfo Pekanbaru</p>
 
                 <form>
                     <div class="row input-group-newsletter">
                         <div class="col-auto">
-                            <button class="btn btn-primary" type="button"
+                            <button class="btn btn-primary rounded-4" type="button"
                                 onclick="window.location.href='https://jadwalsholat.pekanbaru.go.id/firdaus'">
                                 Lihat Jadwal Sholat
                             </button>
