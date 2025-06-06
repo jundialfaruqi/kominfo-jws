@@ -20,7 +20,7 @@ class Index extends Component
     public $deleteUserName;
     public $isLoading = false;
 
-    public $name, $email, $phone, $address, $password, $password_confirmation, $role;
+    public $name, $email, $phone, $address, $password, $password_confirmation, $role, $status;
     public function updatingSearch()
     {
         $this->resetPage();
@@ -29,12 +29,13 @@ class Index extends Component
     public function render()
     {
         $data = array(
-            'user' => User::select('id', 'name', 'phone', 'email', 'role')
+            'user' => User::select('id', 'name', 'phone', 'email', 'role', 'status')
                 ->where(function ($query) {
                     $query->where('name', 'like', '%' . $this->search . '%')
                         ->orWhere('email', 'like', '%' . $this->search . '%');
                 })
                 ->orderBy('role', 'asc')
+                ->orderBy('status', 'asc')
                 ->paginate($this->paginate),
         );
         return view('livewire.admin.user.index', $data);
@@ -57,6 +58,7 @@ class Index extends Component
                 'password',
                 'password_confirmation',
                 'role',
+                'status',
             ]
         );
     }
@@ -71,7 +73,8 @@ class Index extends Component
                 'password_confirmation' => 'required|min:6|same:password',
                 'phone'                 => 'required|numeric',
                 'address'               => 'required',
-                'role'                  => 'required|in:Admin,User',
+                'role'                  => 'required|in:Super Admin,Admin,User',
+                'status'                => 'required|in:Active,Inactive',
             ],
             [
                 'name.required'                  => 'Nama wajib diisi',
@@ -88,6 +91,8 @@ class Index extends Component
                 'address.required'               => 'Alamat wajib diisi',
                 'role.required'                  => 'Role wajib diisi',
                 'role.in'                        => 'Role tidak valid',
+                'status.required'                => 'Status wajib diisi',
+                'status.in'                      => 'Status tidak valid',
             ]
         );
 
@@ -98,6 +103,7 @@ class Index extends Component
         $user->address  = $this->address;
         $user->password = bcrypt($this->password);
         $user->role     = $this->role;
+        $user->status   = $this->status;
         $user->save();
         $this->dispatch('success', 'Data user berhasil ditambahkan');
         $this->dispatch('closeCreateModal');
@@ -118,6 +124,7 @@ class Index extends Component
                 $this->phone    = $user->phone;
                 $this->address  = $user->address;
                 $this->role     = $user->role;
+                $this->status   = $user->status;
 
                 // Reset password fields
                 $this->password = '';
@@ -136,7 +143,8 @@ class Index extends Component
             'name'      => 'required',
             'phone'     => 'required|numeric',
             'address'   => 'required',
-            'role'      => 'required|in:Admin,User',
+            'role'      => 'required|in:Super Admin,Admin,User',
+            'status'    => 'required|in:Active,Inactive',
         ];
 
         $rules['email'] = 'required|email|unique:users,email,' . $this->userId;
@@ -161,6 +169,8 @@ class Index extends Component
             'address.required'               => 'Alamat wajib diisi',
             'role.required'                  => 'Role wajib diisi',
             'role.in'                        => 'Role tidak valid',
+            'status.required'                => 'Status wajib diisi',
+            'status.in'                      => 'Status tidak valid',
         ];
 
         $this->validate($rules, $messages);
@@ -173,6 +183,7 @@ class Index extends Component
             $user->phone    = $this->phone;
             $user->address  = $this->address;
             $user->role     = $this->role;
+            $user->status   = $this->status;
 
             // Only update password if provided
             if (!empty($this->password)) {

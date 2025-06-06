@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Auth\Login;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Admin\User\Index as UserIndex;
+use App\Livewire\Inactive\Inactive;
 use App\Livewire\Petugas\Petugas;
 use App\Livewire\Profil\ProfilMasjid;
 use App\Livewire\Slides\Slide;
@@ -25,8 +26,12 @@ Route::middleware('guest')->group(function () {
 // Register Routes
 Route::get('/register', Register::class)->name('register');
 
-// Protected Routes (require authentication)
 Route::middleware('auth')->group(function () {
+    Route::get('/inactive', Inactive::class)->name('inactive.index');
+});
+
+// Protected Routes (require authentication)
+Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Dashboard Route
     Route::get('/dashboard', DashboardIndex::class)->name('dashboard.index');
 

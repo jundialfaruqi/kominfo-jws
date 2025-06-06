@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->string('address');
-            $table->enum('role', ['Admin', 'User'])->default('User');
+            $table->enum('role', ['Super Admin', 'Admin', 'User'])->default('User');
+            $table->enum('status', ['Active', 'Inactive'])->default('Inactive');
             $table->string('photo')->nullable();
             $table->string('password');
             $table->rememberToken();

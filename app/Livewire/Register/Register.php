@@ -102,6 +102,7 @@ class Register extends Component
                     'phone' => $this->phone,
                     'password' => Hash::make($this->password), // Explicit hashing
                     'role' => 'User',
+                    'status' => 'Inactive',
                 ]);
 
                 Log::info('User created:', ['user_id' => $user->id]);

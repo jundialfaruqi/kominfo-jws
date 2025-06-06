@@ -66,6 +66,7 @@
                                         <th>Email</th>
                                         <th>Phone</th>
                                         <th>Role</th>
+                                        <th>Status</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -86,6 +87,19 @@
                                                 <td>
                                                     <span class="badge bg-red-lt">
                                                         {{ $users->role }}
+                                                    </span>
+                                                </td>
+                                            @endif
+                                            @if ($users->status == 'Active')
+                                                <td>
+                                                    <span class="badge bg-green-lt">
+                                                        {{ $users->status }}
+                                                    </span>
+                                                </td>
+                                            @else
+                                                <td>
+                                                    <span class="badge bg-red-lt">
+                                                        {{ $users->status }}
                                                     </span>
                                                 </td>
                                             @endif

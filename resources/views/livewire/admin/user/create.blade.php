@@ -88,6 +88,20 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Status<span class="text-danger">*</span></label>
+                    <select wire:model="status"
+                        class="form-select rounded-3 @error('status')
+                        is-invalid
+                    @enderror">
+                        <option class="dropdown-header" selected>Pilih Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                    @error('status')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
             <div class="modal-footer">
                 <a wire:click="cancel" href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
