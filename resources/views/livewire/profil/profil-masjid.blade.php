@@ -150,7 +150,7 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label">Logo Pemerintah</label>
+                                                    <label class="form-label">Logo Instansi</label>
                                                     {{-- Photo logo pemerintah --}}
                                                     @if ($logo_pemerintah)
                                                         <div class="card p-5 rounded-3">

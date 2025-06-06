@@ -26,15 +26,26 @@
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    $('.mosque-name-highlight').text(response.data.name);
-                    $('.mosque-address').text(response.data.address);
+
+                    const capitalizedName = response.data.name
+                        .toLowerCase()
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                    $('.mosque-name-highlight').text(capitalizedName);
+
+                    const capitalizedAddress = response.data.address
+                        .toLowerCase()
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                    $('.mosque-address').text(capitalizedAddress);
 
                     $('.logo-container').empty();
-                    if (response.data.logo_masjid) {
-                        $('.logo-container').append(
-                            `<img src="${response.data.logo_masjid}" alt="Logo Masjid" class="logo logo-masjid">`
-                        );
-                    }
+                    // Menambahkan logo masjid dengan gambar default jika tidak ada logo
+                    $('.logo-container').append(
+                        `<img src="${response.data.logo_masjid || '/images/other/logo-masjid-default.png'}" alt="Logo Masjid" class="logo logo-masjid">`
+                    );
 
                     if (response.data.logo_pemerintah) {
                         $('.logo-container').append(

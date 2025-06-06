@@ -17,6 +17,7 @@ class Profil extends Model
         'phone',
         'logo_masjid',
         'logo_pemerintah',
+        'slug',
     ];
 
     public function user()

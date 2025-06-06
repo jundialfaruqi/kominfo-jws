@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 
 // Redirect the base URL to login page
 use App\Livewire\Welcome\Welcome;
+use App\Livewire\Register\Register;
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -20,6 +21,9 @@ Route::get('/', Welcome::class)->name('welcome.index');
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
 });
+
+// Register Routes
+Route::get('/register', Register::class)->name('register');
 
 // Protected Routes (require authentication)
 Route::middleware('auth')->group(function () {
