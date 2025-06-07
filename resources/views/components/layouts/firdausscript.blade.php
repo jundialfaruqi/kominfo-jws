@@ -1195,7 +1195,7 @@
             } else {
                 console.warn(
                     'Elemen #adzan15 tidak ditemukan atau nilainya kosong, menggunakan gambar default');
-                displayAdzanImage('/images/other/lurus-dan-rapatkan-shaf-sholat.png', false, duration);
+                displayAdzanImage('/images/other/lurus-rapat-shaf.webp', false, duration);
             }
         }
 
