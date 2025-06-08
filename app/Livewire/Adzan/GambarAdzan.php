@@ -10,6 +10,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Intervention\Image\Laravel\Facades\Image;
 
 class GambarAdzan extends Component
 {
@@ -129,6 +130,681 @@ class GambarAdzan extends Component
         'adzan14.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
         'adzan15.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
     ];
+
+    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
+    {
+        try {
+            // Konversi ke bytes
+            $maxSizeBytes = $maxSizeKB * 1024;
+
+            // Baca gambar menggunakan Intervention Image
+            $image = Image::read($uploadedFile->getRealPath());
+
+            // Dapatkan dimensi asli
+            $originalWidth = $image->width();
+            $originalHeight = $image->height();
+
+            // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
+            $quality = 95;
+            $minQuality = 20;
+
+            do {
+                // Encode dengan kualitas saat ini
+                $encoded = $image->toJpeg($quality);
+                $currentSize = strlen($encoded);
+
+                // Jika ukuran sudah sesuai, keluar dari loop
+                if ($currentSize <= $maxSizeBytes) {
+                    break;
+                }
+
+                // Turunkan kualitas secara bertahap
+                if ($currentSize > $maxSizeBytes * 1.5) {
+                    $quality -= 10; // Penurunan cepat jika masih jauh dari target
+                } elseif ($currentSize > $maxSizeBytes * 1.2) {
+                    $quality -= 5;  // Penurunan sedang
+                } else {
+                    $quality -= 2;  // Penurunan halus untuk fine-tuning
+                }
+
+                // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil
+                if ($quality < $minQuality && strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
+                    $scaleFactor = 0.9;
+                    while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
+                        $newWidth = (int)($originalWidth * $scaleFactor);
+                        $newHeight = (int)($originalHeight * $scaleFactor);
+                        $image->resize($newWidth, $newHeight);
+                        $scaleFactor -= 0.05;
+                    }
+                }
+            } while ($quality >= $minQuality);
+
+            return $image;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menyimpan gambar yang sudah diproses
+     */
+    private function saveProcessedImage($uploadedFile, $adzanNumber)
+    {
+        try {
+            // Proses resize gambar dengan ukuran maksimal 990KB
+            $processedImage = $this->resizeImageToLimit($uploadedFile);
+
+            // Generate nama file dengan ekstensi .jpg (karena kita convert ke JPEG)
+            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $fileName = time() . '_adzan' . $adzanNumber . '_' . $originalName . '.jpg';
+            $filePath = public_path('images/adzan/' . $fileName);
+
+            // Pastikan directory ada
+            $directory = dirname($filePath);
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Tentukan kualitas optimal berdasarkan ukuran target
+            $maxSizeBytes = 990 * 1024; // 990KB
+            $quality = 95;
+
+            // Fine-tune kualitas untuk mendekati 990KB
+            do {
+                $encoded = $processedImage->toJpeg($quality);
+                $currentSize = strlen($encoded);
+
+                if ($currentSize <= $maxSizeBytes) {
+                    break;
+                }
+
+                $quality -= 1;
+            } while ($quality >= 60);
+
+            // Simpan gambar yang sudah diproses dengan kualitas optimal
+            $processedImage->toJpeg($quality)->save($filePath);
+
+            // Verifikasi ukuran file hasil akhir
+            $finalSize = filesize($filePath);
+            if ($finalSize > $maxSizeBytes) {
+                throw new \Exception("Ukuran file masih terlalu besar: " . round($finalSize / 1024, 2) . "KB");
+            }
+
+            return '/images/adzan/' . $fileName;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal menyimpan gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan1()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan1) {
+                $filePath = public_path($this->tmp_adzan1);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan1 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan1 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan1 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan1']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan1']);
+
+            $this->dispatch('success', 'Gambar Adzan 1 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan2()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan2) {
+                $filePath = public_path($this->tmp_adzan2);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan2 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan2 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan2 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan2']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan2']);
+
+            $this->dispatch('success', 'Gambar Adzan 2 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan3()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan3) {
+                $filePath = public_path($this->tmp_adzan3);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan3 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan3 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan3 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan3']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan3']);
+
+            $this->dispatch('success', 'Gambar Adzan 3 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan4()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan4) {
+                $filePath = public_path($this->tmp_adzan4);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan4 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan4 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan4 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan4']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan4']);
+
+            $this->dispatch('success', 'Gambar Adzan 4 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan5()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan5) {
+                $filePath = public_path($this->tmp_adzan5);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan5 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan5 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan5 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan5']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan5']);
+
+            $this->dispatch('success', 'Gambar Adzan 5 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan6()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan6) {
+                $filePath = public_path($this->tmp_adzan6);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan6 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan6 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan6 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan6']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan6']);
+
+            $this->dispatch('success', 'Gambar Adzan 6 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan7()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan7) {
+                $filePath = public_path($this->tmp_adzan7);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan7 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan7 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan7 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan7']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan7']);
+
+            $this->dispatch('success', 'Gambar Adzan 7 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan8()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan8) {
+                $filePath = public_path($this->tmp_adzan8);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan8 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan8 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan8 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan8']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan8']);
+
+            $this->dispatch('success', 'Gambar Adzan 8 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan9()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan9) {
+                $filePath = public_path($this->tmp_adzan9);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan9 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan9 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan9 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan9']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan9']);
+
+            $this->dispatch('success', 'Gambar Adzan 9 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan10()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan10) {
+                $filePath = public_path($this->tmp_adzan10);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan10 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan10 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan10 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan10']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan10']);
+
+            $this->dispatch('success', 'Gambar Adzan 10 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan11()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan11) {
+                $filePath = public_path($this->tmp_adzan11);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan11 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan11 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan11 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan11']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan11']);
+
+            $this->dispatch('success', 'Gambar Adzan 11 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan12()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan12) {
+                $filePath = public_path($this->tmp_adzan12);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan12 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan12 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan12 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan12']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan12']);
+
+            $this->dispatch('success', 'Gambar Adzan 12 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan13()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan13) {
+                $filePath = public_path($this->tmp_adzan13);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan13 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan13 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan13 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan13']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan13']);
+
+            $this->dispatch('success', 'Gambar Adzan 13 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan14()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan14) {
+                $filePath = public_path($this->tmp_adzan14);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan14 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan14 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan14 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan14']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan14']);
+
+            $this->dispatch('success', 'Gambar Adzan 14 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    public function clearAdzan15()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_adzan15) {
+                $filePath = public_path($this->tmp_adzan15);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->adzanId) {
+                    $adzan = Adzan::find($this->adzanId);
+                    if ($adzan) {
+                        $adzan->adzan15 = null;
+                        $adzan->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->adzan15 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_adzan15 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['adzan15']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'adzan15']);
+
+            $this->dispatch('success', 'Gambar Adzan 15 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
 
     public function mount()
     {
@@ -401,44 +1077,31 @@ class GambarAdzan extends Component
             }
 
             $adzan->user_id = $this->userId;
-            $adzan->adzan1  = $this->tmp_adzan1;
-            $adzan->adzan2  = $this->tmp_adzan2;
-            $adzan->adzan3  = $this->tmp_adzan3;
-            $adzan->adzan4  = $this->tmp_adzan4;
-            $adzan->adzan5  = $this->tmp_adzan5;
-            $adzan->adzan6  = $this->tmp_adzan6;
-            $adzan->adzan7  = $this->tmp_adzan7;
-            $adzan->adzan8  = $this->tmp_adzan8;
-            $adzan->adzan9  = $this->tmp_adzan9;
-            $adzan->adzan10 = $this->tmp_adzan10;
-            $adzan->adzan11 = $this->tmp_adzan11;
-            $adzan->adzan12 = $this->tmp_adzan12;
-            $adzan->adzan13 = $this->tmp_adzan13;
-            $adzan->adzan14 = $this->tmp_adzan14;
-            $adzan->adzan15 = $this->tmp_adzan15;
 
             // Handle adzan 1 upload
             if ($this->adzan1) {
-                // delete old adzan 1 if exists
+                // Delete old adzan 1 if exists
                 if ($this->isEdit && $adzan->adzan1 && file_exists(public_path($adzan->adzan1))) {
                     File::delete(public_path($adzan->adzan1));
                 }
-                // save new adzan 1
-                $fileName = time() . '_adzan1_' . $this->adzan1->getClientOriginalName();
-                $this->adzan1->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan1 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 1 dengan resize otomatis
+                $adzan->adzan1 = $this->saveProcessedImage($this->adzan1, 1);
+            } else {
+                $adzan->adzan1 = $this->tmp_adzan1;
             }
 
             // Handle adzan 2 upload
             if ($this->adzan2) {
-                // delete old adzan 2 if exists
+                // Delete old adzan 2 if exists
                 if ($this->isEdit && $adzan->adzan2 && file_exists(public_path($adzan->adzan2))) {
                     File::delete(public_path($adzan->adzan2));
                 }
-                // save new adzan 2
-                $fileName = time() . '_adzan2_' . $this->adzan2->getClientOriginalName();
-                $this->adzan2->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan2 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 2 dengan resize otomatis
+                $adzan->adzan2 = $this->saveProcessedImage($this->adzan2, 2);
+            } else {
+                $adzan->adzan2 = $this->tmp_adzan2;
             }
 
             // Handle adzan 3 upload
@@ -447,10 +1110,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan3 && file_exists(public_path($adzan->adzan3))) {
                     File::delete(public_path($adzan->adzan3));
                 }
-                // save new adzan 3
-                $fileName = time() . '_adzan3_' . $this->adzan3->getClientOriginalName();
-                $this->adzan3->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan3 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 3 dengan resize otomatis
+                $adzan->adzan3 = $this->saveProcessedImage($this->adzan3, 3);
+            } else {
+                $adzan->adzan3 = $this->tmp_adzan3;
             }
 
             // Handle adzan 4 upload
@@ -459,10 +1123,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan4 && file_exists(public_path($adzan->adzan4))) {
                     File::delete(public_path($adzan->adzan4));
                 }
-                // save new adzan 4
-                $fileName = time() . '_adzan4_' . $this->adzan4->getClientOriginalName();
-                $this->adzan4->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan4 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 4 dengan resize otomatis
+                $adzan->adzan4 = $this->saveProcessedImage($this->adzan4, 4);
+            } else {
+                $adzan->adzan4 = $this->tmp_adzan4;
             }
 
             // Handle adzan 5 upload
@@ -471,10 +1136,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan5 && file_exists(public_path($adzan->adzan5))) {
                     File::delete(public_path($adzan->adzan5));
                 }
-                // save new adzan 5
-                $fileName = time() . '_adzan5_' . $this->adzan5->getClientOriginalName();
-                $this->adzan5->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan5 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 5 dengan resize otomatis
+                $adzan->adzan5 = $this->saveProcessedImage($this->adzan5, 5);
+            } else {
+                $adzan->adzan5 = $this->tmp_adzan5;
             }
 
             // Handle adzan 6 upload            
@@ -483,10 +1149,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan6 && file_exists(public_path($adzan->adzan6))) {
                     File::delete(public_path($adzan->adzan6));
                 }
-                // save new adzan 6
-                $fileName = time() . '_adzan6_' . $this->adzan6->getClientOriginalName();
-                $this->adzan6->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan6 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 6 dengan resize otomatis
+                $adzan->adzan6 = $this->saveProcessedImage($this->adzan6, 6);
+            } else {
+                $adzan->adzan6 = $this->tmp_adzan6;
             }
 
             // Handle adzan 7 upload            
@@ -495,10 +1162,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan7 && file_exists(public_path($adzan->adzan7))) {
                     File::delete(public_path($adzan->adzan7));
                 }
-                // save new adzan 7
-                $fileName = time() . '_adzan7_' . $this->adzan7->getClientOriginalName();
-                $this->adzan7->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan7 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 7 dengan resize otomatis
+                $adzan->adzan7 = $this->saveProcessedImage($this->adzan7, 7);
+            } else {
+                $adzan->adzan7 = $this->tmp_adzan7;
             }
 
             // Handle adzan 8 upload            
@@ -507,10 +1175,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan8 && file_exists(public_path($adzan->adzan8))) {
                     File::delete(public_path($adzan->adzan8));
                 }
-                // save new adzan 8
-                $fileName = time() . '_adzan8_' . $this->adzan8->getClientOriginalName();
-                $this->adzan8->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan8 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 8 dengan resize otomatis
+                $adzan->adzan8 = $this->saveProcessedImage($this->adzan8, 8);
+            } else {
+                $adzan->adzan8 = $this->tmp_adzan8;
             }
 
             // Handle adzan 9 upload            
@@ -519,10 +1188,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan9 && file_exists(public_path($adzan->adzan9))) {
                     File::delete(public_path($adzan->adzan9));
                 }
-                // save new adzan 9
-                $fileName = time() . '_adzan9_' . $this->adzan9->getClientOriginalName();
-                $this->adzan9->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan9 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 9 dengan resize otomatis
+                $adzan->adzan9 = $this->saveProcessedImage($this->adzan9, 9);
+            } else {
+                $adzan->adzan9 = $this->tmp_adzan9;
             }
 
             // Handle adzan 10 upload            
@@ -531,10 +1201,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan10 && file_exists(public_path($adzan->adzan10))) {
                     File::delete(public_path($adzan->adzan10));
                 }
-                // save new adzan 10
-                $fileName = time() . '_adzan10_' . $this->adzan10->getClientOriginalName();
-                $this->adzan10->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan10 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 10 dengan resize otomatis
+                $adzan->adzan10 = $this->saveProcessedImage($this->adzan10, 10);
+            } else {
+                $adzan->adzan10 = $this->tmp_adzan10;
             }
 
             // Handle adzan 11 upload            
@@ -543,10 +1214,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan11 && file_exists(public_path($adzan->adzan11))) {
                     File::delete(public_path($adzan->adzan11));
                 }
-                // save new adzan 11
-                $fileName = time() . '_adzan11_' . $this->adzan11->getClientOriginalName();
-                $this->adzan11->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan11 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 11 dengan resize otomatis
+                $adzan->adzan11 = $this->saveProcessedImage($this->adzan11, 11);
+            } else {
+                $adzan->adzan11 = $this->tmp_adzan11;
             }
 
             // Handle adzan 12 upload            
@@ -555,10 +1227,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan12 && file_exists(public_path($adzan->adzan12))) {
                     File::delete(public_path($adzan->adzan12));
                 }
-                // save new adzan 12
-                $fileName = time() . '_adzan12_' . $this->adzan12->getClientOriginalName();
-                $this->adzan12->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan12 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 12 dengan resize otomatis
+                $adzan->adzan12 = $this->saveProcessedImage($this->adzan12, 12);
+            } else {
+                $adzan->adzan12 = $this->tmp_adzan12;
             }
 
             // Handle adzan 13 upload            
@@ -567,10 +1240,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan13 && file_exists(public_path($adzan->adzan13))) {
                     File::delete(public_path($adzan->adzan13));
                 }
-                // save new adzan 13
-                $fileName = time() . '_adzan13_' . $this->adzan13->getClientOriginalName();
-                $this->adzan13->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan13 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 13 dengan resize otomatis
+                $adzan->adzan13 = $this->saveProcessedImage($this->adzan13, 13);
+            } else {
+                $adzan->adzan13 = $this->tmp_adzan13;
             }
 
             // Handle adzan 14 upload            
@@ -579,10 +1253,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan14 && file_exists(public_path($adzan->adzan14))) {
                     File::delete(public_path($adzan->adzan14));
                 }
-                // save new adzan 14
-                $fileName = time() . '_adzan14_' . $this->adzan14->getClientOriginalName();
-                $this->adzan14->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan14 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 14 dengan resize otomatis
+                $adzan->adzan14 = $this->saveProcessedImage($this->adzan14, 14);
+            } else {
+                $adzan->adzan14 = $this->tmp_adzan14;
             }
 
             // Handle adzan 15 upload            
@@ -591,10 +1266,11 @@ class GambarAdzan extends Component
                 if ($this->isEdit && $adzan->adzan15 && file_exists(public_path($adzan->adzan15))) {
                     File::delete(public_path($adzan->adzan15));
                 }
-                // save new adzan 15
-                $fileName = time() . '_adzan15_' . $this->adzan15->getClientOriginalName();
-                $this->adzan15->storeAs('', $fileName, 'public_images_adzan');
-                $adzan->adzan15 = 'images/adzan/' . $fileName;
+
+                // Save new adzan 15 dengan resize otomatis
+                $adzan->adzan15 = $this->saveProcessedImage($this->adzan15, 15);
+            } else {
+                $adzan->adzan15 = $this->tmp_adzan15;
             }
 
             $adzan->save();

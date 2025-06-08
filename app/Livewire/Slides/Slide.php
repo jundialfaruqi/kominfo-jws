@@ -10,6 +10,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Laravel\Facades\Image;
 
 class Slide extends Component
 {
@@ -43,12 +44,12 @@ class Slide extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
-        'slide1' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'slide2' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'slide3' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'slide4' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'slide5' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'slide6' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
+        'slide1' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide2' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide3' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide4' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide5' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide6' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
     ];
 
     protected $messages = [
@@ -60,12 +61,6 @@ class Slide extends Component
         'slide4.image'    => 'File harus berupa gambar',
         'slide5.image'    => 'File harus berupa gambar',
         'slide6.image'    => 'File harus berupa gambar',
-        'slide1.max'      => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'slide2.max'      => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'slide3.max'      => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'slide4.max'      => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'slide5.max'      => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'slide6.max'      => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
         'slide1.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
         'slide2.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
         'slide3.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
@@ -74,6 +69,335 @@ class Slide extends Component
         'slide6.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
     ];
 
+    /**
+     * Method untuk resize gambar dengan aspect ratio 16:9 dan ukuran maksimal 990KB
+     */
+    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
+    {
+        try {
+            // Konversi ke bytes
+            $maxSizeBytes = $maxSizeKB * 1024;
+
+            // Baca gambar menggunakan Intervention Image
+            $image = Image::read($uploadedFile->getRealPath());
+
+            // Target aspect ratio 16:9
+            $targetRatio = 16 / 9;
+            $targetWidth = 1920;
+            $targetHeight = 1080;
+
+            // Dapatkan dimensi asli
+            $originalWidth = $image->width();
+            $originalHeight = $image->height();
+            $originalRatio = $originalWidth / $originalHeight;
+
+            // Crop gambar ke aspect ratio 16:9 jika diperlukan
+            if (abs($originalRatio - $targetRatio) > 0.01) {
+                if ($originalRatio > $targetRatio) {
+                    // Gambar terlalu lebar, crop dari kiri-kanan
+                    $newWidth = (int)($originalHeight * $targetRatio);
+                    $x = (int)(($originalWidth - $newWidth) / 2);
+                    $image->crop($newWidth, $originalHeight, $x, 0);
+                } else {
+                    // Gambar terlalu tinggi, crop dari atas-bawah
+                    $newHeight = (int)($originalWidth / $targetRatio);
+                    $y = (int)(($originalHeight - $newHeight) / 2);
+                    $image->crop($originalWidth, $newHeight, 0, $y);
+                }
+            }
+
+            // Resize ke dimensi target 1920x1080
+            $image->resize($targetWidth, $targetHeight);
+
+            // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
+            $quality = 95;
+            $minQuality = 20;
+
+            do {
+                // Encode dengan kualitas saat ini
+                $encoded = $image->toJpeg($quality);
+                $currentSize = strlen($encoded);
+
+                // Jika ukuran sudah sesuai, keluar dari loop
+                if ($currentSize <= $maxSizeBytes) {
+                    break;
+                }
+
+                // Turunkan kualitas secara bertahap
+                if ($currentSize > $maxSizeBytes * 1.5) {
+                    $quality -= 10; // Penurunan cepat jika masih jauh dari target
+                } elseif ($currentSize > $maxSizeBytes * 1.2) {
+                    $quality -= 5;  // Penurunan sedang
+                } else {
+                    $quality -= 2;  // Penurunan halus untuk fine-tuning
+                }
+            } while ($quality >= $minQuality);
+
+            // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil
+            if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
+                $scaleFactor = 0.9;
+                while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
+                    $newWidth = (int)($targetWidth * $scaleFactor);
+                    $newHeight = (int)($targetHeight * $scaleFactor);
+                    $image->resize($newWidth, $newHeight);
+                    $scaleFactor -= 0.05;
+                }
+            }
+
+            return $image;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menyimpan gambar yang sudah diproses
+     */
+    private function saveProcessedImage($uploadedFile, $slideNumber)
+    {
+        try {
+            // Proses resize gambar dengan aspect ratio 16:9 dan ukuran maksimal 990KB
+            $processedImage = $this->resizeImageToLimit($uploadedFile);
+
+            // Generate nama file dengan ekstensi .jpg (karena kita convert ke JPEG)
+            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $fileName = time() . '_slide' . $slideNumber . '_' . $originalName . '.jpg';
+            $filePath = public_path('images/slides/' . $fileName);
+
+            // Pastikan directory ada
+            $directory = dirname($filePath);
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Tentukan kualitas optimal berdasarkan ukuran target
+            $maxSizeBytes = 990 * 1024; // 990KB
+            $quality = 95;
+
+            // Fine-tune kualitas untuk mendekati 990KB
+            do {
+                $encoded = $processedImage->toJpeg($quality);
+                $currentSize = strlen($encoded);
+
+                if ($currentSize <= $maxSizeBytes) {
+                    break;
+                }
+
+                $quality -= 1;
+            } while ($quality >= 60);
+
+            // Simpan gambar yang sudah diproses dengan kualitas optimal
+            $processedImage->toJpeg($quality)->save($filePath);
+
+            // Verifikasi ukuran file hasil akhir
+            $finalSize = filesize($filePath);
+            if ($finalSize > $maxSizeBytes) {
+                throw new \Exception("Ukuran file masih terlalu besar: " . round($finalSize / 1024, 2) . "KB");
+            }
+
+            return '/images/slides/' . $fileName;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal menyimpan gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menghapus slide1 dan mereset input file
+     */
+    public function clearSlide1()
+    {
+        try {
+            // Jika sedang edit dan ada file lama di tmp_slide1, hapus file fisiknya
+            if ($this->isEdit && $this->tmp_slide1) {
+                $filePath = public_path($this->tmp_slide1);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                // Update database untuk menghapus referensi file
+                if ($this->slideId) {
+                    $slide = Slides::find($this->slideId);
+                    if ($slide) {
+                        $slide->slide1 = null;
+                        $slide->save();
+                    }
+                }
+            }
+
+            // Reset property slide1 (file yang diupload)
+            $this->slide1 = null;
+
+            // Reset property tmp_slide1 (gambar yang sudah tersimpan)
+            $this->tmp_slide1 = null;
+
+            // Reset validation error untuk slide1
+            $this->resetValidation(['slide1']);
+
+            // Dispatch event untuk reset input file di browser
+            $this->dispatch('resetFileInput', ['inputName' => 'slide1']);
+
+            $this->dispatch('success', 'Gambar Slide 1 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menghapus slide2 dan mereset input file
+     */
+    public function clearSlide2()
+    {
+        try {
+            if ($this->isEdit && $this->tmp_slide2) {
+                $filePath = public_path($this->tmp_slide2);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                if ($this->slideId) {
+                    $slide = Slides::find($this->slideId);
+                    if ($slide) {
+                        $slide->slide2 = null;
+                        $slide->save();
+                    }
+                }
+            }
+
+            $this->slide2 = null;
+            $this->tmp_slide2 = null;
+            $this->resetValidation(['slide2']);
+            $this->dispatch('resetFileInput', ['inputName' => 'slide2']);
+            $this->dispatch('success', 'Gambar Slide 2 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menghapus slide3 dan mereset input file
+     */
+    public function clearSlide3()
+    {
+        try {
+            if ($this->isEdit && $this->tmp_slide3) {
+                $filePath = public_path($this->tmp_slide3);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                if ($this->slideId) {
+                    $slide = Slides::find($this->slideId);
+                    if ($slide) {
+                        $slide->slide3 = null;
+                        $slide->save();
+                    }
+                }
+            }
+
+            $this->slide3 = null;
+            $this->tmp_slide3 = null;
+            $this->resetValidation(['slide3']);
+            $this->dispatch('resetFileInput', ['inputName' => 'slide3']);
+            $this->dispatch('success', 'Gambar Slide 3 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menghapus slide4 dan mereset input file
+     */
+    public function clearSlide4()
+    {
+        try {
+            if ($this->isEdit && $this->tmp_slide4) {
+                $filePath = public_path($this->tmp_slide4);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                if ($this->slideId) {
+                    $slide = Slides::find($this->slideId);
+                    if ($slide) {
+                        $slide->slide4 = null;
+                        $slide->save();
+                    }
+                }
+            }
+
+            $this->slide4 = null;
+            $this->tmp_slide4 = null;
+            $this->resetValidation(['slide4']);
+            $this->dispatch('resetFileInput', ['inputName' => 'slide4']);
+            $this->dispatch('success', 'Gambar Slide 4 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menghapus slide5 dan mereset input file
+     */
+    public function clearSlide5()
+    {
+        try {
+            if ($this->isEdit && $this->tmp_slide5) {
+                $filePath = public_path($this->tmp_slide5);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                if ($this->slideId) {
+                    $slide = Slides::find($this->slideId);
+                    if ($slide) {
+                        $slide->slide5 = null;
+                        $slide->save();
+                    }
+                }
+            }
+
+            $this->slide5 = null;
+            $this->tmp_slide5 = null;
+            $this->resetValidation(['slide5']);
+            $this->dispatch('resetFileInput', ['inputName' => 'slide5']);
+            $this->dispatch('success', 'Gambar Slide 5 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Method untuk menghapus slide6 dan mereset input file
+     */
+    public function clearSlide6()
+    {
+        try {
+            if ($this->isEdit && $this->tmp_slide6) {
+                $filePath = public_path($this->tmp_slide6);
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+
+                if ($this->slideId) {
+                    $slide = Slides::find($this->slideId);
+                    if ($slide) {
+                        $slide->slide6 = null;
+                        $slide->save();
+                    }
+                }
+            }
+
+            $this->slide6 = null;
+            $this->tmp_slide6 = null;
+            $this->resetValidation(['slide6']);
+            $this->dispatch('resetFileInput', ['inputName' => 'slide6']);
+            $this->dispatch('success', 'Gambar Slide 6 berhasil dihapus!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());
+        }
+    }
+
+    // Method mount, render, dan method lainnya tetap sama seperti sebelumnya...
     public function mount()
     {
         $this->paginate = 10;
@@ -166,7 +490,6 @@ class Slide extends Component
 
     public function showAddForm()
     {
-
         // Only admin can add new slides
         if (Auth::user()->role !== 'Admin') {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk menambah slide!');
@@ -275,89 +598,79 @@ class Slide extends Component
             }
 
             $slide->user_id = $this->userId;
-            $slide->slide1  = $this->tmp_slide1;
-            $slide->slide2  = $this->tmp_slide2;
-            $slide->slide3  = $this->tmp_slide3;
-            $slide->slide4  = $this->tmp_slide4;
-            $slide->slide5  = $this->tmp_slide5;
-            $slide->slide6  = $this->tmp_slide6;
 
-            // Handle slide1 upload
+            // Handle slide1 upload dengan resize otomatis
             if ($this->slide1) {
                 // Delete old slide1 if exists
                 if ($this->isEdit && $slide->slide1 && file_exists(public_path($slide->slide1))) {
                     File::delete(public_path($slide->slide1));
                 }
-
-                // Save new slide1
-                $fileName = time() . '_slide1_' . $this->slide1->getClientOriginalName();
-                $this->slide1->storeAs('', $fileName, 'public_images_slides');
-                $slide->slide1 = '/images/slides/' . $fileName;
+                // Save new slide1 dengan resize otomatis
+                $slide->slide1 = $this->saveProcessedImage($this->slide1, 1);
+            } else {
+                // Jika tidak ada file baru, gunakan nilai dari tmp_slide1
+                // Jika tmp_slide1 null (dihapus via trash), maka slide1 akan jadi null
+                $slide->slide1 = $this->tmp_slide1;
             }
 
-            // Handle slide2 upload
+            // Handle slide2 upload dengan resize otomatis
             if ($this->slide2) {
                 // Delete old slide2 if exists
                 if ($this->isEdit && $slide->slide2 && file_exists(public_path($slide->slide2))) {
                     File::delete(public_path($slide->slide2));
                 }
-
-                // Save new slide2
-                $fileName = time() . '_slide2_' . $this->slide2->getClientOriginalName();
-                $this->slide2->storeAs('', $fileName, 'public_images_slides');
-                $slide->slide2 = '/images/slides/' . $fileName;
+                // Save new slide2 dengan resize otomatis
+                $slide->slide2 = $this->saveProcessedImage($this->slide2, 2);
+            } else {
+                $slide->slide2 = $this->tmp_slide2;
             }
 
-            // Handle slide3 upload
+            // Handle slide3 upload dengan resize otomatis
             if ($this->slide3) {
                 // Delete old slide3 if exists
                 if ($this->isEdit && $slide->slide3 && file_exists(public_path($slide->slide3))) {
                     File::delete(public_path($slide->slide3));
                 }
-
-                // Save new slide3
-                $fileName = time() . '_slide3_' . $this->slide3->getClientOriginalName();
-                $this->slide3->storeAs('', $fileName, 'public_images_slides');
-                $slide->slide3 = '/images/slides/' . $fileName;
+                // Save new slide3 dengan resize otomatis
+                $slide->slide3 = $this->saveProcessedImage($this->slide3, 3);
+            } else {
+                $slide->slide3 = $this->tmp_slide3;
             }
 
-            // Handle slide4 upload
+            // Handle slide4 upload dengan resize otomatis
             if ($this->slide4) {
                 // Delete old slide4 if exists
                 if ($this->isEdit && $slide->slide4 && file_exists(public_path($slide->slide4))) {
                     File::delete(public_path($slide->slide4));
                 }
-
-                // Save new slide4
-                $fileName = time() . '_slide4_' . $this->slide4->getClientOriginalName();
-                $this->slide4->storeAs('', $fileName, 'public_images_slides');
-                $slide->slide4 = '/images/slides/' . $fileName;
+                // Save new slide4 dengan resize otomatis
+                $slide->slide4 = $this->saveProcessedImage($this->slide4, 4);
+            } else {
+                $slide->slide4 = $this->tmp_slide4;
             }
 
-            // Handle slide5 upload
+            // Handle slide5 upload dengan resize otomatis
             if ($this->slide5) {
                 // Delete old slide5 if exists
                 if ($this->isEdit && $slide->slide5 && file_exists(public_path($slide->slide5))) {
                     File::delete(public_path($slide->slide5));
                 }
-
-                // Save new slide5
-                $fileName = time() . '_slide5_' . $this->slide5->getClientOriginalName();
-                $this->slide5->storeAs('', $fileName, 'public_images_slides');
-                $slide->slide5 = '/images/slides/' . $fileName;
+                // Save new slide5 dengan resize otomatis
+                $slide->slide5 = $this->saveProcessedImage($this->slide5, 5);
+            } else {
+                $slide->slide5 = $this->tmp_slide5;
             }
 
-            // Handle slide6 upload
+            // Handle slide6 upload dengan resize otomatis
             if ($this->slide6) {
                 // Delete old slide6 if exists
                 if ($this->isEdit && $slide->slide6 && file_exists(public_path($slide->slide6))) {
                     File::delete(public_path($slide->slide6));
                 }
-
-                // Save new slide6
-                $fileName = time() . '_slide6_' . $this->slide6->getClientOriginalName();
-                $this->slide6->storeAs('', $fileName, 'public_images_slides');
-                $slide->slide6 = '/images/slides/' . $fileName;
+                // Save new slide6 dengan resize otomatis
+                $slide->slide6 = $this->saveProcessedImage($this->slide6, 6);
+            } else {
+                $slide->slide6 = $this->tmp_slide6;
             }
 
             $slide->save();

@@ -108,9 +108,35 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan1') is-invalid @enderror"
-                                                        wire:model="adzan1" accept="image/*">
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan1') is-invalid @enderror"
+                                                            wire:model="adzan1" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan1 || $tmp_adzan1)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan1" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan1')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -151,9 +177,36 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan2') is-invalid @enderror"
-                                                        wire:model="adzan2" accept="image/*">
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan2') is-invalid @enderror"
+                                                            wire:model="adzan2" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan2 || $tmp_adzan2)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan2" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
+
                                                     @error('adzan2')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -194,9 +247,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan3') is-invalid @enderror"
-                                                        wire:model="adzan3" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan3') is-invalid @enderror"
+                                                            wire:model="adzan3" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan3 || $tmp_adzan3)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan3" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan3')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -238,9 +316,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan4') is-invalid @enderror"
-                                                        wire:model="adzan4" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan4') is-invalid @enderror"
+                                                            wire:model="adzan4" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan4 || $tmp_adzan4)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan4" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan4')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -282,9 +385,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan5') is-invalid @enderror"
-                                                        wire:model="adzan5" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan5') is-invalid @enderror"
+                                                            wire:model="adzan5" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan5 || $tmp_adzan5)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan5" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan5')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -326,9 +454,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan6') is-invalid @enderror"
-                                                        wire:model="adzan6" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan6') is-invalid @enderror"
+                                                            wire:model="adzan6" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan6 || $tmp_adzan6)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan6" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan6')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -370,9 +523,34 @@
                                                         <small class="text-muted">*Rasio gambar 16:9 (Rekomendasi :
                                                             1417x800 Piksel)</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan15') is-invalid @enderror"
-                                                        wire:model="adzan15" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan15') is-invalid @enderror"
+                                                            wire:model="adzan15" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan15 || $tmp_adzan15)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan15" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan15')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -418,9 +596,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan7') is-invalid @enderror"
-                                                        wire:model="adzan7" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan7') is-invalid @enderror"
+                                                            wire:model="adzan7" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan7 || $tmp_adzan7)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan7" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan7')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -462,9 +665,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan8') is-invalid @enderror"
-                                                        wire:model="adzan8" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan8') is-invalid @enderror"
+                                                            wire:model="adzan8" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan8 || $tmp_adzan8)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan8" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan8')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -506,9 +734,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan9') is-invalid @enderror"
-                                                        wire:model="adzan9" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan9') is-invalid @enderror"
+                                                            wire:model="adzan9" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan9 || $tmp_adzan9)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan9" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan9')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -550,9 +803,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan10') is-invalid @enderror"
-                                                        wire:model="adzan10" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan10') is-invalid @enderror"
+                                                            wire:model="adzan10" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan10 || $tmp_adzan10)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan10" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan10')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -594,9 +872,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan11') is-invalid @enderror"
-                                                        wire:model="adzan11" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan11') is-invalid @enderror"
+                                                            wire:model="adzan11" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan11 || $tmp_adzan11)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan11" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan11')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -638,9 +941,34 @@
                                                         <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
                                                             kualitas gambar terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan12') is-invalid @enderror"
-                                                        wire:model="adzan12" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan12') is-invalid @enderror"
+                                                            wire:model="adzan12" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan12 || $tmp_adzan12)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan12" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan12')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -957,6 +1285,23 @@
                     title: 'Gagal',
                     message,
                     position: 'topRight'
+                });
+            });
+        </script>
+
+        <script>
+            document.addEventListener('livewire:initialized', function() {
+                // Listen untuk event resetFileInput dari Livewire
+                Livewire.on('resetFileInput', (data) => {
+                    const inputName = data.inputName;
+                    const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
+                    if (fileInput) {
+                        fileInput.value = '';
+                        // Trigger change event untuk memastikan Livewire mendeteksi perubahan
+                        fileInput.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
+                    }
                 });
             });
         </script>
