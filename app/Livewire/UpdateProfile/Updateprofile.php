@@ -314,10 +314,10 @@ class Updateprofile extends Component
 
             DB::commit();
 
-            $this->dispatch('success', 'Email berhasil diubah. Anda akan logout otomatis untuk keamanan.');
+            $this->dispatch('success', 'Email berhasil diubah');
             $this->show_email_confirmation = false;
             // Logout user setelah 2 detik
-            $this->dispatch('logout-user');
+            // $this->dispatch('logout-user');
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('error', 'Terjadi kesalahan saat mengubah email.');

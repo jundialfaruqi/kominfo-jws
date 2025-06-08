@@ -24,7 +24,7 @@
                                 <label class="form-label">
                                     Password
                                     <span class="form-label-description">
-                                        <a href="#">Lupa Password?</a>
+                                        {{-- <a href="#">Lupa Password?</a> --}}
                                     </span>
                                 </label>
                                 <div class="input-group input-group-flat rounded-4 border">

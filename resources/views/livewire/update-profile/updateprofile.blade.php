@@ -61,7 +61,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                <div class="col-auto">
+                                <div class="col-auto py-2">
                                     <div class="d-flex gap-2">
                                         <label for="photo-upload" class="btn rounded-3 shadow-sm">
                                             Ubah Foto
@@ -85,7 +85,7 @@
                                     @enderror
                                 </div>
                                 @if ($temp_photo)
-                                    <div class="col-auto">
+                                    <div class="col-auto py-2">
                                         <button type="button" class="btn btn-danger rounded-3 shadow-sm"
                                             wire:click="clearPhoto" wire:loading.attr="disabled">
                                             <span wire:loading.remove wire:target="clearPhoto">Hapus Foto</span>
@@ -186,7 +186,7 @@
                         <div class="card-footer bg-transparent mt-auto">
                             <div class="btn-list justify-content-end">
                                 <a wire:navigate href="{{ route('dashboard.index') }}" class="btn rounded-3">
-                                    Batal
+                                    Tutup
                                 </a>
                                 <button type="button" wire:click="update" class="btn btn-primary rounded-3"
                                     wire:loading.attr="disabled">
@@ -227,7 +227,8 @@
                             @enderror
                         </div>
                         <div class="alert alert-warning rounded-3" role="alert">
-                            <strong>Perhatian!</strong> Setelah email berubah, Anda akan logout otomatis untuk keamanan.
+                            <strong>Perhatian!</strong> Jangan berikan informasi <strong>email</strong> dan
+                            <strong>password</strong> akun Anda kepada siapapun.
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -266,11 +267,11 @@
                 });
             });
 
-            $wire.on('logout-user', () => {
-                setTimeout(() => {
-                    window.location.href = '/logout';
-                }, 2000);
-            });
+            // $wire.on('logout-user', () => {
+            //     setTimeout(() => {
+            //         window.location.href = '/logout';
+            //     }, 2000);
+            // });
 
             $wire.on('resetFileInput', (data) => {
                 const input = document.querySelector(`input[name="${data.inputName}"]`);
