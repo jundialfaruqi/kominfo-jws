@@ -83,6 +83,15 @@ return [
             'throw' => false,
         ],
 
+        // New disk configuration for public images profile
+        'public_images_profile' => [
+            'driver' => 'local',
+            'root' => public_path('images/profiles'),
+            'url' => env('APP_URL') . '/images/profiles',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

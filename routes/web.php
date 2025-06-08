@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Http;
 // Redirect the base URL to login page
 use App\Livewire\Welcome\Welcome;
 use App\Livewire\Register\Register;
+use App\Livewire\UpdateProfile\Updateprofile;
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Dashboard Route
     Route::get('/dashboard', DashboardIndex::class)->name('dashboard.index');
+
+    // Update Profile Route
+    Route::get('/pengaturan', Updateprofile::class)->name('updateprofile.index');
 
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {

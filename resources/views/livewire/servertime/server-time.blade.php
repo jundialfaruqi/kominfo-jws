@@ -10,7 +10,7 @@
     </template>
 </div>
 
-<script>
+{{-- <script>
     function serverClock(timestamp) {
         return {
             timestamp: timestamp,
@@ -45,6 +45,47 @@
 
                 const formatter = new Intl.DateTimeFormat('id-ID', options);
                 this.formattedTime = formatter.format(this.serverTime);
+            }
+        }
+    }
+</script> --}}
+
+<script>
+    function serverClock(timestamp) {
+        return {
+            timestamp: timestamp,
+            formattedTime: '',
+            interval: null,
+
+            init() {
+                if (!this.timestamp) return;
+
+                this.update();
+
+                this.interval = setInterval(() => {
+                    this.update();
+                }, 1000);
+            },
+
+            update() {
+                const now = Date.now();
+                const elapsed = now - this.timestamp;
+                const currentServerTime = new Date(this.timestamp + elapsed);
+
+                const options = {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZone: 'Asia/Jakarta',
+                    hour12: false
+                };
+
+                const formatter = new Intl.DateTimeFormat('id-ID', options);
+                this.formattedTime = formatter.format(currentServerTime);
             }
         }
     }

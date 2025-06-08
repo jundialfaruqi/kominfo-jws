@@ -12,14 +12,19 @@ class ServerTime extends Component
 
     public function mount()
     {
-        $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+        // $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
 
-        if ($response->successful()) {
-            $this->serverTime = $response['serverTime'];
-            $this->serverTimestamp = strtotime($this->serverTime) * 1000; // in milliseconds
-        } else {
-            $this->serverTimestamp = null;
-        }
+        // if ($response->successful()) {
+        //     $this->serverTime = $response['serverTime'];
+        //     $this->serverTimestamp = strtotime($this->serverTime) * 1000; // in milliseconds
+        // } else {
+        //     $this->serverTimestamp = null;
+        // }
+
+        $response = now()->toDateTimeString();
+
+        $this->serverTime = $response;
+        $this->serverTimestamp = strtotime($this->serverTime) * 1000; // in milliseconds
     }
 
     public function render()
