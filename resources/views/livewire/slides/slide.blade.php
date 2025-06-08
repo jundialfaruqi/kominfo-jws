@@ -54,7 +54,7 @@
                                                     </div>
                                                     <div class="col-md-10">
                                                         <select
-                                                            class="form-select @error('userId') is-invalid @enderror"
+                                                            class="form-select rounded-4 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
                                                             <option class="dropdown-header" selected>Pilih Admin Masjid
                                                             </option>
@@ -109,7 +109,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Rasio gambar
-                                                            16:9 (Rekomendasi : 1417x800 Piksel)</small>
+                                                            16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                                                     </div>
                                                     <input type="file"
                                                         class="form-control my-2 rounded-4 @error('slide1') is-invalid @enderror"
@@ -157,7 +157,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Rasio gambar
-                                                            16:9 (Rekomendasi : 1417x800 Piksel)</small>
+                                                            16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                                                     </div>
                                                     <input type="file"
                                                         class="form-control my-2 rounded-4 @error('slide2') is-invalid @enderror"
@@ -205,7 +205,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Rasio gambar
-                                                            16:9 (Rekomendasi : 1417x800 Piksel)</small>
+                                                            16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                                                     </div>
                                                     <input type="file"
                                                         class="form-control my-2 rounded-4 @error('slide3') is-invalid @enderror"
@@ -253,7 +253,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Rasio gambar
-                                                            16:9 (Rekomendasi : 1417x800 Piksel)</small>
+                                                            16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                                                     </div>
                                                     <input type="file"
                                                         class="form-control my-2 rounded-4 @error('slide4') is-invalid @enderror"
@@ -301,7 +301,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Rasio gambar
-                                                            16:9 (Rekomendasi : 1417x800 Piksel)</small>
+                                                            16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                                                     </div>
                                                     <input type="file"
                                                         class="form-control my-2 rounded-4 @error('slide5') is-invalid @enderror"
@@ -350,7 +350,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Rasio gambar
-                                                            16:9 (Rekomendasi : 1417x800 Piksel)</small>
+                                                            16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                                                     </div>
                                                     <input type="file"
                                                         class="form-control my-2 rounded-4 @error('slide6') is-invalid @enderror"
