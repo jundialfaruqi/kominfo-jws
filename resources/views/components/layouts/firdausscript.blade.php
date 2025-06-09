@@ -72,21 +72,22 @@
                 url: '/api/server-time',
                 method: 'GET',
                 dataType: 'json',
-                timeout: 5000,
+                timeout: 10000,
                 success: function(response) {
-                    if (response.success && response.timestamp) {
+                    if (response.success && response.data.timestamp) {
                         const endTime = Date.now();
                         const latency = (endTime - startTime) / 2;
-                        serverTimestamp = parseInt(response.timestamp) + latency;
+                        serverTimestamp = parseInt(response.data.timestamp) + latency;
                         pageLoadTimestamp = endTime;
-                        // console.log('Waktu server diperbarui:', new Date(serverTimestamp)
-                        //     .toISOString());
+                        console.log('Waktu server diperbarui dari:', response.data.source, new Date(
+                            serverTimestamp).toISOString());
                     }
                     if (callback) callback();
                 },
                 error: function(xhr, status, error) {
-                    // console.error('Error saat menyinkronkan waktu server:', error);
-                    console.warn('Menggunakan waktu lokal sebagai cadangan');
+                    console.warn(
+                        'Gagal menyinkronkan waktu server, menggunakan waktu lokal sebagai cadangan'
+                    );
                     serverTimestamp = Date.now();
                     pageLoadTimestamp = Date.now();
                     if (callback) callback();

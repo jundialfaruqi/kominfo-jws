@@ -12,13 +12,13 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-
 class Firdaus extends Component
 {
     #[Layout('components.layouts.firdaus')]
     #[Title('Jadwal Sholat Pekanbaru')]
     public $serverTime; // UTC time from server
     public $serverTimestamp; // timestamp in milliseconds
+    public $apiSource; // Track API source
     public $jadwalSholat = []; // jadwal sholat hari ini
     public $prayerTimes = []; // waktu sholat
     public $activeIndex = 0; // index waktu sholat aktif
@@ -53,97 +53,127 @@ class Firdaus extends Component
         $this->slides   = Slides::where('user_id', $user_id)->first();
 
         try {
-            // Existing server time and prayer times logic remains the same
-            // (Copying the previous mount method's time-related code)
-            $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+            // Coba API utama
+            $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
 
             if ($response->successful()) {
-
                 $this->serverTime = $response['serverTime'];
                 $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
                 $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
                 $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
-
-                // Untuk menguji waktu Tambah 1 jam 5 menit
-                // $serverDateTime->modify('+2 hour 45 minutes');
-
-                // Untuk menguji waktu Tambah hari
-                // $serverDateTime->modify('next Friday 12:14:41');
-
-                // Gunakan timestamp UTC untuk konsistensi dengan JavaScript
                 $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
+                $this->apiSource = 'pekanbaru';
+            } else {
+                throw new \Exception('API utama gagal');
+            }
+        } catch (\Exception $e) {
+            try {
+                // Fallback ke timeapi.io
+                $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
 
-                // Ambil tanggal, bulan, dan tahun hari ini
-                $tanggalHariIni         = date('Y-m-d', strtotime($this->serverTime));
-                $this->currentMonth     = date('m', strtotime($this->serverTime));
-                $this->currentYear      = date('Y', strtotime($this->serverTime));
-                $this->currentDayOfWeek = date('N', strtotime($this->serverTime)); // 1 (Senin) hingga 7 (Minggu)
+                if ($fallbackResponse->successful()) {
+                    $this->serverTime = $fallbackResponse['dateTime'];
+                    $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
+                    $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
+                    $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
+                    $this->apiSource = 'timeapi';
+                } else {
+                    throw new \Exception('API timeapi.io gagal');
+                }
+            } catch (\Exception $e) {
+                try {
+                    // Fallback ke API Google Script
+                    $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
 
-                // Buat URL dinamis berdasarkan tahun dan bulan saat ini
-                $jadwalUrl = $this->baseUrl . $this->currentYear . '/' . $this->currentMonth . '.json';
+                    if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
+                        $this->serverTime = $newApiResponse['fulldate'];
+                        $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
+                        $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
+                        $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
+                        $this->apiSource = 'google-script';
+                    } else {
+                        throw new \Exception('API Google Script gagal');
+                    }
+                } catch (\Exception $e) {
+                    // Fallback ke waktu server lokal
+                    $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
+                    $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
+                    $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
+                    $this->apiSource = 'local';
+                }
+            }
+        }
 
-                // Ambil data jadwal sholat berdasarkan URL dinamis
-                $jadwalResponse = Http::get($jadwalUrl);
+        // Lanjutkan dengan logika jadwal sholat
+        try {
+            // Ambil tanggal, bulan, dan tahun hari ini
+            $tanggalHariIni         = date('Y-m-d', strtotime($this->serverTime));
+            $this->currentMonth     = date('m', strtotime($this->serverTime));
+            $this->currentYear      = date('Y', strtotime($this->serverTime));
+            $this->currentDayOfWeek = date('N', strtotime($this->serverTime)); // 1 (Senin) hingga 7 (Minggu)
 
-                if (!$jadwalResponse->successful()) {
-                    // Jika gagal, coba gunakan data bulan terakhir yang tersedia (fallback)
-                    $bulanSebelumnya = $this->getPreviousMonth($this->currentMonth, $this->currentYear);
-                    $tahunSebelumnya = $bulanSebelumnya['year'];
-                    $bulanSebelumnya = $bulanSebelumnya['month'];
+            // Buat URL dinamis berdasarkan tahun dan bulan saat ini
+            $jadwalUrl = $this->baseUrl . $this->currentYear . '/' . $this->currentMonth . '.json';
 
-                    $fallbackUrl = $this->baseUrl . $tahunSebelumnya . '/' . $bulanSebelumnya . '.json';
-                    $jadwalResponse = Http::get($fallbackUrl);
+            // Ambil data jadwal sholat berdasarkan URL dinamis
+            $jadwalResponse = Http::get($jadwalUrl);
 
-                    // Log untuk debugging
-                    logger("Menggunakan data jadwal fallback: " . $fallbackUrl);
+            if (!$jadwalResponse->successful()) {
+                // Jika gagal, coba gunakan data bulan terakhir yang tersedia (fallback)
+                $bulanSebelumnya = $this->getPreviousMonth($this->currentMonth, $this->currentYear);
+                $tahunSebelumnya = $bulanSebelumnya['year'];
+                $bulanSebelumnya = $bulanSebelumnya['month'];
+
+                $fallbackUrl = $this->baseUrl . $tahunSebelumnya . '/' . $bulanSebelumnya . '.json';
+                $jadwalResponse = Http::get($fallbackUrl);
+
+                // Log untuk debugging
+                logger("Menggunakan data jadwal fallback: " . $fallbackUrl);
+            }
+
+            if ($jadwalResponse->successful()) {
+                $jadwalSholat = $jadwalResponse->json();
+                $this->jadwalSholat = $jadwalSholat; // simpan seluruh jadwal bulan ini
+
+                // Cari data jadwal sholat berdasarkan tanggal hari ini
+                $jadwalHariIni = null;
+                foreach ($jadwalSholat as $item) {
+                    if ($item['tanggal'] === $tanggalHariIni) {
+                        $jadwalHariIni = $item;
+                        break;
+                    }
                 }
 
-                if ($jadwalResponse->successful()) {
-                    $jadwalSholat = $jadwalResponse->json();
-                    $this->jadwalSholat = $jadwalSholat; // simpan seluruh jadwal bulan ini
+                // Pastikan data tersedia untuk hari ini
+                if ($jadwalHariIni) {
+                    // Tentukan nama untuk Dzuhur (Jum'at jika hari ini Jumat)
+                    $dzuhurLabel = $this->currentDayOfWeek == 5 ? "Jum'at" : "Dzuhur";
 
-                    // Cari data jadwal sholat berdasarkan tanggal hari ini
-                    $jadwalHariIni = null;
-                    foreach ($jadwalSholat as $item) {
-                        if ($item['tanggal'] === $tanggalHariIni) {
-                            $jadwalHariIni = $item;
-                            break;
-                        }
-                    }
+                    // Menyusun data waktu sholat
+                    $this->prayerTimes = [
+                        ['name' => 'Shubuh', 'time' => $jadwalHariIni['shubuh'], 'icon' => 'sunset'],
+                        ['name' => 'Shuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
+                        ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
+                        ['name' => 'Ashar', 'time' => $jadwalHariIni['ashr'], 'icon' => 'sunwind'],
+                        ['name' => 'Maghrib', 'time' => $jadwalHariIni['magrib'], 'icon' => 'hazemoon'],
+                        ['name' => 'Isya', 'time' => $jadwalHariIni['isya'], 'icon' => 'moon'],
+                    ];
 
-                    // Pastikan data tersedia untuk hari ini
-                    if ($jadwalHariIni) {
-                        // Tentukan nama untuk Dzuhur (Jum'at jika hari ini Jumat)
-                        $dzuhurLabel = $this->currentDayOfWeek == 5 ? "Jum'at" : "Dzuhur";
+                    // Tentukan waktu aktif berdasarkan waktu sekarang
+                    $currentTime = date('H:i', strtotime($this->serverTime)); // waktu saat ini di server, format HH:MM
 
-                        // Menyusun data waktu sholat
-                        $this->prayerTimes = [
-                            ['name' => 'Shubuh', 'time' => $jadwalHariIni['shubuh'], 'icon' => 'sunset'],
-                            ['name' => 'Shuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
-                            ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
-                            ['name' => 'Ashar', 'time' => $jadwalHariIni['ashr'], 'icon' => 'sunwind'],
-                            ['name' => 'Maghrib', 'time' => $jadwalHariIni['magrib'], 'icon' => 'hazemoon'],
-                            ['name' => 'Isya', 'time' => $jadwalHariIni['isya'], 'icon' => 'moon'],
-                        ];
+                    // PERUBAHAN: Logic untuk menentukan waktu sholat yang sedang aktif dan berikutnya
+                    $prayerIndices = $this->determineActivePrayerTime($currentTime);
+                    $this->activeIndex = $prayerIndices['active'];
+                    $this->nextPrayerIndex = $prayerIndices['next'];
 
-                        // Tentukan waktu aktif berdasarkan waktu sekarang
-                        $currentTime = date('H:i', strtotime($this->serverTime)); // waktu saat ini di server, format HH:MM
-
-                        // PERUBAHAN: Logic untuk menentukan waktu sholat yang sedang aktif dan berikutnya
-                        $prayerIndices = $this->determineActivePrayerTime($currentTime);
-                        $this->activeIndex = $prayerIndices['active'];
-                        $this->nextPrayerIndex = $prayerIndices['next'];
-
-                        // Calculate active prayer time status
-                        $this->activePrayerStatus = $this->calculateActivePrayerTimeStatus($currentTime);
-                    } else {
-                        logger("Data jadwal sholat tidak ditemukan untuk tanggal: " . $tanggalHariIni);
-                    }
+                    // Calculate active prayer time status
+                    $this->activePrayerStatus = $this->calculateActivePrayerTimeStatus($currentTime);
                 } else {
-                    logger("Gagal mengambil data jadwal sholat dari API");
+                    logger("Data jadwal sholat tidak ditemukan untuk tanggal: " . $tanggalHariIni);
                 }
             } else {
-                logger("Gagal mengambil waktu server dari API");
+                logger("Gagal mengambil data jadwal sholat dari API");
             }
         } catch (\Exception $e) {
             logger("Error saat memproses jadwal sholat: " . $e->getMessage());
@@ -474,6 +504,7 @@ class Firdaus extends Component
             'petugas' => $this->petugas,
             'slides' => $this->slides,
             'activePrayerStatus' => $this->activePrayerStatus,
+            'apiSource' => $this->apiSource, // Tambahkan apiSource ke view
             'adzanData' => $this->adzan ? [
                 'adzan1' => $this->adzan->adzan1,
                 'adzan2' => $this->adzan->adzan2,

@@ -81,32 +81,91 @@
                                             <td>{{ $users->phone }}</td>
                                             @if ($users->role == 'Super Admin')
                                                 <td>
-                                                    <span class="badge bg-purple-lt">
+                                                    <span
+                                                        class="badge bg-purple-lt d-inline-flex align-items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-circle">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                            <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                                            <path
+                                                                d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" />
+                                                        </svg>
                                                         {{ $users->role }}
                                                     </span>
                                                 </td>
                                             @elseif ($users->role == 'Admin')
                                                 <td>
-                                                    <span class="badge bg-blue-lt">
+                                                    <span
+                                                        class="badge bg-blue-lt d-inline-flex align-items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-circle">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                            <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                                            <path
+                                                                d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" />
+                                                        </svg>
                                                         {{ $users->role }}
                                                     </span>
                                                 </td>
                                             @else
                                                 <td>
-                                                    <span class="badge bg-green-lt">
+                                                    <span
+                                                        class="badge bg-green-lt d-inline-flex align-items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-circle">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+                                                            <path d="M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                                            <path
+                                                                d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855" />
+                                                        </svg>
                                                         {{ $users->role }}
                                                     </span>
                                                 </td>
                                             @endif
                                             @if ($users->status == 'Active')
                                                 <td>
-                                                    <span class="badge bg-green-lt">
+                                                    <span
+                                                        class="badge bg-green-lt d-inline-flex align-items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path
+                                                                d="M5 7.2a2.2 2.2 0 0 1 2.2 -2.2h1a2.2 2.2 0 0 0 1.55 -.64l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.64 1.55v1a2.2 2.2 0 0 1 -2.2 2.2h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1" />
+                                                            <path d="M9 12l2 2l4 -4" />
+                                                        </svg>
                                                         {{ $users->status }}
                                                     </span>
                                                 </td>
                                             @else
                                                 <td>
-                                                    <span class="badge bg-red-lt">
+                                                    <span
+                                                        class="badge bg-red-lt d-inline-flex align-items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-rosette-discount-check-off">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M9 12l2 2l1.5 -1.5m2 -2l.5 -.5" />
+                                                            <path
+                                                                d="M8.887 4.89a2.2 2.2 0 0 0 .863 -.53l.7 -.7a2.2 2.2 0 0 1 3.12 0l.7 .7c.412 .41 .97 .64 1.55 .64h1a2.2 2.2 0 0 1 2.2 2.2v1c0 .58 .23 1.138 .64 1.55l.7 .7a2.2 2.2 0 0 1 0 3.12l-.7 .7a2.2 2.2 0 0 0 -.528 .858m-.757 3.248a2.193 2.193 0 0 1 -1.555 .644h-1a2.2 2.2 0 0 0 -1.55 .64l-.7 .7a2.2 2.2 0 0 1 -3.12 0l-.7 -.7a2.2 2.2 0 0 0 -1.55 -.64h-1a2.2 2.2 0 0 1 -2.2 -2.2v-1a2.2 2.2 0 0 0 -.64 -1.55l-.7 -.7a2.2 2.2 0 0 1 0 -3.12l.7 -.7a2.2 2.2 0 0 0 .64 -1.55v-1c0 -.604 .244 -1.152 .638 -1.55" />
+                                                            <path d="M3 3l18 18" />
+                                                        </svg>
                                                         {{ $users->status }}
                                                     </span>
                                                 </td>
@@ -128,8 +187,8 @@
 
                                                 @if ($canEdit)
                                                     <button wire:click="edit('{{ $users->id }}')"
-                                                        class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
-                                                        data-bs-target="#editModal">
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm"
+                                                        data-bs-toggle="modal" data-bs-target="#editModal">
                                                         <span wire:loading.remove
                                                             wire:target="edit('{{ $users->id }}')">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -137,7 +196,8 @@
                                                                 stroke="currentColor" stroke-width="2"
                                                                 stroke-linecap="round" stroke-linejoin="round"
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
                                                                 <path
                                                                     d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
                                                                 <path
@@ -156,8 +216,8 @@
 
                                                 @if ($canDelete)
                                                     <button wire:click="delete('{{ $users->id }}')"
-                                                        class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
-                                                        data-bs-target="#deleteModal">
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal">
                                                         <span wire:loading.remove
                                                             wire:target="delete('{{ $users->id }}')">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -165,7 +225,8 @@
                                                                 stroke="currentColor" stroke-width="2"
                                                                 stroke-linecap="round" stroke-linejoin="round"
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
                                                                 <path d="M4 7l16 0" />
                                                                 <path d="M10 11l0 6" />
                                                                 <path d="M14 11l0 6" />
@@ -175,7 +236,8 @@
                                                             </svg>
                                                             Hapus
                                                         </span>
-                                                        <span wire:loading wire:target="delete('{{ $users->id }}')">
+                                                        <span wire:loading
+                                                            wire:target="delete('{{ $users->id }}')">
                                                             <span class="spinner-border spinner-border-sm"
                                                                 role="status" aria-hidden="true"></span>
                                                             <span class="small">Loading...</span>
@@ -192,7 +254,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+                        <div
+                            class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
                             {{ $user->links() }}
                         </div>
                     </div>

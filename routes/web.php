@@ -194,14 +194,88 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.adzan');
 
-Route::get('/api/server-time/', function () {
-    return response()->json([
-        'success' => true,
-        'data' => [
-            'timestamp' => time(),
-            'serverTime' => date('Y-m-d H:i:s')
-        ]
-    ]);
+// Route::get('/api/server-time/', function () {
+//     return response()->json([
+//         'success' => true,
+//         'data' => [
+//             'timestamp' => time(),
+//             'serverTime' => date('Y-m-d H:i:s')
+//         ]
+//     ]);
+// });
+
+Route::get('/api/server-time', function () {
+    try {
+        // Coba API utama (Pekanbaru)
+        $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+
+        if ($response->successful()) {
+            $serverTime = $response['serverTime'];
+            $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
+            $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                    'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                    'source' => 'pekanbaru'
+                ]
+            ]);
+        } else {
+            throw new \Exception('API utama gagal');
+        }
+    } catch (\Exception $e) {
+        try {
+            // Fallback ke timeapi.io
+            $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+
+            if ($fallbackResponse->successful()) {
+                $serverTime = $fallbackResponse['dateTime'];
+                $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                        'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                        'source' => 'timeapi'
+                    ]
+                ]);
+            } else {
+                throw new \Exception('API timeapi.io gagal');
+            }
+        } catch (\Exception $e) {
+            try {
+                // Fallback ke API Google Script
+                $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
+
+                if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
+                    $serverTime = $newApiResponse['fulldate'];
+                    $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
+                    return response()->json([
+                        'success' => true,
+                        'data' => [
+                            'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                            'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                            'source' => 'google-script'
+                        ]
+                    ]);
+                } else {
+                    throw new \Exception('API Google Script gagal');
+                }
+            } catch (\Exception $e) {
+                // Fallback ke waktu server lokal
+                $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                        'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                        'source' => 'local'
+                    ]
+                ]);
+            }
+        }
+    }
 });
 
 // Public route for accessing specific mosque page by slug

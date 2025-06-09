@@ -6,18 +6,17 @@
             <p x-text="formattedTime + ' WIB'"></p>
             <p class="text-sm text-gray-100">
                 <?php if ($apiSource === 'pekanbaru'): ?>
-                Menggunakan Api Pekanbaru Super App
+                Sumber : Api Pekanbaru Super App
                 <?php elseif ($apiSource === 'timeapi'): ?>
-                Menggunakan waktu TimeAPI.io
+                Sumber : TimeAPI.io
+                <?php elseif ($apiSource === 'google-script'): ?>
+                Sumber : Google Script API
                 <?php else: ?>
-                Sumber waktu tidak diketahui
+                Gagal menampilkan waktu, mengganti dengan waktu lokal <a href="javascript:void(0)"
+                    @click="window.location.reload()" class="text-blue-500 hover:underline">coba lagi</a>
                 <?php endif; ?>
             </p>
         </div>
-    </template>
-
-    <template x-if="!timestamp">
-        <p>Gagal mengambil waktu server.</p>
     </template>
 </div>
 

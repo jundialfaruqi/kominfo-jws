@@ -118,18 +118,18 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png, webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk Kualitas
+                                                            Gambar Terbaik</small>
                                                     </div>
 
                                                     <div class="d-flex align-items-center gap-2">
@@ -187,18 +187,19 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
 
                                                     <div class="d-flex align-items-center gap-2">
@@ -257,18 +258,19 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -325,19 +327,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk
                                                             memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -394,19 +397,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk
                                                             memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -463,19 +467,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -532,19 +537,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan
-                                                            Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
+                                                            untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Rasio gambar 16:9 (Rekomendasi :
-                                                            1417x800 Piksel)</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Rasio gambar 16:9 (Rekomendasi :
+                                                            1920x1080 Piksel)</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -605,19 +611,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -674,19 +681,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -743,19 +751,21 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik
+                                                        </small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -812,19 +822,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -881,19 +892,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
@@ -950,19 +962,20 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
