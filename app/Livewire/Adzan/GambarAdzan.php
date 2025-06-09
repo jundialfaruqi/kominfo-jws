@@ -894,10 +894,18 @@ class GambarAdzan extends Component
         // get current user and role
         $currentUser = Auth::user();
         $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
+        $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // query builder for adzan
         $query = Adzan::with('user')
             ->select('id', 'user_id', 'adzan1', 'adzan2', 'adzan3', 'adzan4', 'adzan5', 'adzan6', 'adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11', 'adzan12', 'adzan13', 'adzan14', 'adzan15');
+
+        // if user is not Super Admin, filter adzan and exclude users with 'Super Admin' or 'Admin' roles
+        if (!$isSuperAdmin) {
+            $query->whereHas('user', function ($q) {
+                $q->whereNotIn('role', ['Super Admin', 'Admin']);
+            });
+        }
 
         // if user is not admin, only show their own adzan
         if (!$isAdmin) {
@@ -915,7 +923,19 @@ class GambarAdzan extends Component
             ->paginate($this->paginate);
 
         // only admin can see list of users for assignment
-        $users = $isAdmin ? User::orderBy('name')->get() : collect([]);
+        $users = collect([]);
+        if ($isAdmin) {
+            $usersWithAdzan = Adzan::pluck('user_id')->toArray();
+
+            // If not Super Admin, exclude users with 'Super Admin' or 'Admin' roles
+            $usersQuery = User::whereNotIn('id', $usersWithAdzan);
+            if (!$isSuperAdmin) {
+                $usersQuery->whereNotIn('role', ['Super Admin', 'Admin']);
+            }
+
+            $users = $usersQuery->orderBy('name')
+                ->get();
+        }
 
         return view('livewire.adzan.gambar-adzan', [
             'adzanList' => $adzanList,
@@ -1055,6 +1075,25 @@ class GambarAdzan extends Component
         // If user is not admin, force userId to be their own id
         if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
+        }
+
+        // Additional validation for one adzan per user
+        if (!$this->isEdit) {
+            // Check if the selected user already has an adzan
+            $existingAdzan = Adzan::where('user_id', $this->userId)->first();
+            if ($existingAdzan) {
+                $this->dispatch('error', 'User ini sudah memiliki adzan!');
+                return;
+            }
+        } else {
+            // When editing, make sure we're not changing to a user who already has an adzan
+            $existingAdzan = Adzan::where('user_id', $this->userId)
+                ->where('id', '!=', $this->adzanId)
+                ->first();
+            if ($existingAdzan) {
+                $this->dispatch('error', 'User ini sudah memiliki adzan!');
+                return;
+            }
         }
 
         $this->validate();

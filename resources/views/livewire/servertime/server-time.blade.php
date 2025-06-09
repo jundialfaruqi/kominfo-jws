@@ -2,7 +2,18 @@
     <h2 class="font-bold mb-2">Hari ini</h2>
 
     <template x-if="timestamp">
-        <p x-text="formattedTime + ' WIB'"></p>
+        <div>
+            <p x-text="formattedTime + ' WIB'"></p>
+            <p class="text-sm text-gray-100">
+                <?php if ($apiSource === 'pekanbaru'): ?>
+                Menggunakan Api Pekanbaru Super App
+                <?php elseif ($apiSource === 'timeapi'): ?>
+                Menggunakan waktu TimeAPI.io
+                <?php else: ?>
+                Sumber waktu tidak diketahui
+                <?php endif; ?>
+            </p>
+        </div>
     </template>
 
     <template x-if="!timestamp">
@@ -10,24 +21,31 @@
     </template>
 </div>
 
-{{-- <script>
+<script>
     function serverClock(timestamp) {
         return {
             timestamp: timestamp,
             serverTime: null,
             formattedTime: '',
-            interval: null,
+            lastUpdate: null,
 
             init() {
                 if (!this.timestamp) return;
 
                 this.serverTime = new Date(this.timestamp);
+                this.lastUpdate = performance.now();
                 this.update();
 
-                this.interval = setInterval(() => {
-                    this.serverTime = new Date(this.serverTime.getTime() + 1000);
-                    this.update();
-                }, 1000);
+                // Gunakan requestAnimationFrame untuk pembaruan halus
+                const tick = (now) => {
+                    if (now - this.lastUpdate >= 1000) {
+                        this.serverTime = new Date(this.serverTime.getTime() + (now - this.lastUpdate));
+                        this.lastUpdate = now;
+                        this.update();
+                    }
+                    requestAnimationFrame(tick);
+                };
+                requestAnimationFrame(tick);
             },
 
             update() {
@@ -45,47 +63,6 @@
 
                 const formatter = new Intl.DateTimeFormat('id-ID', options);
                 this.formattedTime = formatter.format(this.serverTime);
-            }
-        }
-    }
-</script> --}}
-
-<script>
-    function serverClock(timestamp) {
-        return {
-            timestamp: timestamp,
-            formattedTime: '',
-            interval: null,
-
-            init() {
-                if (!this.timestamp) return;
-
-                this.update();
-
-                this.interval = setInterval(() => {
-                    this.update();
-                }, 1000);
-            },
-
-            update() {
-                const now = Date.now();
-                const elapsed = now - this.timestamp;
-                const currentServerTime = new Date(this.timestamp + elapsed);
-
-                const options = {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    timeZone: 'Asia/Jakarta',
-                    hour12: false
-                };
-
-                const formatter = new Intl.DateTimeFormat('id-ID', options);
-                this.formattedTime = formatter.format(currentServerTime);
             }
         }
     }

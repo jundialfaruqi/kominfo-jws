@@ -119,16 +119,24 @@ class ProfilMasjid extends Component
         // Get current user and role
         $currentUser = Auth::user();
         $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
+        $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder for profiles
         $query = Profil::with('user')
             ->select('id', 'user_id', 'name', 'slug', 'address', 'phone', 'logo_masjid', 'logo_pemerintah');
 
+        // If user is not Super Admin, filter profiles and exclude users with 'Super Admin' or 'Admin' roles
+        if (!$isSuperAdmin) {
+            $query->whereHas('user', function ($q) {
+                $q->whereNotIn('role', ['Super Admin', 'Admin']);
+            });
+        }
+
         // If user is not admin, only show their own profile
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
         } else {
-            // Admin can search through all profiles
+            // Admin can search through profiles
             $query->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('phone', 'like', '%' . $this->search . '%')
@@ -142,7 +150,19 @@ class ProfilMasjid extends Component
             ->paginate($this->paginate);
 
         // Only admin can see list of users for assignment
-        $users = $isAdmin ? User::orderBy('name')->get() : collect([]);
+        $users = collect([]);
+        if ($isAdmin) {
+            $usersWithProfiles = Profil::pluck('user_id')->toArray();
+
+            // If not Super Admin, exclude users with 'Super Admin' or 'Admin' roles
+            $usersQuery = User::whereNotIn('id', $usersWithProfiles);
+            if (!$isSuperAdmin) {
+                $usersQuery->whereNotIn('role', ['Super Admin', 'Admin']);
+            }
+
+            $users = $usersQuery->orderBy('name')
+                ->get();
+        }
 
         return view('livewire.profil.profil-masjid', [
             'profilList' => $profilList,
@@ -260,6 +280,25 @@ class ProfilMasjid extends Component
         // If user is not admin, force userId to be their own id
         if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
+        }
+
+        // Additional validation for one profile per user
+        if (!$this->isEdit) {
+            // Check if the selected user already has a profile
+            $existingProfile = Profil::where('user_id', $this->userId)->first();
+            if ($existingProfile) {
+                $this->dispatch('error', 'User ini sudah memiliki profil masjid!');
+                return;
+            }
+        } else {
+            // When editing, make sure we're not changing to a user who already has a profile
+            $existingProfile = Profil::where('user_id', $this->userId)
+                ->where('id', '!=', $this->profileId)
+                ->first();
+            if ($existingProfile) {
+                $this->dispatch('error', 'User ini sudah memiliki profil masjid!');
+                return;
+            }
         }
 
         $this->validate();

@@ -459,6 +459,7 @@ class Slide extends Component
         // Get current user and role
         $currentUser = Auth::user();
         $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
+        $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder for slides
         $query = Slides::with('user')
@@ -480,7 +481,19 @@ class Slide extends Component
             ->paginate($this->paginate);
 
         // Only admin can see list of users for assignment
-        $users = $isAdmin ? User::orderBy('name')->get() : collect([]);
+        $users = collect([]);
+        if ($isAdmin) {
+            $usersWithSlides = Slides::pluck('user_id')->toArray();
+
+            // If not Super Admin, exclude users with 'Super Admin' or 'Admin' roles
+            $usersQuery = User::whereNotIn('id', $usersWithSlides);
+            if (!$isSuperAdmin) {
+                $usersQuery->whereNotIn('role', ['Super Admin', 'Admin']);
+            }
+
+            $users = $usersQuery->orderBy('name')
+                ->get();
+        }
 
         return view('livewire.slides.slide', [
             'slideList' => $slideList,
@@ -576,6 +589,25 @@ class Slide extends Component
         // If user is not admin, force userId to be their own id
         if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
+        }
+
+        // Additional validation for one slide per user
+        if (!$this->isEdit) {
+            // Check if the selected user already has a profile
+            $existingSlide = Slides::where('user_id', $this->userId)->first();
+            if ($existingSlide) {
+                $this->dispatch('error', 'User ini sudah memiliki slide!');
+                return;
+            }
+        } else {
+            // When editing, make sure we're not changing to a user who already has a slide
+            $existingSlide = Slides::where('user_id', $this->userId)
+                ->where('id', '!=', $this->slideId)
+                ->first();
+            if ($existingSlide) {
+                $this->dispatch('error', 'User ini sudah memiliki slide!');
+                return;
+            }
         }
 
         $this->validate();

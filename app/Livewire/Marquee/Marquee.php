@@ -109,10 +109,18 @@ class Marquee extends Component
         // get current user and role
         $currentUser = Auth::user();
         $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
+        $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder for marquee
         $query = ModelsMarquee::with('user')
             ->select('id', 'user_id', 'marquee1', 'marquee2', 'marquee3', 'marquee4', 'marquee5', 'marquee6');
+
+        // If user is not Super Admin, filter marquee and exclude users with 'Super Admin' or 'Admin' roles
+        if (!$isSuperAdmin) {
+            $query->whereHas('user', function ($q) {
+                $q->whereNotIn('role', ['Super Admin', 'Admin']);
+            });
+        }
 
         // If user is not admin, only show their own marquee
         if (!$isAdmin) {
@@ -136,7 +144,19 @@ class Marquee extends Component
             ->paginate($this->paginate);
 
         // Only admin can see list of users for assignment
-        $users = $isAdmin ? User::orderBy('name')->get() : collect([]);
+        $users = collect([]);
+        if ($isAdmin) {
+            $usersWithMarquee = ModelsMarquee::pluck('user_id')->toArray();
+
+            // If not Super Admin, exclude users with 'Super Admin' or 'Admin' roles
+            $usersQuery = User::whereNotIn('id', $usersWithMarquee);
+            if (!$isSuperAdmin) {
+                $usersQuery->whereNotIn('role', ['Super Admin', 'Admin']);
+            }
+
+            $users = $usersQuery->orderBy('name')
+                ->get();
+        }
 
         return view('livewire.marquee.marquee', [
             'marqueeList' => $marqueeList,
@@ -219,6 +239,25 @@ class Marquee extends Component
         // If user is not admin, force userId to be their own id
         if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
+        }
+
+        // Additional validation for one marquee per user
+        if (!$this->isEdit) {
+            // Check if the selected user already has a marquee
+            $existingMarquee = ModelsMarquee::where('user_id', $this->userId)->first();
+            if ($existingMarquee) {
+                $this->dispatch('error', 'User ini sudah memiliki marquee!');
+                return;
+            }
+        } else {
+            // When editing, make sure we're not changing to a user who already has a marquee
+            $existingMarquee = ModelsMarquee::where('user_id', $this->userId)
+                ->where('id', '!=', $this->marqueeId)
+                ->first();
+            if ($existingMarquee) {
+                $this->dispatch('error', 'User ini sudah memiliki marquee!');
+                return;
+            }
         }
 
         $this->validate();

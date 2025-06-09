@@ -50,24 +50,47 @@
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-                                                <div class="row g-2 mb-5">
+                                                <div class="row g-2 mb-3">
                                                     <div class="col-md-2">
-                                                        <label class="form-label"> Admin Masjid</label>
+                                                        <label class="form-label">Admin Masjid</label>
                                                     </div>
                                                     <div class="col-md-10">
                                                         <select
                                                             class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
-                                                            </option>
+                                                            <option class="dropdown-header" value="">Pilih Admin
+                                                                Masjid</option> {{-- Jika sedang edit dan user sudah dipilih, tampilkan user tersebut --}}
+                                                            @if ($isEdit && $userId)
+                                                                @php
+                                                                    $selectedUser = \App\Models\User::find($userId);
+                                                                @endphp
+                                                                @if ($selectedUser && (Auth::user()->role === 'Super Admin' || !in_array($selectedUser->role, ['Super Admin', 'Admin'])))
+                                                                    <option value="{{ $selectedUser->id }}" selected>
+                                                                        {{ $selectedUser->name }} (Dipilih)
+                                                                    </option>
+                                                                @endif
+                                                            @endif {{-- Tampilkan user yang belum memiliki Gambar Adzan --}}
                                                             @foreach ($users as $user)
-                                                                <option value="{{ $user->id }}">{{ $user->name }}
-                                                                </option>
-                                                            @endforeach
+                                                                {{-- Jangan tampilkan user yang sudah dipilih saat edit --}}
+                                                                @if (!($isEdit && $userId == $user->id))
+                                                                    <option value="{{ $user->id }}">
+                                                                        {{ $user->name }}
+                                                                    </option>
+                                                                @endif
+                                                            @endforeach {{-- Jika tidak ada user yang tersedia --}}
+                                                            @if ($users->isEmpty() && !($isEdit && $userId))
+                                                                <option disabled>Tidak ada user yang tersedia</option>
+                                                            @endif
                                                         </select>
                                                         @error('userId')
                                                             <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
+                                                        @enderror {{-- Informasi tambahan --}}
+                                                        @if ($users->isEmpty() && !$isEdit)
+                                                            <div class="form-text">
+                                                                <small class="text-muted">Semua user sudah memiliki
+                                                                    Gambar Iqomah, Final, dan Shalat Jum'at</small>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endif

@@ -20,7 +20,7 @@
                 <div class="btn-list">
                     <div class="dropdown">
                         <button
-                            class="btn btn-light rounded-pill shadow-xl dropdown-toggle d-flex align-items-center gap-2"
+                            class="btn btn-dark rounded-pill shadow-xl dropdown-toggle d-flex align-items-center gap-2"
                             type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             @if (Auth::user()->photo)
                                 <span class="avatar avatar-sm rounded-circle"
@@ -37,11 +37,11 @@
                             @endif
                             {{ Auth::user()->name }}
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end rounded-3" aria-labelledby="adminDropdown">
-                            <li>
+                        <ul class="dropdown-menu bg-dark dropdown-menu-end rounded-4" aria-labelledby="adminDropdown">
+                            <li class="text-white">
                                 @livewire('auth.logout')
                             </li>
-                            <li>
+                            <li class="text-white">
                                 <a wire:navigate href="{{ route('updateprofile.index') }}"
                                     class="dropdown-item d-flex align-items-center gap-2">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

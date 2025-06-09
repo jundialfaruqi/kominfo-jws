@@ -66,16 +66,47 @@
                                                         <select
                                                             class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
-                                                            </option>
+                                                            <option class="dropdown-header" value="">Pilih Admin
+                                                                Masjid</option>
+
+                                                            {{-- Jika sedang edit dan user sudah dipilih, tampilkan user tersebut --}}
+                                                            @if ($isEdit && $userId)
+                                                                @php
+                                                                    $selectedUser = \App\Models\User::find($userId);
+                                                                @endphp
+                                                                @if ($selectedUser && (Auth::user()->role === 'Super Admin' || !in_array($selectedUser->role, ['Super Admin', 'Admin'])))
+                                                                    <option value="{{ $selectedUser->id }}" selected>
+                                                                        {{ $selectedUser->name }} (Dipilih)
+                                                                    </option>
+                                                                @endif
+                                                            @endif
+
+                                                            {{-- Tampilkan user yang belum memiliki profil --}}
                                                             @foreach ($users as $user)
-                                                                <option value="{{ $user->id }}">{{ $user->name }}
-                                                                </option>
+                                                                {{-- Jangan tampilkan user yang sudah dipilih saat edit --}}
+                                                                @if (!($isEdit && $userId == $user->id))
+                                                                    <option value="{{ $user->id }}">
+                                                                        {{ $user->name }}
+                                                                    </option>
+                                                                @endif
                                                             @endforeach
+
+                                                            {{-- Jika tidak ada user yang tersedia --}}
+                                                            @if ($users->isEmpty() && !($isEdit && $userId))
+                                                                <option disabled>Tidak ada user yang tersedia</option>
+                                                            @endif
                                                         </select>
                                                         @error('userId')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
+
+                                                        {{-- Informasi tambahan --}}
+                                                        @if ($users->isEmpty() && !$isEdit)
+                                                            <div class="form-text">
+                                                                <small class="text-muted">Semua user sudah memiliki
+                                                                    profil masjid</small>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endif

@@ -4,27 +4,43 @@ namespace App\Livewire\Servertime;
 
 use Illuminate\Support\Facades\Http;
 use Livewire\Component;
+use Carbon\Carbon;
 
 class ServerTime extends Component
 {
-    public $serverTime; // UTC time from server, raw
-    public $serverTimestamp; // timestamp in milliseconds
+    public $serverTime; // Raw time from server
+    public $serverTimestamp; // Timestamp in milliseconds
+    public $apiSource; // Track API source
 
     public function mount()
     {
-        // $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+        try {
+            // Coba API utama
+            $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
 
-        // if ($response->successful()) {
-        //     $this->serverTime = $response['serverTime'];
-        //     $this->serverTimestamp = strtotime($this->serverTime) * 1000; // in milliseconds
-        // } else {
-        //     $this->serverTimestamp = null;
-        // }
+            if ($response->successful()) {
+                $this->serverTime = $response['serverTime'];
+                $this->serverTimestamp = Carbon::parse($this->serverTime, 'UTC')
+                    ->setTimezone('Asia/Jakarta')
+                    ->timestamp * 1000; // in milliseconds
+                $this->apiSource = 'pekanbaru';
+            } else {
+                throw new \Exception('API utama gagal');
+            }
+        } catch (\Exception $e) {
+            // Fallback ke timeapi.io
+            $fallbackResponse = Http::get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
 
-        $response = now()->toDateTimeString();
-
-        $this->serverTime = $response;
-        $this->serverTimestamp = strtotime($this->serverTime) * 1000; // in milliseconds
+            if ($fallbackResponse->successful()) {
+                $this->serverTime = $fallbackResponse['dateTime'];
+                $this->serverTimestamp = Carbon::parse($this->serverTime, 'Asia/Jakarta')
+                    ->timestamp * 1000; // in milliseconds
+                $this->apiSource = 'timeapi';
+            } else {
+                $this->serverTimestamp = null;
+                $this->apiSource = null;
+            }
+        }
     }
 
     public function render()
