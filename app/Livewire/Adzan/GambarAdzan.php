@@ -812,7 +812,7 @@ class GambarAdzan extends Component
         $this->search = '';
 
         // jika user bukan admin
-        if (Auth::user()->role !== 'Admin') {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $adzan = Adzan::where('user_id', Auth::user()->id)->first();
 
             // Always show form for non-admin users
@@ -893,7 +893,7 @@ class GambarAdzan extends Component
     {
         // get current user and role
         $currentUser = Auth::user();
-        $isAdmin = $currentUser->role === 'Admin';
+        $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
 
         // query builder for adzan
         $query = Adzan::with('user')
@@ -927,7 +927,7 @@ class GambarAdzan extends Component
     {
 
         // only admin can add new adzan
-        if (Auth::user()->role !== 'Admin') {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk menambah adzan!');
             return;
         }
@@ -980,7 +980,7 @@ class GambarAdzan extends Component
         $adzan = Adzan::findOrFail($id);
 
         // Check if user has permission to edit this adzan
-        if (Auth::user()->role !== 'Admin' && Auth::id() !== $adzan->user_id) {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin']) && Auth::id() !== $adzan->user_id) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit adzan ini!');
             return;
         }
@@ -1053,7 +1053,7 @@ class GambarAdzan extends Component
         $currentUser = Auth::user();
 
         // If user is not admin, force userId to be their own id
-        if ($currentUser->role !== 'Admin') {
+        if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
         }
 
@@ -1063,13 +1063,13 @@ class GambarAdzan extends Component
             if ($this->isEdit) {
                 $adzan = Adzan::findOrFail($this->adzanId);
                 // Check if user has permission to edit this adzan
-                if ($currentUser->role !== 'Admin' && $currentUser->id !== $adzan->user_id) {
+                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $currentUser->id !== $adzan->user_id) {
                     $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit adzan ini!');
                     return;
                 }
             } else {
                 // Allow non-admin users to create their own adzan
-                if ($currentUser->role !== 'Admin' && $this->userId !== $currentUser->id) {
+                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $this->userId !== $currentUser->id) {
                     $this->dispatch('error', 'Anda tidak memiliki akses untuk membuat adzan untuk user lain!');
                     return;
                 }
@@ -1278,7 +1278,7 @@ class GambarAdzan extends Component
             $this->dispatch('success', $this->isEdit ? 'Adzan berhasil diubah!' : 'Adzan berhasil ditambahkan!');
 
             // only hide form and reset fields if user is not admin
-            if (Auth::user()->role === 'Admin') {
+            if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
                 $this->showForm = false;
                 $this->resetValidation();
                 $this->reset(

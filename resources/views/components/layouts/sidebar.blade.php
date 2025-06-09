@@ -1,4 +1,4 @@
-<aside class="navbar navbar-vertical navbar-expand-lg sticky-top shadow-sm" data-bs-theme="light">
+<aside class="navbar navbar-vertical navbar-expand-lg sticky-top shadow-sm" data-bs-theme="dark">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,7 +92,7 @@
                             </span>
                         </a>
                     </li>
-                    @if (Auth::user()->role === 'Admin')
+                    @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                         <li class="nav-item {{ request()->routeIs('admin.user.index') ? 'active' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">

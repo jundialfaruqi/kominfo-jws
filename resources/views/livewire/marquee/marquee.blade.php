@@ -9,10 +9,10 @@
                                 @if ($showForm)
                                     {{ $isEdit ? 'Ubah Pengaturan Teks' : 'Tambah Teks Marquee Baru' }}
                                 @else
-                                    {{ Auth::user()->role === 'Admin' ? 'Daftar Teks' : 'Ubah Pengaturan Teks' }}
+                                    {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Teks' : 'Ubah Pengaturan Teks' }}
                                 @endif
                             </h3>
-                            @if (Auth::user()->role === 'Admin' && !$showForm)
+                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
                                 <div class="card-actions">
                                     <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                                         <span wire:loading.remove wire:target="showAddForm">
@@ -43,7 +43,7 @@
                                 <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-12">
-                                            @if (Auth::user()->role === 'Admin')
+                                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                                 <div class="row g-2 mb-3">
                                                     <div class="col-md-2">
                                                         <label class="form-label">Admin Masjid</label>
@@ -149,7 +149,7 @@
                                 <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
                                     style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
-                                        @if (Auth::user()->role === 'Admin')
+                                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                             <button type="button" wire:click="cancelForm"
                                                 class="btn py-2 px-2 rounded-3 shadow-sm">
                                                 <span wire:loading.remove wire:target="cancelForm">
@@ -201,7 +201,7 @@
                             </form>
                         @endif
 
-                        @if (Auth::user()->role === 'Admin')
+                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                             {{-- Pagination & Search Controls --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">

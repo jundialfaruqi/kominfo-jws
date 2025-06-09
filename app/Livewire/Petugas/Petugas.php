@@ -54,7 +54,7 @@ class Petugas extends Component
         $this->search = '';
 
         // jika user bukan admin
-        if (Auth::user()->role !== 'Admin') {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $petugas = ModelsPetugas::where('user_id', Auth::user()->id)->first();
 
             // Always show form for non-admin users
@@ -98,7 +98,7 @@ class Petugas extends Component
     {
         // Get current user and role
         $currentUser = Auth::user();
-        $isAdmin = $currentUser->role === 'Admin';
+        $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
 
         // Query builder for petugas
         $query = ModelsPetugas::with('user')
@@ -135,7 +135,7 @@ class Petugas extends Component
     public function showAddForm()
     {
         // Only admin can add new petugas
-        if (Auth::user()->role !== 'Admin') {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk menambah petugas!');
             return;
         }
@@ -162,7 +162,7 @@ class Petugas extends Component
         $petugas = ModelsPetugas::findOrFail($id);
 
         // Check if user has permission to edit this petugas
-        if (Auth::user()->role !== 'Admin' && Auth::id() !== $petugas->user_id) {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin']) && Auth::id() !== $petugas->user_id) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit petugas ini!');
             return;
         }
@@ -199,7 +199,7 @@ class Petugas extends Component
         $currentUser = Auth::user();
 
         // If user is not admin, force userId to be their own id
-        if ($currentUser->role !== 'Admin') {
+        if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
         }
 
@@ -209,13 +209,13 @@ class Petugas extends Component
             if ($this->isEdit) {
                 $petugas = ModelsPetugas::findOrFail($this->petugasId);
                 // Check if user has permission to edit this petugas
-                if ($currentUser->role !== 'Admin' && $currentUser->id !== $petugas->user_id) {
+                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $currentUser->id !== $petugas->user_id) {
                     $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit petugas ini!');
                     return;
                 }
             } else {
                 // Allow non-admin users to create their own petugas
-                if ($currentUser->role !== 'Admin' && $this->userId !== $currentUser->id) {
+                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $this->userId !== $currentUser->id) {
                     $this->dispatch('error', 'Anda tidak memiliki akses untuk membuat petugas untuk user lain!');
                     return;
                 }
@@ -232,7 +232,7 @@ class Petugas extends Component
             $this->dispatch('success', $this->isEdit ? 'Petugas berhasil diubah!' : 'Petugas berhasil ditambahkan!');
 
             // only hide form and reset field if user is not admin
-            if (Auth::user()->role === 'Admin') {
+            if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
                 $this->showForm = false;
                 $this->reset(
                     [

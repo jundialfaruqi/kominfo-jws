@@ -404,7 +404,7 @@ class Slide extends Component
         $this->search = '';
 
         // If user is not admin
-        if (Auth::user()->role !== 'Admin') {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $slide = Slides::where('user_id', Auth::id())->first();
 
             // Always show form for non-admin users
@@ -458,7 +458,7 @@ class Slide extends Component
     {
         // Get current user and role
         $currentUser = Auth::user();
-        $isAdmin = $currentUser->role === 'Admin';
+        $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
 
         // Query builder for slides
         $query = Slides::with('user')
@@ -491,7 +491,7 @@ class Slide extends Component
     public function showAddForm()
     {
         // Only admin can add new slides
-        if (Auth::user()->role !== 'Admin') {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk menambah slide!');
             return;
         }
@@ -527,7 +527,7 @@ class Slide extends Component
         $slide = Slides::findOrFail($id);
 
         // Check if user has permission to edit this slide
-        if (Auth::user()->role !== 'Admin' && Auth::id() !== $slide->user_id) {
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin']) && Auth::id() !== $slide->user_id) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit slide ini!');
             return;
         }
@@ -574,7 +574,7 @@ class Slide extends Component
         $currentUser = Auth::user();
 
         // If user is not admin, force userId to be their own id
-        if ($currentUser->role !== 'Admin') {
+        if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
             $this->userId = $currentUser->id;
         }
 
@@ -584,13 +584,13 @@ class Slide extends Component
             if ($this->isEdit) {
                 $slide = Slides::findOrFail($this->slideId);
                 // Check if user has permission to edit this slide
-                if ($currentUser->role !== 'Admin' && $currentUser->id !== $slide->user_id) {
+                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $currentUser->id !== $slide->user_id) {
                     $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit slide ini!');
                     return;
                 }
             } else {
                 // Allow non-admin users to create their own slide
-                if ($currentUser->role !== 'Admin' && $this->userId !== $currentUser->id) {
+                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $this->userId !== $currentUser->id) {
                     $this->dispatch('error', 'Anda tidak memiliki akses untuk membuat slide untuk user lain!');
                     return;
                 }
@@ -678,7 +678,7 @@ class Slide extends Component
             $this->dispatch('success', $this->isEdit ? 'Gambar Slide berhasil diubah!' : 'Gambar Slide berhasil ditambahkan!');
 
             // Only hide form and reset fields if user is not admin
-            if (Auth::user()->role === 'Admin') {
+            if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
                 $this->showForm = false;
                 $this->reset(
                     [

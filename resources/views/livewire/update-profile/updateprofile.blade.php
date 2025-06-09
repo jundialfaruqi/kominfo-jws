@@ -158,7 +158,8 @@
                                 <div class="form-label">Password Lama</div>
                                 <input type="password"
                                     class="form-control rounded-3 @error('password_old') is-invalid @enderror"
-                                    wire:model="password_old" placeholder="Masukkan Password Lama">
+                                    wire:model="password_old" autocomplete="new-password"
+                                    placeholder="Masukkan Password Lama">
                                 @error('password_old')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -167,9 +168,11 @@
                                 <div class="form-label">Password Baru</div>
                                 <input type="password"
                                     class="form-control rounded-3 @error('password_new') is-invalid @enderror"
-                                    wire:model="password_new" placeholder="Masukkan Password Baru">
+                                    wire:model="password_new" placeholder="Masukkan Password Baru"
+                                    autocomplete="new-password">
                                 @error('password_new')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}
+                                    </div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
@@ -177,9 +180,10 @@
                                 <input type="password"
                                     class="form-control rounded-3 @error('password_new_confirmation') is-invalid @enderror"
                                     wire:model="password_new_confirmation"
-                                    placeholder="Masukkan Konfirmasi Password Baru">
+                                    placeholder="Masukkan Konfirmasi Password Baru" autocomplete="new-password">
                                 @error('password_new_confirmation')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="invalid-feedback">{{ $message }}
+                                    </div>
                                 @enderror
                             </div>
                         </div>
