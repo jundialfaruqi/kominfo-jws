@@ -106,15 +106,29 @@
 
             <div class="mosque-image">
 
-                {{-- Hidden inputs to store slide URLs --}}
+                {{-- Hidden inputs to store slide URLs with default fallback --}}
                 @if ($slides)
-                    <input type="hidden" id="slide1" value="{{ $slides->slide1 }}">
-                    <input type="hidden" id="slide2" value="{{ $slides->slide2 }}">
-                    <input type="hidden" id="slide3" value="{{ $slides->slide3 }}">
-                    <input type="hidden" id="slide4" value="{{ $slides->slide4 }}">
-                    <input type="hidden" id="slide5" value="{{ $slides->slide5 }}">
-                    <input type="hidden" id="slide6" value="{{ $slides->slide6 }}">
+                    <input type="hidden" id="slide1"
+                        value="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide2"
+                        value="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide3"
+                        value="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide4"
+                        value="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide5"
+                        value="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide6"
+                        value="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}">
+                @else
+                    <input type="hidden" id="slide1" value="{{ asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide2" value="{{ asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide3" value="{{ asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide4" value="{{ asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide5" value="{{ asset('images/other/slide-jws-default.jpg') }}">
+                    <input type="hidden" id="slide6" value="{{ asset('images/other/slide-jws-default.jpg') }}">
                 @endif
+
                 <div class="countdown-timer">
                     <div class="countdown-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
@@ -144,7 +158,19 @@
                     <input type="hidden" id="marquee5" value="{{ $marquee->marquee5 }}">
                     <input type="hidden" id="marquee6" value="{{ $marquee->marquee6 }}">
                 @endif
-                <p>-</p>
+                <p>
+                    Matikan ponsel atau gunakan mode senyap saat berada di dalam masjid
+                    <span class="separator">•</span>
+                    Mohon menjaga kebersihan di dalam masjid
+                    <span class="separator">•</span>
+                    Berdoalah untuk umat Islam
+                    <span class="separator">•</span>
+                    Shalatlah berjamaah untuk mendapatkan lebih banyak pahala
+                    <span class="separator">•</span>
+                    Ingatlah untuk berdonasi demi pemeliharaan masjid
+                    <span class="separator">•</span>
+                    Harap gunakan rak sepatu yang telah disediakan
+                </p>
             </div>
         </div>
     </div>

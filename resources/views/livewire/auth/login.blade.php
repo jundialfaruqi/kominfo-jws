@@ -24,16 +24,16 @@
                                 <label class="form-label">
                                     Password
                                     <span class="form-label-description">
-                                        <a href="#">Lupa Password?</a>
+                                        {{-- <a href="#">Lupa Password?</a> --}}
                                     </span>
                                 </label>
                                 <div class="input-group input-group-flat rounded-4 border">
-                                    <input wire:model="password" type="password" id="passwordField"
+                                    <input wire:model="password" type="password" id="password"
                                         class="form-control rounded-4 border-0 @error('password') is-invalid @enderror"
                                         placeholder="Masukkan Password" autocomplete="off">
                                     <span class="input-group-text rounded-4 border-0">
-                                        <a href="#" class="link-secondary" id="togglePassword"
-                                            title="Show password">
+                                        <span class="link-secondary" title="Show password" data-bs-toggle="tooltip"
+                                            onclick="togglePassword('password')">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
                                                 height="24" viewBox="0 0 24 24" stroke-width="2"
                                                 stroke="currentColor" fill="none" stroke-linecap="round"
@@ -43,7 +43,7 @@
                                                 <path
                                                     d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
                                             </svg>
-                                        </a>
+                                        </span>
                                     </span>
                                 </div>
                                 @error('password')
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="text-center text-secondary mt-3">
-                    Belum Punya Akun? <a href="#" tabindex="-1">Daftar</a>
+                    Belum Punya Akun? <a wire:navigate href="{{ route('register') }}" tabindex="-1">Daftar</a>
                 </div>
             </div>
         </div>
@@ -143,4 +143,16 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            event.preventDefault(); // Cegah perilaku default elemen <a>
+            const field = document.getElementById(fieldId);
+            if (field.type === 'password') {
+                field.type = 'text';
+            } else {
+                field.type = 'password';
+            }
+        }
+    </script>
 </div>

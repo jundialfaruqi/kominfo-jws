@@ -9,10 +9,10 @@
                                 @if ($showForm)
                                     {{ $isEdit ? 'Ubah Pengaturan Profil Masjid' : 'Tambah Profil Masjid Baru' }}
                                 @else
-                                    {{ Auth::user()->role === 'Admin' ? 'Daftar Profil Masjid' : 'Ubah Pengaturan Profil Masjid' }}
+                                    {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Profil Masjid' : 'Ubah Pengaturan Profil Masjid' }}
                                 @endif
                             </h3>
-                            @if (Auth::user()->role === 'Admin' && !$showForm)
+                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
                                 <div class="card-actions">
                                     <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                                         <span wire:loading.remove wire:target="showAddForm">
@@ -57,7 +57,7 @@
                                                 </div>
                                             </div>
 
-                                            @if (Auth::user()->role === 'Admin')
+                                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                                 <div class="row g-2 mb-3">
                                                     <div class="col-md-2">
                                                         <label class="form-label">Admin Masjid</label>
@@ -66,16 +66,47 @@
                                                         <select
                                                             class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
-                                                            </option>
+                                                            <option class="dropdown-header" value="">Pilih Admin
+                                                                Masjid</option>
+
+                                                            {{-- Jika sedang edit dan user sudah dipilih, tampilkan user tersebut --}}
+                                                            @if ($isEdit && $userId)
+                                                                @php
+                                                                    $selectedUser = \App\Models\User::find($userId);
+                                                                @endphp
+                                                                @if ($selectedUser && (Auth::user()->role === 'Super Admin' || !in_array($selectedUser->role, ['Super Admin', 'Admin'])))
+                                                                    <option value="{{ $selectedUser->id }}" selected>
+                                                                        {{ $selectedUser->name }} (Dipilih)
+                                                                    </option>
+                                                                @endif
+                                                            @endif
+
+                                                            {{-- Tampilkan user yang belum memiliki profil --}}
                                                             @foreach ($users as $user)
-                                                                <option value="{{ $user->id }}">{{ $user->name }}
-                                                                </option>
+                                                                {{-- Jangan tampilkan user yang sudah dipilih saat edit --}}
+                                                                @if (!($isEdit && $userId == $user->id))
+                                                                    <option value="{{ $user->id }}">
+                                                                        {{ $user->name }}
+                                                                    </option>
+                                                                @endif
                                                             @endforeach
+
+                                                            {{-- Jika tidak ada user yang tersedia --}}
+                                                            @if ($users->isEmpty() && !($isEdit && $userId))
+                                                                <option disabled>Tidak ada user yang tersedia</option>
+                                                            @endif
                                                         </select>
                                                         @error('userId')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
+
+                                                        {{-- Informasi tambahan --}}
+                                                        @if ($users->isEmpty() && !$isEdit)
+                                                            <div class="form-text">
+                                                                <small class="text-muted">Semua user sudah memiliki
+                                                                    profil masjid</small>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endif
@@ -114,13 +145,13 @@
                                                     <label class="form-label">Logo Masjid</label>
                                                     {{-- Photo logo masjid --}}
                                                     @if ($logo_masjid)
-                                                        <div class="card p-5 rounded-3">
+                                                        <div class="card p-5 rounded-3 shadow-sm border mb-2">
                                                             <div class="img-responsive img-responsive-21x9"
                                                                 style="background-image: url('{{ $logo_masjid->temporaryUrl() }}'); background-size: contain; background-position: center;">
                                                             </div>
                                                         </div>
                                                     @elseif($temp_logo)
-                                                        <div class="card p-5 rounded-3">
+                                                        <div class="card p-5 rounded-3 shadow-sm border mb-2">
                                                             <div class="img-responsive img-responsive-21x9"
                                                                 style="background-image: url('{{ asset($temp_logo) }}'); background-size: contain; background-position: center;">
                                                             </div>
@@ -133,34 +164,63 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk
-                                                            memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png, webp, gif.
+                                                            Maks: 1MB</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-3 @error('logo_masjid') is-invalid @enderror"
-                                                        wire:model="logo_masjid" accept="image/*">
+                                                    <div class="form-text">
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran persegi untuk kualitas
+                                                            gambar terbaik</small>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('logo_masjid') is-invalid @enderror"
+                                                            wire:model="logo_masjid" accept="image/*">
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($logo_masjid || $temp_logo)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearLogoMasjid" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('logo_masjid')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Logo Pemerintah</label>
+                                                <div class="col-md-6 mb-2">
+                                                    <label class="form-label">Logo Instansi</label>
                                                     {{-- Photo logo pemerintah --}}
                                                     @if ($logo_pemerintah)
-                                                        <div class="card p-5 rounded-3">
-                                                            <div class="img-responsive img-responsive-21x9 card-img-top"
+                                                        <div class="card p-5 rounded-3 shadow-sm border mb-2">
+                                                            <div class="img-responsive img-responsive-21x9"
                                                                 style="background-image: url('{{ $logo_pemerintah->temporaryUrl() }}'); background-size: contain; background-position: center;">
                                                             </div>
                                                         </div>
                                                     @elseif($temp_logo_pemerintah)
-                                                        <div class="card p-5 rounded-3">
-                                                            <div class="img-responsive img-responsive-21x9 card-img-top"
+                                                        <div class="card p-5 rounded-3 shadow-sm border mb-2">
+                                                            <div class="img-responsive img-responsive-21x9"
                                                                 style="background-image: url('{{ asset($temp_logo_pemerintah) }}'); background-size: contain; background-position: center;">
                                                             </div>
                                                         </div>
@@ -172,18 +232,47 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk
-                                                            memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format: JPG, PNG, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png, webp, gif.
+                                                            Maks: 1MB</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-3 @error('logo_pemerintah') is-invalid @enderror"
-                                                        wire:model="logo_pemerintah" accept="image/*">
+                                                    <div class="form-text">
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran persegi untuk kualitas
+                                                            gambar terbaik</small>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('logo_pemerintah') is-invalid @enderror"
+                                                            wire:model="logo_pemerintah" accept="image/*">
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($logo_pemerintah || $temp_logo_pemerintah)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearLogoPemerintah" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('logo_pemerintah')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -195,7 +284,7 @@
                                 <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
                                     style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
-                                        @if (Auth::user()->role === 'Admin')
+                                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                             <button type="button" wire:click="cancelForm"
                                                 class="btn py-2 px-2 rounded-3 shadow-sm">
                                                 <span wire:loading.remove wire:target="cancelForm">
@@ -247,7 +336,7 @@
                             </form>
                         @endif
 
-                        @if (Auth::user()->role === 'Admin')
+                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                             {{-- Pagination & Search Controls --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
@@ -280,11 +369,12 @@
                                     <thead>
                                         <tr>
                                             <th class="w-1">No.</th>
-                                            <th>Nama Masjid</th>
-                                            <th>Admin Masjid</th>
-                                            <th>Alamat Masjid</th>
+                                            <th>Masjid</th>
+                                            <th>Admin</th>
+                                            <th>Alamat</th>
                                             <th>No Hp</th>
-                                            <th>Logo Masjid</th>
+                                            <th>Logo</th>
+                                            <th>Lihat JWS</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -298,8 +388,30 @@
                                                 <td class="text-wrap">{{ $profil->phone }}</td>
                                                 <td>
                                                     @if ($profil->logo_masjid)
-                                                        <img src="{{ asset($profil->logo_masjid) }}" width="60"
+                                                        <img src="{{ asset($profil->logo_masjid) }}" width="40"
                                                             class="img-thumbnail">
+                                                    @else
+                                                        <span class="text-gray-400">-</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @if ($profil->slug)
+                                                        <a href="{{ route('firdaus', $profil->slug) }}"
+                                                            class="btn btn-icon bg-blue-lt text-blue-lt-fg rounded-3 border-0 shadow-sm"
+                                                            target="_blank">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-external-link">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+                                                                <path d="M11 13l9 -9" />
+                                                                <path d="M15 4h5v5" />
+                                                            </svg>
+                                                        </a>
                                                     @else
                                                         <span class="text-gray-400">-</span>
                                                     @endif
@@ -331,7 +443,7 @@
                                                         </span>
                                                     </button>
                                                     <button wire:click="delete('{{ $profil->id }}')"
-                                                        class="btn py-2 px-2 rounded-3 shadow-sm"
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm "
                                                         data-bs-toggle="modal" data-bs-target="#deleteModal">
                                                         <span wire:loading.remove
                                                             wire:target="delete('{{ $profil->id }}')">

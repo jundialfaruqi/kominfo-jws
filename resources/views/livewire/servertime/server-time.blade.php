@@ -2,11 +2,21 @@
     <h2 class="font-bold mb-2">Hari ini</h2>
 
     <template x-if="timestamp">
-        <p x-text="formattedTime + ' WIB'"></p>
-    </template>
-
-    <template x-if="!timestamp">
-        <p>Gagal mengambil waktu server.</p>
+        <div>
+            <p x-text="formattedTime + ' WIB'"></p>
+            <p class="text-sm text-gray-100">
+                <?php if ($apiSource === 'pekanbaru'): ?>
+                Sumber : Api Pekanbaru Super App
+                <?php elseif ($apiSource === 'timeapi'): ?>
+                Sumber : TimeAPI.io
+                <?php elseif ($apiSource === 'google-script'): ?>
+                Sumber : Google Script API
+                <?php else: ?>
+                Gagal menampilkan waktu, mengganti dengan waktu lokal <a href="javascript:void(0)"
+                    @click="window.location.reload()" class="text-blue-500 hover:underline">coba lagi</a>
+                <?php endif; ?>
+            </p>
+        </div>
     </template>
 </div>
 
@@ -16,18 +26,25 @@
             timestamp: timestamp,
             serverTime: null,
             formattedTime: '',
-            interval: null,
+            lastUpdate: null,
 
             init() {
                 if (!this.timestamp) return;
 
                 this.serverTime = new Date(this.timestamp);
+                this.lastUpdate = performance.now();
                 this.update();
 
-                this.interval = setInterval(() => {
-                    this.serverTime = new Date(this.serverTime.getTime() + 1000);
-                    this.update();
-                }, 1000);
+                // Gunakan requestAnimationFrame untuk pembaruan halus
+                const tick = (now) => {
+                    if (now - this.lastUpdate >= 1000) {
+                        this.serverTime = new Date(this.serverTime.getTime() + (now - this.lastUpdate));
+                        this.lastUpdate = now;
+                        this.update();
+                    }
+                    requestAnimationFrame(tick);
+                };
+                requestAnimationFrame(tick);
             },
 
             update() {

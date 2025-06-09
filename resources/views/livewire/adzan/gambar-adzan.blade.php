@@ -9,10 +9,10 @@
                                 @if ($showForm)
                                     {{ $isEdit ? 'Ubah Pengaturan Slide' : 'Tambah Slide' }}
                                 @else
-                                    {{ Auth::user()->role === 'Admin' ? 'Daftar Slide' : 'Ubah Pengaturan Slide' }}
+                                    {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Slide' : 'Ubah Pengaturan Slide' }}
                                 @endif
                             </h3>
-                            @if (Auth::user()->role === 'Admin' && !$showForm)
+                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
                                 <div class="card-actions">
                                     <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                                         <span wire:loading.remove wire:target="showAddForm">
@@ -49,25 +49,48 @@
 
                                     <div class="row mb-3">
                                         <div class="col-md-12">
-                                            @if (Auth::user()->role === 'Admin')
-                                                <div class="row g-2 mb-5">
+                                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
+                                                <div class="row g-2 mb-3">
                                                     <div class="col-md-2">
-                                                        <label class="form-label"> Admin Masjid</label>
+                                                        <label class="form-label">Admin Masjid</label>
                                                     </div>
                                                     <div class="col-md-10">
                                                         <select
                                                             class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                             wire:model="userId">
-                                                            <option class="dropdown-header" selected>Pilih Admin Masjid
-                                                            </option>
+                                                            <option class="dropdown-header" value="">Pilih Admin
+                                                                Masjid</option> {{-- Jika sedang edit dan user sudah dipilih, tampilkan user tersebut --}}
+                                                            @if ($isEdit && $userId)
+                                                                @php
+                                                                    $selectedUser = \App\Models\User::find($userId);
+                                                                @endphp
+                                                                @if ($selectedUser && (Auth::user()->role === 'Super Admin' || !in_array($selectedUser->role, ['Super Admin', 'Admin'])))
+                                                                    <option value="{{ $selectedUser->id }}" selected>
+                                                                        {{ $selectedUser->name }} (Dipilih)
+                                                                    </option>
+                                                                @endif
+                                                            @endif {{-- Tampilkan user yang belum memiliki Gambar Adzan --}}
                                                             @foreach ($users as $user)
-                                                                <option value="{{ $user->id }}">{{ $user->name }}
-                                                                </option>
-                                                            @endforeach
+                                                                {{-- Jangan tampilkan user yang sudah dipilih saat edit --}}
+                                                                @if (!($isEdit && $userId == $user->id))
+                                                                    <option value="{{ $user->id }}">
+                                                                        {{ $user->name }}
+                                                                    </option>
+                                                                @endif
+                                                            @endforeach {{-- Jika tidak ada user yang tersedia --}}
+                                                            @if ($users->isEmpty() && !($isEdit && $userId))
+                                                                <option disabled>Tidak ada user yang tersedia</option>
+                                                            @endif
                                                         </select>
                                                         @error('userId')
                                                             <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
+                                                        @enderror {{-- Informasi tambahan --}}
+                                                        @if ($users->isEmpty() && !$isEdit)
+                                                            <div class="form-text">
+                                                                <small class="text-muted">Semua user sudah memiliki
+                                                                    Gambar Iqomah, Final, dan Shalat Jum'at</small>
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             @endif
@@ -95,22 +118,48 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png, webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk Kualitas
+                                                            Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan1') is-invalid @enderror"
-                                                        wire:model="adzan1" accept="image/*">
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan1') is-invalid @enderror"
+                                                            wire:model="adzan1" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan1 || $tmp_adzan1)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan1" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan1')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -138,22 +187,50 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan2') is-invalid @enderror"
-                                                        wire:model="adzan2" accept="image/*">
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan2') is-invalid @enderror"
+                                                            wire:model="adzan2" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan2 || $tmp_adzan2)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan2" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
+
                                                     @error('adzan2')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -181,22 +258,48 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan3') is-invalid @enderror"
-                                                        wire:model="adzan3" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan3') is-invalid @enderror"
+                                                            wire:model="adzan3" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan3 || $tmp_adzan3)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan3" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan3')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -224,23 +327,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk
                                                             memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan4') is-invalid @enderror"
-                                                        wire:model="adzan4" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan4') is-invalid @enderror"
+                                                            wire:model="adzan4" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan4 || $tmp_adzan4)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan4" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan4')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -268,23 +397,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi untuk
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi untuk
                                                             memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan5') is-invalid @enderror"
-                                                        wire:model="adzan5" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan5') is-invalid @enderror"
+                                                            wire:model="adzan5" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan5 || $tmp_adzan5)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan5" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan5')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -312,23 +467,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan6') is-invalid @enderror"
-                                                        wire:model="adzan6" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan6') is-invalid @enderror"
+                                                            wire:model="adzan6" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan6 || $tmp_adzan6)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan6" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan6')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -356,23 +537,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan
-                                                            Browse/Jelajahi untuk memilih
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
+                                                            untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Rasio gambar 16:9 (Rekomendasi :
-                                                            1417x800 Piksel)</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Rasio gambar 16:9 (Rekomendasi :
+                                                            1920x1080 Piksel)</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan15') is-invalid @enderror"
-                                                        wire:model="adzan15" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan15') is-invalid @enderror"
+                                                            wire:model="adzan15" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan15 || $tmp_adzan15)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan15" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan15')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -404,23 +611,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan7') is-invalid @enderror"
-                                                        wire:model="adzan7" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan7') is-invalid @enderror"
+                                                            wire:model="adzan7" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan7 || $tmp_adzan7)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan7" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan7')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -448,23 +681,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan8') is-invalid @enderror"
-                                                        wire:model="adzan8" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan8') is-invalid @enderror"
+                                                            wire:model="adzan8" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan8 || $tmp_adzan8)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan8" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan8')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -492,23 +751,50 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik
+                                                        </small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan9') is-invalid @enderror"
-                                                        wire:model="adzan9" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan9') is-invalid @enderror"
+                                                            wire:model="adzan9" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan9 || $tmp_adzan9)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan9" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan9')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -536,23 +822,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan10') is-invalid @enderror"
-                                                        wire:model="adzan10" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan10') is-invalid @enderror"
+                                                            wire:model="adzan10" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan10 || $tmp_adzan10)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan10" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan10')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -580,23 +892,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan11') is-invalid @enderror"
-                                                        wire:model="adzan11" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan11') is-invalid @enderror"
+                                                            wire:model="adzan11" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan11 || $tmp_adzan11)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan11" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan11')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -624,23 +962,49 @@
                                                         <span class="small">Mengupload...</span>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Tekan Browse/Jelajahi
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Tekan Browse/Jelajahi
                                                             untuk memilih
                                                             gambar</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Format:
-                                                            JPG, PNG, JPEG, WEBP, GIF.
-                                                            Maks:
-                                                            1MB</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Format: jpg, jpeg, png,
+                                                            webp</small>
                                                     </div>
                                                     <div class="form-text">
-                                                        <small class="text-muted">*Gunakan ukuran 939x1162 Piksel untuk
-                                                            kualitas gambar terbaik</small>
+                                                        <small class="text-danger">*</small>
+                                                        <small class="text-muted">Gunakan ukuran 960x1080 Untuk
+                                                            Kualitas Gambar Terbaik</small>
                                                     </div>
-                                                    <input type="file"
-                                                        class="form-control my-2 rounded-4 @error('adzan12') is-invalid @enderror"
-                                                        wire:model="adzan12" accept="image/*">
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <input type="file"
+                                                            class="form-control my-2 rounded-4 @error('adzan12') is-invalid @enderror"
+                                                            wire:model="adzan12" accept="image/*">
+
+                                                        {{-- Tombol Trash - hanya muncul jika ada gambar --}}
+                                                        @if ($adzan12 || $tmp_adzan12)
+                                                            <button type="button"
+                                                                class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
+                                                                wire:click="clearAdzan12" title="Hapus gambar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-1">
+                                                                    <path d="M4 7l16 0"></path>
+                                                                    <path d="M10 11l0 6"></path>
+                                                                    <path d="M14 11l0 6"></path>
+                                                                    <path
+                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                    </path>
+                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                    </path>
+                                                                </svg>
+                                                                reset
+                                                            </button>
+                                                        @endif
+                                                    </div>
                                                     @error('adzan12')
                                                         <div class="invalid-feedback">{{ $message }}
                                                         </div>
@@ -653,7 +1017,7 @@
                                 <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
                                     style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
-                                        @if (Auth::user()->role === 'Admin')
+                                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                             <button type="button" wire:click="cancelForm"
                                                 class="btn py-2 px-2 rounded-3 shadow-sm">
                                                 <span wire:loading.remove wire:target="cancelForm">
@@ -704,7 +1068,7 @@
                                 </div>
                             </form>
                         @endif
-                        @if (Auth::user()->role === 'Admin')
+                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                             {{-- Pagination & search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">
@@ -957,6 +1321,23 @@
                     title: 'Gagal',
                     message,
                     position: 'topRight'
+                });
+            });
+        </script>
+
+        <script>
+            document.addEventListener('livewire:initialized', function() {
+                // Listen untuk event resetFileInput dari Livewire
+                Livewire.on('resetFileInput', (data) => {
+                    const inputName = data.inputName;
+                    const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
+                    if (fileInput) {
+                        fileInput.value = '';
+                        // Trigger change event untuk memastikan Livewire mendeteksi perubahan
+                        fileInput.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
+                    }
                 });
             });
         </script>

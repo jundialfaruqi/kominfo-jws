@@ -9,10 +9,10 @@
                                 @if ($showForm)
                                     {{ $isEdit ? 'Ubah Pengaturan Petugas' : 'Tambah Petugas Baru' }}
                                 @else
-                                    {{ Auth::user()->role === 'Admin' ? 'Daftar Petugas' : 'Ubah Pengaturan Petugas' }}
+                                    {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Petugas' : 'Ubah Pengaturan Petugas' }}
                                 @endif
                             </h3>
-                            @if (Auth::user()->role === 'Admin' && !$showForm)
+                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
                                 <div class="card-actions">
                                     <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                                         <span wire:loading.remove wire:target="showAddForm">
@@ -43,7 +43,7 @@
                             <form wire:submit.prevent="save">
                                 <div class="card-body">
                                     <div class="row mb-3">
-                                        @if (Auth::user()->role === 'Admin')
+                                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                             <div class="row g-2 mb-3">
                                                 <div class="col-md-2">
                                                     <label class="form-label">Admin Masjid</label>
@@ -52,16 +52,39 @@
                                                     <select
                                                         class="form-select rounded-3 @error('userId') is-invalid @enderror"
                                                         wire:model="userId">
-                                                        <option class="dropdown-header" selected>Pilih Admin Masjid
-                                                        </option>
+                                                        <option class="dropdown-header" value="">Pilih Admin
+                                                            Masjid</option> {{-- Jika sedang edit dan user sudah dipilih, tampilkan user tersebut --}}
+                                                        @if ($isEdit && $userId)
+                                                            @php
+                                                                $selectedUser = \App\Models\User::find($userId);
+                                                            @endphp
+                                                            @if ($selectedUser && (Auth::user()->role === 'Super Admin' || !in_array($selectedUser->role, ['Super Admin', 'Admin'])))
+                                                                <option value="{{ $selectedUser->id }}" selected>
+                                                                    {{ $selectedUser->name }} (Dipilih)
+                                                                </option>
+                                                            @endif
+                                                        @endif {{-- Tampilkan user yang belum memiliki Petugas Jumat --}}
                                                         @foreach ($users as $user)
-                                                            <option value="{{ $user->id }}">{{ $user->name }}
-                                                            </option>
-                                                        @endforeach
+                                                            {{-- Jangan tampilkan user yang sudah dipilih saat edit --}}
+                                                            @if (!($isEdit && $userId == $user->id))
+                                                                <option value="{{ $user->id }}">
+                                                                    {{ $user->name }}
+                                                                </option>
+                                                            @endif
+                                                        @endforeach {{-- Jika tidak ada user yang tersedia --}}
+                                                        @if ($users->isEmpty() && !($isEdit && $userId))
+                                                            <option disabled>Tidak ada user yang tersedia</option>
+                                                        @endif
                                                     </select>
                                                     @error('userId')
                                                         <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
+                                                    @enderror {{-- Informasi tambahan --}}
+                                                    @if ($users->isEmpty() && !$isEdit)
+                                                        <div class="form-text">
+                                                            <small class="text-muted">Semua user sudah memiliki
+                                                                Petugas Jumat</small>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             </div>
                                         @endif
@@ -130,7 +153,7 @@
                                 <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
                                     style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
-                                        @if (Auth::user()->role === 'Admin')
+                                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                                             <button type="button" wire:click="cancelForm"
                                                 class="btn py-2 px-2 rounded-3 shadow-sm">
                                                 <span wire:loading.remove wire:target="cancelForm">
@@ -183,7 +206,7 @@
                             </form>
                         @endif
 
-                        @if (Auth::user()->role === 'Admin')
+                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                             {{-- Pagination and search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">

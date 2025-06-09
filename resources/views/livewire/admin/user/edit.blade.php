@@ -22,9 +22,7 @@
                     <div class="mb-3">
                         <label class="form-label">Nama<span class="text-danger">*</span></label>
                         <input wire:model="name" type="text"
-                            class="form-control rounded-3 @error('name')
-                            is-invalid
-                        @enderror"
+                            class="form-control rounded-3 @error('name') is-invalid @enderror"
                             placeholder="Masukkan Nama">
                         @error('name')
                             <span class="text-danger small">{{ $message }}</span>
@@ -33,9 +31,7 @@
                     <div class="mb-3">
                         <label class="form-label">Email<span class="text-danger">*</span></label>
                         <input wire:model="email" type="email"
-                            class="form-control rounded-3 @error('email')
-                            is-invalid
-                        @enderror"
+                            class="form-control rounded-3 @error('email') is-invalid @enderror"
                             placeholder="Masukkan Email">
                         @error('email')
                             <span class="text-danger small">{{ $message }}</span>
@@ -44,9 +40,7 @@
                     <div class="mb-3">
                         <label class="form-label">Telepon<span class="text-danger">*</span></label>
                         <input wire:model="phone" type="text"
-                            class="form-control rounded-3 @error('phone')    
-                            is-invalid
-                        @enderror"
+                            class="form-control rounded-3 @error('phone') is-invalid @enderror"
                             placeholder="Masukkan Telepon">
                         @error('phone')
                             <span class="text-danger small">{{ $message }}</span>
@@ -55,9 +49,7 @@
                     <div class="mb-3">
                         <label class="form-label">Alamat<span class="text-danger">*</span></label>
                         <input wire:model="address" type="text"
-                            class="form-control rounded-3 @error('address')
-                            is-invalid
-                        @enderror"
+                            class="form-control rounded-3 @error('address') is-invalid @enderror"
                             placeholder="Masukkan Alamat">
                         @error('address')
                             <span class="text-danger small">{{ $message }}</span>
@@ -65,12 +57,12 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Role<span class="text-danger">*</span></label>
-                        <select wire:model="role"
-                            class="form-select rounded-3 @error('role')
-                            is-invalid
-                        @enderror">
-                            <option class="dropdown-header" selected>Pilih Role</option>
-                            <option value="Admin">Admin</option>
+                        <select wire:model="role" class="form-select rounded-3 @error('role') is-invalid @enderror">
+                            <option value="" selected>Pilih Role</option>
+                            @if (auth()->user()->role === 'Super Admin')
+                                <option value="Super Admin">Super Admin</option>
+                                <option value="Admin">Admin</option>
+                            @endif
                             <option value="User">User</option>
                         </select>
                         @error('role')
@@ -80,9 +72,7 @@
                     <div class="mb-3">
                         <label class="form-label">Password (Biarkan kosong jika tidak ingin mengubah)</label>
                         <input wire:model="password" type="password"
-                            class="form-control rounded-3 @error('password')
-                            is-invalid
-                        @enderror"
+                            class="form-control rounded-3 @error('password') is-invalid @enderror"
                             placeholder="Masukkan Password">
                         @error('password')
                             <span class="text-danger small">{{ $message }}</span>
@@ -91,11 +81,20 @@
                     <div class="mb-3">
                         <label class="form-label">Konfirmasi Password</label>
                         <input wire:model="password_confirmation" type="password"
-                            class="form-control rounded-3 @error('password_confirmation')
-                            is-invalid
-                        @enderror"
+                            class="form-control rounded-3 @error('password_confirmation') is-invalid @enderror"
                             placeholder="Masukkan Konfirmasi Password">
                         @error('password_confirmation')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status<span class="text-danger">*</span></label>
+                        <select wire:model="status" class="form-select rounded-3 @error('status') is-invalid @enderror">
+                            <option value="" selected>Pilih Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                        @error('status')
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror
                     </div>

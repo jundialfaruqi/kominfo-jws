@@ -25,6 +25,17 @@ class DatabaseSeeder extends Seeder
             'phone' => '082172117001',
             'password' => Hash::make('admin123'),
             'address' => 'Pekanbaru',
+            'status' => 'Active',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin@mail.com',
+            'role' => 'Super Admin',
+            'phone' => '082172117002',
+            'password' => Hash::make('admin123'),
+            'address' => 'Pekanbaru',
+            'status' => 'Active',
         ]);
 
         $this->call([

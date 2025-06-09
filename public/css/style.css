@@ -25,7 +25,6 @@ body {
     "footer";
   height: 100vh;
   width: 100vw;
-  border: 12px solid #d4af37;
   background-color: #004080;
   overflow: hidden;
   /* Mencegah scrollbar pada container */
@@ -411,7 +410,6 @@ body {
       "footer";
     height: 100vh;
     width: 100vw;
-    border: 20px solid #d4af37;
     background-color: #004080;
     overflow: hidden;
   }
@@ -420,7 +418,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 29vw;
+    width: 30vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -747,7 +745,6 @@ body {
       "footer";
     height: 100vh;
     width: 100vw;
-    border: 16px solid #d4af37;
     background-color: #004080;
     overflow: hidden;
   }
@@ -756,7 +753,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 28vw;
+    width: 29vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -1091,7 +1088,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 28vw;
+    width: 29vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -1417,7 +1414,6 @@ body {
       "footer";
     height: 100vh;
     width: 100vw;
-    border: 13px solid #d4af37;
     background-color: #004080;
     overflow: hidden;
   }
@@ -1426,7 +1422,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 28vw;
+    width: 29vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -1752,7 +1748,6 @@ body {
       "footer";
     height: 100vh;
     width: 100vw;
-    border: 14px solid #d4af37;
     background-color: #004080;
     overflow: hidden;
   }
@@ -1761,7 +1756,7 @@ body {
     position: absolute;
     left: 0;
     top: 0;
-    width: 28vw;
+    width: 29vw;
     height: 100%;
     z-index: 10;
     background-color: rgb(0, 64, 128);
@@ -2087,7 +2082,6 @@ body {
       "footer";
     height: 100vh;
     width: 100vw;
-    border: 10px solid #d4af37;
     background-color: #004080;
     overflow: hidden;
   }
@@ -2422,7 +2416,6 @@ body {
       "footer";
     height: 100vh;
     width: 100vw;
-    border: 10px solid #d4af37;
     background-color: #004080;
     overflow: hidden;
   }
@@ -2738,7 +2731,6 @@ body {
     display: flex;
     flex-direction: column;
     overflow: auto;
-    border: 10px solid #d4af37;
   }
 
   .prayer-times {
@@ -2850,10 +2842,7 @@ body {
 /* Mobile (480) */
 @media (max-width: 480px) {
   .container {
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-    border: 10px solid #d4af37;
+    border: none;
   }
 
   .prayer-times {

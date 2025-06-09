@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Auth\Login;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Admin\User\Index as UserIndex;
+use App\Livewire\Inactive\Inactive;
 use App\Livewire\Petugas\Petugas;
 use App\Livewire\Profil\ProfilMasjid;
 use App\Livewire\Slides\Slide;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 
 // Redirect the base URL to login page
 use App\Livewire\Welcome\Welcome;
+use App\Livewire\Register\Register;
+use App\Livewire\UpdateProfile\Updateprofile;
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -21,10 +24,20 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
 });
 
-// Protected Routes (require authentication)
+// Register Routes
+Route::get('/register', Register::class)->name('register');
+
 Route::middleware('auth')->group(function () {
+    Route::get('/inactive', Inactive::class)->name('inactive.index');
+});
+
+// Protected Routes (require authentication)
+Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Dashboard Route
     Route::get('/dashboard', DashboardIndex::class)->name('dashboard.index');
+
+    // Update Profile Route
+    Route::get('/pengaturan', Updateprofile::class)->name('updateprofile.index');
 
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
@@ -181,14 +194,88 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.adzan');
 
-Route::get('/api/server-time/', function () {
-    return response()->json([
-        'success' => true,
-        'data' => [
-            'timestamp' => time(),
-            'serverTime' => date('Y-m-d H:i:s')
-        ]
-    ]);
+// Route::get('/api/server-time/', function () {
+//     return response()->json([
+//         'success' => true,
+//         'data' => [
+//             'timestamp' => time(),
+//             'serverTime' => date('Y-m-d H:i:s')
+//         ]
+//     ]);
+// });
+
+Route::get('/api/server-time', function () {
+    try {
+        // Coba API utama (Pekanbaru)
+        $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+
+        if ($response->successful()) {
+            $serverTime = $response['serverTime'];
+            $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
+            $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                    'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                    'source' => 'pekanbaru'
+                ]
+            ]);
+        } else {
+            throw new \Exception('API utama gagal');
+        }
+    } catch (\Exception $e) {
+        try {
+            // Fallback ke timeapi.io
+            $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+
+            if ($fallbackResponse->successful()) {
+                $serverTime = $fallbackResponse['dateTime'];
+                $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                        'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                        'source' => 'timeapi'
+                    ]
+                ]);
+            } else {
+                throw new \Exception('API timeapi.io gagal');
+            }
+        } catch (\Exception $e) {
+            try {
+                // Fallback ke API Google Script
+                $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
+
+                if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
+                    $serverTime = $newApiResponse['fulldate'];
+                    $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
+                    return response()->json([
+                        'success' => true,
+                        'data' => [
+                            'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                            'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                            'source' => 'google-script'
+                        ]
+                    ]);
+                } else {
+                    throw new \Exception('API Google Script gagal');
+                }
+            } catch (\Exception $e) {
+                // Fallback ke waktu server lokal
+                $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                        'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                        'source' => 'local'
+                    ]
+                ]);
+            }
+        }
+    }
 });
 
 // Public route for accessing specific mosque page by slug
