@@ -232,6 +232,7 @@ Route::get('/api/server-time', function () {
             if ($fallbackResponse->successful()) {
                 $serverTime = $fallbackResponse['dateTime'];
                 $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
+                // $serverDateTime->modify('+0 hour 52 minutes'); // Tambah 1 jam 20 menit
                 return response()->json([
                     'success' => true,
                     'data' => [

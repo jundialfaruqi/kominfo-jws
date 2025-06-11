@@ -44,12 +44,12 @@ class Slide extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
-        'slide1' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide2' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide3' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide4' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide5' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide6' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide1' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp',
+        'slide2' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp',
+        'slide3' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp',
+        'slide4' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp',
+        'slide5' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp',
+        'slide6' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp',
     ];
 
     protected $messages = [
@@ -61,17 +61,101 @@ class Slide extends Component
         'slide4.image'    => 'File harus berupa gambar',
         'slide5.image'    => 'File harus berupa gambar',
         'slide6.image'    => 'File harus berupa gambar',
-        'slide1.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide2.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide3.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide4.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide5.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide6.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
+        'slide1.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'slide2.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'slide3.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'slide4.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'slide5.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'slide6.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'slide1.max'      => 'Ukuran gambar maksimal 1MB',
+        'slide2.max'      => 'Ukuran gambar maksimal 1MB',
+        'slide3.max'      => 'Ukuran gambar maksimal 1MB',
+        'slide4.max'      => 'Ukuran gambar maksimal 1MB',
+        'slide5.max'      => 'Ukuran gambar maksimal 1MB',
+        'slide6.max'      => 'Ukuran gambar maksimal 1MB',
     ];
 
     /**
      * Method untuk resize gambar dengan aspect ratio 16:9 dan ukuran maksimal 990KB
      */
+    // private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
+    // {
+    //     try {
+    //         // Konversi ke bytes
+    //         $maxSizeBytes = $maxSizeKB * 1024;
+
+    //         // Baca gambar menggunakan Intervention Image
+    //         $image = Image::read($uploadedFile->getRealPath());
+
+    //         // Target aspect ratio 16:9
+    //         $targetRatio = 16 / 9;
+    //         $targetWidth = 1920;
+    //         $targetHeight = 1080;
+
+    //         // Dapatkan dimensi asli
+    //         $originalWidth = $image->width();
+    //         $originalHeight = $image->height();
+    //         $originalRatio = $originalWidth / $originalHeight;
+
+    //         // Crop gambar ke aspect ratio 16:9 jika diperlukan
+    //         if (abs($originalRatio - $targetRatio) > 0.01) {
+    //             if ($originalRatio > $targetRatio) {
+    //                 // Gambar terlalu lebar, crop dari kiri-kanan
+    //                 $newWidth = (int)($originalHeight * $targetRatio);
+    //                 $x = (int)(($originalWidth - $newWidth) / 2);
+    //                 $image->crop($newWidth, $originalHeight, $x, 0);
+    //             } else {
+    //                 // Gambar terlalu tinggi, crop dari atas-bawah
+    //                 $newHeight = (int)($originalWidth / $targetRatio);
+    //                 $y = (int)(($originalHeight - $newHeight) / 2);
+    //                 $image->crop($originalWidth, $newHeight, 0, $y);
+    //             }
+    //         }
+
+    //         // Resize ke dimensi target 1920x1080
+    //         $image->resize($targetWidth, $targetHeight);
+
+    //         // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
+    //         $quality = 95;
+    //         $minQuality = 20;
+
+    //         do {
+    //             // Encode dengan kualitas saat ini
+    //             $encoded = $image->toJpeg($quality);
+    //             $currentSize = strlen($encoded);
+
+    //             // Jika ukuran sudah sesuai, keluar dari loop
+    //             if ($currentSize <= $maxSizeBytes) {
+    //                 break;
+    //             }
+
+    //             // Turunkan kualitas secara bertahap
+    //             if ($currentSize > $maxSizeBytes * 1.5) {
+    //                 $quality -= 10; // Penurunan cepat jika masih jauh dari target
+    //             } elseif ($currentSize > $maxSizeBytes * 1.2) {
+    //                 $quality -= 5;  // Penurunan sedang
+    //             } else {
+    //                 $quality -= 2;  // Penurunan halus untuk fine-tuning
+    //             }
+    //         } while ($quality >= $minQuality);
+
+    //         // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil
+    //         if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
+    //             $scaleFactor = 0.9;
+    //             while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
+    //                 $newWidth = (int)($targetWidth * $scaleFactor);
+    //                 $newHeight = (int)($targetHeight * $scaleFactor);
+    //                 $image->resize($newWidth, $newHeight);
+    //                 $scaleFactor -= 0.05;
+    //             }
+    //         }
+
+    //         return $image;
+    //     } catch (\Exception $e) {
+    //         throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
+    //     }
+    // }
+
     private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
     {
         try {
@@ -81,33 +165,9 @@ class Slide extends Component
             // Baca gambar menggunakan Intervention Image
             $image = Image::read($uploadedFile->getRealPath());
 
-            // Target aspect ratio 16:9
-            $targetRatio = 16 / 9;
-            $targetWidth = 1920;
-            $targetHeight = 1080;
-
-            // Dapatkan dimensi asli
+            // Dapatkan dimensi asli (tidak ada perubahan dimensi)
             $originalWidth = $image->width();
             $originalHeight = $image->height();
-            $originalRatio = $originalWidth / $originalHeight;
-
-            // Crop gambar ke aspect ratio 16:9 jika diperlukan
-            if (abs($originalRatio - $targetRatio) > 0.01) {
-                if ($originalRatio > $targetRatio) {
-                    // Gambar terlalu lebar, crop dari kiri-kanan
-                    $newWidth = (int)($originalHeight * $targetRatio);
-                    $x = (int)(($originalWidth - $newWidth) / 2);
-                    $image->crop($newWidth, $originalHeight, $x, 0);
-                } else {
-                    // Gambar terlalu tinggi, crop dari atas-bawah
-                    $newHeight = (int)($originalWidth / $targetRatio);
-                    $y = (int)(($originalHeight - $newHeight) / 2);
-                    $image->crop($originalWidth, $newHeight, 0, $y);
-                }
-            }
-
-            // Resize ke dimensi target 1920x1080
-            $image->resize($targetWidth, $targetHeight);
 
             // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
             $quality = 95;
@@ -137,8 +197,8 @@ class Slide extends Component
             if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
                 $scaleFactor = 0.9;
                 while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                    $newWidth = (int)($targetWidth * $scaleFactor);
-                    $newHeight = (int)($targetHeight * $scaleFactor);
+                    $newWidth = (int)($originalWidth * $scaleFactor);
+                    $newHeight = (int)($originalHeight * $scaleFactor);
                     $image->resize($newWidth, $newHeight);
                     $scaleFactor -= 0.05;
                 }

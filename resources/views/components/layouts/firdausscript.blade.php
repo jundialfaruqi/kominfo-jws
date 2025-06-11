@@ -104,13 +104,15 @@
             return new Date(serverTimestamp + elapsed);
         }
 
-        syncServerTime(() => {
-            checkAndRestoreSessions();
-        });
+        setTimeout(() => {
+            syncServerTime(() => {
+                checkAndRestoreSessions();
+            });
+        }, 3000); // 3000 milidetik = 3 detik
 
         setInterval(() => {
             syncServerTime();
-        }, 30000);
+        }, 300000); // 300000 milidetik = 5 menit
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -842,23 +844,33 @@
                 currentPrayerTime = prayerTimeStr;
             }
 
-            const duration = 3 * 60;
-            let lastUpdateTime = getCurrentTimeFromServer().getTime();
+            const duration = 3 * 60; // 3 menit dalam detik
+            let lastCountdownUpdate = 0;
             isAdzanPlaying = true;
-            let adzanUpdateTimeout = null;
+            let animationId;
 
-            function updateAdzan() {
+            // Fungsi animasi dengan requestAnimationFrame
+            function updateAdzanAnimation(timestamp) {
+                if (!isAdzanPlaying) {
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    return;
+                }
+
                 const currentTime = getCurrentTimeFromServer().getTime();
                 const elapsedSeconds = (currentTime - adzanStartTime) / 1000;
                 const timeLeft = duration - elapsedSeconds;
 
+                // Cek apakah adzan sudah selesai
                 if (timeLeft <= 0) {
                     $popup.css('display', 'none');
                     isAdzanPlaying = false;
-                    if (adzanUpdateTimeout) {
-                        clearTimeout(adzanUpdateTimeout);
-                        adzanUpdateTimeout = null;
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
                     }
+
+                    // Logika setelah adzan selesai
                     if (prayerName === "Jum'at" && now.getDay() === 5) {
                         updateFridayImages();
                         startFridayImageSlider();
@@ -873,25 +885,39 @@
                     return;
                 }
 
+                // Update progress bar (smooth animation setiap frame)
+                const progressPercentage = (elapsedSeconds / duration) * 100;
                 $progress.css({
-                    width: `${(elapsedSeconds / duration) * 100}%`,
-                    transition: 'width 0.3s linear'
+                    width: `${Math.min(progressPercentage, 100)}%`
                 });
 
-                if (currentTime - lastUpdateTime >= 1000) {
+                // Update countdown hanya setiap detik untuk efisiensi
+                if (currentTime - lastCountdownUpdate >= 1000) {
                     const hours = Math.floor(timeLeft / 3600);
                     const minutes = Math.floor((timeLeft % 3600) / 60);
                     const seconds = Math.floor(timeLeft % 60);
+
                     $countdown.text(
                         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
                     );
-                    lastUpdateTime = currentTime;
+
+                    lastCountdownUpdate = currentTime;
                 }
 
-                adzanUpdateTimeout = setTimeout(updateAdzan, 1000);
+                // Lanjutkan animasi
+                animationId = requestAnimationFrame(updateAdzanAnimation);
             }
 
-            updateAdzan();
+            // Mulai animasi
+            animationId = requestAnimationFrame(updateAdzanAnimation);
+
+            // Return function untuk cleanup jika diperlukan
+            return function stopAdzan() {
+                isAdzanPlaying = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            };
         }
 
         let iqomahImageSliderInterval = null;
@@ -1050,13 +1076,16 @@
                 localStorage.setItem('iqomahStartTime', iqomahStartTime);
             }
 
-            const duration = 420;
-            let lastUpdateTime = getCurrentTimeFromServer().getTime();
+            const duration = 420; // 7 menit dalam detik
+            let lastCountdownUpdate = 0;
             let isIqomahPlaying = true;
             let hasPlayedFinalBeep = false;
-            const iqomahInterval = setInterval(() => {
+            let animationId;
+
+            // Fungsi animasi dengan requestAnimationFrame
+            function updateIqomahAnimation(timestamp) {
                 if (!isIqomahPlaying) {
-                    clearInterval(iqomahInterval);
+                    cancelAnimationFrame(animationId);
                     return;
                 }
 
@@ -1064,38 +1093,55 @@
                 const elapsedSeconds = (currentTime - iqomahStartTime) / 1000;
                 const timeLeft = duration - elapsedSeconds;
 
+                // Mainkan beep sound saat 5 detik terakhir
                 if (timeLeft <= 5 && !hasPlayedFinalBeep) {
                     playBeepSound(3);
                     hasPlayedFinalBeep = true;
                 }
+
+                // Cek apakah iqomah sudah selesai
                 if (timeLeft <= 0) {
                     $popup.css('display', 'none');
                     isIqomahPlaying = false;
-                    clearInterval(iqomahInterval);
+                    cancelAnimationFrame(animationId);
                     clearAdzanState();
                     showFinalAdzanImage();
                     return;
                 }
 
+                // Update progress bar (smooth animation setiap frame)
+                const progressPercentage = (elapsedSeconds / duration) * 100;
                 $progress.css({
-                    width: `${(elapsedSeconds / duration) * 100}%`,
-                    transition: 'width 0.3s linear'
+                    width: `${Math.min(progressPercentage, 100)}%`
                 });
-                if (currentTime - lastUpdateTime >= 1000) {
+
+                // Update countdown hanya setiap detik untuk efisiensi
+                if (currentTime - lastCountdownUpdate >= 1000) {
                     const hours = Math.floor(timeLeft / 3600);
                     const minutes = Math.floor((timeLeft % 3600) / 60);
                     const seconds = Math.floor(timeLeft % 60);
+
                     $countdown.text(
                         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
                     );
-                    lastUpdateTime = currentTime;
-                }
-            }, 1000);
 
+                    lastCountdownUpdate = currentTime;
+                }
+
+                // Lanjutkan animasi
+                animationId = requestAnimationFrame(updateIqomahAnimation);
+            }
+
+            // Mulai animasi
+            animationId = requestAnimationFrame(updateIqomahAnimation);
+
+            // Return function untuk membatalkan iqomah
             return function cancelIqomah() {
                 isIqomahPlaying = false;
                 $popup.css('display', 'none');
-                clearInterval(iqomahInterval);
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
             };
         }
 
@@ -1218,14 +1264,46 @@
             }
 
             const $adzan15 = $('#adzan15');
+            let imageUrl;
+
             if ($adzan15.length && $adzan15.val()) {
-                displayAdzanImage($adzan15.val(), false, duration);
+                imageUrl = $adzan15.val();
             } else {
                 console.warn(
                     'Elemen #adzan15 tidak ditemukan atau nilainya kosong, menggunakan gambar default');
-                displayAdzanImage('/images/other/lurus-rapat-shaf-default.webp', false, duration);
+                imageUrl = '/images/other/lurus-rapat-shaf-default.webp';
             }
+
+            // Tampilkan gambar dengan durasi yang ditentukan
+            displayAdzanImage(imageUrl, false, duration);
+
+            // Set timeout untuk menutup gambar setelah durasi habis
+            setTimeout(() => {
+                hideAdzanImage();
+                console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
+            }, duration);
         }
+
+        // Fungsi helper untuk menutup gambar adzan
+        function hideAdzanImage() {
+            // Sembunyikan overlay gambar adzan
+            const adzanOverlay = document.getElementById('adzan-overlay') || document.querySelector(
+                '.adzan-overlay');
+            if (adzanOverlay) {
+                adzanOverlay.style.display = 'none';
+                adzanOverlay.remove();
+            }
+
+            // Reset variabel waktu
+            adzanImageStartTime = null;
+            adzanImageEndTime = null;
+
+            // Jika menggunakan jQuery untuk overlay
+            $('#adzan-overlay, .adzan-overlay').fadeOut(500, function() {
+                $(this).remove();
+            });
+        }
+
 
         let fridayInfoStartTime = localStorage.getItem('fridayInfoStartTime') ? parseInt(localStorage.getItem(
             'fridayInfoStartTime')) : null;
@@ -1730,9 +1808,6 @@
 
                 $mosqueImageElement.css({
                     'background-image': `url("${window.slideUrls[slideIndex]}")`,
-                    'background-size': 'cover',
-                    'background-position': 'center',
-                    'transition': 'background-image 0.5s ease-in-out'
                 });
             }
 
@@ -1765,8 +1840,6 @@
         setInterval(handlePrayerTimes, 1000);
         updateDate();
         setInterval(updateDate, 60000);
-        // checkDayChange();
-        // setInterval(checkDayChange, 60000);
         updateMarqueeText();
 
         setTimeout(function() {
@@ -1882,18 +1955,19 @@
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-        }, 30000);
+        }, 30000); // 30000 milidetik = 30 detik
 
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible') {
-                // console.log('Tab kembali aktif, menyinkronkan waktu server');
-                syncServerTime();
-                checkAndRestoreSessions();
-                checkAndRestoreAdzanImage();
-                checkAndRestoreFridayInfo();
-                handlePrayerTimes();
-            }
-        });
+
+        // document.addEventListener('visibilitychange', function() {
+        //     if (document.visibilityState === 'visible') {
+        //         console.log('Tab kembali aktif, menyinkronkan waktu server');
+        //         syncServerTime();
+        //         checkAndRestoreSessions();
+        //         checkAndRestoreAdzanImage();
+        //         checkAndRestoreFridayInfo();
+        //         handlePrayerTimes();
+        //     }
+        // });
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
