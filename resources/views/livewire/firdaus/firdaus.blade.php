@@ -182,6 +182,7 @@
     <input type="hidden" id="current-year" value="{{ $currentYear }}">
     <input type="hidden" id="active-prayer-status"
         value='{{ $activePrayerStatus ? json_encode($activePrayerStatus) : '' }}'>
+    <input type="hidden" id="durasi-data" value='{{ $durasi ? json_encode($durasi->toArray()) : '' }}'>
 
     {{-- Hidden inputs for adzan data --}}
     @foreach ($adzanData as $key => $value)

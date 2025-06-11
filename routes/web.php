@@ -60,6 +60,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // adzan routes
     Route::get('/adzan', \App\Livewire\Adzan\GambarAdzan::class)->name('adzan.index');
 
+    // durasi routes
+    Route::get('/durasi', \App\Livewire\Durasi\Durasi::class)->name('durasi.index');
+
     // User-specific route that redirects to their own mosque page
     Route::get('/my/mosque', function () {
         // Get the authenticated user
@@ -232,7 +235,7 @@ Route::get('/api/server-time', function () {
             if ($fallbackResponse->successful()) {
                 $serverTime = $fallbackResponse['dateTime'];
                 $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
-                // $serverDateTime->modify('+0 hour 52 minutes'); // Tambah 1 jam 20 menit
+                // $serverDateTime->modify('+7 hour 22 minutes'); // Tambah 1 jam 20 menit
                 return response()->json([
                     'success' => true,
                     'data' => [
@@ -252,6 +255,7 @@ Route::get('/api/server-time', function () {
                 if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
                     $serverTime = $newApiResponse['fulldate'];
                     $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
+                    // $serverDateTime->modify('+2 hour 56 minutes'); // Tambah 1 jam 20 menit
                     return response()->json([
                         'success' => true,
                         'data' => [
