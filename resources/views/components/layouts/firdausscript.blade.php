@@ -800,6 +800,109 @@
             }
         }
 
+            function getDurasiData() {
+        let durasiData = {};
+        try {
+            const durasiJson = $('#durasi-data').val();
+            if (durasiJson) {
+                durasiData = JSON.parse(durasiJson);
+                console.log('Data durasi berhasil dimuat:', durasiData);
+            } else {
+                console.warn('Data durasi tidak tersedia, menggunakan nilai default');
+            }
+        } catch (e) {
+            console.error('Error parsing durasi data:', e);
+        }
+        return durasiData;
+    }
+    
+    // Fungsi untuk mendapatkan durasi adzan berdasarkan nama sholat (dalam detik)
+    function getAdzanDuration(prayerName) {
+        const durasiData = getDurasiData();
+        const prayerLower = prayerName.toLowerCase();
+        
+        // Default durasi jika data tidak tersedia (dalam detik)
+        const defaultDuration = 3 * 60; // 3 menit
+        
+        if (!durasiData) return defaultDuration;
+        
+        if (prayerLower === 'shubuh' && durasiData.adzan_shubuh) {
+            return durasiData.adzan_shubuh * 60;
+        } else if ((prayerLower === 'dzuhur' || prayerLower === "jum'at") && durasiData.adzan_dzuhur) {
+            return durasiData.adzan_dzuhur * 60;
+        } else if (prayerLower === 'ashar' && durasiData.adzan_ashar) {
+            return durasiData.adzan_ashar * 60;
+        } else if (prayerLower === 'maghrib' && durasiData.adzan_maghrib) {
+            return durasiData.adzan_maghrib * 60;
+        } else if (prayerLower === 'isya' && durasiData.adzan_isya) {
+            return durasiData.adzan_isya * 60;
+        }
+        
+        return defaultDuration;
+    }
+    
+    // Fungsi untuk mendapatkan durasi iqomah berdasarkan nama sholat (dalam detik)
+    function getIqomahDuration(prayerName) {
+        const durasiData = getDurasiData();
+        const prayerLower = prayerName.toLowerCase();
+        
+        // Default durasi jika data tidak tersedia (dalam detik)
+        const defaultDuration = 7 * 60; // 7 menit
+        
+        if (!durasiData) return defaultDuration;
+        
+        if (prayerLower === 'shubuh' && durasiData.iqomah_shubuh) {
+            return durasiData.iqomah_shubuh * 60;
+        } else if (prayerLower === 'dzuhur' && durasiData.iqomah_dzuhur) {
+            return durasiData.iqomah_dzuhur * 60;
+        } else if (prayerLower === 'ashar' && durasiData.iqomah_ashar) {
+            return durasiData.iqomah_ashar * 60;
+        } else if (prayerLower === 'maghrib' && durasiData.iqomah_maghrib) {
+            return durasiData.iqomah_maghrib * 60;
+        } else if (prayerLower === 'isya' && durasiData.iqomah_isya) {
+            return durasiData.iqomah_isya * 60;
+        }
+        
+        return defaultDuration;
+    }
+    
+    // Fungsi untuk mendapatkan durasi final berdasarkan nama sholat (dalam milidetik)
+    function getFinalDuration(prayerName) {
+        const durasiData = getDurasiData();
+        const prayerLower = prayerName.toLowerCase();
+        
+        // Default durasi jika data tidak tersedia (dalam milidetik)
+        const defaultDuration = 60 * 1000; // 60 detik
+        
+        if (!durasiData) return defaultDuration;
+        
+        if (prayerLower === 'shubuh' && durasiData.final_shubuh) {
+            return durasiData.final_shubuh * 1000;
+        } else if (prayerLower === 'dzuhur' && durasiData.final_dzuhur) {
+            return durasiData.final_dzuhur * 1000;
+        } else if (prayerLower === 'ashar' && durasiData.final_ashar) {
+            return durasiData.final_ashar * 1000;
+        } else if (prayerLower === 'maghrib' && durasiData.final_maghrib) {
+            return durasiData.final_maghrib * 1000;
+        } else if (prayerLower === 'isya' && durasiData.final_isya) {
+            return durasiData.final_isya * 1000;
+        }
+        
+        return defaultDuration;
+    }
+    
+    // Fungsi untuk mendapatkan durasi jumat slide (dalam milidetik)
+    function getJumatSlideDuration() {
+        const durasiData = getDurasiData();
+        
+        // Default durasi jika data tidak tersedia (dalam milidetik)
+        const defaultDuration = 10 * 60 * 1000; // 10 menit
+        
+        if (!durasiData || !durasiData.jumat_slide) return defaultDuration;
+        
+        return durasiData.jumat_slide * 60 * 1000; // Konversi menit ke milidetik
+    }
+
         function showAdzanPopup(prayerName, prayerTimeStr, isRestored = false) {
             const now = getCurrentTimeFromServer();
             const currentDate = now.getDate();
@@ -844,7 +947,8 @@
                 currentPrayerTime = prayerTimeStr;
             }
 
-            const duration = 3 * 60; // 3 menit dalam detik
+            // Gunakan durasi dinamis berdasarkan nama sholat
+            const duration = getAdzanDuration(prayerName); // dalam detik
             let lastCountdownUpdate = 0;
             isAdzanPlaying = true;
             let animationId;
@@ -1071,12 +1175,16 @@
                         adzanStartTime = calculateSyncStartTime(prayerTimeStr);
                         localStorage.setItem('adzanStartTime', adzanStartTime);
                     }
-                    iqomahStartTime = adzanStartTime + (3 * 60 * 1000);
+                    iqomahStartTime = adzanStartTime + (getAdzanDuration(currentPrayerName) * 1000);
                 }
                 localStorage.setItem('iqomahStartTime', iqomahStartTime);
             }
 
-            const duration = 420; // 7 menit dalam detik
+            // Ekstrak nama sholat dari currentPrayerName
+            const prayerName = currentPrayerName || 'Dzuhur';
+            
+            // Gunakan durasi dinamis berdasarkan nama sholat
+            const duration = getIqomahDuration(prayerName); // dalam detik
             let lastCountdownUpdate = 0;
             let isIqomahPlaying = true;
             let hasPlayedFinalBeep = false;
@@ -1248,7 +1356,7 @@
             }
         }
 
-        function showFinalAdzanImage(duration = 60000) {
+        function showFinalAdzanImage() {
             if (currentPrayerName === "Jum'at" && getCurrentTimeFromServer().getDay() === 5) {
                 // console.log('Tidak menampilkan final adzan image untuk adzan Jum\'at');
                 return;
@@ -1273,6 +1381,9 @@
                     'Elemen #adzan15 tidak ditemukan atau nilainya kosong, menggunakan gambar default');
                 imageUrl = '/images/other/lurus-rapat-shaf-default.webp';
             }
+
+            // Gunakan durasi dinamis berdasarkan nama sholat
+            const duration = getFinalDuration(currentPrayerName || 'Dzuhur');
 
             // Tampilkan gambar dengan durasi yang ditentukan
             displayAdzanImage(imageUrl, false, duration);
@@ -1467,7 +1578,8 @@
             }
             fridayImageSliderInterval = setInterval(updateFridayImage, 1000);
 
-            const displayDuration = 600000;
+            // Gunakan durasi dinamis untuk jumat slide
+            const displayDuration = getJumatSlideDuration();
             setTimeout(() => {
                 const $fridayPopup = $('#fridayInfoPopup');
                 if ($fridayPopup.length) {
@@ -1495,7 +1607,11 @@
             if (!isRestored) {
                 const now = getCurrentTimeFromServer().getTime();
                 fridayInfoStartTime = now;
-                fridayInfoEndTime = now + 600000; // 10 menit
+                
+                // Gunakan durasi dinamis untuk jumat slide
+                const duration = getJumatSlideDuration();
+                fridayInfoEndTime = now + duration;
+                
                 localStorage.setItem('fridayInfoStartTime', fridayInfoStartTime);
                 localStorage.setItem('fridayInfoEndTime', fridayInfoEndTime);
                 localStorage.setItem('fridayInfoData', JSON.stringify(data));
