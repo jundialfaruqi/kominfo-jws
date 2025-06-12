@@ -1255,7 +1255,7 @@
                     // Hitung waktu mulai iqomah berdasarkan sisa waktu dari backend
                     const elapsedIqomahSeconds = (activePrayerStatus.elapsedSeconds + activePrayerStatus.remainingSeconds) - activePrayerStatus.remainingSeconds;
                     iqomahStartTime = now - (elapsedIqomahSeconds * 1000);
-                    
+
                     // Hitung adzanStartTime berdasarkan iqomahStartTime
                     const adzanDuration = getAdzanDuration();
                     adzanStartTime = iqomahStartTime - (adzanDuration * 1000);
