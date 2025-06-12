@@ -91,6 +91,7 @@
             <div class="clock-container">
                 <canvas id="analogClock" width="300" height="300"></canvas>
                 <div class="clock-text">Loading...</div>
+                <div class="brand-text">DISKOMINFO</div>
             </div>
         </div>
 

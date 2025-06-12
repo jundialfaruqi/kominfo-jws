@@ -270,7 +270,7 @@
             if ($clockText.length) {
                 const displayHours = now.getHours();
                 $clockText.html(
-                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}<br>DISKOMINFO`
+                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
                 );
             }
         }
@@ -2066,13 +2066,17 @@
         setInterval(function() {
             updateMosqueInfo();
             updateMarqueeText();
-            updateSlides();
+            // updateSlides();
             updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
+            console.log('Data diperbarui');
         }, 30000); // 30000 milidetik = 30 detik
 
+        setInterval(function() {
+            updateSlides();
+        }, 35000);
 
         // document.addEventListener('visibilitychange', function() {
         //     if (document.visibilityState === 'visible') {

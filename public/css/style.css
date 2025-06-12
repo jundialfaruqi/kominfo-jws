@@ -178,10 +178,23 @@ body {
   left: 0;
   width: 100%;
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: white;
   font-weight: 500;
-  z-index: 2;
+  z-index: 10;
+  /* Make sure text is above canvas */
+}
+
+.brand-text {
+  position: absolute;
+  bottom: 55%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 1.3rem;
+  color: white;
+  font-weight: 500;
+  z-index: 4;
   /* Make sure text is above canvas */
 }
 
@@ -555,6 +568,19 @@ body {
     z-index: 2;
   }
 
+  .brand-text {
+    position: absolute;
+    bottom: 55%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: 500;
+    z-index: 4;
+    /* Make sure text is above canvas */
+  }
+
   .right-content {
     grid-area: right-content;
     display: flex;
@@ -880,14 +906,27 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 30%;
+    bottom: 35%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 1.6rem;
+    font-size: 2rem;
     color: white;
     font-weight: 500;
     z-index: 2;
+  }
+
+  .brand-text {
+    position: absolute;
+    bottom: 53%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: 500;
+    z-index: 4;
+    /* Make sure text is above canvas */
   }
 
   .right-content {
@@ -1214,14 +1253,27 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 30%;
+    bottom: 34%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     color: white;
     font-weight: 500;
-    z-index: 2;
+    z-index: 10;
+  }
+
+  .brand-text {
+    position: absolute;
+    bottom: 55%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 500;
+    z-index: 4;
+    /* Make sure text is above canvas */
   }
 
   .right-content {
@@ -1552,10 +1604,23 @@ body {
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     color: white;
     font-weight: 500;
     z-index: 2;
+  }
+
+  .brand-text {
+    position: absolute;
+    bottom: 55%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 500;
+    z-index: 4;
+    /* Make sure text is above canvas */
   }
 
   .right-content {
@@ -1882,14 +1947,27 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 30%;
+    bottom: 34%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 1rem;
+    font-size: 1.5rem;
     color: white;
     font-weight: 500;
     z-index: 2;
+  }
+
+  .brand-text {
+    position: absolute;
+    bottom: 54%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.3rem;
+    color: white;
+    font-weight: 500;
+    z-index: 4;
+    /* Make sure text is above canvas */
   }
 
   .right-content {
