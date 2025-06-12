@@ -1118,7 +1118,7 @@
         function startIqomahImageSlider() {
             console.log('Starting iqomah image slider...');
             console.log('window.iqomahImages:', window.iqomahImages);
-            
+
             if (!window.iqomahImages || window.iqomahImages.length === 0) {
                 console.log('No iqomah images available');
                 return;
@@ -1142,10 +1142,11 @@
 
                 const currentTime = getCurrentTimeFromServer().getTime();
                 let elapsedSeconds;
-                
+
                 if (activePrayerStatus && activePrayerStatus.phase === 'iqomah') {
                     // Gunakan elapsed time dari backend untuk sinkronisasi yang tepat
-                    const totalDuration = activePrayerStatus.elapsedSeconds + activePrayerStatus.remainingSeconds;
+                    const totalDuration = activePrayerStatus.elapsedSeconds + activePrayerStatus
+                        .remainingSeconds;
                     elapsedSeconds = totalDuration - activePrayerStatus.remainingSeconds;
                 } else {
                     // Fallback ke perhitungan manual
@@ -1156,22 +1157,23 @@
                         elapsedSeconds = 0;
                     }
                 }
-                
+
                 const currentIndex = Math.floor(elapsedSeconds / 10) % window.iqomahImages.length;
                 const imageUrl = window.iqomahImages[currentIndex];
-                
-                console.log('Updating iqomah image:', imageUrl, 'Index:', currentIndex, 'Elapsed:', elapsedSeconds);
-                
+
+                console.log('Updating iqomah image:', imageUrl, 'Index:', currentIndex, 'Elapsed:',
+                    elapsedSeconds);
+
                 // Update src gambar langsung
                 $imageElement.attr('src', imageUrl);
-                
+
                 // Pastikan gambar visible
                 $imageElement.show();
             }
 
             // Update gambar pertama kali
             updateImage();
-            
+
             // Set interval untuk update gambar
             const imageInterval = setInterval(() => {
                 if (typeof isIqomahPlaying !== 'undefined' && !isIqomahPlaying) {
@@ -1181,7 +1183,7 @@
                 }
                 updateImage();
             }, 1000);
-            
+
             console.log('Iqomah image slider started with interval');
         }
 
@@ -1253,7 +1255,8 @@
                 if (isRestored && activePrayerStatus && activePrayerStatus.phase === 'iqomah') {
                     const now = getCurrentTimeFromServer().getTime();
                     // Hitung waktu mulai iqomah berdasarkan sisa waktu dari backend
-                    const elapsedIqomahSeconds = (activePrayerStatus.elapsedSeconds + activePrayerStatus.remainingSeconds) - activePrayerStatus.remainingSeconds;
+                    const elapsedIqomahSeconds = (activePrayerStatus.elapsedSeconds + activePrayerStatus
+                        .remainingSeconds) - activePrayerStatus.remainingSeconds;
                     iqomahStartTime = now - (elapsedIqomahSeconds * 1000);
 
                     // Hitung adzanStartTime berdasarkan iqomahStartTime

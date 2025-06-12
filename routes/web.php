@@ -216,6 +216,21 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+            // $serverDateTime->modify('+2 hour 30 minutes'); // Tambah 1 jam 20 menit
+
+            // Atur waktu ke Jumat pukul 11:20:00
+            // Cek hari sekarang
+            // $currentDay = (int)$serverDateTime->format('N'); // 1 = Senin, ..., 5 = Jumat
+            // $daysToAdd = (5 - $currentDay + 7) % 7; // Selisih ke hari Jumat
+
+            // if ($daysToAdd === 0 && $serverDateTime->format('H:i') >= '12:00') {
+            //     // Jika sekarang sudah Jumat dan lewat jam 11:20, set ke Jumat berikutnya
+            //     $daysToAdd = 7;
+            // }
+
+            // $serverDateTime->modify("+$daysToAdd days");
+            // $serverDateTime->setTime(12, 16, 50);
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -235,7 +250,7 @@ Route::get('/api/server-time', function () {
             if ($fallbackResponse->successful()) {
                 $serverTime = $fallbackResponse['dateTime'];
                 $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
-                // $serverDateTime->modify('+7 hour 22 minutes'); // Tambah 1 jam 20 menit
+                // $serverDateTime->modify('+2 hour 33 minutes'); // Tambah 1 jam 20 menit
                 return response()->json([
                     'success' => true,
                     'data' => [
@@ -255,7 +270,7 @@ Route::get('/api/server-time', function () {
                 if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
                     $serverTime = $newApiResponse['fulldate'];
                     $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
-                    // $serverDateTime->modify('+2 hour 56 minutes'); // Tambah 1 jam 20 menit
+                    // $serverDateTime->modify('+1 hour 59 minutes'); // Tambah 1 jam 20 menit
                     return response()->json([
                         'success' => true,
                         'data' => [
