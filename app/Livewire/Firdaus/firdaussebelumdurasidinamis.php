@@ -7,7 +7,6 @@ use App\Models\Adzan;
 use App\Models\Marquee;
 use App\Models\Petugas;
 use App\Models\Slides;
-use App\Models\Durasi;
 use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -17,43 +16,46 @@ class Firdaus extends Component
 {
     #[Layout('components.layouts.firdaus')]
     #[Title('Jadwal Sholat Pekanbaru')]
-    public $serverTime;
-    public $serverTimestamp;
-    public $apiSource;
-    public $jadwalSholat = [];
-    public $prayerTimes = [];
-    public $activeIndex = 0;
-    public $nextPrayerIndex = 0;
-    public $currentMonth;
-    public $currentYear;
-    public $currentDayOfWeek;
-    public $baseUrl = 'https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/pekanbaru/';
-    public $activePrayerStatus = null;
+    public $serverTime; // UTC time from server
+    public $serverTimestamp; // timestamp in milliseconds
+    public $apiSource; // Track API source
+    public $jadwalSholat = []; // jadwal sholat hari ini
+    public $prayerTimes = []; // waktu sholat
+    public $activeIndex = 0; // index waktu sholat aktif
+    public $nextPrayerIndex = 0; // index waktu sholat berikutnya
+    public $currentMonth; // menyimpan bulan saat ini
+    public $currentYear; // menyimpan tahun saat ini
+    public $currentDayOfWeek; // menyimpan hari dalam seminggu (1-7, dengan 5 = Jumat)
+    public $baseUrl = 'https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/pekanbaru/'; // URL base untuk mengambil data jadwal sholat
+
+    // Properties for active prayer time status
+    public $activePrayerStatus = null; // Status waktu shalat aktif
+
+    // New properties for related models
     public $profil;
     public $adzan;
     public $marquee;
     public $petugas;
     public $slides;
-    public $durasi; // Tambahkan properti untuk durasi
-
-    public $slug;
 
     public function mount($slug)
     {
-        $this->slug = $slug;
+        // Fetch Profil by slug instead of id
         $this->profil = Profil::where('slug', $slug)->firstOrFail();
+
+        // Fetch related models using the user_id from Profil
         $user_id = $this->profil->user_id;
 
-        // Ambil data durasi
-        $this->durasi = Durasi::where('user_id', $user_id)->first();
-
+        // Fetch related models
         $this->adzan    = Adzan::where('user_id', $user_id)->first();
         $this->marquee  = Marquee::where('user_id', $user_id)->first();
         $this->petugas  = Petugas::where('user_id', $user_id)->first();
         $this->slides   = Slides::where('user_id', $user_id)->first();
 
         try {
+            // Coba API utama
             $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+
             if ($response->successful()) {
                 $this->serverTime = $response['serverTime'];
                 $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
@@ -66,7 +68,9 @@ class Firdaus extends Component
             }
         } catch (\Exception $e) {
             try {
+                // Fallback ke timeapi.io
                 $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+
                 if ($fallbackResponse->successful()) {
                     $this->serverTime = $fallbackResponse['dateTime'];
                     $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
@@ -78,7 +82,9 @@ class Firdaus extends Component
                 }
             } catch (\Exception $e) {
                 try {
+                    // Fallback ke API Google Script
                     $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
+
                     if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
                         $this->serverTime = $newApiResponse['fulldate'];
                         $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
@@ -89,6 +95,7 @@ class Firdaus extends Component
                         throw new \Exception('API Google Script gagal');
                     }
                 } catch (\Exception $e) {
+                    // Fallback ke waktu server lokal
                     $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
                     $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
                     $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
@@ -97,28 +104,38 @@ class Firdaus extends Component
             }
         }
 
+        // Lanjutkan dengan logika jadwal sholat
         try {
+            // Ambil tanggal, bulan, dan tahun hari ini
             $tanggalHariIni         = date('Y-m-d', strtotime($this->serverTime));
             $this->currentMonth     = date('m', strtotime($this->serverTime));
             $this->currentYear      = date('Y', strtotime($this->serverTime));
-            $this->currentDayOfWeek = date('N', strtotime($this->serverTime));
+            $this->currentDayOfWeek = date('N', strtotime($this->serverTime)); // 1 (Senin) hingga 7 (Minggu)
 
+            // Buat URL dinamis berdasarkan tahun dan bulan saat ini
             $jadwalUrl = $this->baseUrl . $this->currentYear . '/' . $this->currentMonth . '.json';
+
+            // Ambil data jadwal sholat berdasarkan URL dinamis
             $jadwalResponse = Http::get($jadwalUrl);
 
             if (!$jadwalResponse->successful()) {
+                // Jika gagal, coba gunakan data bulan terakhir yang tersedia (fallback)
                 $bulanSebelumnya = $this->getPreviousMonth($this->currentMonth, $this->currentYear);
                 $tahunSebelumnya = $bulanSebelumnya['year'];
                 $bulanSebelumnya = $bulanSebelumnya['month'];
+
                 $fallbackUrl = $this->baseUrl . $tahunSebelumnya . '/' . $bulanSebelumnya . '.json';
                 $jadwalResponse = Http::get($fallbackUrl);
+
+                // Log untuk debugging
                 logger("Menggunakan data jadwal fallback: " . $fallbackUrl);
             }
 
             if ($jadwalResponse->successful()) {
                 $jadwalSholat = $jadwalResponse->json();
-                $this->jadwalSholat = $jadwalSholat;
+                $this->jadwalSholat = $jadwalSholat; // simpan seluruh jadwal bulan ini
 
+                // Cari data jadwal sholat berdasarkan tanggal hari ini
                 $jadwalHariIni = null;
                 foreach ($jadwalSholat as $item) {
                     if ($item['tanggal'] === $tanggalHariIni) {
@@ -127,8 +144,12 @@ class Firdaus extends Component
                     }
                 }
 
+                // Pastikan data tersedia untuk hari ini
                 if ($jadwalHariIni) {
+                    // Tentukan nama untuk Dzuhur (Jum'at jika hari ini Jumat)
                     $dzuhurLabel = $this->currentDayOfWeek == 5 ? "Jum'at" : "Dzuhur";
+
+                    // Menyusun data waktu sholat
                     $this->prayerTimes = [
                         ['name' => 'Shubuh', 'time' => $jadwalHariIni['shubuh'], 'icon' => 'sunset'],
                         ['name' => 'Shuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
@@ -138,10 +159,15 @@ class Firdaus extends Component
                         ['name' => 'Isya', 'time' => $jadwalHariIni['isya'], 'icon' => 'moon'],
                     ];
 
-                    $currentTime = date('H:i', strtotime($this->serverTime));
+                    // Tentukan waktu aktif berdasarkan waktu sekarang
+                    $currentTime = date('H:i', strtotime($this->serverTime)); // waktu saat ini di server, format HH:MM
+
+                    // PERUBAHAN: Logic untuk menentukan waktu sholat yang sedang aktif dan berikutnya
                     $prayerIndices = $this->determineActivePrayerTime($currentTime);
                     $this->activeIndex = $prayerIndices['active'];
                     $this->nextPrayerIndex = $prayerIndices['next'];
+
+                    // Calculate active prayer time status
                     $this->activePrayerStatus = $this->calculateActivePrayerTimeStatus($currentTime);
                 } else {
                     logger("Data jadwal sholat tidak ditemukan untuk tanggal: " . $tanggalHariIni);
@@ -154,37 +180,52 @@ class Firdaus extends Component
         }
     }
 
+    /**
+     * Menentukan waktu sholat yang sedang aktif dan berikutnya berdasarkan waktu saat ini
+     * @param string $currentTime waktu saat ini dalam format HH:MM
+     * @return array indeks waktu sholat yang aktif dan berikutnya
+     */
     private function determineActivePrayerTime($currentTime)
     {
+        // Konversi string waktu ke timestamp untuk perbandingan yang lebih mudah
         $currentTimeStamp = strtotime("1970-01-01 " . $currentTime . ":00");
+
+        // Cari waktu sholat berikutnya (yang belum terjadi)
         $nextIndex = -1;
         $nextPrayerTimeStamp = PHP_INT_MAX;
 
         for ($i = 0; $i < count($this->prayerTimes); $i++) {
             $prayerTimeStamp = strtotime("1970-01-01 " . $this->prayerTimes[$i]['time'] . ":00");
+
+            // Jika waktu sholat ini belum terjadi dan lebih dekat dari waktu sholat berikutnya yang sudah ditemukan
             if ($prayerTimeStamp > $currentTimeStamp && $prayerTimeStamp < $nextPrayerTimeStamp) {
                 $nextIndex = $i;
                 $nextPrayerTimeStamp = $prayerTimeStamp;
             }
         }
 
+        // Jika tidak ada waktu sholat berikutnya hari ini, berarti waktu sholat berikutnya adalah Shubuh besok
         if ($nextIndex == -1) {
-            $nextIndex = 0;
+            $nextIndex = 0; // Shubuh
         }
 
+        // Cari waktu sholat yang sedang aktif (waktu sholat terakhir yang sudah terjadi)
         $activeIndex = -1;
         $lastPrayerTimeStamp = 0;
 
         for ($i = 0; $i < count($this->prayerTimes); $i++) {
             $prayerTimeStamp = strtotime("1970-01-01 " . $this->prayerTimes[$i]['time'] . ":00");
+
+            // Jika waktu sholat ini sudah terjadi dan lebih baru dari waktu sholat aktif yang sudah ditemukan
             if ($prayerTimeStamp <= $currentTimeStamp && $prayerTimeStamp > $lastPrayerTimeStamp) {
                 $activeIndex = $i;
                 $lastPrayerTimeStamp = $prayerTimeStamp;
             }
         }
 
+        // Jika tidak ada waktu sholat yang sudah terjadi hari ini, berarti waktu sholat aktif adalah Isya kemarin
         if ($activeIndex == -1) {
-            $activeIndex = 5;
+            $activeIndex = 5; // Isya
         }
 
         return [
@@ -193,25 +234,51 @@ class Firdaus extends Component
         ];
     }
 
+    /**
+     * Mendapatkan bulan sebelumnya untuk fallback data
+     * @param string $month bulan dalam format 2 digit (01-12)
+     * @param string $year tahun dalam format 4 digit
+     * @return array bulan sebelumnya dan tahunnya
+     */
     private function getPreviousMonth($month, $year)
     {
         $month = (int)$month;
         $year = (int)$year;
+
         if ($month == 1) {
-            return ['month' => '12', 'year' => (string)($year - 1)];
+            return [
+                'month' => '12',
+                'year' => (string)($year - 1)
+            ];
         } else {
-            return ['month' => str_pad($month - 1, 2, '0', STR_PAD_LEFT), 'year' => (string)$year];
+            return [
+                'month' => str_pad($month - 1, 2, '0', STR_PAD_LEFT),
+                'year' => (string)$year
+            ];
         }
     }
 
+    /**
+     * Mendapatkan bulan berikutnya untuk antisipasi pergantian bulan
+     * @param string $month bulan dalam format 2 digit (01-12)
+     * @param string $year tahun dalam format 4 digit
+     * @return array bulan berikutnya dan tahunnya
+     */
     private function getNextMonth($month, $year)
     {
         $month = (int)$month;
         $year = (int)$year;
+
         if ($month == 12) {
-            return ['month' => '01', 'year' => (string)($year + 1)];
+            return [
+                'month' => '01',
+                'year' => (string)($year + 1)
+            ];
         } else {
-            return ['month' => str_pad($month + 1, 2, '0', STR_PAD_LEFT), 'year' => (string)$year];
+            return [
+                'month' => str_pad($month + 1, 2, '0', STR_PAD_LEFT),
+                'year' => (string)$year
+            ];
         }
     }
 
@@ -221,7 +288,9 @@ class Firdaus extends Component
             return null;
         }
 
+        // === STEP 1: Find Active Prayer Time Independently ===
         $activePrayerData = $this->findActivePrayerTime($currentTime);
+
         if (!$activePrayerData) {
             return null;
         }
@@ -231,51 +300,72 @@ class Firdaus extends Component
         $prayerName = $activePrayer['name'];
         $prayerTime = $activePrayer['time'];
 
+        // Skip if the active prayer is Shuruq
         if (strtolower($prayerName) === 'shuruq') {
             return null;
         }
 
+        // === STEP 2: Calculate Prayer Day and Elapsed Time ===
         $serverDate = new \DateTime($this->serverTime);
         $today = $serverDate->format('Y-m-d');
+
+        // Create DateTime objects for comparison
         $currentDateTime = new \DateTime("{$today} {$currentTime}");
         $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
+
+        // Determine correct prayer day
         $prayerDay = $this->determinePrayerDay($prayerName, $prayerTime, $currentTime, $today, $serverDate);
 
+        // Recalculate timestamps with correct day
         $prayerFullDateTime = new \DateTime("{$prayerDay} {$prayerTime}");
         $currentFullDateTime = new \DateTime("{$today} {$currentTime}");
+
+        // Calculate elapsed time in seconds
         $elapsedSeconds = $currentFullDateTime->getTimestamp() - $prayerFullDateTime->getTimestamp();
 
-        // Tentukan durasi maksimum berdasarkan waktu sholat
-        $maxDuration = $this->getMaxDuration($prayerName);
-
-        if ($elapsedSeconds < 0 || $elapsedSeconds > $maxDuration) {
+        // Only process if we're within the relevant timeframes (0-10 minutes after prayer time)
+        if ($elapsedSeconds < 0 || $elapsedSeconds > 600) { // 10 minutes max (for Iqomah)
             return null;
         }
 
+        // === STEP 3: Determine Phase and Status ===
         return $this->buildPrayerStatus($prayerName, $prayerTime, $elapsedSeconds, $prayerDay);
     }
 
+    /**
+     * Find the currently active prayer time independently
+     * @param string $currentTime Current time in HH:MM format
+     * @return array|null Array with 'prayer' and 'index' keys, or null if not found
+     */
     private function findActivePrayerTime($currentTime)
     {
         $currentTimeStamp = strtotime("1970-01-01 " . $currentTime . ":00");
+
         $activeIndex = -1;
         $lastPrayerTimeStamp = 0;
 
+        // Find the most recent prayer time that has already occurred
         for ($i = 0; $i < count($this->prayerTimes); $i++) {
             $prayerTimeStamp = strtotime("1970-01-01 " . $this->prayerTimes[$i]['time'] . ":00");
+
+            // If this prayer time has occurred and is more recent than previously found
             if ($prayerTimeStamp <= $currentTimeStamp && $prayerTimeStamp > $lastPrayerTimeStamp) {
                 $activeIndex = $i;
                 $lastPrayerTimeStamp = $prayerTimeStamp;
             }
         }
 
+        // Special handling for early morning (midnight to 6am)
         $currentHour = (int)substr($currentTime, 0, 2);
         $isEarlyMorning = $currentHour >= 0 && $currentHour < 6;
 
         if ($activeIndex == -1) {
             if ($isEarlyMorning) {
-                $activeIndex = 5;
+                // If it's early morning and no prayer has occurred today, 
+                // the active prayer is Isya from yesterday
+                $activeIndex = 5; // Isya
             } else {
+                // No active prayer found
                 return null;
             }
         }
@@ -286,42 +376,69 @@ class Firdaus extends Component
         ];
     }
 
+    /**
+     * Determine the correct day for the prayer time
+     * @param string $prayerName Name of the prayer
+     * @param string $prayerTime Time of the prayer (HH:MM)
+     * @param string $currentTime Current time (HH:MM)
+     * @param string $today Today's date (Y-m-d)
+     * @param DateTime $serverDate Server date object
+     * @return string Prayer day in Y-m-d format
+     */
     private function determinePrayerDay($prayerName, $prayerTime, $currentTime, $today, $serverDate)
     {
         $currentHour = (int)substr($currentTime, 0, 2);
         $prayerHour = (int)substr($prayerTime, 0, 2);
+
+        // Define time periods
         $isEarlyMorning = $currentHour >= 0 && $currentHour < 6;
         $isMorning = $currentHour >= 6 && $currentHour < 12;
         $isAfternoon = $currentHour >= 12 && $currentHour < 18;
         $isEvening = $currentHour >= 18;
 
+        // Create day variation objects
         $tomorrowDate = (clone $serverDate)->modify('+1 day');
         $tomorrow = $tomorrowDate->format('Y-m-d');
+
         $yesterdayDate = (clone $serverDate)->modify('-1 day');
         $yesterday = $yesterdayDate->format('Y-m-d');
 
+        // Determine correct prayer day based on prayer name and current time period
         if ($prayerName === 'Shubuh') {
             if ($isEarlyMorning) {
+                // After midnight but before/at Shubuh time
                 $currentDateTime = new \DateTime("{$today} {$currentTime}");
                 $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
+
                 if ($currentDateTime < $prayerDateTime) {
+                    // Current time is before Shubuh time - Shubuh is today
                     return $today;
                 } else {
+                    // Current time is after Shubuh time - next Shubuh is tomorrow
                     return $tomorrow;
                 }
             } else {
+                // Current time is after early morning, Shubuh is tomorrow
                 return $tomorrow;
             }
-        } elseif ($prayerName === 'Isya') {
+        } else if ($prayerName === 'Isya') {
             if ($isEarlyMorning) {
+                // After midnight, before dawn - Isya is from yesterday
                 return $yesterday;
+            } else if ($isEvening) {
+                // Evening time - Isya is today
+                return $today;
             } else {
+                // Morning/Afternoon - Isya is today (next one)
                 return $today;
             }
         } else {
+            // Handle other prayer times
             if ($isEarlyMorning && $prayerHour >= 18) {
+                // Current time is early morning but prayer is evening prayer from yesterday
                 return $yesterday;
-            } elseif (($isEvening || $isAfternoon) && $prayerHour < 6) {
+            } else if (($isEvening || $isAfternoon) && $prayerHour < 6) {
+                // Current time is evening/afternoon but prayer is early morning prayer for tomorrow
                 return $tomorrow;
             }
         }
@@ -329,31 +446,14 @@ class Firdaus extends Component
         return $today;
     }
 
-    private function getMaxDuration($prayerName)
-    {
-        if (!$this->durasi) {
-            // Default jika durasi belum ada
-            return ($prayerName === "Jum'at" && $this->currentDayOfWeek == 5) ? (20 * 60) : (4 * 60 + 10 * 60 + 30);
-        }
-
-        $prayerLower = strtolower($prayerName);
-        if ($prayerLower === "juma'at" && $this->currentDayOfWeek == 5) {
-            return $this->durasi->adzan_dzuhur * 60 + $this->durasi->jumat_slide * 60;
-        } elseif ($prayerLower === "shubuh") {
-            return ($this->durasi->adzan_shubuh * 60) + ($this->durasi->iqomah_shubuh * 60) + $this->durasi->final_shubuh;
-        } elseif ($prayerLower === "dzuhur") {
-            return ($this->durasi->adzan_dzuhur * 60) + ($this->durasi->iqomah_dzuhur * 60) + $this->durasi->final_dzuhur;
-        } elseif ($prayerLower === "ashar") {
-            return ($this->durasi->adzan_ashar * 60) + ($this->durasi->iqomah_ashar * 60) + $this->durasi->final_ashar;
-        } elseif ($prayerLower === "maghrib") {
-            return ($this->durasi->adzan_maghrib * 60) + ($this->durasi->iqomah_maghrib * 60) + $this->durasi->final_maghrib;
-        } elseif ($prayerLower === "isya") {
-            return ($this->durasi->adzan_isya * 60) + ($this->durasi->iqomah_isya * 60) + $this->durasi->final_isya;
-        }
-
-        return 0;
-    }
-
+    /**
+     * Build the prayer status array with phase information
+     * @param string $prayerName Name of the prayer
+     * @param string $prayerTime Time of the prayer
+     * @param int $elapsedSeconds Elapsed seconds since prayer time
+     * @param string $prayerDay Prayer day
+     * @return array Prayer status information
+     */
     private function buildPrayerStatus($prayerName, $prayerTime, $elapsedSeconds, $prayerDay)
     {
         $status = [
@@ -363,88 +463,29 @@ class Firdaus extends Component
             'prayerDay' => $prayerDay
         ];
 
-        $prayerLower = strtolower($prayerName);
-        $isFriday = $this->currentDayOfWeek == 5 && $prayerLower === 'juma\'at';
+        // Adzan phase (0-3 minutes)
+        if ($elapsedSeconds <= 180) { // 3 minutes
+            $status['phase'] = 'adzan';
+            $status['remainingSeconds'] = 180 - $elapsedSeconds;
+            $status['progress'] = ($elapsedSeconds / 180) * 100;
+        }
+        // Iqomah phase (3-10 minutes)
+        else if ($elapsedSeconds <= 600) { // 10 minutes
+            $status['phase'] = 'iqomah';
+            // Iqomah starts at 3 minutes after prayer time
+            $iqomahElapsedSeconds = $elapsedSeconds - 180;
+            $status['remainingSeconds'] = 420 - $iqomahElapsedSeconds; // 7 minutes duration
+            $status['progress'] = ($iqomahElapsedSeconds / 420) * 100;
 
-        if (!$this->durasi) {
-            // Fallback ke durasi statis (dalam detik)
-            $durasi = [
-                'adzan' => 4 * 60,      // 4 menit
-                'iqomah' => 10 * 60,    // 10 menit
-                'final' => 30 * 60,     // 30 menit
-                'jumat_slide' => 10 * 60 // 20 menit
-            ];
-        } else {
-            if ($prayerLower === 'shubuh') {
-                $durasi = [
-                    'adzan' => $this->durasi->adzan_shubuh * 60,
-                    'iqomah' => $this->durasi->iqomah_shubuh * 60,
-                    'final' => $this->durasi->final_shubuh * 60,
-                ];
-            } elseif ($prayerLower === 'dzuhur' || $prayerLower === 'juma\'at') {
-                $durasi = [
-                    'adzan' => $this->durasi->adzan_dzuhur * 60, // Perbaikan: *60, bukan *30
-                    'iqomah' => $this->durasi->iqomah_dzuhur * 60,
-                    'final' => $this->durasi->final_dzuhur * 60,
-                    'jumat_slide' => $this->durasi->jumat_slide * 60
-                ];
-            } elseif ($prayerLower === 'ashar') {
-                $durasi = [
-                    'adzan' => $this->durasi->adzan_ashar * 60,
-                    'iqomah' => $this->durasi->iqomah_ashar * 60,
-                    'final' => $this->durasi->final_ashar * 60,
-                ];
-            } elseif ($prayerLower === 'maghrib') {
-                $durasi = [
-                    'adzan' => $this->durasi->adzan_maghrib * 60,
-                    'iqomah' => $this->durasi->iqomah_maghrib * 60,
-                    'final' => $this->durasi->final_maghrib * 60,
-                ];
-            } elseif ($prayerLower === 'isya') {
-                $durasi = [
-                    'adzan' => $this->durasi->adzan_isya * 60,
-                    'iqomah' => $this->durasi->iqomah_isya * 60,
-                    'final' => $this->durasi->final_isya * 60,
-                ];
+            // Special case for final image
+            if ($status['remainingSeconds'] <= 0) {
+                $status['phase'] = 'final';
             }
         }
 
-        if ($isFriday) {
-            // Adzan phase
-            if ($elapsedSeconds <= $durasi['adzan']) {
-                $status['phase'] = 'adzan';
-                $status['remainingSeconds'] = $durasi['adzan'] - $elapsedSeconds;
-                $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
-            }
-            // Jum'at slide phase
-            elseif ($elapsedSeconds <= $durasi['adzan'] + $durasi['jumat_slide']) {
-                $status['phase'] = 'friday';
-                $jumatElapsed = $elapsedSeconds - $durasi['adzan'];
-                $status['remainingSeconds'] = $durasi['jumat_slide'] - $jumatElapsed;
-                $status['progressPercentage'] = ($jumatElapsed / $durasi['jumat_slide']) * 100;
-            }
+        // Special handling for Friday
+        if ($this->currentDayOfWeek == 5 && $prayerName == "Jum'at" && $elapsedSeconds <= 600) {
             $status['isFriday'] = true;
-        } else {
-            // Adzan phase
-            if ($elapsedSeconds <= $durasi['adzan']) {
-                $status['phase'] = 'adzan';
-                $status['remainingSeconds'] = $durasi['adzan'] - $elapsedSeconds;
-                $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
-            }
-            // Iqomah phase
-            elseif ($elapsedSeconds <= $durasi['adzan'] + $durasi['iqomah']) {
-                $status['phase'] = 'iqomah';
-                $iqomahElapsed = $elapsedSeconds - $durasi['adzan'];
-                $status['remainingSeconds'] = $durasi['iqomah'] - $iqomahElapsed;
-                $status['progressPercentage'] = ($iqomahElapsed / $durasi['iqomah']) * 100;
-            }
-            // Final phase
-            elseif ($elapsedSeconds <= $durasi['adzan'] + $durasi['iqomah'] + $durasi['final']) {
-                $status['phase'] = 'final';
-                $finalElapsed = $elapsedSeconds - ($durasi['adzan'] + $durasi['iqomah']);
-                $status['remainingSeconds'] = $durasi['final'] - $finalElapsed;
-                $status['progressPercentage'] = ($finalElapsed / $durasi['final']) * 100;
-            }
         }
 
         return $status;
@@ -462,9 +503,8 @@ class Firdaus extends Component
             'marquee' => $this->marquee,
             'petugas' => $this->petugas,
             'slides' => $this->slides,
-            'durasi' => $this->durasi, // Kirim data durasi ke view
             'activePrayerStatus' => $this->activePrayerStatus,
-            'apiSource' => $this->apiSource,
+            'apiSource' => $this->apiSource, // Tambahkan apiSource ke view
             'adzanData' => $this->adzan ? [
                 'adzan1' => $this->adzan->adzan1,
                 'adzan2' => $this->adzan->adzan2,

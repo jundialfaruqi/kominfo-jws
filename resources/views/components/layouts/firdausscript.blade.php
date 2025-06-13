@@ -12,54 +12,6 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 <script>
-    function updateMosqueInfo() {
-        const slug = window.location.pathname.replace(/^\//, '');
-
-        if (typeof $.ajax === 'undefined') {
-            console.error('jQuery AJAX tidak tersedia. Gunakan versi jQuery lengkap, bukan slim.');
-            return;
-        }
-
-        $.ajax({
-            url: `/api/profil/${slug}`,
-            method: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                if (response.success) {
-
-                    const capitalizedName = response.data.name
-                        .toLowerCase()
-                        .split(' ')
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ');
-                    $('.mosque-name-highlight').text(capitalizedName);
-
-                    const capitalizedAddress = response.data.address
-                        .toLowerCase()
-                        .split(' ')
-                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                        .join(' ');
-                    $('.mosque-address').text(capitalizedAddress);
-
-                    $('.logo-container').empty();
-                    // Menambahkan logo masjid dengan gambar default jika tidak ada logo
-                    $('.logo-container').append(
-                        `<img src="${response.data.logo_masjid || '/images/other/logo-masjid-default.png'}" alt="Logo Masjid" class="logo logo-masjid">`
-                    );
-
-                    if (response.data.logo_pemerintah) {
-                        $('.logo-container').append(
-                            `<img src="${response.data.logo_pemerintah}" alt="Logo Pemerintah" class="logo logo-pemerintah">`
-                        );
-                    }
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Error saat mengambil data profil masjid:', error);
-            }
-        });
-    }
-
     $(document).ready(function() {
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
@@ -107,12 +59,14 @@
         setTimeout(() => {
             syncServerTime(() => {
                 checkAndRestoreSessions();
+                console.log('Waktu server diupdate setelah 3 detik halaman di muat');
             });
         }, 3000); // 3000 milidetik = 3 detik
 
         setInterval(() => {
             syncServerTime();
-        }, 300000); // 300000 milidetik = 5 menit
+            console.log('Waktu server diupdate setiap 1 menit');
+        }, 60000); // 60000 milidetik = 1 menit
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -310,6 +264,83 @@
             });
         }
 
+        function updateMosqueInfo() {
+            const slug = window.location.pathname.replace(/^\//, '');
+
+            if (typeof $.ajax === 'undefined') {
+                console.error('jQuery AJAX tidak tersedia. Gunakan versi jQuery lengkap, bukan slim.');
+                return;
+            }
+
+            $.ajax({
+                url: `/api/profil/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        const capitalizedName = response.data.name
+                            .toLowerCase()
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                        $('.mosque-name-highlight').text(capitalizedName);
+
+                        const capitalizedAddress = response.data.address
+                            .toLowerCase()
+                            .split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                        $('.mosque-address').text(capitalizedAddress);
+
+                        // Preload logo masjid
+                        const logoMasjidSrc = response.data.logo_masjid ||
+                            '/images/other/logo-masjid-default.png';
+                        const logoMasjidImg = new Image();
+                        logoMasjidImg.src = logoMasjidSrc;
+
+                        logoMasjidImg.onload = function() {
+                            let $logoMasjid = $('.logo-container .logo-masjid');
+                            if ($logoMasjid.length) {
+                                if ($logoMasjid.attr('src') !== logoMasjidSrc) {
+                                    $logoMasjid.attr('src', logoMasjidSrc);
+                                }
+                            } else {
+                                $('.logo-container').append(
+                                    `<img src="${logoMasjidSrc}" alt="Logo Masjid" class="logo logo-masjid">`
+                                );
+                            }
+                        };
+
+                        // Preload logo pemerintah jika ada
+                        if (response.data.logo_pemerintah) {
+                            const logoPemerintahImg = new Image();
+                            logoPemerintahImg.src = response.data.logo_pemerintah;
+
+                            logoPemerintahImg.onload = function() {
+                                let $logoPemerintah = $('.logo-container .logo-pemerintah');
+                                if ($logoPemerintah.length) {
+                                    if ($logoPemerintah.attr('src') !== response.data
+                                        .logo_pemerintah) {
+                                        $logoPemerintah.attr('src', response.data
+                                            .logo_pemerintah);
+                                    }
+                                } else {
+                                    $('.logo-container').append(
+                                        `<img src="${response.data.logo_pemerintah}" alt="Logo Pemerintah" class="logo logo-pemerintah">`
+                                    );
+                                }
+                            };
+                        } else {
+                            $('.logo-container .logo-pemerintah').remove();
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saat mengambil data profil masjid:', error);
+                }
+            });
+        }
+
         function updateDate() {
             const $dateElement = $('.date-item');
             const now = getCurrentTimeFromServer();
@@ -500,6 +531,13 @@
             const nowTime = now.getTime();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
 
+            // Cek apakah Friday Info sedang aktif
+            if (fridayInfoStartTime && fridayInfoEndTime && nowTime < fridayInfoEndTime) {
+                clearAdzanState(); // Hapus state adzan jika Friday Info aktif
+                displayFridayInfoPopup(fridayInfoData, true);
+                return;
+            }
+
             if (activePrayerStatus) {
                 // console.log('Processing active prayer status from server');
                 const {
@@ -546,6 +584,7 @@
 
                 if (isFriday) {
                     // console.log('Friday prayer info detected');
+                    clearAdzanState();
                     const options = {
                         weekday: 'long',
                         day: '2-digit',
@@ -569,25 +608,40 @@
 
             if (adzanStartTime && !iqomahStartTime) {
                 const adzanElapsedSeconds = (nowTime - adzanStartTime) / 1000;
-                const adzanDuration = 3 * 60;
+                const adzanDuration = getAdzanDuration(currentPrayerName || 'Dzuhur');
 
                 if (adzanElapsedSeconds < adzanDuration) {
-                    // console.log('Restoring Adzan session from localStorage');
                     showAdzanPopup(currentPrayerName, currentPrayerTime, true);
                 } else {
-                    // console.log('Adzan finished, starting Iqomah from localStorage');
-                    iqomahStartTime = adzanStartTime + (adzanDuration * 1000);
-                    localStorage.setItem('iqomahStartTime', iqomahStartTime);
-                    if (currentPrayerName !== "Jum'at" || now.getDay() !== 5) {
-                        showIqomahPopup(currentPrayerTime, true);
-                    } else {
+                    if (currentPrayerName === "Jum'at" && now.getDay() === 5) {
+                        clearAdzanState(); // Hapus state adzan untuk Jumat
                         updateFridayImages();
                         startFridayImageSlider();
                         const $fridayPopup = $('#fridayInfoPopup');
                         if ($fridayPopup.length) {
                             $fridayPopup.css('display', 'flex');
                         }
-                        clearAdzanState();
+                        const options = {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit'
+                        };
+                        const formattedDate = now.toLocaleDateString('id-ID', options);
+                        const khatib = $('#khatib').val();
+                        const imam = $('#imam').val();
+                        const muadzin = $('#muadzin').val();
+                        const fridayData = {
+                            date: formattedDate,
+                            khatib,
+                            imam,
+                            muadzin
+                        };
+                        displayFridayInfoPopup(fridayData);
+                    } else {
+                        iqomahStartTime = adzanStartTime + (adzanDuration * 1000);
+                        localStorage.setItem('iqomahStartTime', iqomahStartTime);
+                        showIqomahPopup(currentPrayerTime, true);
                     }
                 }
             } else if (iqomahStartTime) {
@@ -666,8 +720,34 @@
                             currentPrayerTime = prayerToRestore.time;
                             showFinalAdzanImage();
                         } else {
-                            // console.log('Waktu shalat sudah lewat lebih dari 10 menit, tidak ada pemulihan');
-                            clearAdzanState();
+                            if (prayerToRestore && prayerToRestore.name === "Jum'at" && now.getDay() === 5) {
+                                clearAdzanState(); // Hapus state adzan untuk Jumat
+                                adzanStartTime = nowTime - (timeDiffSeconds * 1000);
+                                localStorage.setItem('adzanStartTime', adzanStartTime);
+                                localStorage.setItem('currentPrayerName', prayerToRestore.name);
+                                localStorage.setItem('currentPrayerTime', prayerToRestore.time);
+                                currentPrayerName = prayerToRestore.name;
+                                currentPrayerTime = prayerToRestore.time;
+                                updateFridayImages();
+                                startFridayImageSlider();
+                                const options = {
+                                    weekday: 'long',
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: '2-digit'
+                                };
+                                const formattedDate = now.toLocaleDateString('id-ID', options);
+                                const khatib = $('#khatib').val();
+                                const imam = $('#imam').val();
+                                const muadzin = $('#muadzin').val();
+                                const fridayData = {
+                                    date: formattedDate,
+                                    khatib,
+                                    imam,
+                                    muadzin
+                                };
+                                displayFridayInfoPopup(fridayData);
+                            }
                         }
                     } else {
                         // console.log('Waktu shalat Jumat terlewat, memulai slider gambar Jumat');
@@ -711,6 +791,7 @@
             localStorage.removeItem('currentPrayerName');
             localStorage.removeItem('currentPrayerTime');
             localStorage.removeItem('iqomahSliderStartTime');
+            localStorage.removeItem('jumatAdzanShown');
 
             if (adzanTimeout) {
                 clearTimeout(adzanTimeout);
@@ -893,14 +974,23 @@
 
         // Fungsi untuk mendapatkan durasi jumat slide (dalam milidetik)
         function getJumatSlideDuration() {
+            // Simpan hasil dalam variabel untuk menghindari pemanggilan berulang
+            if (window.cachedJumatSlideDuration !== undefined) {
+                return window.cachedJumatSlideDuration;
+            }
+
             const durasiData = getDurasiData();
 
             // Default durasi jika data tidak tersedia (dalam milidetik)
             const defaultDuration = 10 * 60 * 1000; // 10 menit
 
-            if (!durasiData || !durasiData.jumat_slide) return defaultDuration;
+            if (!durasiData || !durasiData.jumat_slide) {
+                window.cachedJumatSlideDuration = defaultDuration;
+                return defaultDuration;
+            }
 
-            return durasiData.jumat_slide * 60 * 1000; // Konversi menit ke milidetik
+            window.cachedJumatSlideDuration = durasiData.jumat_slide * 60 * 1000; // Konversi menit ke milidetik
+            return window.cachedJumatSlideDuration;
         }
 
         function showAdzanPopup(prayerName, prayerTimeStr, isRestored = false) {
@@ -925,8 +1015,9 @@
             $title.text(` ${prayerName}`);
             $popup.css('display', 'flex');
 
+            // Putar alarm hanya saat popup adzan dimulai (bukan saat dipulihkan)
             if (!isRestored) {
-                playBeepSound(3);
+                playBeepSound(3); // Alarm tetap diputar untuk semua adzan, termasuk Jumat
                 $progress.css('width', '0%');
                 // console.log(`Memutar alarm untuk ${prayerName} pada ${prayerTimeStr}`);
             } else if (activePrayerStatus && activePrayerStatus.phase === 'adzan') {
@@ -976,13 +1067,27 @@
 
                     // Logika setelah adzan selesai
                     if (prayerName === "Jum'at" && now.getDay() === 5) {
-                        updateFridayImages();
-                        startFridayImageSlider();
-                        const $fridayPopup = $('#fridayInfoPopup');
-                        if ($fridayPopup.length) {
-                            $fridayPopup.css('display', 'flex');
-                        }
+                        // Hapus semua state adzan sebelum menampilkan Friday Info
                         clearAdzanState();
+                        updateFridayImages();
+                        // Tampilkan popup Friday info dengan data yang sesuai tanpa alarm tambahan
+                        const options = {
+                            weekday: 'long',
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit'
+                        };
+                        const formattedDate = now.toLocaleDateString('id-ID', options);
+                        const khatib = $('#khatib').val();
+                        const imam = $('#imam').val();
+                        const muadzin = $('#muadzin').val();
+                        const fridayData = {
+                            date: formattedDate,
+                            khatib,
+                            imam,
+                            muadzin
+                        };
+                        displayFridayInfoPopup(fridayData); // Tidak memanggil playBeepSound
                     } else {
                         showIqomahPopup(prayerTimeStr);
                     }
@@ -1150,6 +1255,12 @@
         }
 
         function showIqomahPopup(prayerTimeStr, isRestored = false) {
+            const now = getCurrentTimeFromServer();
+            if (now.getDay() === 5 && currentPrayerName === "Jum'at") {
+                console.log('Tidak menampilkan iqomah untuk sholat Jumat');
+                return;
+            }
+
             const $popup = $('#iqomahPopup');
             const $progress = $('#iqomahProgress');
             const $countdown = $('#iqomahCountdown');
@@ -1358,7 +1469,7 @@
 
         function showFinalAdzanImage() {
             if (currentPrayerName === "Jum'at" && getCurrentTimeFromServer().getDay() === 5) {
-                // console.log('Tidak menampilkan final adzan image untuk adzan Jum\'at');
+                console.log('Tidak menampilkan final adzan image untuk adzan Jum\'at');
                 return;
             }
 
@@ -1442,6 +1553,7 @@
             fridayInfoEndTime = null;
             fridayInfoData = null;
             fridaySliderStartTime = null;
+            window.cachedJumatSlideDuration = undefined;
             localStorage.removeItem('fridayInfoStartTime');
             localStorage.removeItem('fridayInfoEndTime');
             localStorage.removeItem('fridayInfoData');
@@ -1470,7 +1582,7 @@
                     // console.log('Respons API adzan:', response);
                     if (response.success && response.data) {
                         const previousAdzan = [];
-                        for (let i = 7; i <= 12; i++) {
+                        for (let i = 8; i <= 12; i++) {
                             previousAdzan.push($(`#adzan${i}`).val() || '');
                         }
 
@@ -1509,20 +1621,17 @@
         }
 
         function startFridayImageSlider() {
-            const $fridayImageElement = $('#currentFridayImage');
-            if (!$fridayImageElement.length) {
-                console.error('Elemen #currentFridayImage tidak ditemukan');
-                return;
-            }
-
             window.fridayImages = [];
-            for (let i = 7; i <= 12; i++) {
+            for (let i = 8; i <= 12; i++) {
                 const adzanElement = $(`#adzan${i}`);
-                if (adzanElement.length && adzanElement.val()) {
+                if (adzanElement.val()) {
                     window.fridayImages.push(adzanElement.val());
                 }
             }
 
+            const $fridayImageElement = $('#currentFridayImage');
+
+            // Use six default images if no Friday images are available
             if (window.fridayImages.length === 0) {
                 window.fridayImages = [
                     'images/other/doa-setelah-adzan-default.webp',
@@ -1564,6 +1673,7 @@
 
                 if (currentIndex !== lastIndex) {
                     lastIndex = currentIndex;
+
                     $fridayImageElement.css('opacity', '0');
                     setTimeout(() => {
                         $fridayImageElement.attr('src', window.fridayImages[currentIndex]);
@@ -1573,6 +1683,7 @@
             }
 
             updateFridayImage();
+
             if (fridayImageSliderInterval) {
                 clearInterval(fridayImageSliderInterval);
             }
@@ -1594,17 +1705,19 @@
         }
 
         function displayFridayInfoPopup(data, isRestored = false) {
+            // Periksa apakah popup sudah ditampilkan
             const $popup = $('#fridayInfoPopup');
-            const $dateElement = $('#fridayDate');
-            const $officialsElement = $('#fridayOfficials');
-            const now = getCurrentTimeFromServer();
+            if ($popup.css('display') === 'flex') {
+                return; // Jangan tampilkan lagi jika sudah ditampilkan
+            }
 
             updateFridayInfoContent();
+            $popup.css('display', 'flex');
 
-            if ($popup.css('display') !== 'flex') {
-                $popup.css('display', 'flex');
-            }
             if (!isRestored) {
+                // Pastikan gambar Friday diperbarui sebelum menampilkan popup
+                updateFridayImages();
+
                 const now = getCurrentTimeFromServer().getTime();
                 fridayInfoStartTime = now;
 
@@ -1615,6 +1728,9 @@
                 localStorage.setItem('fridayInfoStartTime', fridayInfoStartTime);
                 localStorage.setItem('fridayInfoEndTime', fridayInfoEndTime);
                 localStorage.setItem('fridayInfoData', JSON.stringify(data));
+
+                // Mulai slider gambar setelah konten diperbarui
+                startFridayImageSlider();
             }
 
             const remainingTime = fridayInfoEndTime - getCurrentTimeFromServer().getTime();
@@ -1805,7 +1921,6 @@
                     if (prayer.name.toLowerCase().includes('shuruq') || prayer.name.toLowerCase()
                         .includes('syuruq') || prayer.name.toLowerCase().includes('terbit')) {
                         if (!isShuruqAlarmPlaying) {
-                            // console.log('Shuruq time - playing beep sound only');
                             isShuruqAlarmPlaying = true;
                             localStorage.setItem('shuruqAlarmTime', currentTimeFormatted);
                             playBeepSound(2);
@@ -1813,6 +1928,10 @@
                                 clearShuruqAlarmState();
                             }, 60000);
                         }
+                    } else if (prayer.name === "Jum'at" && fridayInfoStartTime && now.getTime() <
+                        fridayInfoEndTime) {
+                        // Jangan memulai adzan Jumat jika popup Friday Info aktif
+                        clearAdzanState();
                     } else {
                         showAdzanPopup(prayer.name, prayer.time);
                     }
@@ -2064,19 +2183,21 @@
         }
 
         setInterval(function() {
-            updateMosqueInfo();
-            updateMarqueeText();
-            // updateSlides();
             updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            console.log('Data diperbarui');
-        }, 30000); // 30000 milidetik = 30 detik
+            console.log(
+                'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 37 Detik'
+            );
+        }, 37000); // 37000 milidetik = 37 detik
 
         setInterval(function() {
+            updateMosqueInfo();
+            updateMarqueeText();
             updateSlides();
-        }, 35000);
+            console.log('Data Masjid, marquee, dan slide diperbarui setiap 63 detik');
+        }, 63000); // 63000 milidetik = 63 detik
 
         // document.addEventListener('visibilitychange', function() {
         //     if (document.visibilityState === 'visible') {
