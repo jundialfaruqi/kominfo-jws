@@ -307,7 +307,7 @@ body {
   background-position: center;
   position: relative;
   margin-left: 293px;
-  transition: background-image 0.5s ease-in-out;
+  /* transition: background-image 0.5s ease-in-out; */
   will-change: background-image;
   /* Other existing styles */
 }
@@ -665,7 +665,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 820px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
@@ -1013,7 +1013,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 475px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
@@ -1360,7 +1360,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 396px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
@@ -1707,7 +1707,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 349px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
@@ -2054,7 +2054,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 317px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
@@ -2388,7 +2388,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 237px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
@@ -2722,7 +2722,7 @@ body {
     background-position: center;
     position: relative;
     margin-left: 0px;
-    transition: background-image 0.5s ease-in-out;
+    /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
   }
 
