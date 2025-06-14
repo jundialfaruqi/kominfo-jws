@@ -2074,10 +2074,71 @@
             });
         }
 
+        // Objek global untuk menyimpan cache gambar
+        window.imageCache = window.imageCache || {};
+
+        function clearUnusedCache(currentUrls) {
+            const maxCacheSize = 10; // Batas maksimum gambar di cache
+            Object.keys(window.imageCache).forEach(url => {
+                if (!currentUrls.includes(url)) {
+                    delete window.imageCache[url];
+                    console.log(`Gambar dihapus dari cache: ${url}`);
+                }
+            });
+            // Jika cache masih terlalu besar, hapus gambar tertua
+            const cachedUrls = Object.keys(window.imageCache);
+            if (cachedUrls.length > maxCacheSize) {
+                const urlsToRemove = cachedUrls.slice(0, cachedUrls.length - maxCacheSize);
+                urlsToRemove.forEach(url => {
+                    delete window.imageCache[url];
+                    console.log(`Gambar lama dihapus dari cache: ${url}`);
+                });
+            }
+        }
+
+        // Fungsi untuk preload gambar
+        function preloadImages(urls) {
+            return Promise.all(urls.map(url => {
+                return new Promise((resolve, reject) => {
+                    // Cek apakah gambar sudah ada di cache
+                    if (window.imageCache[url] && window.imageCache[url].complete) {
+                        console.log(`Gambar sudah ada di cache: ${url}`);
+                        resolve(window.imageCache[url]);
+                        return;
+                    }
+
+                    const img = new Image();
+                    img.src = url;
+
+                    img.onload = () => {
+                        console.log(`Gambar berhasil dimuat: ${url}`);
+                        window.imageCache[url] = img; // Simpan di cache
+                        resolve(img);
+                    };
+
+                    img.onerror = () => {
+                        console.warn(
+                            `Gagal memuat gambar: ${url}, menggunakan default`);
+                        const defaultUrl = '/images/default-slide.jpg';
+                        if (!window.imageCache[defaultUrl]) {
+                            const defaultImg = new Image();
+                            defaultImg.src = defaultUrl;
+                            window.imageCache[defaultUrl] = defaultImg;
+                        }
+                        resolve(window.imageCache[defaultUrl]);
+                    };
+                });
+            }));
+        }
+
         function manageSlideDisplay() {
             const $mosqueImageElement = $('.mosque-image');
-            if (!$mosqueImageElement.length) return;
+            if (!$mosqueImageElement.length) {
+                console.warn('Elemen .mosque-image tidak ditemukan');
+                return;
+            }
 
+            // Inisialisasi slideUrls
             window.slideUrls = [
                 $('#slide1').val() || '',
                 $('#slide2').val() || '',
@@ -2087,27 +2148,80 @@
                 $('#slide6').val() || ''
             ].filter(url => url.trim() !== '');
 
-            if (window.slideUrls.length === 0) return;
-
-            function updateSlide() {
-                if (window.slideUrls.length === 0) return;
-
-                const now = getCurrentTimeFromServer();
-
-                const slideDuration = 10000;
-
-                const totalSeconds = (now.getMinutes() * 60) + now.getSeconds();
-                const totalSlideTime = slideDuration * window.slideUrls.length;
-                const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) % totalSlideTime;
-                const slideIndex = Math.floor(cyclePosition / slideDuration);
-
-                $mosqueImageElement.css({
-                    'background-image': `url("${window.slideUrls[slideIndex]}")`,
-                });
+            if (window.slideUrls.length === 0) {
+                console.warn('Tidak ada slide yang tersedia, menggunakan default');
+                window.slideUrls = ['/images/default-slide.jpg'];
             }
 
-            updateSlide();
-            setInterval(updateSlide, 1000);
+            // Fungsi untuk memulai slider setelah preload
+            async function initSlider() {
+                try {
+                    // Preload semua gambar
+                    await preloadImages(window.slideUrls);
+                    console.log('Semua gambar telah dimuat, memulai slider');
+
+                    const slideDuration = 10000; // 10 detik
+
+                    function updateSlide() {
+                        if (window.slideUrls.length === 0) return;
+
+                        const now = getCurrentTimeFromServer();
+                        const totalSeconds = (now.getMinutes() * 60) + now.getSeconds();
+                        const totalSlideTime = slideDuration * window.slideUrls.length;
+                        const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
+                            totalSlideTime;
+                        const slideIndex = Math.floor(cyclePosition / slideDuration);
+
+                        // Gunakan URL dari slideUrls, dengan fallback ke default jika tidak ada di cache
+                        const currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
+                            '/images/default-slide.jpg';
+
+                        // Terapkan transisi untuk pergantian gambar yang mulus
+                        $mosqueImageElement.css({
+                            'background-image': `url("${currentUrl}")`,
+                            'transition': 'background-image 0.5s ease-in-out'
+                        });
+
+                        console.log(`Slide diperbarui: Index ${slideIndex}, URL ${currentUrl}`);
+                    }
+
+                    // Jalankan updateSlide pertama
+                    updateSlide();
+
+                    // Atur interval untuk memeriksa waktu server setiap detik
+                    setInterval(updateSlide, 1000);
+                } catch (error) {
+                    console.error('Error saat preload gambar:', error);
+                    // Fallback: mulai slider dengan gambar default
+                    window.slideUrls = ['/images/default-slide.jpg'];
+                    updateSlide();
+                    setInterval(updateSlide, 1000);
+                }
+            }
+
+            // Mulai slider
+            initSlider();
+
+            // Dengarkan event slidesUpdated untuk menangani perubahan slide
+            $(document).on('slidesUpdated', async function(event, newSlides) {
+                console.log('Event slidesUpdated diterima, memperbarui slider');
+                const newUrls = newSlides.filter(url => url.trim() !== '');
+                if (newUrls.length === 0) {
+                    console.warn('Tidak ada slide baru, menggunakan default');
+                    newUrls.push('/images/default-slide.jpg');
+                }
+
+                // Perbarui slideUrls hanya untuk URL baru yang belum ada di cache
+                const urlsToPreload = newUrls.filter(url => !window.imageCache[url] || !window
+                    .imageCache[url].complete);
+                if (urlsToPreload.length > 0) {
+                    console.log(`Preload gambar baru: ${urlsToPreload}`);
+                    await preloadImages(urlsToPreload);
+                }
+
+                window.slideUrls = newUrls;
+                console.log('SlideUrls diperbarui:', window.slideUrls);
+            });
         }
 
         manageSlideDisplay();
