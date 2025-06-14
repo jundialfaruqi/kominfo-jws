@@ -2119,7 +2119,7 @@
                     img.onerror = () => {
                         console.warn(
                             `Gagal memuat gambar: ${url}, menggunakan default`);
-                        const defaultUrl = '/images/default-slide.jpg';
+                        const defaultUrl = '/images/other/slide-jws-default.jpg';
                         if (!window.imageCache[defaultUrl]) {
                             const defaultImg = new Image();
                             defaultImg.src = defaultUrl;
@@ -2150,7 +2150,7 @@
 
             if (window.slideUrls.length === 0) {
                 console.warn('Tidak ada slide yang tersedia, menggunakan default');
-                window.slideUrls = ['/images/default-slide.jpg'];
+                window.slideUrls = ['/images/other/slide-jws-default.jpg'];
             }
 
             // Fungsi untuk memulai slider setelah preload
@@ -2174,7 +2174,7 @@
 
                         // Gunakan URL dari slideUrls, dengan fallback ke default jika tidak ada di cache
                         const currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
-                            '/images/default-slide.jpg';
+                            '/images/other/slide-jws-default.jpg';
 
                         // Terapkan transisi untuk pergantian gambar yang mulus
                         $mosqueImageElement.css({
@@ -2193,7 +2193,7 @@
                 } catch (error) {
                     console.error('Error saat preload gambar:', error);
                     // Fallback: mulai slider dengan gambar default
-                    window.slideUrls = ['/images/default-slide.jpg'];
+                    window.slideUrls = ['/images/other/slide-jws-default.jpg'];
                     updateSlide();
                     setInterval(updateSlide, 1000);
                 }
@@ -2208,7 +2208,7 @@
                 const newUrls = newSlides.filter(url => url.trim() !== '');
                 if (newUrls.length === 0) {
                     console.warn('Tidak ada slide baru, menggunakan default');
-                    newUrls.push('/images/default-slide.jpg');
+                    newUrls.push('/images/other/slide-jws-default.jpg');
                 }
 
                 // Perbarui slideUrls hanya untuk URL baru yang belum ada di cache
