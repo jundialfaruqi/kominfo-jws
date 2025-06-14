@@ -315,7 +315,7 @@ body {
 .countdown-timer {
   display: flex;
   align-items: center;
-  background-color: rgba(0, 102, 204, 0.7);
+  background-color: #004080;
   /* 0.5 = 50% transparan */
   padding: 10px 20px;
   border-radius: 30px;
@@ -367,7 +367,7 @@ body {
   white-space: nowrap;
   animation: scrollText 60s linear infinite;
   padding-left: 100%;
-  margin-left: 375px;
+  /* margin-left: 375px; */
   /* Mulai dari setelah prayer-times untuk desktop */
   will-change: transform;
   /* Optimasi performa */
@@ -558,11 +558,11 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 30%;
+    bottom: 35%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 2rem;
+    font-size: 3rem;
     color: white;
     font-weight: 500;
     z-index: 2;
@@ -574,7 +574,7 @@ body {
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 2rem;
+    font-size: 3rem;
     color: white;
     font-weight: 500;
     z-index: 4;
@@ -672,7 +672,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 20px 40px;
     border-radius: 50px;
     position: absolute;
@@ -719,7 +719,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 750px;
+    /* margin-left: 750px; */
     will-change: transform;
   }
 
@@ -1020,7 +1020,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 15px 30px;
     border-radius: 40px;
     position: absolute;
@@ -1067,7 +1067,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 562px;
+    /* margin-left: 562px; */
     will-change: transform;
   }
 
@@ -1135,7 +1135,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     box-shadow: 6px 0 18px rgba(0, 0, 0, 0.3);
-    border-radius: 42%;
+    /* border-radius: 42%; */
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
     border-top-right-radius: 50%;
@@ -1367,7 +1367,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 12px 25px;
     border-radius: 35px;
     position: absolute;
@@ -1414,7 +1414,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 469px;
+    /* margin-left: 469px; */
     will-change: transform;
   }
 
@@ -1714,7 +1714,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 11px 22px;
     border-radius: 32px;
     position: absolute;
@@ -1761,7 +1761,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 413px;
+    /* margin-left: 413px; */
     will-change: transform;
   }
 
@@ -2061,7 +2061,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 10px 20px;
     border-radius: 30px;
     position: absolute;
@@ -2108,7 +2108,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 375px;
+    /* margin-left: 375px; */
     will-change: transform;
   }
 
@@ -2395,7 +2395,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 8px 15px;
     border-radius: 25px;
     position: absolute;
@@ -2442,7 +2442,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 281px;
+    /* margin-left: 281px; */
     will-change: transform;
   }
 
@@ -2729,7 +2729,7 @@ body {
   .countdown-timer {
     display: flex;
     align-items: center;
-    background-color: rgba(0, 102, 204, 0.7);
+    background-color: #004080;
     padding: 8px 15px;
     border-radius: 25px;
     position: absolute;
@@ -2776,7 +2776,7 @@ body {
     white-space: nowrap;
     animation: scrollText 60s linear infinite;
     padding-left: 100%;
-    margin-left: 281px;
+    /* margin-left: 281px; */
     will-change: transform;
   }
 

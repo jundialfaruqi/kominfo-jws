@@ -56,6 +56,24 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        // Fungsi untuk memperbarui jam digital
+        function updateDigitalClock() {
+            const now = getCurrentTimeFromServer();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+
+            // Perbarui semua elemen dengan kelas .clock-time
+            $('.clock-time').text(timeString);
+
+            // Lanjutkan animasi
+            requestAnimationFrame(updateDigitalClock);
+        }
+
+        // Mulai animasi jam digital
+        requestAnimationFrame(updateDigitalClock);
+
         setTimeout(() => {
             syncServerTime(() => {
                 checkAndRestoreSessions();
@@ -1765,7 +1783,6 @@
         }
 
         function displayFridayInfoPopup(data, isRestored = false) {
-            // Periksa apakah popup sudah ditampilkan
             const $popup = $('#fridayInfoPopup');
             if ($popup.css('display') === 'flex') {
                 return; // Jangan tampilkan lagi jika sudah ditampilkan
@@ -1774,14 +1791,22 @@
             updateFridayInfoContent();
             $popup.css('display', 'flex');
 
-            if (!isRestored) {
-                // Pastikan gambar Friday diperbarui sebelum menampilkan popup
-                updateFridayImages();
+            // Pastikan jam digital ada dan diperbarui
+            const $clockTime = $popup.find('.clock-time');
+            if ($clockTime.length) {
+                const now = getCurrentTimeFromServer();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                $clockTime.text(`${hours}:${minutes}:${seconds}`);
+            } else {
+                console.warn('Elemen .clock-time tidak ditemukan di fridayInfoPopup');
+            }
 
+            if (!isRestored) {
+                updateFridayImages();
                 const now = getCurrentTimeFromServer().getTime();
                 fridayInfoStartTime = now;
-
-                // Gunakan durasi dinamis untuk jumat slide
                 const duration = getJumatSlideDuration();
                 fridayInfoEndTime = now + duration;
 
@@ -1789,7 +1814,6 @@
                 localStorage.setItem('fridayInfoEndTime', fridayInfoEndTime);
                 localStorage.setItem('fridayInfoData', JSON.stringify(data));
 
-                // Mulai slider gambar setelah konten diperbarui
                 startFridayImageSlider();
             }
 
@@ -2317,7 +2341,8 @@
                 const hari = moment(now).format('dddd');
                 const tanggalMasehi = moment(now).format('D MMMM YYYY');
 
-                let formattedDate = `<span class="day-name">${hari}</span>, <br />${tanggalMasehi}`;
+                let formattedDate =
+                    `<span class="day-name" style="font-size: 5rem;">${hari}</span>, <br />${tanggalMasehi}`;
 
 
                 if (typeof moment().iDate === 'function') {

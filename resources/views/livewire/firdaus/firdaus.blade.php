@@ -226,7 +226,9 @@
         <div class="friday-info-content">
             <div id="fridayDate" class="friday-date"></div>
             <div id="fridayOfficials" class="friday-officials"></div>
-            {{-- Hidden inputs untuk data petugas --}}
+            <div class="digital-clock">
+                <span class="clock-time">00:00:00</span>
+            </div>
             @if ($petugas)
                 <input type="hidden" id="khatib" value="{{ $petugas->khatib }}">
                 <input type="hidden" id="imam" value="{{ $petugas->imam }}">
