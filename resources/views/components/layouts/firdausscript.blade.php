@@ -805,6 +805,10 @@
                 clearInterval(iqomahImageSliderInterval);
                 iqomahImageSliderInterval = null;
             }
+            if (adzanImageTimeout) {
+                clearTimeout(adzanImageTimeout);
+                adzanImageTimeout = null;
+            }
         }
 
         function clearAllAdzanStates() {
@@ -1140,41 +1144,42 @@
                 return;
             }
 
-            // console.log('Memperbarui gambar Iqomah untuk slug:', slug);
+            console.log('Memperbarui gambar Iqomah untuk slug:', slug);
 
             $.ajax({
                 url: `/api/adzan/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    // console.log('Respons API adzan untuk Iqomah:', response);
+                    console.log('Respons API adzan untuk Iqomah:', response);
                     if (response.success) {
-                        const previousAdzan = [];
-                        for (let i = 1; i <= 6; i++) {
-                            previousAdzan.push($(`#adzan${i}`).val() || '');
-                        }
-                        $('#adzan1').val(response.data.adzan1);
-                        $('#adzan2').val(response.data.adzan2);
-                        $('#adzan3').val(response.data.adzan3);
-                        $('#adzan4').val(response.data.adzan4);
-                        $('#adzan5').val(response.data.adzan5);
-                        $('#adzan6').val(response.data.adzan6);
+                        // Perbarui nilai input
+                        $('#adzan1').val(response.data.adzan1 || '');
+                        $('#adzan2').val(response.data.adzan2 || '');
+                        $('#adzan3').val(response.data.adzan3 || '');
+                        $('#adzan4').val(response.data.adzan4 || '');
+                        $('#adzan5').val(response.data.adzan5 || '');
+                        $('#adzan6').val(response.data.adzan6 || '');
 
-                        window.iqomahImages = [];
+                        // Perbarui array gambar tanpa mengosongkannya terlebih dahulu
+                        const newIqomahImages = [];
                         for (let i = 1; i <= 6; i++) {
                             const adzanValue = $(`#adzan${i}`).val();
                             if (adzanValue) {
-                                window.iqomahImages.push(adzanValue);
+                                newIqomahImages.push(adzanValue);
                             }
                         }
 
-                        // console.log('Gambar Iqomah diperbarui, jumlah gambar:', window.iqomahImages
-                        //     .length);
-
-                        if (window.iqomahImages.length === 0 && iqomahImageSliderInterval) {
-                            clearInterval(iqomahImageSliderInterval);
-                            iqomahImageSliderInterval = null;
+                        // Perbarui window.iqomahImages hanya jika ada perubahan
+                        if (JSON.stringify(newIqomahImages) !== JSON.stringify(window
+                                .iqomahImages)) {
+                            console.log('Gambar Iqomah berubah, memperbarui array:',
+                                newIqomahImages);
+                            window.iqomahImages = newIqomahImages;
                         }
+
+                        console.log('Gambar Iqomah diperbarui, jumlah gambar:', window.iqomahImages
+                            .length);
                     }
                 },
                 error: function(xhr, status, error) {
@@ -1194,64 +1199,99 @@
             }
 
             const $iqomahImageElement = $('#currentIqomahImage');
+            if (!$iqomahImageElement.length) {
+                console.error('Elemen #currentIqomahImage tidak ditemukan di DOM');
+                return;
+            }
 
-            // Use six default images if no Iqomah images are available
+            // Gunakan gambar default jika tidak ada gambar dari database
             if (window.iqomahImages.length === 0) {
                 window.iqomahImages = [
                     'images/other/doa-setelah-adzan-default.webp',
-                    'images/other/doa-setelah-adzan-default.webp',
-                    'images/other/doa-masuk-masjid-default.webp',
                     'images/other/doa-masuk-masjid-default.webp',
                     'images/other/non-silent-hp-default.webp',
-                    'images/other/non-silent-hp-default.webp'
+                    'images/other/lurus-rapat-shaf-default.webp',
+                    'images/other/gambar-default-5.webp',
+                    'images/other/gambar-default-6.webp'
                 ];
-                console.log('Menggunakan enam gambar default untuk slider Iqomah:', window.iqomahImages);
+                console.log('Menggunakan gambar default untuk slider Iqomah:', window.iqomahImages);
             }
 
+            // Simpan salinan array gambar untuk mendeteksi perubahan
+            let previousIqomahImages = [...window.iqomahImages];
+
+            // Atur waktu mulai slider jika belum ada
             if (!iqomahSliderStartTime) {
                 iqomahSliderStartTime = getCurrentTimeFromServer().getTime();
                 localStorage.setItem('iqomahSliderStartTime', iqomahSliderStartTime);
             }
 
-            let lastIndex = -1;
+            // Inisialisasi currentIndex dari localStorage atau mulai dari 0
+            let currentIndex = localStorage.getItem('iqomahSliderIndex') ?
+                parseInt(localStorage.getItem('iqomahSliderIndex')) : 0;
 
             function updateIqomahImage() {
-                // Use six default images if no Iqomah images are available
+                console.log('updateIqomahImage dipanggil, currentIndex:', currentIndex, 'gambar:', window
+                    .iqomahImages[currentIndex]);
+
+                // Periksa apakah array gambar telah berubah
+                if (JSON.stringify(window.iqomahImages) !== JSON.stringify(previousIqomahImages)) {
+                    console.log('Array iqomahImages berubah, mereset slider:', window.iqomahImages);
+                    currentIndex = 0; // Reset indeks ke 0
+                    previousIqomahImages = [...window.iqomahImages]; // Perbarui salinan
+                    localStorage.setItem('iqomahSliderIndex', currentIndex);
+                }
+
+                // Pastikan array gambar tidak kosong
                 if (!window.iqomahImages || window.iqomahImages.length === 0) {
                     window.iqomahImages = [
                         'images/other/doa-setelah-adzan-default.webp',
-                        'images/other/doa-setelah-adzan-default.webp',
-                        'images/other/doa-masuk-masjid-default.webp',
                         'images/other/doa-masuk-masjid-default.webp',
                         'images/other/non-silent-hp-default.webp',
-                        'images/other/non-silent-hp-default.webp'
+                        'images/other/lurus-rapat-shaf-default.webp',
+                        'images/other/gambar-default-5.webp',
+                        'images/other/gambar-default-6.webp'
                     ];
-                    console.log('Menggunakan enam gambar default dalam updateIqomahImage:', window
-                        .iqomahImages);
+                    console.warn('Array iqomahImages kosong, menggunakan gambar default:', window.iqomahImages);
+                    currentIndex = 0; // Reset indeks jika array diisi ulang
+                    previousIqomahImages = [...window.iqomahImages];
+                    localStorage.setItem('iqomahSliderIndex', currentIndex);
                 }
 
-                const now = getCurrentTimeFromServer().getTime();
-                const elapsedMs = now - iqomahSliderStartTime;
-                const elapsedSeconds = Math.floor(elapsedMs / 1000);
-                const currentIndex = Math.floor(elapsedSeconds / 10) % window.iqomahImages.length;
+                // Pastikan currentIndex valid
+                currentIndex = currentIndex % window.iqomahImages.length;
 
-                if (currentIndex !== lastIndex) {
-                    lastIndex = currentIndex;
-
+                // Ganti gambar dengan transisi
+                try {
                     $iqomahImageElement.css('opacity', '0');
                     setTimeout(() => {
                         $iqomahImageElement.attr('src', window.iqomahImages[currentIndex]);
                         $iqomahImageElement.css('opacity', '1');
+                        console.log('Gambar diperbarui:', window.iqomahImages[currentIndex]);
                     }, 250);
+                } catch (error) {
+                    console.error('Kesalahan saat memperbarui gambar:', error);
                 }
+
+                // Perbarui indeks dan simpan ke localStorage
+                currentIndex = (currentIndex + 1) % window.iqomahImages.length;
+                localStorage.setItem('iqomahSliderIndex', currentIndex);
             }
 
+            // Tampilkan gambar pertama segera
             updateIqomahImage();
 
+            // Hentikan interval sebelumnya jika ada
             if (iqomahImageSliderInterval) {
                 clearInterval(iqomahImageSliderInterval);
+                console.log('Interval slider iqomah sebelumnya dihentikan');
             }
-            iqomahImageSliderInterval = setInterval(updateIqomahImage, 1000);
+
+            // Mulai interval baru untuk mengganti gambar setiap 10 detik
+            iqomahImageSliderInterval = setInterval(() => {
+                console.log('Interval iqomahImageSliderInterval dijalankan');
+                updateIqomahImage();
+            }, 10000);
         }
 
         function showIqomahPopup(prayerTimeStr, isRestored = false) {
@@ -1374,7 +1414,11 @@
             const now = getCurrentTimeFromServer().getTime();
             if (adzanImageStartTime && adzanImageEndTime && now >= adzanImageStartTime && now <
                 adzanImageEndTime && adzanImageSrc) {
-                // console.log('Restoring Adzan final image');
+                if ($('#adzanImageDisplay').is(':visible')) {
+                    console.log('Gambar adzan sudah ditampilkan, tidak perlu dipulihkan');
+                    return;
+                }
+                console.log('Restoring Adzan final image');
                 displayAdzanImage(adzanImageSrc, true);
             } else {
                 clearAdzanImageState();
@@ -1393,32 +1437,43 @@
         function updateAdzanImages() {
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
-                // console.error('Tidak dapat menentukan slug dari URL');
                 return;
             }
-            // console.log('Memperbarui gambar Adzan untuk slug:', slug);
             $.ajax({
                 url: `/api/adzan/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    // console.log('Respons API adzan untuk Adzan15:', response);
                     if (response.success) {
                         const oldAdzan15 = $('#adzan15').val();
-                        $('#adzan15').val(response.data.adzan15);
-                        if ($('#adzanImageDisplay').is(':visible') && oldAdzan15 !== response.data
-                            .adzan15) {
-                            const $imageElement = $('#currentAdzanImage');
-                            $imageElement.css('opacity', '0');
-                            setTimeout(() => {
-                                $imageElement.attr('src', response.data.adzan15);
-                                $imageElement.css('opacity', '1');
-                                adzanImageSrc = response.data.adzan15;
-                                localStorage.setItem('adzanImageSrc', adzanImageSrc);
-                            }, 250);
-                        }
+                        const newAdzan15 = response.data.adzan15 || '';
+                        $('#adzan15').val(newAdzan15);
 
-                        // console.log('Gambar Adzan15 diperbarui');
+                        if ($('#adzanImageDisplay').is(':visible')) {
+                            // Jika gambar default sedang ditampilkan dan respons kosong, jangan ubah gambar
+                            if (!newAdzan15 && adzanImageSrc ===
+                                '/images/other/lurus-rapat-shaf-default.webp') {
+                                console.log(
+                                    'Gambar default tetap digunakan karena respons adzan15 kosong'
+                                );
+                                return;
+                            }
+                            // Jika ada perubahan atau beralih ke gambar database, perbarui gambar
+                            if (oldAdzan15 !== newAdzan15 || (newAdzan15 && adzanImageSrc !==
+                                    newAdzan15)) {
+                                const $imageElement = $('#currentAdzanImage');
+                                $imageElement.css('opacity', '0');
+                                setTimeout(() => {
+                                    const srcToUse = newAdzan15 ||
+                                        '/images/other/lurus-rapat-shaf-default.webp';
+                                    $imageElement.attr('src', srcToUse);
+                                    $imageElement.css('opacity', '1');
+                                    adzanImageSrc = srcToUse;
+                                    localStorage.setItem('adzanImageSrc', adzanImageSrc);
+                                    console.log('Gambar Adzan15 diperbarui ke:', srcToUse);
+                                }, 250);
+                            }
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
@@ -1454,17 +1509,6 @@
                 localStorage.setItem('adzanImageEndTime', adzanImageEndTime);
                 localStorage.setItem('adzanImageSrc', imageSrc);
             }
-
-            const remainingTime = adzanImageEndTime - getCurrentTimeFromServer().getTime();
-            if (remainingTime > 0) {
-                setTimeout(() => {
-                    $imageDisplay.css('display', 'none');
-                    clearAdzanImageState();
-                }, remainingTime);
-            } else {
-                $imageDisplay.css('display', 'none');
-                clearAdzanImageState();
-            }
         }
 
         function showFinalAdzanImage() {
@@ -1473,11 +1517,9 @@
                 return;
             }
 
-            // Cek apakah gambar final masih aktif
             if (adzanImageStartTime && adzanImageEndTime) {
                 const currentTime = getCurrentTimeFromServer().getTime();
                 if (currentTime < adzanImageEndTime) {
-                    // console.log('Gambar final masih aktif, menunggu selesai');
                     return;
                 }
             }
@@ -1493,15 +1535,14 @@
                 imageUrl = '/images/other/lurus-rapat-shaf-default.webp';
             }
 
-            // Gunakan durasi dinamis berdasarkan nama sholat
             const duration = getFinalDuration(currentPrayerName || 'Dzuhur');
 
-            // Tampilkan gambar dengan durasi yang ditentukan
             displayAdzanImage(imageUrl, false, duration);
 
-            // Set timeout untuk menutup gambar setelah durasi habis
-            setTimeout(() => {
-                hideAdzanImage();
+            adzanImageTimeout = setTimeout(() => {
+                const $imageDisplay = $('#adzanImageDisplay');
+                $imageDisplay.css('display', 'none');
+                clearAdzanImageState();
                 console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
             }, duration);
         }
@@ -1572,14 +1613,11 @@
                 return;
             }
 
-            // console.log('Memperbarui gambar Friday untuk slug:', slug);
-
             $.ajax({
                 url: `/api/adzan/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    // console.log('Respons API adzan:', response);
                     if (response.success && response.data) {
                         const previousAdzan = [];
                         for (let i = 8; i <= 12; i++) {
@@ -1590,9 +1628,7 @@
                             'adzan12'
                         ];
                         adzanKeys.forEach(key => {
-                            if (response.data[key]) {
-                                $(`#${key}`).val(response.data[key]);
-                            }
+                            $(`#${key}`).val(response.data[key] || '');
                         });
 
                         window.fridayImages = [];
@@ -1603,14 +1639,23 @@
                             }
                         }
 
-                        // console.log('Gambar Friday diperbarui, jumlah gambar:', window.fridayImages
-                        //     .length);
+                        // Gunakan gambar default jika tidak ada gambar dari API
+                        if (window.fridayImages.length === 0) {
+                            window.fridayImages = [
+                                '/images/other/doa-setelah-adzan-default.webp',
+                                '/images/other/doa-setelah-adzan-default.webp',
+                                '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                                '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                                '/images/other/non-silent-hp-default.webp',
+                                '/images/other/doa-masuk-masjid-default.webp'
+                            ];
+                            console.log('Menggunakan gambar default karena respons API kosong:',
+                                window.fridayImages);
+                        }
 
-                        if (window.fridayImages.length === 0 && fridayImageSliderInterval) {
-                            clearInterval(fridayImageSliderInterval);
-                            fridayImageSliderInterval = null;
-                            $('#currentFridayImage').css('opacity', '0');
-                            // console.log('Slider Friday dihentikan karena tidak ada gambar');
+                        // Pastikan slider tetap berjalan jika popup aktif
+                        if ($('#fridayInfoPopup').is(':visible') && !fridayImageSliderInterval) {
+                            startFridayImageSlider();
                         }
                     }
                 },
@@ -1622,7 +1667,7 @@
 
         function startFridayImageSlider() {
             window.fridayImages = [];
-            for (let i = 8; i <= 12; i++) {
+            for (let i = 7; i <= 12; i++) {
                 const adzanElement = $(`#adzan${i}`);
                 if (adzanElement.val()) {
                     window.fridayImages.push(adzanElement.val());
@@ -1630,16 +1675,20 @@
             }
 
             const $fridayImageElement = $('#currentFridayImage');
+            if (!$fridayImageElement.length) {
+                console.error('Elemen #currentFridayImage tidak ditemukan di DOM');
+                return;
+            }
 
-            // Use six default images if no Friday images are available
+            // Gunakan gambar default dengan jalur absolut jika tidak ada gambar dari database
             if (window.fridayImages.length === 0) {
                 window.fridayImages = [
-                    'images/other/doa-setelah-adzan-default.webp',
-                    'images/other/doa-setelah-adzan-default.webp',
-                    'images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                    'images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                    'images/other/non-silent-hp-default.webp',
-                    'images/other/doa-masuk-masjid-default.webp'
+                    '/images/other/doa-setelah-adzan-default.webp',
+                    '/images/other/doa-setelah-adzan-default.webp',
+                    '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                    '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                    '/images/other/non-silent-hp-default.webp',
+                    '/images/other/doa-masuk-masjid-default.webp'
                 ];
                 console.log('Menggunakan enam gambar default untuk slider Friday:', window.fridayImages);
             }
@@ -1652,15 +1701,14 @@
             let lastIndex = -1;
 
             function updateFridayImage() {
-                // Use six default images if no Friday images are available
                 if (!window.fridayImages || window.fridayImages.length === 0) {
                     window.fridayImages = [
-                        'images/other/doa-setelah-adzan-default.webp',
-                        'images/other/doa-setelah-adzan-default.webp',
-                        'images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                        'images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                        'images/other/non-silent-hp-default.webp',
-                        'images/other/doa-masuk-masjid-default.webp'
+                        '/images/other/doa-setelah-adzan-default.webp',
+                        '/images/other/doa-setelah-adzan-default.webp',
+                        '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                        '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                        '/images/other/non-silent-hp-default.webp',
+                        '/images/other/doa-masuk-masjid-default.webp'
                     ];
                     console.log('Menggunakan enam gambar default dalam updateFridayImage:', window
                         .fridayImages);
@@ -1674,11 +1722,23 @@
                 if (currentIndex !== lastIndex) {
                     lastIndex = currentIndex;
 
-                    $fridayImageElement.css('opacity', '0');
-                    setTimeout(() => {
-                        $fridayImageElement.attr('src', window.fridayImages[currentIndex]);
+                    // Preload gambar untuk memastikan pemuatan berhasil
+                    const img = new Image();
+                    img.src = window.fridayImages[currentIndex];
+                    img.onload = () => {
+                        $fridayImageElement.css('opacity', '0');
+                        setTimeout(() => {
+                            $fridayImageElement.attr('src', img.src);
+                            $fridayImageElement.css('opacity', '1');
+                            console.log('Gambar Friday diperbarui ke:', img.src);
+                        }, 250);
+                    };
+                    img.onerror = () => {
+                        console.error('Gagal memuat gambar:', img.src);
+                        // Fallback ke gambar default jika gagal
+                        $fridayImageElement.attr('src', '/images/other/doa-masuk-masjid-default.webp');
                         $fridayImageElement.css('opacity', '1');
-                    }, 250);
+                    };
                 }
             }
 
