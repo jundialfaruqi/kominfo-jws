@@ -404,21 +404,7 @@
 
         function updateScrollingText(marqueeData) {
             const $scrollingTextElement = $('.scrolling-text');
-            let currentPosition = 0;
-
-            // Ambil posisi transformasi saat ini (jika ada)
-            if ($scrollingTextElement.length) {
-                const computedStyle = window.getComputedStyle($scrollingTextElement[0]);
-                const transform = computedStyle.getPropertyValue('transform');
-                if (transform && transform !== 'none') {
-                    const matrix = transform.match(/matrix\((.*?)\)/);
-                    if (matrix) {
-                        const values = matrix[1].split(', ');
-                        currentPosition = parseFloat(values[4]);
-                    }
-                }
-            }
-
+            
             // Ambil teks marquee
             let marqueeTexts;
             if (marqueeData) {
@@ -450,25 +436,15 @@
             const baseDuration = 60;
             const calculatedDuration = Math.max(baseDuration, textLength / 10);
 
-            // Ambil state animasi dari localStorage
-            const savedMarqueeState = localStorage.getItem('marqueeState');
-            let animationProgress = 0;
-            let marqueeStartTime = localStorage.getItem('marqueeStartTime') ?
-                parseInt(localStorage.getItem('marqueeStartTime')) :
-                null;
-
-            if (marqueeStartTime) {
-                // Hitung progress berdasarkan waktu yang telah berlalu
-                const now = getCurrentTimeFromServer().getTime();
-                const elapsedMs = now - marqueeStartTime;
-                const totalCycleTime = calculatedDuration * 1000;
-                animationProgress = (elapsedMs % totalCycleTime) / totalCycleTime;
-            } else {
-                // Jika tidak ada state sebelumnya, mulai dari waktu saat ini
-                marqueeStartTime = getCurrentTimeFromServer().getTime();
-                localStorage.setItem('marqueeStartTime', marqueeStartTime);
-            }
-
+            // Gunakan waktu server untuk sinkronisasi
+            const now = getCurrentTimeFromServer().getTime();
+            
+            // Gunakan timestamp server untuk menghitung posisi awal yang konsisten
+            // Menggunakan modulo dari timestamp server dengan durasi total animasi
+            // Ini akan memastikan semua perangkat memulai dari posisi yang sama
+            const totalCycleTimeMs = calculatedDuration * 1000;
+            const animationProgress = (now % totalCycleTimeMs) / totalCycleTimeMs;
+            
             // Perbarui elemen marquee
             $scrollingTextElement.css('animation', 'none');
             $scrollingTextElement.html(`<p>${combinedText}</p>`);
@@ -476,10 +452,6 @@
             if ($scrollingTextElement[0]) {
                 $scrollingTextElement[0].offsetHeight; // Trigger reflow
             }
-
-            const containerWidth = $scrollingTextElement.parent().width();
-            const textWidth = $scrollingTextElement.find('p').width();
-            const totalDistance = textWidth + containerWidth;
 
             // Terapkan animasi dengan delay berdasarkan progress
             $scrollingTextElement.css({
