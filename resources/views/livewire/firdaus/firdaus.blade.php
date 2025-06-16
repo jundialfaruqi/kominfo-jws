@@ -100,9 +100,26 @@
             @livewire('firdaus.mosque-info', ['slug' => request()->route('slug')])
 
             <div class="date-info">
-                <ul>
-                    <li class="date-item"></li>
-                </ul>
+
+                <span class="next-adzan">
+                    <div class="countdown-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-alarm">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M12 13m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                            <path d="M12 10l0 3l2 0" />
+                            <path d="M7 4l-2.75 2" />
+                            <path d="M17 4l2.75 2" />
+                        </svg>
+                    </div>
+                    <div class="countdown-text">
+                        <span id="next-prayer-label">Maghrib</span>
+                        <span>&nbsp; -</span>
+                        <span id="countdown-value">-01:04:00</span>
+                    </div>
+                </span>
+                <span class="date-item"></span>
             </div>
 
             <div class="mosque-image">
@@ -129,22 +146,6 @@
                     <input type="hidden" id="slide5" value="{{ asset('images/other/slide-jws-default.jpg') }}">
                     <input type="hidden" id="slide6" value="{{ asset('images/other/slide-jws-default.jpg') }}">
                 @endif
-
-                <div class="countdown-timer">
-                    <div class="countdown-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-clock">
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                        </svg>
-                    </div>
-                    <div class="countdown-text">
-                        <span id="next-prayer-label">Maghrib</span>
-                        <span>&nbsp; - </span>
-                        <span id="countdown-value">-01:04:00</span>
-                    </div>
-                </div>
             </div>
         </div>
 
