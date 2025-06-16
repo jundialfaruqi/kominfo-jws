@@ -184,6 +184,7 @@
 }
 
 .friday-date {
+    text-align: left;
     margin-bottom: 2rem;
     font-size: 1.5rem;
     font-weight: bold;
@@ -291,7 +292,7 @@
     }
 
     .responsive-table td {
-        padding: 12px 18px;
+        padding: 1rem;
         font-size: 4.5rem;
     }
 
@@ -941,5 +942,296 @@
 
     .friday-officials {
         font-size: 0.8rem;
+    }
+}
+
+
+/* Tambahkan font Digital-7 (opsional, unduh dari sumber seperti dafont.com) */
+/* @font-face {
+    font-family: 'Digital-7';
+    src: url('/fonts/Digital-7.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+} */
+
+/* Styling untuk Digital Clock (berlaku untuk semua popup) */
+.digital-clock {
+    font-family: 'Digital-7', monospace, sans-serif;
+    color: #ffffff;
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.9));
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+    margin: 1.5rem auto;
+    display: inline-block;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    text-align: center;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.digital-clock::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+}
+
+.clock-time {
+    letter-spacing: 3px;
+    font-weight: bold;
+    position: relative;
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    font-size: 7rem;
+}
+
+/* Digital Clock di Adzan Popup */
+.adzan-popup .digital-clock {
+    font-size: 4rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 16px;
+}
+
+/* Digital Clock di Iqomah Popup */
+.iqomah-popup .digital-clock {
+    font-size: 3.5rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 14px;
+}
+
+/* Digital Clock di Friday Info Popup */
+.friday-info-popup .digital-clock {
+    font-size: 2.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 12px;
+}
+
+/* Hover effect */
+.digital-clock:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* ===== RESPONSIVE STYLES untuk Digital Clock ===== */
+
+/* Ultra-high resolution: 4K and above (3840px x 2160px) */
+@media (min-width: 3840px) and (min-height: 2160px) {
+    .adzan-popup .digital-clock {
+        font-size: 10rem;
+        padding: 1.2rem 2.4rem;
+        border-radius: 24px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 9rem;
+        padding: 1.1rem 2.2rem;
+        border-radius: 22px;
+    }
+
+    .friday-info-popup .digital-clock {
+        margin-top: 5rem;
+        font-size: 6rem;
+        padding: 0.9rem 1.8rem;
+        border-radius: 20px;
+    }
+
+    .clock-time {
+        font-size: 19rem;
+        letter-spacing: 4px;
+    }
+}
+
+/* High resolution: 2560px - 3839px (e.g., QHD+) */
+@media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
+    .adzan-popup .digital-clock {
+        font-size: 6rem;
+        padding: 0.9rem 1.8rem;
+        border-radius: 20px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 5rem;
+        padding: 0.85rem 1.7rem;
+        border-radius: 18px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 4rem;
+        padding: 0.7rem 1.4rem;
+        border-radius: 16px;
+    }
+}
+
+/* Full HD: 1920px - 2559px */
+@media (min-width: 1920px) and (max-width: 2559px) and (min-height: 1080px) {
+    .adzan-popup .digital-clock {
+        font-size: 5rem;
+        padding: 0.8rem 1.6rem;
+        border-radius: 18px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 4.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 16px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 3rem;
+        padding: 0.65rem 1.3rem;
+        border-radius: 14px;
+    }
+}
+
+/* 1600px - 1919px */
+@media (min-width: 1600px) and (max-width: 1919px) and (min-height: 900px) {
+    .adzan-popup .digital-clock {
+        font-size: 4.5rem;
+        padding: 0.7rem 1.4rem;
+        border-radius: 16px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 4rem;
+        padding: 0.65rem 1.3rem;
+        border-radius: 14px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 2.5rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 12px;
+    }
+}
+
+/* 1366px - 1599px */
+@media (min-width: 1366px) and (max-width: 1599px) and (min-height: 768px) {
+    .adzan-popup .digital-clock {
+        font-size: 4rem;
+        padding: 0.65rem 1.3rem;
+        border-radius: 14px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 3.5rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 2rem;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+    }
+}
+
+/* 1024px - 1365px */
+@media (min-width: 1024px) and (max-width: 1365px) and (min-height: 768px) {
+    .adzan-popup .digital-clock {
+        font-size: 3.5rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 3rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 10px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 1.5rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+    }
+}
+
+/* Tablet Portrait (768px - 991px) */
+@media screen and (max-width: 991px) {
+    .adzan-popup .digital-clock {
+        font-size: 3rem;
+        padding: 0.55rem 1.1rem;
+        border-radius: 10px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 2.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 1.2rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 7px;
+    }
+}
+
+/* Mobile Landscape (576px - 767px) */
+@media screen and (max-width: 767px) {
+    .adzan-popup .digital-clock {
+        font-size: 2.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 9px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 2rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 1rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 6px;
+    }
+}
+
+/* Mobile Portrait (up to 575px) */
+@media screen and (max-width: 575px) {
+    .adzan-popup .digital-clock {
+        font-size: 2rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 8px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 1.5rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 7px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 0.9rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 5px;
+    }
+}
+
+/* Extra Small Mobile (up to 320px) */
+@media screen and (max-width: 320px) {
+    .adzan-popup .digital-clock {
+        font-size: 1.5rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 7px;
+    }
+
+    .iqomah-popup .digital-clock {
+        font-size: 1.2rem;
+        padding: 0.35rem 0.7rem;
+        border-radius: 6px;
+    }
+
+    .friday-info-popup .digital-clock {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
     }
 }

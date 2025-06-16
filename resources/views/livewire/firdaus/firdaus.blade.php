@@ -91,6 +91,7 @@
             <div class="clock-container">
                 <canvas id="analogClock" width="300" height="300"></canvas>
                 <div class="clock-text">Loading...</div>
+                <div class="brand-text">DISKOMINFO</div>
             </div>
         </div>
 
@@ -182,6 +183,7 @@
     <input type="hidden" id="current-year" value="{{ $currentYear }}">
     <input type="hidden" id="active-prayer-status"
         value='{{ $activePrayerStatus ? json_encode($activePrayerStatus) : '' }}'>
+    <input type="hidden" id="durasi-data" value='{{ $durasi ? json_encode($durasi->toArray()) : '' }}'>
 
     {{-- Hidden inputs for adzan data --}}
     @foreach ($adzanData as $key => $value)
@@ -224,7 +226,9 @@
         <div class="friday-info-content">
             <div id="fridayDate" class="friday-date"></div>
             <div id="fridayOfficials" class="friday-officials"></div>
-            {{-- Hidden inputs untuk data petugas --}}
+            <div class="digital-clock">
+                <span class="clock-time">00:00:00</span>
+            </div>
             @if ($petugas)
                 <input type="hidden" id="khatib" value="{{ $petugas->khatib }}">
                 <input type="hidden" id="imam" value="{{ $petugas->imam }}">
