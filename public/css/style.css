@@ -325,7 +325,7 @@ body {
   position: absolute;
   bottom: 0px;
   right: 0px;
-  box-shadow: -8px -8px 15px rgba(0, 0, 0, 0.4);
+  /* box-shadow: -8px -8px 15px rgba(0, 0, 0, 0.4); */
 }
 
 .countdown-icon {
@@ -562,7 +562,7 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 35%;
+    bottom: 30%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -574,11 +574,11 @@ body {
 
   .brand-text {
     position: absolute;
-    bottom: 55%;
+    bottom: 60%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 3rem;
+    font-size: 2.8rem;
     color: white;
     font-weight: 500;
     z-index: 4;
@@ -641,26 +641,57 @@ body {
   }
 
   .date-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #003366;
-    padding: 20px 40px;
+    padding: 15px 30px;
     margin-left: 0px;
   }
 
-  .date-info ul {
-    list-style: none;
-  }
-
   .date-item {
-    display: flex;
     align-items: center;
-    font-size: 2.8rem;
-    justify-content: flex-end;
+    font-size: 4rem;
   }
 
   .day-name {
     font-weight: 600;
     color: #ffeb3b;
-    margin-right: 10px;
+    margin-right: 7px;
+  }
+
+  .next-adzan {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 1040px;
+    color: #ffeb3b;
+  }
+
+  .countdown-icon {
+    margin-bottom: 0px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .countdown-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .countdown-text {
+    font-size: 4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #countdown-value {
+    font-family: monospace;
+    font-size: 4.6rem;
+    font-weight: 1500;
+    min-width: 8ch;
+    display: inline-block;
+    text-align: right;
   }
 
   .mosque-image {
@@ -671,43 +702,6 @@ body {
     margin-left: 820px;
     /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
-  }
-
-  .countdown-timer {
-    display: flex;
-    align-items: center;
-    background-color: #004080;
-    padding: 20px 40px;
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    box-shadow: -8px -8px 15px rgba(0, 0, 0, 0.4);
-  }
-
-  .countdown-icon {
-    margin-right: 20px;
-    margin-top: 10px;
-    width: 60px;
-    height: 60px;
-  }
-
-  .countdown-text {
-    font-size: 3.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  #countdown-value {
-    font-family: monospace;
-    font-size: 4rem;
-    font-weight: 1000;
-    min-width: 8ch;
-    display: inline-block;
-    text-align: right;
   }
 
   .footer-message {
@@ -834,7 +828,7 @@ body {
   }
 
   .prayer-name {
-    font-size: 2.6rem;
+    font-size: 2.7rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
@@ -914,7 +908,7 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 35%;
+    bottom: 30%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -926,11 +920,11 @@ body {
 
   .brand-text {
     position: absolute;
-    bottom: 53%;
+    bottom: 60%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     color: white;
     font-weight: 500;
     z-index: 4;
@@ -993,20 +987,17 @@ body {
   }
 
   .date-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #003366;
     padding: 15px 30px;
     margin-left: 0px;
   }
 
-  .date-info ul {
-    list-style: none;
-  }
-
   .date-item {
-    display: flex;
     align-items: center;
-    font-size: 2.2rem;
-    justify-content: flex-end;
+    font-size: 2.8rem;
   }
 
   .day-name {
@@ -1015,36 +1006,23 @@ body {
     margin-right: 7px;
   }
 
-  .mosque-image {
-    flex: 1;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    margin-left: 475px;
-    /* transition: background-image 0.5s ease-in-out; */
-    will-change: background-image;
-  }
-
-  .countdown-timer {
+  .next-adzan {
     display: flex;
     align-items: center;
-    background-color: #004080;
-    padding: 15px 30px;
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    box-shadow: 1px -8px 15px rgba(0, 0, 0, 0.4);
+    gap: 5px;
+    margin-left: 670px;
+    color: #ffeb3b;
   }
 
   .countdown-icon {
-    margin-right: 15px;
-    margin-top: 7px;
-    width: 45px;
-    height: 45px;
+    margin-bottom: 0px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .countdown-icon svg {
+    width: 100%;
+    height: 100%;
   }
 
   .countdown-text {
@@ -1060,6 +1038,33 @@ body {
     min-width: 8ch;
     display: inline-block;
     text-align: right;
+  }
+
+
+  .mosque-image {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    margin-left: 475px;
+    /* transition: background-image 0.5s ease-in-out; */
+    will-change: background-image;
+  }
+
+  .countdown-timer {
+    display: flex;
+    align-items: center;
+    /* background-color: #004080; */
+    background-color: transparent;
+    padding: 15px 30px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    position: absolute;
+    bottom: 1020px;
+    right: 1320px;
+    color: #ffeb3b;
   }
 
   .footer-message {
@@ -1185,7 +1190,7 @@ body {
   }
 
   .prayer-name {
-    font-size: 2.2rem;
+    font-size: 2.4rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     text-transform: uppercase;
@@ -1265,7 +1270,7 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 34%;
+    bottom: 29%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -1277,7 +1282,7 @@ body {
 
   .brand-text {
     position: absolute;
-    bottom: 55%;
+    bottom: 60%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -1344,26 +1349,58 @@ body {
   }
 
   .date-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #003366;
-    padding: 12px 25px;
+    padding: 10px 25px;
     margin-left: 0px;
   }
 
-  .date-info ul {
-    list-style: none;
-  }
-
   .date-item {
-    display: flex;
     align-items: center;
-    font-size: 1.8rem;
-    justify-content: flex-end;
+    font-size: 2.1rem;
   }
 
   .day-name {
     font-weight: 600;
     color: #ffeb3b;
-    margin-right: 6px;
+    margin-right: 7px;
+  }
+
+  .next-adzan {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 505px;
+    color: #ffeb3b;
+  }
+
+  .countdown-icon {
+    margin-bottom: 0px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .countdown-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .countdown-text {
+    font-size: 2.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #countdown-value {
+    /* font-family: monospace; */
+    font-size: 2.4rem;
+    font-weight: 1000;
+    min-width: 8ch;
+    display: inline-block;
+    text-align: right;
+    /* letter-spacing: 5px; */
   }
 
   .mosque-image {
@@ -1374,55 +1411,6 @@ body {
     margin-left: 396px;
     /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
-  }
-
-  .countdown-timer {
-    display: flex;
-    align-items: center;
-    background-color: #004080;
-    padding: 12px 25px;
-    /* border-radius: 35px; */
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-  }
-
-  .countdown-icon {
-    margin-right: 12px;
-    margin-top: 6px;
-    width: 36px;
-    height: 36px;
-  }
-
-  .countdown-text {
-    font-size: 2.4rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  #countdown-value {
-    font-family: monospace;
-    font-size: 2.8rem;
-    font-weight: 1000;
-    min-width: 8ch;
-    display: inline-block;
-    text-align: right;
-  }
-
-  .footer-message {
-    grid-area: footer;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 12px 25px;
-    text-align: center;
-    font-size: 2.4rem;
-    overflow: hidden;
-    height: 85px;
-    z-index: 5;
-    position: relative;
   }
 
   .scrolling-text {
@@ -1616,7 +1604,7 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 30%;
+    bottom: 29%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -1628,11 +1616,11 @@ body {
 
   .brand-text {
     position: absolute;
-    bottom: 55%;
+    bottom: 60%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: white;
     font-weight: 500;
     z-index: 4;
@@ -1667,7 +1655,7 @@ body {
   }
 
   .logo {
-    height: 100px;
+    height: 103px;
     width: auto;
     margin-left: 11px;
     margin-top: 22px;
@@ -1695,26 +1683,58 @@ body {
   }
 
   .date-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #003366;
-    padding: 11px 22px;
+    padding: 10px 25px;
     margin-left: 0px;
   }
 
-  .date-info ul {
-    list-style: none;
-  }
-
   .date-item {
-    display: flex;
     align-items: center;
-    font-size: 1.5rem;
-    justify-content: flex-end;
+    font-size: 1.9rem;
   }
 
   .day-name {
     font-weight: 600;
     color: #ffeb3b;
-    margin-right: 5.5px;
+    margin-right: 7px;
+  }
+
+  .next-adzan {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 415px;
+    color: #ffeb3b;
+  }
+
+  .countdown-icon {
+    margin-bottom: 0px;
+    width: 37px;
+    height: 37px;
+  }
+
+  .countdown-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .countdown-text {
+    font-size: 1.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #countdown-value {
+    /* font-family: monospace; */
+    font-size: 2.2rem;
+    font-weight: 1000;
+    min-width: 8ch;
+    display: inline-block;
+    text-align: right;
+    /* letter-spacing: 5px; */
   }
 
   .mosque-image {
@@ -1725,42 +1745,6 @@ body {
     margin-left: 349px;
     /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
-  }
-
-  .countdown-timer {
-    display: flex;
-    align-items: center;
-    background-color: #004080;
-    padding: 11px 22px;
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-  }
-
-  .countdown-icon {
-    margin-right: 11px;
-    margin-top: 5.5px;
-    width: 33px;
-    height: 33px;
-  }
-
-  .countdown-text {
-    font-size: 2.1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  #countdown-value {
-    font-family: monospace;
-    font-size: 2.5rem;
-    font-weight: 1000;
-    min-width: 8ch;
-    display: inline-block;
-    text-align: right;
   }
 
   .footer-message {
@@ -1966,7 +1950,7 @@ body {
 
   .clock-text {
     position: absolute;
-    bottom: 34%;
+    bottom: 30%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -1978,7 +1962,7 @@ body {
 
   .brand-text {
     position: absolute;
-    bottom: 54%;
+    bottom: 60%;
     left: 0;
     width: 100%;
     text-align: center;
@@ -2045,26 +2029,58 @@ body {
   }
 
   .date-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #003366;
-    padding: 10px 20px;
+    padding: 10px 25px;
     margin-left: 0px;
   }
 
-  .date-info ul {
-    list-style: none;
-  }
-
   .date-item {
-    display: flex;
     align-items: center;
-    font-size: 1.4rem;
-    justify-content: flex-end;
+    font-size: 1.8rem;
   }
 
   .day-name {
     font-weight: 600;
     color: #ffeb3b;
-    margin-right: 5px;
+    margin-right: 7px;
+  }
+
+  .next-adzan {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-left: 400px;
+    color: #ffeb3b;
+  }
+
+  .countdown-icon {
+    margin-bottom: 0px;
+    width: 35px;
+    height: 35px;
+  }
+
+  .countdown-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .countdown-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #countdown-value {
+    /* font-family: monospace; */
+    font-size: 2.1rem;
+    font-weight: 1000;
+    min-width: 8ch;
+    display: inline-block;
+    text-align: right;
+    /* letter-spacing: 5px; */
   }
 
   .mosque-image {
@@ -2075,42 +2091,6 @@ body {
     margin-left: 317px;
     /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
-  }
-
-  .countdown-timer {
-    display: flex;
-    align-items: center;
-    background-color: #004080;
-    padding: 10px 20px;
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-  }
-
-  .countdown-icon {
-    margin-right: 10px;
-    margin-top: 5px;
-    width: 30px;
-    height: 30px;
-  }
-
-  .countdown-text {
-    font-size: 2rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  #countdown-value {
-    font-family: monospace;
-    font-size: 2.3rem;
-    font-weight: 1000;
-    min-width: 8ch;
-    display: inline-block;
-    text-align: right;
   }
 
   .footer-message {
@@ -2309,21 +2289,35 @@ body {
     margin: 4px;
   }
 
-  #analogClock {
-    width: 255px !important;
-    height: 255px !important;
-  }
-
   .clock-text {
     position: absolute;
     bottom: 30%;
     left: 0;
     width: 100%;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: 1.1rem;
     color: white;
     font-weight: 500;
-    z-index: 2;
+    z-index: 10;
+    /* Make sure text is above canvas */
+  }
+
+  .brand-text {
+    position: absolute;
+    bottom: 60%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    color: white;
+    font-weight: 500;
+    z-index: 4;
+    /* Make sure text is above canvas */
+  }
+
+  #analogClock {
+    width: 255px !important;
+    height: 255px !important;
   }
 
   .right-content {
@@ -2382,26 +2376,58 @@ body {
   }
 
   .date-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #003366;
-    padding: 8px 15px;
+    padding: 5px 15px;
     margin-left: 0px;
   }
 
-  .date-info ul {
-    list-style: none;
-  }
-
   .date-item {
-    display: flex;
     align-items: center;
-    font-size: 1.1rem;
-    justify-content: flex-end;
+    font-size: 1.3rem;
   }
 
   .day-name {
     font-weight: 600;
     color: #ffeb3b;
-    margin-right: 4px;
+    margin-right: 7px;
+  }
+
+  .next-adzan {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-left: 290px;
+    color: #ffeb3b;
+  }
+
+  .countdown-icon {
+    margin-bottom: 0px;
+    width: 25px;
+    height: 25px;
+  }
+
+  .countdown-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .countdown-text {
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  #countdown-value {
+    /* font-family: monospace; */
+    font-size: 1.4rem;
+    font-weight: 1000;
+    min-width: 8ch;
+    display: inline-block;
+    text-align: right;
+    /* letter-spacing: 5px; */
   }
 
   .mosque-image {
@@ -2412,42 +2438,6 @@ body {
     margin-left: 237px;
     /* transition: background-image 0.5s ease-in-out; */
     will-change: background-image;
-  }
-
-  .countdown-timer {
-    display: flex;
-    align-items: center;
-    background-color: #004080;
-    padding: 8px 15px;
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-  }
-
-  .countdown-icon {
-    margin-right: 8px;
-    margin-top: 4px;
-    width: 24px;
-    height: 24px;
-  }
-
-  .countdown-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  #countdown-value {
-    font-family: monospace;
-    font-size: 1.8rem;
-    font-weight: 1000;
-    min-width: 8ch;
-    display: inline-block;
-    text-align: right;
   }
 
   .footer-message {
@@ -2496,338 +2486,119 @@ body {
 
 /* tablet 900 - 1023 */
 @media (min-width: 900px) and (max-width: 1023px) {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: "Poppins", sans-serif;
-    background-color: #000;
-    color: white;
+  .container {
+    display: flex;
+    flex-direction: column;
     overflow: auto;
   }
 
-  .container {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
-    grid-template-areas:
-      "right-content"
-      "footer";
-    height: 100vh;
-    width: 100vw;
-    background-color: #004080;
-    overflow: hidden;
-  }
-
   .prayer-times {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 32vw;
-    height: 100%;
-    z-index: 10;
-    background-color: rgb(0, 64, 128);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
-    border-radius: 42%;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 50%;
-    border-bottom-right-radius: 50%;
-    padding-right: 0px;
-    overflow: hidden;
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-radius: 0;
+    padding-right: 0;
+    padding-left: 0;
+    order: 3;
+    overflow: visible;
   }
 
   .prayer-time {
-    display: flex;
-    align-items: center;
-    padding-right: 45px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    overflow: hidden;
+    padding: 10px 15px;
+    font-size: 0.9rem;
   }
 
-  .prayer-times .prayer-time:last-child {
-    border-bottom: none;
+  .prayer-name {
+    font-size: 0.7rem;
+  }
+
+  .prayer-time-value {
+    font-size: 1.2rem;
   }
 
   .prayer-icon {
     margin-right: 15px;
     color: white;
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
   }
 
-  .prayer-info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+  .mosque-info,
+  .date-info,
+  .mosque-image {
+    margin-left: 0;
+    text-align: center;
   }
 
-  .prayer-name {
-    font-size: 1.3rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+  .logo {
+    display: none;
   }
 
-  .prayer-time-value {
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: white;
+  .mosque-info h1 {
+    font-size: 1rem;
+    order: 1;
+    text-align: center;
   }
 
-  .prayer-time.active {
-    background-color: rgba(0, 51, 102, 1);
+  .mosque-address {
+    font-size: 0.5rem;
+    order: 2;
+    text-align: center;
   }
 
-  .prayer-time.active .prayer-name,
-  .prayer-time.active .prayer-time-value {
-    color: #ff0000;
+  .date-info {
+    text-align: center;
+    order: 2;
   }
 
-  .prayer-time.active .prayer-icon {
-    color: #ff0000;
+  .date-item {
+    font-size: 0.6rem;
+    justify-content: center;
   }
 
-  .prayer-time.next-prayer .prayer-name,
-  .prayer-time.next-prayer .prayer-time-value {
-    color: #ffeb3b;
+  .mosque-image {
+    height: 250px;
+    object-fit: contain;
+    aspect-ratio: 16 / 9;
+    /* Sesuaikan rasio */
+    /* atau lebih besar dari 10px */
   }
 
-  .prayer-time.next-prayer {
-    background-color: rgba(0, 51, 102, 0.6);
+  .countdown-timer {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    margin-top: 396px;
+    /* agar makin terpisah */
+    position: static;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    width: fit-content;
   }
 
-  .prayer-time.next-prayer .prayer-icon {
-    color: #ffeb3b;
+  .countdown-text {
+    font-size: 0.6rem;
+  }
+
+  #countdown-value {
+    min-width: 1ch;
+    font-size: 0.6rem;
+  }
+
+  .countdown-icon {
+    display: none;
   }
 
   .floating-clock {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-130%, -50%);
-    z-index: 20;
-    background-color: transparent;
-  }
-
-  .clock-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .clock {
-    position: relative;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background-color: #003366;
-    box-shadow: 4px 8px 25px rgba(0, 0, 0, 1);
-    overflow: hidden;
-  }
-
-  .clock canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    margin: 4px;
-  }
-
-  #analogClock {
-    width: 200px !important;
-    height: 200px !important;
-  }
-
-  .clock-text {
-    position: absolute;
-    bottom: 30%;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 0.8rem;
-    color: white;
-    font-weight: 500;
-    z-index: 2;
-  }
-
-  .right-content {
-    grid-area: right-content;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(to bottom, #4a6fa5, #004080);
-    margin-left: 0;
-  }
-
-  .mosque-info {
-    padding: 12px;
-    padding-top: 3px;
-    padding-right: 15px;
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: center;
-    justify-content: flex-start;
-    margin-left: 150px;
-  }
-
-  .logo-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-left: 1.5px;
-    margin-right: 0;
-  }
-
-  .logo {
-    height: 93px;
-    width: auto;
-    margin-left: 8px;
-    margin-top: 15px;
-    object-fit: contain;
-  }
-
-  .mosque-text {
-    text-align: end;
-  }
-
-  .mosque-info h1 {
-    font-size: 1.5rem;
-    margin-bottom: 0.8px;
-    margin-top: 4px;
-    text-shadow: 1.5px 1.5px 3px rgba(0, 0, 0, 0.5);
-  }
-
-  .mosque-name-highlight {
-    color: #ffeb3b;
-  }
-
-  .mosque-address {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .date-info {
-    background-color: #003366;
-    padding: 8px 15px;
-    margin-left: 0px;
-  }
-
-  .date-info ul {
-    list-style: none;
-  }
-
-  .date-item {
-    display: flex;
-    align-items: center;
-    font-size: 1.1rem;
-    justify-content: flex-end;
-  }
-
-  .day-name {
-    font-weight: 600;
-    color: #ffeb3b;
-    margin-right: 4px;
-  }
-
-  .mosque-image {
-    flex: 1;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    margin-left: 0px;
-    /* transition: background-image 0.5s ease-in-out; */
-    will-change: background-image;
-  }
-
-  .countdown-timer {
-    display: flex;
-    align-items: center;
-    background-color: #004080;
-    padding: 8px 15px;
-    border-top-left-radius: 35px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-  }
-
-  .countdown-icon {
-    margin-right: 8px;
-    margin-top: 4px;
-    width: 24px;
-    height: 24px;
-  }
-
-  .countdown-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  #countdown-value {
-    font-family: monospace;
-    font-size: 1.8rem;
-    font-weight: 1000;
-    min-width: 8ch;
-    display: inline-block;
-    text-align: right;
+    left: -9999px;
   }
 
   .footer-message {
-    grid-area: footer;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 8px 15px;
-    text-align: center;
-    font-size: 1.5rem;
-    overflow: hidden;
-    height: 55px;
-    z-index: 5;
-    position: relative;
-  }
-
-  .scrolling-text {
-    display: inline-block;
-    white-space: nowrap;
-    animation: scrollText 60s linear infinite;
-    padding-left: 100%;
-    /* margin-left: 281px; */
-    will-change: transform;
-  }
-
-  @keyframes scrollText {
-    0% {
-      transform: translateX(0);
-    }
-
-    100% {
-      transform: translateX(-100%);
-    }
-  }
-
-  .scrolling-text p {
-    display: inline-block;
-    margin: 0;
-    color: #ffeb3b;
-  }
-
-  .scrolling-text p span.separator {
-    display: inline-block;
-    margin: 0 9px;
-    color: white;
+    display: none;
   }
 }
 
@@ -2932,7 +2703,7 @@ body {
 
   #countdown-value {
     min-width: 1ch;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
   }
 
   .countdown-icon {
@@ -3055,7 +2826,7 @@ body {
 
   #countdown-value {
     min-width: 1ch;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
   }
 
   .countdown-icon {
