@@ -197,16 +197,6 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.adzan');
 
-// Route::get('/api/server-time/', function () {
-//     return response()->json([
-//         'success' => true,
-//         'data' => [
-//             'timestamp' => time(),
-//             'serverTime' => date('Y-m-d H:i:s')
-//         ]
-//     ]);
-// });
-
 Route::get('/api/server-time', function () {
     try {
         // Coba API utama (Pekanbaru)
@@ -216,20 +206,16 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+0 hour 55 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+2 hour 32 minutes'); // Tambah 1 jam 20 menit
 
-            // Atur waktu ke Jumat pukul 11:20:00
-            // Cek hari sekarang
-            // $currentDay = (int)$serverDateTime->format('N'); // 1 = Senin, ..., 5 = Jumat
-            // $daysToAdd = (5 - $currentDay + 7) % 7; // Selisih ke hari Jumat
-
-            // if ($daysToAdd === 0 && $serverDateTime->format('H:i') >= '12:00') {
-            //     // Jika sekarang sudah Jumat dan lewat jam 11:20, set ke Jumat berikutnya
-            //     $daysToAdd = 7;
+            // untuk testing hari jumat
+            // $currentDay = (int)$serverDateTime->format('w');
+            // $daysToFriday = 5 - $currentDay;
+            // if ($daysToFriday < 0) {
+            //     $daysToFriday += 7;
             // }
-
-            // $serverDateTime->modify("+$daysToAdd days");
-            // $serverDateTime->setTime(12, 16, 50);
+            // $serverDateTime->modify("+{$daysToFriday} days");
+            // $serverDateTime->setTime(12, 17, 40);
 
             return response()->json([
                 'success' => true,
@@ -270,7 +256,7 @@ Route::get('/api/server-time', function () {
                 if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
                     $serverTime = $newApiResponse['fulldate'];
                     $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
-                    // $serverDateTime->modify('+1 hour 59 minutes'); // Tambah 1 jam 20 menit
+
                     return response()->json([
                         'success' => true,
                         'data' => [

@@ -240,7 +240,7 @@
                                 </svg>
                             </span>
                             <span class="nav-link-title">
-                                Durasi A/I/F/J
+                                Pengaturan Durasi
                             </span>
                         </a>
                     </li>

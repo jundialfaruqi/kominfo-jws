@@ -318,10 +318,14 @@ body {
   background-color: #004080;
   /* 0.5 = 50% transparan */
   padding: 10px 20px;
-  border-radius: 30px;
+  border-top-left-radius: 35px;
+  border-bottom-left-radius: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
   position: absolute;
-  bottom: 20px;
-  right: 20px;
+  bottom: 0px;
+  right: 0px;
+  box-shadow: -8px -8px 15px rgba(0, 0, 0, 0.4);
 }
 
 .countdown-icon {
@@ -674,10 +678,14 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 20px 40px;
-    border-radius: 50px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 40px;
-    right: 40px;
+    bottom: 0px;
+    right: 0px;
+    box-shadow: -8px -8px 15px rgba(0, 0, 0, 0.4);
   }
 
   .countdown-icon {
@@ -1022,10 +1030,14 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 15px 30px;
-    border-radius: 40px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 30px;
-    right: 30px;
+    bottom: 0px;
+    right: 0px;
+    box-shadow: 1px -8px 15px rgba(0, 0, 0, 0.4);
   }
 
   .countdown-icon {
@@ -1369,10 +1381,14 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 12px 25px;
-    border-radius: 35px;
+    /* border-radius: 35px; */
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 25px;
-    right: 25px;
+    bottom: 0px;
+    right: 0px;
   }
 
   .countdown-icon {
@@ -1716,10 +1732,13 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 11px 22px;
-    border-radius: 32px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 22px;
-    right: 22px;
+    bottom: 0px;
+    right: 0px;
   }
 
   .countdown-icon {
@@ -2063,10 +2082,13 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 10px 20px;
-    border-radius: 30px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 20px;
-    right: 20px;
+    bottom: 0px;
+    right: 0px;
   }
 
   .countdown-icon {
@@ -2397,10 +2419,13 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 8px 15px;
-    border-radius: 25px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 15px;
-    right: 15px;
+    bottom: 0px;
+    right: 0px;
   }
 
   .countdown-icon {
@@ -2731,10 +2756,13 @@ body {
     align-items: center;
     background-color: #004080;
     padding: 8px 15px;
-    border-radius: 25px;
+    border-top-left-radius: 35px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
     position: absolute;
-    bottom: 15px;
-    right: 15px;
+    bottom: 0px;
+    right: 0px;
   }
 
   .countdown-icon {
@@ -2885,12 +2913,16 @@ body {
   }
 
   .countdown-timer {
-    margin-top: 150px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    margin-top: 396px;
     /* agar makin terpisah */
     position: static;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
     width: fit-content;
   }
 
@@ -2960,6 +2992,7 @@ body {
   .mosque-image {
     margin-left: 0;
     text-align: center;
+    justify-content: center;
   }
 
   .logo {
@@ -2997,13 +3030,23 @@ body {
   }
 
   .countdown-timer {
-    margin-top: 150px;
-    /* agar makin terpisah */
-    position: static;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+
+    margin-top: 225px;
+    margin-left: auto;
+    /* tengah horizontal */
+    margin-right: auto;
+    /* tengah horizontal */
+    margin-bottom: 0px;
+
     width: fit-content;
+    display: block;
+    /* pastikan bisa ditengah */
+
+    position: static;
   }
 
   .countdown-text {

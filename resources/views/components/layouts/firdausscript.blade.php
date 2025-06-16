@@ -31,8 +31,8 @@
                         const latency = (endTime - startTime) / 2;
                         serverTimestamp = parseInt(response.data.timestamp) + latency;
                         pageLoadTimestamp = endTime;
-                        console.log('Waktu server diperbarui dari:', response.data.source, new Date(
-                            serverTimestamp).toISOString());
+                        // console.log('Waktu server diperbarui dari:', response.data.source, new Date(
+                        //     serverTimestamp).toISOString());
                     }
                     if (callback) callback();
                 },
@@ -77,13 +77,14 @@
         setTimeout(() => {
             syncServerTime(() => {
                 checkAndRestoreSessions();
-                console.log('Waktu server diupdate setelah 3 detik halaman di muat');
+                updateSlides();
+                // console.log('Waktu server diupdate setelah 3 detik halaman di muat');
             });
         }, 3000); // 3000 milidetik = 3 detik
 
         setInterval(() => {
             syncServerTime();
-            console.log('Waktu server diupdate setiap 1 menit');
+            // console.log('Waktu server diupdate setiap 1 menit');
         }, 60000); // 60000 milidetik = 1 menit
 
         let activePrayerStatus = null;
@@ -404,7 +405,7 @@
 
         function updateScrollingText(marqueeData) {
             const $scrollingTextElement = $('.scrolling-text');
-            
+
             // Ambil teks marquee
             let marqueeTexts;
             if (marqueeData) {
@@ -438,13 +439,13 @@
 
             // Gunakan waktu server untuk sinkronisasi
             const now = getCurrentTimeFromServer().getTime();
-            
+
             // Gunakan timestamp server untuk menghitung posisi awal yang konsisten
             // Menggunakan modulo dari timestamp server dengan durasi total animasi
             // Ini akan memastikan semua perangkat memulai dari posisi yang sama
             const totalCycleTimeMs = calculatedDuration * 1000;
             const animationProgress = (now % totalCycleTimeMs) / totalCycleTimeMs;
-            
+
             // Perbarui elemen marquee
             $scrollingTextElement.css('animation', 'none');
             $scrollingTextElement.html(`<p>${combinedText}</p>`);
@@ -521,15 +522,13 @@
             const nowTime = now.getTime();
             const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
 
-            // Cek apakah Friday Info sedang aktif
             if (fridayInfoStartTime && fridayInfoEndTime && nowTime < fridayInfoEndTime) {
-                clearAdzanState(); // Hapus state adzan jika Friday Info aktif
+                clearAdzanState();
                 displayFridayInfoPopup(fridayInfoData, true);
                 return;
             }
 
             if (activePrayerStatus) {
-                // console.log('Processing active prayer status from server');
                 const {
                     phase,
                     prayerName,
@@ -541,9 +540,6 @@
                 } = activePrayerStatus;
 
                 if (phase === 'adzan') {
-                    // console.log(
-                    //     `Active adzan phase detected for ${prayerName}, elapsed: ${elapsedSeconds}s, remaining: ${remainingSeconds}s`
-                    // );
                     adzanStartTime = nowTime - (elapsedSeconds * 1000);
                     localStorage.setItem('adzanStartTime', adzanStartTime);
                     localStorage.setItem('currentPrayerName', prayerName);
@@ -553,9 +549,6 @@
                     showAdzanPopup(prayerName, prayerTime, true);
                     return;
                 } else if (phase === 'iqomah') {
-                    // console.log(
-                    //     `Active iqomah phase detected for ${prayerName}, elapsed: ${elapsedSeconds}s, remaining: ${remainingSeconds}s`
-                    // );
                     adzanStartTime = nowTime - (elapsedSeconds * 1000);
                     iqomahStartTime = adzanStartTime + (180 * 1000);
                     localStorage.setItem('adzanStartTime', adzanStartTime);
@@ -567,13 +560,11 @@
                     showIqomahPopup(prayerTime, true);
                     return;
                 } else if (phase === 'final') {
-                    // console.log(`Final adzan image phase detected for ${prayerName}`);
                     showFinalAdzanImage();
                     return;
                 }
 
                 if (isFriday) {
-                    // console.log('Friday prayer info detected');
                     clearAdzanState();
                     const options = {
                         weekday: 'long',
@@ -604,7 +595,7 @@
                     showAdzanPopup(currentPrayerName, currentPrayerTime, true);
                 } else {
                     if (currentPrayerName === "Jum'at" && now.getDay() === 5) {
-                        clearAdzanState(); // Hapus state adzan untuk Jumat
+                        clearAdzanState();
                         updateFridayImages();
                         startFridayImageSlider();
                         const $fridayPopup = $('#fridayInfoPopup');
@@ -636,17 +627,14 @@
                 }
             } else if (iqomahStartTime) {
                 const iqomahElapsedSeconds = (nowTime - iqomahStartTime) / 1000;
-                const iqomahDuration = 420;
-                const finalPhaseDuration = 60;
+                const iqomahDuration = getIqomahDuration(currentPrayerName || 'Dzuhur');
+                const finalPhaseDuration = getFinalDuration(currentPrayerName || 'Dzuhur') / 1000;
 
                 if (iqomahElapsedSeconds < iqomahDuration) {
-                    // console.log('Restoring Iqomah session from localStorage');
                     showIqomahPopup(currentPrayerTime, true);
                 } else if (iqomahElapsedSeconds < iqomahDuration + finalPhaseDuration) {
-                    // console.log('Iqomah finished, restoring final phase from localStorage');
                     showFinalAdzanImage();
                 } else {
-                    // console.log('Iqomah and final phase finished, clearing state');
                     clearAdzanState();
                 }
             } else {
@@ -674,11 +662,10 @@
                 });
 
                 if (prayerToRestore) {
-                    // console.log(`Waktu shalat ${prayerToRestore.name} terlewat, memulai pemulihan`);
                     const timeDiffSeconds = (currentTimeInMinutes - prayerToRestore.timeInMinutes) * 60;
-                    const adzanDuration = 3 * 60;
-                    const iqomahDuration = 7 * 60;
-                    const finalPhaseDuration = 60;
+                    const adzanDuration = getAdzanDuration(prayerToRestore.name);
+                    const iqomahDuration = getIqomahDuration(prayerToRestore.name);
+                    const finalPhaseDuration = getFinalDuration(prayerToRestore.name) / 1000;
 
                     if (timeDiffSeconds < adzanDuration) {
                         adzanStartTime = nowTime - (timeDiffSeconds * 1000);
@@ -709,38 +696,8 @@
                             currentPrayerName = prayerToRestore.name;
                             currentPrayerTime = prayerToRestore.time;
                             showFinalAdzanImage();
-                        } else {
-                            if (prayerToRestore && prayerToRestore.name === "Jum'at" && now.getDay() === 5) {
-                                clearAdzanState(); // Hapus state adzan untuk Jumat
-                                adzanStartTime = nowTime - (timeDiffSeconds * 1000);
-                                localStorage.setItem('adzanStartTime', adzanStartTime);
-                                localStorage.setItem('currentPrayerName', prayerToRestore.name);
-                                localStorage.setItem('currentPrayerTime', prayerToRestore.time);
-                                currentPrayerName = prayerToRestore.name;
-                                currentPrayerTime = prayerToRestore.time;
-                                updateFridayImages();
-                                startFridayImageSlider();
-                                const options = {
-                                    weekday: 'long',
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: '2-digit'
-                                };
-                                const formattedDate = now.toLocaleDateString('id-ID', options);
-                                const khatib = $('#khatib').val();
-                                const imam = $('#imam').val();
-                                const muadzin = $('#muadzin').val();
-                                const fridayData = {
-                                    date: formattedDate,
-                                    khatib,
-                                    imam,
-                                    muadzin
-                                };
-                                displayFridayInfoPopup(fridayData);
-                            }
                         }
                     } else {
-                        // console.log('Waktu shalat Jumat terlewat, memulai slider gambar Jumat');
                         adzanStartTime = nowTime - (timeDiffSeconds * 1000);
                         localStorage.setItem('adzanStartTime', adzanStartTime);
                         localStorage.setItem('currentPrayerName', prayerToRestore.name);
@@ -881,7 +838,7 @@
                 const durasiJson = $('#durasi-data').val();
                 if (durasiJson) {
                     durasiData = JSON.parse(durasiJson);
-                    console.log('Data durasi berhasil dimuat:', durasiData);
+                    // console.log('Data durasi berhasil dimuat:', durasiData);
                 } else {
                     console.warn('Data durasi tidak tersedia, menggunakan nilai default');
                 }
@@ -1134,16 +1091,15 @@
                 return;
             }
 
-            console.log('Memperbarui gambar Iqomah untuk slug:', slug);
+            // console.log('Memperbarui gambar Iqomah untuk slug:', slug);
 
             $.ajax({
                 url: `/api/adzan/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Respons API adzan untuk Iqomah:', response);
+                    // console.log('Respons API adzan untuk Iqomah:', response);
                     if (response.success) {
-                        // Perbarui nilai input
                         $('#adzan1').val(response.data.adzan1 || '');
                         $('#adzan2').val(response.data.adzan2 || '');
                         $('#adzan3').val(response.data.adzan3 || '');
@@ -1151,7 +1107,6 @@
                         $('#adzan5').val(response.data.adzan5 || '');
                         $('#adzan6').val(response.data.adzan6 || '');
 
-                        // Perbarui array gambar tanpa mengosongkannya terlebih dahulu
                         const newIqomahImages = [];
                         for (let i = 1; i <= 6; i++) {
                             const adzanValue = $(`#adzan${i}`).val();
@@ -1160,11 +1115,10 @@
                             }
                         }
 
-                        // Perbarui window.iqomahImages hanya jika ada perubahan
                         if (JSON.stringify(newIqomahImages) !== JSON.stringify(window
                                 .iqomahImages)) {
-                            console.log('Gambar Iqomah berubah, memperbarui array:',
-                                newIqomahImages);
+                            // console.log('Gambar Iqomah berubah, memperbarui array:',
+                            //     newIqomahImages);
                             window.iqomahImages = newIqomahImages;
                         }
 
@@ -1194,94 +1148,74 @@
                 return;
             }
 
-            // Gunakan gambar default jika tidak ada gambar dari database
             if (window.iqomahImages.length === 0) {
                 window.iqomahImages = [
-                    'images/other/doa-setelah-adzan-default.webp',
-                    'images/other/doa-masuk-masjid-default.webp',
-                    'images/other/non-silent-hp-default.webp',
-                    'images/other/lurus-rapat-shaf-default.webp',
-                    'images/other/gambar-default-5.webp',
-                    'images/other/gambar-default-6.webp'
+                    '/images/other/doa-setelah-adzan-default.webp',
+                    '/images/other/doa-masuk-masjid-default.webp',
+                    '/images/other/non-silent-hp-default.webp'
                 ];
                 console.log('Menggunakan gambar default untuk slider Iqomah:', window.iqomahImages);
             }
 
-            // Simpan salinan array gambar untuk mendeteksi perubahan
             let previousIqomahImages = [...window.iqomahImages];
 
-            // Atur waktu mulai slider jika belum ada
             if (!iqomahSliderStartTime) {
                 iqomahSliderStartTime = getCurrentTimeFromServer().getTime();
                 localStorage.setItem('iqomahSliderStartTime', iqomahSliderStartTime);
             }
 
-            // Inisialisasi currentIndex dari localStorage atau mulai dari 0
-            let currentIndex = localStorage.getItem('iqomahSliderIndex') ?
-                parseInt(localStorage.getItem('iqomahSliderIndex')) : 0;
+            let lastIndex = -1;
 
             function updateIqomahImage() {
-                console.log('updateIqomahImage dipanggil, currentIndex:', currentIndex, 'gambar:', window
-                    .iqomahImages[currentIndex]);
-
-                // Periksa apakah array gambar telah berubah
-                if (JSON.stringify(window.iqomahImages) !== JSON.stringify(previousIqomahImages)) {
-                    console.log('Array iqomahImages berubah, mereset slider:', window.iqomahImages);
-                    currentIndex = 0; // Reset indeks ke 0
-                    previousIqomahImages = [...window.iqomahImages]; // Perbarui salinan
-                    localStorage.setItem('iqomahSliderIndex', currentIndex);
-                }
-
-                // Pastikan array gambar tidak kosong
                 if (!window.iqomahImages || window.iqomahImages.length === 0) {
                     window.iqomahImages = [
-                        'images/other/doa-setelah-adzan-default.webp',
-                        'images/other/doa-masuk-masjid-default.webp',
-                        'images/other/non-silent-hp-default.webp',
-                        'images/other/lurus-rapat-shaf-default.webp',
-                        'images/other/gambar-default-5.webp',
-                        'images/other/gambar-default-6.webp'
+                        '/images/other/doa-setelah-adzan-default.webp',
+                        '/images/other/doa-masuk-masjid-default.webp',
+                        '/images/other/non-silent-hp-default.webp'
                     ];
                     console.warn('Array iqomahImages kosong, menggunakan gambar default:', window.iqomahImages);
-                    currentIndex = 0; // Reset indeks jika array diisi ulang
                     previousIqomahImages = [...window.iqomahImages];
-                    localStorage.setItem('iqomahSliderIndex', currentIndex);
                 }
 
-                // Pastikan currentIndex valid
-                currentIndex = currentIndex % window.iqomahImages.length;
+                if (JSON.stringify(window.iqomahImages) !== JSON.stringify(previousIqomahImages)) {
+                    console.log('Array iqomahImages berubah, memperbarui slider tanpa reset:', window
+                        .iqomahImages);
+                    previousIqomahImages = [...window.iqomahImages];
+                }
 
-                // Ganti gambar dengan transisi
-                try {
-                    $iqomahImageElement.css('opacity', '0');
-                    setTimeout(() => {
-                        $iqomahImageElement.attr('src', window.iqomahImages[currentIndex]);
+                const now = getCurrentTimeFromServer().getTime();
+                const elapsedMs = now - iqomahSliderStartTime;
+                const elapsedSeconds = Math.floor(elapsedMs / 1000);
+                const currentIndex = Math.floor(elapsedSeconds / 20) % window.iqomahImages.length;
+
+                if (currentIndex !== lastIndex) {
+                    lastIndex = currentIndex;
+
+                    const img = new Image();
+                    img.src = window.iqomahImages[currentIndex];
+                    img.onload = () => {
+                        $iqomahImageElement.css('opacity', '0');
+                        setTimeout(() => {
+                            $iqomahImageElement.attr('src', img.src);
+                            $iqomahImageElement.css('opacity', '1');
+                            // console.log('Gambar Iqomah diperbarui ke:', img.src);
+                        }, 250);
+                    };
+                    img.onerror = () => {
+                        console.error('Gagal memuat gambar:', img.src);
+                        $iqomahImageElement.attr('src', '/images/other/doa-masuk-masjid-default.webp');
                         $iqomahImageElement.css('opacity', '1');
-                        console.log('Gambar diperbarui:', window.iqomahImages[currentIndex]);
-                    }, 250);
-                } catch (error) {
-                    console.error('Kesalahan saat memperbarui gambar:', error);
+                    };
                 }
-
-                // Perbarui indeks dan simpan ke localStorage
-                currentIndex = (currentIndex + 1) % window.iqomahImages.length;
-                localStorage.setItem('iqomahSliderIndex', currentIndex);
             }
 
-            // Tampilkan gambar pertama segera
             updateIqomahImage();
 
-            // Hentikan interval sebelumnya jika ada
             if (iqomahImageSliderInterval) {
                 clearInterval(iqomahImageSliderInterval);
                 console.log('Interval slider iqomah sebelumnya dihentikan');
             }
-
-            // Mulai interval baru untuk mengganti gambar setiap 10 detik
-            iqomahImageSliderInterval = setInterval(() => {
-                console.log('Interval iqomahImageSliderInterval dijalankan');
-                updateIqomahImage();
-            }, 10000);
+            iqomahImageSliderInterval = setInterval(updateIqomahImage, 1000);
         }
 
         function showIqomahPopup(prayerTimeStr, isRestored = false) {
@@ -1533,7 +1467,7 @@
                 const $imageDisplay = $('#adzanImageDisplay');
                 $imageDisplay.css('display', 'none');
                 clearAdzanImageState();
-                console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
+                // console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
             }, duration);
         }
 
@@ -1610,7 +1544,7 @@
                 success: function(response) {
                     if (response.success && response.data) {
                         const previousAdzan = [];
-                        for (let i = 8; i <= 12; i++) {
+                        for (let i = 7; i <= 12; i++) {
                             previousAdzan.push($(`#adzan${i}`).val() || '');
                         }
 
@@ -1633,14 +1567,12 @@
                         if (window.fridayImages.length === 0) {
                             window.fridayImages = [
                                 '/images/other/doa-setelah-adzan-default.webp',
-                                '/images/other/doa-setelah-adzan-default.webp',
+                                '/images/other/doa-masuk-masjid-default.webp',
                                 '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                                '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                                '/images/other/non-silent-hp-default.webp',
-                                '/images/other/doa-masuk-masjid-default.webp'
+                                '/images/other/non-silent-hp-default.webp'
                             ];
-                            console.log('Menggunakan gambar default karena respons API kosong:',
-                                window.fridayImages);
+                            // console.log('Menggunakan gambar default karena respons API kosong:',
+                            //     window.fridayImages);
                         }
 
                         // Pastikan slider tetap berjalan jika popup aktif
@@ -1674,13 +1606,11 @@
             if (window.fridayImages.length === 0) {
                 window.fridayImages = [
                     '/images/other/doa-setelah-adzan-default.webp',
-                    '/images/other/doa-setelah-adzan-default.webp',
+                    '/images/other/doa-masuk-masjid-default.webp',
                     '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                    '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                    '/images/other/non-silent-hp-default.webp',
-                    '/images/other/doa-masuk-masjid-default.webp'
+                    '/images/other/non-silent-hp-default.webp'
                 ];
-                console.log('Menggunakan enam gambar default untuk slider Friday:', window.fridayImages);
+                console.log('Menggunakan 4 gambar default untuk slider Friday:', window.fridayImages);
             }
 
             if (!fridaySliderStartTime) {
@@ -1694,20 +1624,18 @@
                 if (!window.fridayImages || window.fridayImages.length === 0) {
                     window.fridayImages = [
                         '/images/other/doa-setelah-adzan-default.webp',
-                        '/images/other/doa-setelah-adzan-default.webp',
+                        '/images/other/doa-masuk-masjid-default.webp',
                         '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                        '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                        '/images/other/non-silent-hp-default.webp',
-                        '/images/other/doa-masuk-masjid-default.webp'
+                        '/images/other/non-silent-hp-default.webp'
                     ];
-                    console.log('Menggunakan enam gambar default dalam updateFridayImage:', window
+                    console.log('Menggunakan 4 gambar default dalam updateFridayImage:', window
                         .fridayImages);
                 }
 
                 const now = getCurrentTimeFromServer().getTime();
                 const elapsedMs = now - fridaySliderStartTime;
                 const elapsedSeconds = Math.floor(elapsedMs / 1000);
-                const currentIndex = Math.floor(elapsedSeconds / 10) % window.fridayImages.length;
+                const currentIndex = Math.floor(elapsedSeconds / 20) % window.fridayImages.length;
 
                 if (currentIndex !== lastIndex) {
                     lastIndex = currentIndex;
@@ -2107,7 +2035,7 @@
                     img.src = url;
 
                     img.onload = () => {
-                        console.log(`Gambar berhasil dimuat: ${url}`);
+                        // console.log(`Gambar berhasil dimuat: ${url}`);
                         window.imageCache[url] = img; // Simpan di cache
                         resolve(img);
                     };
@@ -2154,9 +2082,9 @@
                 try {
                     // Preload semua gambar
                     await preloadImages(window.slideUrls);
-                    console.log('Semua gambar telah dimuat, memulai slider');
+                    // console.log('Semua gambar telah dimuat, memulai slider');
 
-                    const slideDuration = 10000; // 10 detik
+                    const slideDuration = 20000; // 10 detik
 
                     function updateSlide() {
                         if (window.slideUrls.length === 0) return;
@@ -2178,7 +2106,7 @@
                             'transition': 'background-image 0.5s ease-in-out'
                         });
 
-                        console.log(`Slide diperbarui: Index ${slideIndex}, URL ${currentUrl}`);
+                        // console.log(`Slide diperbarui: Index ${slideIndex}, URL ${currentUrl}`);
                     }
 
                     // Jalankan updateSlide pertama
@@ -2200,7 +2128,7 @@
 
             // Dengarkan event slidesUpdated untuk menangani perubahan slide
             $(document).on('slidesUpdated', async function(event, newSlides) {
-                console.log('Event slidesUpdated diterima, memperbarui slider');
+                // console.log('Event slidesUpdated diterima, memperbarui slider');
                 const newUrls = newSlides.filter(url => url.trim() !== '');
                 if (newUrls.length === 0) {
                     console.warn('Tidak ada slide baru, menggunakan default');
@@ -2211,12 +2139,12 @@
                 const urlsToPreload = newUrls.filter(url => !window.imageCache[url] || !window
                     .imageCache[url].complete);
                 if (urlsToPreload.length > 0) {
-                    console.log(`Preload gambar baru: ${urlsToPreload}`);
+                    // console.log(`Preload gambar baru: ${urlsToPreload}`);
                     await preloadImages(urlsToPreload);
                 }
 
                 window.slideUrls = newUrls;
-                console.log('SlideUrls diperbarui:', window.slideUrls);
+                // console.log('SlideUrls diperbarui:', window.slideUrls);
             });
         }
 
@@ -2275,6 +2203,8 @@
                 url: `/api/petugas/${slug}`,
                 method: 'GET',
                 dataType: 'json',
+                retries: 3, // Maksimum jumlah percobaan
+                retryDelay: 5000, // Jeda 5 detik antara percobaan
                 success: function(response) {
                     // console.log('Respons API petugas:', response);
                     if (response.success) {
@@ -2295,8 +2225,28 @@
                         // console.log('Data petugas Jumat diperbarui');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error saat mengambil data petugas:', error, xhr.responseText);
+                error: function(xhr, status, error, retryCount = 0) {
+                    console.error(
+                        `Error saat mengambil data petugas (Percobaan ${retryCount + 1}):`,
+                        error, xhr.responseText);
+                    if (retryCount < this.retries) {
+                        setTimeout(() => {
+                            console.log(
+                                `Mencoba ulang pengambilan data petugas (Percobaan ${retryCount + 2})...`
+                            );
+                            $.ajax({
+                                ...this,
+                                error: (xhr, status, error) => {
+                                    this.error(xhr, status, error, retryCount +
+                                        1);
+                                }
+                            });
+                        }, this.retryDelay);
+                    } else {
+                        console.error(
+                            'Maksimum percobaan pengambilan data petugas tercapai. Tidak ada percobaan ulang lebih lanjut.'
+                        );
+                    }
                 }
             });
         }
@@ -2358,28 +2308,17 @@
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            console.log(
-                'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 37 Detik'
-            );
+            // console.log(
+            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 37 Detik'
+            // );
         }, 37000); // 37000 milidetik = 37 detik
 
         setInterval(function() {
             updateMosqueInfo();
             updateMarqueeText();
             updateSlides();
-            console.log('Data Masjid, marquee, dan slide diperbarui setiap 63 detik');
+            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 63 detik');
         }, 63000); // 63000 milidetik = 63 detik
-
-        // document.addEventListener('visibilitychange', function() {
-        //     if (document.visibilityState === 'visible') {
-        //         console.log('Tab kembali aktif, menyinkronkan waktu server');
-        //         syncServerTime();
-        //         checkAndRestoreSessions();
-        //         checkAndRestoreAdzanImage();
-        //         checkAndRestoreFridayInfo();
-        //         handlePrayerTimes();
-        //     }
-        // });
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
