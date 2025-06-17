@@ -123,14 +123,11 @@
     align-items: center;
     background-color: black;
     height: 100%;
-}
-
-.iqomah-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity 0.5s ease-in-out;
-    will-change: opacity;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
 }
 
 .adzan-image-display {
@@ -192,13 +189,16 @@
 
 .friday-officials {
     font-size: 1.5rem;
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
 }
 
 .currentFridayImage {
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
 }
 
 .friday-image-display {
@@ -224,16 +224,11 @@
     align-items: center;
     background-color: black;
     height: 100%;
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
-}
-
-.friday-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
 }
 
 .responsive-table {
