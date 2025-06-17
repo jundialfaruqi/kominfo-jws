@@ -179,8 +179,8 @@
                         <label class="form-check">
                             <input type="checkbox" wire:model="terms_agreed"
                                 class="form-check-input rounded-4 @error('terms_agreed') is-invalid @enderror" />
-                            <span class="form-check-label">Saya Setuju dengan <a href="./terms-of-service.html"
-                                    tabindex="-1">Syarat dan Ketentuan</a>.</span>
+                            <span class="form-check-label">Saya Setuju dengan <a href="#" tabindex="-1">Syarat
+                                    dan Ketentuan</a>.</span>
                         </label>
                         @error('terms_agreed')
                             <div class="invalid-feedback d-block">

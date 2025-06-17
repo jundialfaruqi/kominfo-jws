@@ -1046,9 +1046,8 @@
                 }
 
                 // Update progress bar (smooth animation setiap frame)
-                const progressPercentage = (elapsedSeconds / duration) * 100;
                 $progress.css({
-                    width: `${Math.min(progressPercentage, 100)}%`
+                    'animation': `progressAnimation ${duration}s linear forwards`
                 });
 
                 // Update countdown hanya setiap detik untuk efisiensi
@@ -1303,10 +1302,9 @@
                     return;
                 }
 
-                // Update progress bar (smooth animation setiap frame)
-                const progressPercentage = (elapsedSeconds / duration) * 100;
+                // Update progress bar iqomah pop up (smooth animation setiap frame)
                 $progress.css({
-                    width: `${Math.min(progressPercentage, 100)}%`
+                    'animation': `progressAnimation ${duration}s linear forwards`
                 });
 
                 // Update countdown hanya setiap detik untuk efisiensi
