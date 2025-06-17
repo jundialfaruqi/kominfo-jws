@@ -218,7 +218,7 @@
             <div id="iqomahCountdown" class="iqomah-countdown"></div>
         </div>
         <div class="iqomah-image">
-            <img id="currentIqomahImage" src="" alt="Iqomah Image">
+            <div id="currentIqomahImage" class="iqomah-image"></div>
         </div>
     </div>
 
@@ -237,7 +237,7 @@
             @endif
         </div>
         <div class="friday-image">
-            <img id="currentFridayImage" src="" alt="Friday Image">
+            <div id="currentFridayImage" class="currentFridayImage"></div>
         </div>
     </div>
 

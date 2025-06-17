@@ -47,16 +47,45 @@
     overflow: hidden;
 }
 
-.progress-bar {
+@keyframes progressAnimation {
+    from {
+        width: 0%;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+.progress-bar,
+.iqomah-progress-bar {
     height: 100%;
     background-color: #d4af37;
     width: 0%;
-    transition: width 0.1s linear;
+    animation: none;
+    /* Awalnya nonaktif */
 }
 
 .countdown {
-    font-size: 9rem;
-    font-weight: bold;
+    font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
+    font-weight: 700;
+    /* Bold untuk tampilan tegas */
+    font-style: normal;
+    /* Perbaiki font-style */
+    font-size: clamp(6rem, 8vw, 8rem);
+    /* Responsif, antara 6-8rem */
+    color: #ffffff;
+    /* Warna teks putih untuk kontras */
+    text-shadow: 0 4px 8px rgb(76, 76, 76);
+    /* Bayangan halus untuk kedalaman */
+    letter-spacing: 0.05em;
+    /* Latar gradasi */
+    padding: 0.5rem 1rem;
+    /* Ruang dalam untuk kenyamanan */
+    border-radius: 8px;
+    /* Sudut melengkung untuk kesan lembut */
+    display: inline-block;
+    /* Agar padding dan background sesuai */
 }
 
 .iqomah-popup {
@@ -96,16 +125,26 @@
     overflow: hidden;
 }
 
-.iqomah-progress-bar {
-    height: 100%;
-    background-color: #d4af37;
-    width: 0%;
-    transition: width 0.1s linear;
-}
-
 .iqomah-countdown {
-    font-size: 7rem;
-    font-weight: bold;
+    font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
+    font-weight: 700;
+    /* Bold untuk tampilan tegas */
+    font-style: normal;
+    /* Perbaiki font-style */
+    font-size: clamp(6rem, 8vw, 8rem);
+    /* Responsif, antara 6-8rem */
+    color: #ffffff;
+    /* Warna teks putih untuk kontras */
+    text-shadow: 0 4px 8px rgb(76, 76, 76);
+    /* Bayangan halus untuk kedalaman */
+    letter-spacing: 0.05em;
+    /* Latar gradasi */
+    padding: 0.5rem 1rem;
+    /* Ruang dalam untuk kenyamanan */
+    border-radius: 8px;
+    /* Sudut melengkung untuk kesan lembut */
+    display: inline-block;
+    /* Agar padding dan background sesuai */
 }
 
 .iqomah-title {
@@ -123,14 +162,11 @@
     align-items: center;
     background-color: black;
     height: 100%;
-}
-
-.iqomah-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity 0.5s ease-in-out;
-    will-change: opacity;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
 }
 
 .adzan-image-display {
@@ -192,13 +228,16 @@
 
 .friday-officials {
     font-size: 1.5rem;
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
 }
 
 .currentFridayImage {
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
 }
 
 .friday-image-display {
@@ -224,16 +263,11 @@
     align-items: center;
     background-color: black;
     height: 100%;
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
-}
-
-.friday-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: opacity 0.5s ease-in;
-    will-change: opacity;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.5s ease-in-out;
+    will-change: background-image;
 }
 
 .responsive-table {

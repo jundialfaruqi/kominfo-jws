@@ -809,7 +809,7 @@
                 beepSound.play();
                 count++;
                 if (count < times) {
-                    setTimeout(play, 1000);
+                    setTimeout(play, 5000);
                 }
             };
             play();
@@ -968,7 +968,7 @@
 
             // Putar alarm hanya saat popup adzan dimulai (bukan saat dipulihkan)
             if (!isRestored) {
-                playBeepSound(3); // Alarm tetap diputar untuk semua adzan, termasuk Jumat
+                playBeepSound(1); // Alarm tetap diputar untuk semua adzan, termasuk Jumat
                 $progress.css('width', '0%');
                 // console.log(`Memutar alarm untuk ${prayerName} pada ${prayerTimeStr}`);
             } else if (activePrayerStatus && activePrayerStatus.phase === 'adzan') {
@@ -1046,9 +1046,8 @@
                 }
 
                 // Update progress bar (smooth animation setiap frame)
-                const progressPercentage = (elapsedSeconds / duration) * 100;
                 $progress.css({
-                    width: `${Math.min(progressPercentage, 100)}%`
+                    'animation': `progressAnimation ${duration}s linear forwards`
                 });
 
                 // Update countdown hanya setiap detik untuk efisiensi
@@ -1172,7 +1171,6 @@
 
             async function initIqomahSlider() {
                 try {
-                    // Preload gambar menggunakan fungsi preloadImages
                     await preloadImages(window.iqomahImages);
                     console.log('Semua gambar Iqomah telah dimuat, memulai slider');
 
@@ -1197,18 +1195,15 @@
                         if (currentIndex !== lastIndex) {
                             lastIndex = currentIndex;
 
-                            // Gunakan gambar dari cache, fallback ke default jika tidak ada
                             const currentUrl = window.imageCache[window.iqomahImages[currentIndex]]?.src ||
                                 '/images/other/doa-masuk-masjid-default.webp';
 
-                            $iqomahImageElement.css('opacity', '0');
-                            setTimeout(() => {
-                                $iqomahImageElement.attr('src', currentUrl);
-                                $iqomahImageElement.css('opacity', '1');
-                                console.log('Gambar Iqomah diperbarui ke:', currentUrl);
-                            }, 250);
+                            $iqomahImageElement.css({
+                                'background-image': `url("${currentUrl}")`,
+                                'transition': 'background-image 0.5s ease-in-out'
+                            });
+                            console.log('Gambar Iqomah diperbarui ke:', currentUrl);
 
-                            // Bersihkan cache yang tidak digunakan
                             clearUnusedCache(window.iqomahImages);
                         }
                     }
@@ -1293,7 +1288,7 @@
 
                 // Mainkan beep sound saat 5 detik terakhir
                 if (timeLeft <= 5 && !hasPlayedFinalBeep) {
-                    playBeepSound(3);
+                    playBeepSound(1);
                     hasPlayedFinalBeep = true;
                 }
 
@@ -1307,10 +1302,9 @@
                     return;
                 }
 
-                // Update progress bar (smooth animation setiap frame)
-                const progressPercentage = (elapsedSeconds / duration) * 100;
+                // Update progress bar iqomah pop up (smooth animation setiap frame)
                 $progress.css({
-                    width: `${Math.min(progressPercentage, 100)}%`
+                    'animation': `progressAnimation ${duration}s linear forwards`
                 });
 
                 // Update countdown hanya setiap detik untuk efisiensi
@@ -1641,7 +1635,6 @@
 
             async function initFridaySlider() {
                 try {
-                    // Preload gambar menggunakan fungsi preloadImages
                     await preloadImages(window.fridayImages);
                     console.log('Semua gambar Friday telah dimuat, memulai slider');
 
@@ -1667,18 +1660,15 @@
                         if (currentIndex !== lastIndex) {
                             lastIndex = currentIndex;
 
-                            // Gunakan gambar dari cache, fallback ke default jika tidak ada
                             const currentUrl = window.imageCache[window.fridayImages[currentIndex]]?.src ||
                                 '/images/other/doa-masuk-masjid-default.webp';
 
-                            $fridayImageElement.css('opacity', '0');
-                            setTimeout(() => {
-                                $fridayImageElement.attr('src', currentUrl);
-                                $fridayImageElement.css('opacity', '1');
-                                console.log('Gambar Friday diperbarui ke:', currentUrl);
-                            }, 250);
+                            $fridayImageElement.css({
+                                'background-image': `url("${currentUrl}")`,
+                                'transition': 'background-image 0.5s ease-in-out'
+                            });
+                            console.log('Gambar Friday diperbarui ke:', currentUrl);
 
-                            // Bersihkan cache yang tidak digunakan
                             clearUnusedCache(window.fridayImages);
                         }
                     }
@@ -1689,7 +1679,6 @@
                     }
                     fridayImageSliderInterval = setInterval(updateFridayImage, 1000);
 
-                    // Gunakan durasi dinamis untuk jumat slide
                     const displayDuration = getJumatSlideDuration();
                     setTimeout(() => {
                         const $fridayPopup = $('#fridayInfoPopup');
@@ -1941,7 +1930,7 @@
                         if (!isShuruqAlarmPlaying) {
                             isShuruqAlarmPlaying = true;
                             localStorage.setItem('shuruqAlarmTime', currentTimeFormatted);
-                            playBeepSound(2);
+                            playBeepSound(1);
                             shuruqAlarmTimeout = setTimeout(() => {
                                 clearShuruqAlarmState();
                             }, 60000);

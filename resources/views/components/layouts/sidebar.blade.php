@@ -4,10 +4,10 @@
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pt-lg-5">
+        <h1 class="navbar-brand d-none-navbar-horizontal pt-lg-5">
             <a wire:navigate href="{{ route('dashboard.index') }}">
                 <span class="navbar-brand-image">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                    {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                         stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-box">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -15,7 +15,11 @@
                         <path d="M12 12l8 -4.5" />
                         <path d="M12 12l0 9" />
                         <path d="M12 12l-8 -4.5" />
-                    </svg>
+                    </svg> --}}
+                    <a href=".">
+                        <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
+                            class="navbar-brand-image">
+                    </a>
                 </span>
                 <span class="navbar-brand-text">JWS Diskominfo</span>
             </a>
