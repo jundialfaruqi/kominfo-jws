@@ -45,6 +45,8 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
         // Add other admin routes here
     });
 
+    Route::get('/jumbotron', \App\Livewire\Jumbotron\Jumbotron::class)->name('jumbotron.index');
+
     // Profile Routes
     Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index');
 
@@ -206,7 +208,7 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+0 hour 8 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+1 hour 57 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');

@@ -217,6 +217,9 @@
                 <div id="iqomahProgress" class="iqomah-progress-bar"></div>
             </div>
             <div id="iqomahCountdown" class="iqomah-countdown"></div>
+            <div class="logo-poopup">
+                <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
+            </div>
         </div>
         <div class="iqomah-image">
             <div id="currentIqomahImage" class="iqomah-image"></div>
@@ -236,6 +239,9 @@
                 <input type="hidden" id="imam" value="{{ $petugas->imam }}">
                 <input type="hidden" id="muadzin" value="{{ $petugas->muadzin }}">
             @endif
+            <div class="logo-poopup">
+                <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
+            </div>
         </div>
         <div class="friday-image">
             <div id="currentFridayImage" class="currentFridayImage"></div>

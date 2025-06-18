@@ -65,6 +65,15 @@ return [
             'throw' => false,
         ],
 
+        // new disk configuration for public images jumbotron
+        'public_images_jumbotron' => [
+            'driver' => 'local',
+            'root' => public_path('images/jumbotrons'),
+            'url' => env('APP_URL') . '/images/jumbotrons',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         // new disk configuration for public images adzan
         'public_images_adzan' => [
             'driver' => 'local',
