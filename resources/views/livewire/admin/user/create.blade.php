@@ -50,6 +50,7 @@
                         @if (auth()->user()->role === 'Super Admin')
                             <option value="Super Admin">Super Admin</option>
                             <option value="Admin">Admin</option>
+                            <option value="Pemko">Pemko</option>
                         @endif
                         <option value="User">User</option>
                     </select>

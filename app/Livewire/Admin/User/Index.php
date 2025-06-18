@@ -53,7 +53,8 @@ class Index extends Component
         }
 
         $data = array(
-            'user' => $query->orderBy('role', 'asc')
+            'user' => $query
+                ->orderByRaw("FIELD(role, 'Super Admin', 'Admin', 'Pemko', 'User')")
                 ->orderBy('status', 'asc')
                 ->paginate($this->paginate),
         );
@@ -391,7 +392,7 @@ class Index extends Component
 
         // Super Admin can create any role
         if ($currentUserRole === 'Super Admin') {
-            return 'Super Admin,Admin,User';
+            return 'Super Admin,Admin,Pemko,User';
         }
 
         // Admin can only create Users
