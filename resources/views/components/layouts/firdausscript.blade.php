@@ -131,6 +131,10 @@
             y: $canvas[0].height / 2
         };
 
+        // Muat gambar logo
+        const logo = new Image();
+        logo.src = '../theme/static/logo.webp'; // Pastikan path ini benar
+
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
             const now = getCurrentTimeFromServer();
@@ -159,6 +163,17 @@
             ctx.lineWidth = 15;
             ctx.stroke();
 
+            // Gambar logo di tengah
+            if (logo.complete) { // Pastikan logo sudah dimuat
+                const logoHeight = clockRadius * 0.23; // Misalnya, 10% dari radius jam
+                const logoWidth = (logo.naturalWidth / logo.naturalHeight) *
+                    logoHeight; // Hitung lebar berdasarkan rasio aspek
+                const logoX = clockCenter.x - logoWidth / 2;
+                const logoY = clockCenter.y - logoHeight / 2 - clockRadius * 0.33;
+                ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+            }
+
+            // Gambar angka dan tanda jam
             for (let i = 0; i < 12; i++) {
                 const angle = (i * Math.PI / 6) - Math.PI / 2;
                 const tickStart = clockRadius - 20;
@@ -211,6 +226,7 @@
                 }
             }
 
+            // Gambar jarum jam
             const hourAngle = ((hours + minutes / 60) * Math.PI / 6) - Math.PI / 2;
             const minuteAngle = ((minutes + seconds / 60) * Math.PI / 30) - Math.PI / 2;
             const secondAngle = ((seconds + milliseconds / 1000) * Math.PI / 30) - Math.PI / 2;
