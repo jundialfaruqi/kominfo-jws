@@ -133,7 +133,7 @@
 
         // Muat gambar logo
         const logo = new Image();
-        logo.src = '../theme/static/logo.webp'; // Pastikan path ini benar
+        logo.src = '../theme/static/logo-small.png'; // Pastikan path ini benar
 
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
