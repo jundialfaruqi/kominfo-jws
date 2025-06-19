@@ -91,8 +91,6 @@
             <div class="clock-container">
                 <canvas id="analogClock" width="300" height="300"></canvas>
                 <div class="clock-text">Loading...</div>
-                {{-- <div class="brand-text">DISKOMINFO</div> --}}
-                {{-- <div class="brand-logo"></div> --}}
             </div>
         </div>
 
@@ -101,7 +99,6 @@
             @livewire('firdaus.mosque-info', ['slug' => request()->route('slug')])
 
             <div class="date-info">
-
                 <span class="next-adzan">
                     <div class="countdown-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -116,7 +113,7 @@
                     </div>
                     <div class="countdown-text">
                         <span id="next-prayer-label">Maghrib</span>
-                        <span>&nbsp; -</span>
+                        <span> -</span>
                         <span id="countdown-value">-01:04:00</span>
                     </div>
                 </span>
@@ -124,7 +121,6 @@
             </div>
 
             <div class="mosque-image">
-
                 {{-- Hidden inputs to store slide URLs with default fallback --}}
                 @if ($slides)
                     <input type="hidden" id="slide1"
@@ -196,6 +192,39 @@
     @foreach ($petugasData as $key => $value)
         <input type="hidden" id="{{ $key }}" value="{{ $value }}">
     @endforeach
+
+    {{-- Hidden inputs for jumbotron data --}}
+    @if ($jumbotron)
+        <input type="hidden" id="jumbo1" value="{{ $jumbotron->jumbo1 ?? '' }}">
+        <input type="hidden" id="jumbo2" value="{{ $jumbotron->jumbo2 ?? '' }}">
+        <input type="hidden" id="jumbo3" value="{{ $jumbotron->jumbo3 ?? '' }}">
+        <input type="hidden" id="jumbo4" value="{{ $jumbotron->jumbo4 ?? '' }}">
+        <input type="hidden" id="jumbo5" value="{{ $jumbotron->jumbo5 ?? '' }}">
+        <input type="hidden" id="jumbo6" value="{{ $jumbotron->jumbo6 ?? '' }}">
+        <input type="hidden" id="jumbo_is_active" value="{{ $jumbotron->is_active ? 'true' : 'false' }}">
+    @else
+        <input type="hidden" id="jumbo1" value="">
+        <input type="hidden" id="jumbo2" value="">
+        <input type="hidden" id="jumbo3" value="">
+        <input type="hidden" id="jumbo4" value="">
+        <input type="hidden" id="jumbo5" value="">
+        <input type="hidden" id="jumbo6" value="">
+        <input type="hidden" id="jumbo_is_active" value="false">
+    @endif
+
+    {{-- Jumbotron Banner --}}
+    <div id="jumbotronImage" class="jumbotron-image" style="display: none;">
+        <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo" class="jumbotron-logo">
+        <div class="jumbotron-countdown">
+            <span id="jumbotron-next-prayer-label"></span>
+            <span> - </span>
+            <span id="jumbotron-countdown-value"></span>
+        </div>
+        <div class="jumbotron-digital-clock">
+            <span>JAM :</span>
+            <span id="jumbotron-clock-time"></span>
+        </div>
+    </div>
 
     {{-- Adzan Popup --}}
     <div id="adzanPopup" class="adzan-popup" style="display: none;">
