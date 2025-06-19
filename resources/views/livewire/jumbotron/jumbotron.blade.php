@@ -83,7 +83,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP</small>
+                                                            WEBP Maksimal 1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -149,7 +149,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP</small>
+                                                            WEBP Maksimal 1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -215,7 +215,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP</small>
+                                                            WEBP Maksimal 1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -281,7 +281,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP</small>
+                                                            WEBP Maksimal 1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -347,7 +347,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP</small>
+                                                            WEBP Maksimal 1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
@@ -413,7 +413,7 @@
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
                                                                 class="text-danger">*</span>Format: JPG, PNG, JPEG,
-                                                            WEBP</small>
+                                                            WEBP Maksimal 1MB</small>
                                                     </div>
                                                     <div class="form-text">
                                                         <small class="text-muted"><span
