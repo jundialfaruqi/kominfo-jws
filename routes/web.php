@@ -150,6 +150,26 @@ Route::get('/api/slides/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 })->name('api.slides');
 
+// API route untuk mendapatkan data jumbotron
+Route::get('/api/jumbotron', function () {
+    $jumbotron = \App\Models\Jumbotron::where('is_active', true)->first();
+    if ($jumbotron) {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'jumbo1' => $jumbotron->jumbo1 ?? '',
+                'jumbo2' => $jumbotron->jumbo2 ?? '',
+                'jumbo3' => $jumbotron->jumbo3 ?? '',
+                'jumbo4' => $jumbotron->jumbo4 ?? '',
+                'jumbo5' => $jumbotron->jumbo5 ?? '',
+                'jumbo6' => $jumbotron->jumbo6 ?? '',
+                'is_active' => $jumbotron->is_active,
+            ]
+        ]);
+    }
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+})->name('api.jumbotron');
+
 // API route untuk mendapatkan data petugas jumat
 Route::get('/api/petugas/{slug}', function ($slug) {
     $profil = \App\Models\Profil::where('slug', $slug)->first();
@@ -208,7 +228,7 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+1 hour 57 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+4 hour 22 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
@@ -217,7 +237,7 @@ Route::get('/api/server-time', function () {
             //     $daysToFriday += 7;
             // }
             // $serverDateTime->modify("+{$daysToFriday} days");
-            // $serverDateTime->setTime(12, 17, 55);
+            // $serverDateTime->setTime(12, 17, 10);
 
             return response()->json([
                 'success' => true,

@@ -43,12 +43,12 @@ class Jumbotron extends Component
     public $deleteJumboName;
 
     protected $rules = [
-        'jumbo1' => 'nullable|image|mimes:jpg,png,jpeg,webp',
-        'jumbo2' => 'nullable|image|mimes:jpg,png,jpeg,webp',
-        'jumbo3' => 'nullable|image|mimes:jpg,png,jpeg,webp',
-        'jumbo4' => 'nullable|image|mimes:jpg,png,jpeg,webp',
-        'jumbo5' => 'nullable|image|mimes:jpg,png,jpeg,webp',
-        'jumbo6' => 'nullable|image|mimes:jpg,png,jpeg,webp',
+        'jumbo1' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+        'jumbo2' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+        'jumbo3' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+        'jumbo4' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+        'jumbo5' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+        'jumbo6' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
         'is_active' => 'boolean',
     ];
 
@@ -65,6 +65,12 @@ class Jumbotron extends Component
         'jumbo4.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
         'jumbo5.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
         'jumbo6.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
+        'jumbo1.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
+        'jumbo2.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
+        'jumbo3.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
+        'jumbo4.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
+        'jumbo5.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
+        'jumbo6.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
     ];
 
     private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)

@@ -8,6 +8,7 @@ use App\Models\Marquee;
 use App\Models\Petugas;
 use App\Models\Slides;
 use App\Models\Durasi;
+use App\Models\Jumbotron; // Tambahkan model Jumbotron
 use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -34,8 +35,8 @@ class Firdaus extends Component
     public $marquee;
     public $petugas;
     public $slides;
-    public $durasi; // Tambahkan properti untuk durasi
-
+    public $durasi;
+    public $jumbotron; // Tambahkan properti untuk jumbotron
     public $slug;
 
     public function mount($slug)
@@ -46,6 +47,9 @@ class Firdaus extends Component
 
         // Ambil data durasi
         $this->durasi = Durasi::where('user_id', $user_id)->first();
+
+        // Ambil data jumbotron yang aktif
+        $this->jumbotron = Jumbotron::where('is_active', true)->first();
 
         $this->adzan    = Adzan::where('user_id', $user_id)->first();
         $this->marquee  = Marquee::where('user_id', $user_id)->first();
@@ -383,7 +387,7 @@ class Firdaus extends Component
                 ];
             } elseif ($prayerLower === 'dzuhur' || $prayerLower === 'juma\'at') {
                 $durasi = [
-                    'adzan' => $this->durasi->adzan_dzuhur * 60, // Perbaikan: *60, bukan *30
+                    'adzan' => $this->durasi->adzan_dzuhur * 60,
                     'iqomah' => $this->durasi->iqomah_dzuhur * 60,
                     'final' => $this->durasi->final_dzuhur * 60,
                     'jumat_slide' => $this->durasi->jumat_slide * 60
@@ -462,7 +466,8 @@ class Firdaus extends Component
             'marquee' => $this->marquee,
             'petugas' => $this->petugas,
             'slides' => $this->slides,
-            'durasi' => $this->durasi, // Kirim data durasi ke view
+            'durasi' => $this->durasi,
+            'jumbotron' => $this->jumbotron,
             'activePrayerStatus' => $this->activePrayerStatus,
             'apiSource' => $this->apiSource,
             'adzanData' => $this->adzan ? [
