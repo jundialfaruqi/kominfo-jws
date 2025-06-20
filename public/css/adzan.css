@@ -1424,7 +1424,7 @@
     position: absolute;
     top: 20px;
     left: 20px;
-    height: 55px;
+    height: 65px;
     /* Diperbesar dari 50px */
     width: auto;
     z-index: 10000;
@@ -1433,21 +1433,23 @@
 /* Countdown di sudut kiri bawah */
 .jumbotron-countdown {
     font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
+    text-transform: uppercase;
     position: absolute;
     bottom: 20px;
     left: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    padding: 12px 18px;
-    /* Diperbesar dari 10px 15px */
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 9.6px;
+    /* Diperbesar dari 8px * 1.2 */
+    padding: 14.4px 21.6px;
+    /* Diperbesar dari 12px 18px * 1.2 */
     color: #ffffff;
-    font-size: 1.65rem;
-    /* Diperbesar dari 1.5rem */
-    font-weight: 500;
+    font-size: 1.98rem;
+    /* Diperbesar dari 1.65rem * 1.2 */
+    font-weight: 800;
     display: flex;
     align-items: center;
-    gap: 12px;
-    /* Diperbesar dari 10px */
+    gap: 14.4px;
+    /* Diperbesar dari 12px * 1.2 */
     z-index: 10000;
 }
 
@@ -1457,14 +1459,15 @@
     position: absolute;
     bottom: 20px;
     right: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    border-radius: 8px;
-    padding: 12px 18px;
-    /* Diperbesar dari 10px 15px */
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 9.6px;
+    /* Diperbesar dari 8px * 1.2 */
+    padding: 14.4px 21.6px;
+    /* Diperbesar dari 12px 18px * 1.2 */
     color: #ffffff;
-    font-size: 1.65rem;
-    /* Diperbesar dari 1.5rem */
-    font-weight: 500;
+    font-size: 1.98rem;
+    /* Diperbesar dari 1.65rem * 1.2 */
+    font-weight: 800;
     z-index: 10000;
 }
 
@@ -1480,30 +1483,31 @@
     .jumbotron-logo {
         top: 30px;
         left: 30px;
-        height: 80px;
-        /* Diperbesar dari 70px */
+        height: 90px;
     }
 
     .jumbotron-countdown {
         bottom: 30px;
         left: 30px;
-        font-size: 2.3rem;
-        /* Diperbesar dari 2rem */
-        padding: 18px 24px;
-        /* Diperbesar dari 15px 20px */
-        border-radius: 14px;
-        /* Diperbesar dari 12px */
+        font-size: 3.6432rem;
+        /* 3.312rem * 1.1 */
+        padding: 28.512px 38.016px;
+        /* 25.92px 34.56px * 1.1 */
+        border-radius: 22.176px;
+        /* 20.16px * 1.1 */
+        gap: 19.008px;
+        /* 17.28px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 30px;
         right: 30px;
-        font-size: 2.3rem;
-        /* Diperbesar dari 2rem */
-        padding: 18px 24px;
-        /* Diperbesar dari 15px 20px */
-        border-radius: 14px;
-        /* Diperbesar dari 12px */
+        font-size: 3.6432rem;
+        /* 3.312rem * 1.1 */
+        padding: 28.512px 38.016px;
+        /* 25.92px 34.56px * 1.1 */
+        border-radius: 22.176px;
+        /* 20.16px * 1.1 */
     }
 }
 
@@ -1517,30 +1521,31 @@
     .jumbotron-logo {
         top: 25px;
         left: 25px;
-        height: 70px;
-        /* Diperbesar dari 60px */
+        height: 80px;
     }
 
     .jumbotron-countdown {
         bottom: 25px;
         left: 25px;
-        font-size: 2.1rem;
-        /* Diperbesar dari 1.8rem */
-        padding: 14px 21px;
-        /* Diperbesar dari 12px 18px */
-        border-radius: 12px;
-        /* Diperbesar dari 10px */
+        font-size: 3.3264rem;
+        /* 3.024rem * 1.1 */
+        padding: 22.176px 33.264px;
+        /* 20.16px 30.24px * 1.1 */
+        border-radius: 19.008px;
+        /* 17.28px * 1.1 */
+        gap: 19.008px;
+        /* 17.28px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 25px;
         right: 25px;
-        font-size: 2.1rem;
-        /* Diperbesar dari 1.8rem */
-        padding: 14px 21px;
-        /* Diperbesar dari 12px 18px */
-        border-radius: 12px;
-        /* Diperbesar dari 10px */
+        font-size: 3.3264rem;
+        /* 3.024rem * 1.1 */
+        padding: 22.176px 33.264px;
+        /* 20.16px 30.24px * 1.1 */
+        border-radius: 19.008px;
+        /* 17.28px * 1.1 */
     }
 }
 
@@ -1554,30 +1559,31 @@
     .jumbotron-logo {
         top: 20px;
         left: 20px;
-        height: 55px;
-        /* Diperbesar dari 50px */
+        height: 65px;
     }
 
     .jumbotron-countdown {
         bottom: 20px;
         left: 20px;
-        font-size: 1.65rem;
-        /* Diperbesar dari 1.5rem */
-        padding: 12px 18px;
-        /* Diperbesar dari 10px 15px */
-        border-radius: 10px;
-        /* Diperbesar dari 8px */
+        font-size: 2.6136rem;
+        /* 2.376rem * 1.1 */
+        padding: 19.008px 28.512px;
+        /* 17.28px 25.92px * 1.1 */
+        border-radius: 15.84px;
+        /* 14.4px * 1.1 */
+        gap: 19.008px;
+        /* 17.28px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 20px;
         right: 20px;
-        font-size: 1.65rem;
-        /* Diperbesar dari 1.5rem */
-        padding: 12px 18px;
-        /* Diperbesar dari 10px 15px */
-        border-radius: 10px;
-        /* Diperbesar dari 8px */
+        font-size: 2.6136rem;
+        /* 2.376rem * 1.1 */
+        padding: 19.008px 28.512px;
+        /* 17.28px 25.92px * 1.1 */
+        border-radius: 15.84px;
+        /* 14.4px * 1.1 */
     }
 }
 
@@ -1591,30 +1597,31 @@
     .jumbotron-logo {
         top: 15px;
         left: 15px;
-        height: 50px;
-        /* Diperbesar dari 45px */
+        height: 60px;
     }
 
     .jumbotron-countdown {
         bottom: 15px;
         left: 15px;
-        font-size: 1.5rem;
-        /* Diperbesar dari 1.3rem */
-        padding: 10px 15px;
-        /* Diperbesar dari 8px 12px */
-        border-radius: 8px;
-        /* Diperbesar dari 6px */
+        font-size: 2.376rem;
+        /* 2.16rem * 1.1 */
+        padding: 15.84px 23.76px;
+        /* 14.4px 21.6px * 1.1 */
+        border-radius: 12.672px;
+        /* 11.52px * 1.1 */
+        gap: 15.84px;
+        /* 14.4px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 15px;
         right: 15px;
-        font-size: 1.5rem;
-        /* Diperbesar dari 1.3rem */
-        padding: 10px 15px;
-        /* Diperbesar dari 8px 12px */
-        border-radius: 8px;
-        /* Diperbesar dari 6px */
+        font-size: 2.376rem;
+        /* 2.16rem * 1.1 */
+        padding: 15.84px 23.76px;
+        /* 14.4px 21.6px * 1.1 */
+        border-radius: 12.672px;
+        /* 11.52px * 1.1 */
     }
 }
 
@@ -1628,30 +1635,31 @@
     .jumbotron-logo {
         top: 12px;
         left: 12px;
-        height: 45px;
-        /* Diperbesar dari 40px */
+        height: 55px;
     }
 
     .jumbotron-countdown {
         bottom: 12px;
         left: 12px;
-        font-size: 1.4rem;
-        /* Diperbesar dari 1.2rem */
-        padding: 8px 12px;
-        /* Diperbesar dari 7px 10px */
-        border-radius: 7px;
-        /* Diperbesar dari 6px */
+        font-size: 2.2176rem;
+        /* 2.016rem * 1.1 */
+        padding: 12.672px 19.008px;
+        /* 11.52px 17.28px * 1.1 */
+        border-radius: 11.088px;
+        /* 10.08px * 1.1 */
+        gap: 12.672px;
+        /* 11.52px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 12px;
         right: 12px;
-        font-size: 1.4rem;
-        /* Diperbesar dari 1.2rem */
-        padding: 8px 12px;
-        /* Diperbesar dari 7px 10px */
-        border-radius: 7px;
-        /* Diperbesar dari 6px */
+        font-size: 2.2176rem;
+        /* 2.016rem * 1.1 */
+        padding: 12.672px 19.008px;
+        /* 11.52px 17.28px * 1.1 */
+        border-radius: 11.088px;
+        /* 10.08px * 1.1 */
     }
 }
 
@@ -1665,30 +1673,29 @@
     .jumbotron-logo {
         top: 10px;
         left: 10px;
-        height: 40px;
-        /* Diperbesar dari 35px */
+        height: 50px;
     }
 
     .jumbotron-countdown {
         bottom: 10px;
         left: 10px;
-        font-size: 1.15rem;
-        /* Diperbesar dari 1rem */
-        padding: 7px 10px;
-        /* Diperbesar dari 6px 8px */
-        border-radius: 6px;
-        /* Diperbesar dari 5px */
+        font-size: 1.518rem;
+        /* 1.38rem * 1.1 */
+        padding: 9.24px 13.2px;
+        /* 8.4px 12px * 1.1 */
+        border-radius: 7.92px;
+        /* 7.2px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 10px;
         right: 10px;
-        font-size: 1.15rem;
-        /* Diperbesar dari 1rem */
-        padding: 7px 10px;
-        /* Diperbesar dari 6px 8px */
-        border-radius: 6px;
-        /* Diperbesar dari 5px */
+        font-size: 1.518rem;
+        /* 1.38rem * 1.1 */
+        padding: 9.24px 13.2px;
+        /* 8.4px 12px * 1.1 */
+        border-radius: 7.92px;
+        /* 7.2px * 1.1 */
     }
 }
 
@@ -1771,6 +1778,7 @@
     .jumbotron-image {
         border-width: 4px;
         padding: 0.125rem;
+        background-size: contain !important;
     }
 
     .jumbotron-logo {
@@ -1808,6 +1816,7 @@
     .jumbotron-image {
         border-width: 4px;
         padding: 0.125rem;
+        background-size: contain !important;
     }
 
     .jumbotron-logo {
@@ -1845,6 +1854,7 @@
     .jumbotron-image {
         border-width: 6px;
         padding: 0.25rem;
+        background-size: contain !important;
     }
 
     .jumbotron-logo {
