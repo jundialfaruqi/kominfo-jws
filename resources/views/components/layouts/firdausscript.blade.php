@@ -2114,9 +2114,8 @@
         }
 
         // Contoh penambahan dalam manageSlideDisplay atau fungsi serupa
-        // Contoh penambahan dalam manageSlideDisplay atau fungsi serupa
         function updateJumbotronContent() {
-            let countdownInterval = null;
+            let animationFrameId = null;
 
             // Fungsi untuk memperbarui konten jumbotron
             function updateContent() {
@@ -2132,25 +2131,30 @@
                 const minutes = String(serverTime.getMinutes()).padStart(2, '0');
                 const seconds = String(serverTime.getSeconds()).padStart(2, '0');
                 $('#jumbotron-clock-time').text(`${hours}:${minutes}:${seconds}`);
+
+                // Lanjutkan animasi
+                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0 && $(
+                        '#jumbotronImage').is(':visible')) {
+                    animationFrameId = requestAnimationFrame(updateContent);
+                }
             }
 
             // Mulai pembaruan jika jumbotron aktif
             function startJumbotronUpdates() {
                 if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0 && $(
                         '#jumbotronImage').is(':visible')) {
-                    if (!countdownInterval) {
+                    if (!animationFrameId) {
                         updateContent(); // Perbarui segera
-                        countdownInterval = setInterval(updateContent, 1000); // Perbarui setiap detik
-                        console.log('Jumbotron countdown updates started');
+                        console.log('Jumbotron countdown updates started with requestAnimationFrame');
                     }
                 }
             }
 
             // Hentikan pembaruan
             function stopJumbotronUpdates() {
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                    animationFrameId = null;
                     console.log('Jumbotron countdown updates stopped');
                 }
             }
