@@ -1414,7 +1414,6 @@
     background-color: #000000;
     z-index: 9999;
     display: none;
-    border: 12px solid #d4af37;
     box-sizing: border-box;
     padding: 1rem;
 }
@@ -1476,7 +1475,6 @@
 /* Ultra-high resolution: 4K and above (3840px x 2160px) */
 @media (min-width: 3840px) and (min-height: 2160px) {
     .jumbotron-image {
-        border-width: 16px;
         padding: 1.5rem;
     }
 
@@ -1514,7 +1512,6 @@
 /* High resolution: 2560px - 3839px (e.g., QHD+) */
 @media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
     .jumbotron-image {
-        border-width: 14px;
         padding: 1.2rem;
     }
 
@@ -1552,7 +1549,6 @@
 /* Full HD: 1920px - 2559px */
 @media (min-width: 1920px) and (max-width: 2559px) and (min-height: 1080px) {
     .jumbotron-image {
-        border-width: 12px;
         padding: 1rem;
     }
 
@@ -1590,7 +1586,6 @@
 /* 1600px - 1919px */
 @media (min-width: 1600px) and (max-width: 1919px) and (min-height: 900px) {
     .jumbotron-image {
-        border-width: 10px;
         padding: 0.8rem;
     }
 
@@ -1628,7 +1623,6 @@
 /* 1366px - 1599px */
 @media (min-width: 1366px) and (max-width: 1599px) and (min-height: 768px) {
     .jumbotron-image {
-        border-width: 8px;
         padding: 0.7rem;
     }
 
@@ -1666,7 +1660,6 @@
 /* 1024px - 1365px */
 @media (min-width: 1024px) and (max-width: 1365px) and (min-height: 768px) {
     .jumbotron-image {
-        border-width: 6px;
         padding: 0.5rem;
     }
 
@@ -1702,7 +1695,6 @@
 /* Tablet Portrait (768px - 991px) */
 @media screen and (max-width: 991px) {
     .jumbotron-image {
-        border-width: 8px;
         padding: 0.5rem;
     }
 
@@ -1739,7 +1731,6 @@
 /* Mobile Landscape (576px - 767px) */
 @media screen and (max-width: 767px) {
     .jumbotron-image {
-        border-width: 6px;
         padding: 0.25rem;
     }
 
@@ -1776,7 +1767,6 @@
 /* Mobile Portrait (up to 575px) */
 @media screen and (max-width: 575px) {
     .jumbotron-image {
-        border-width: 4px;
         padding: 0.125rem;
         background-size: contain !important;
     }
@@ -1814,7 +1804,6 @@
 /* Extra Small Mobile (up to 320px) */
 @media screen and (max-width: 320px) {
     .jumbotron-image {
-        border-width: 4px;
         padding: 0.125rem;
         background-size: contain !important;
     }
@@ -1852,7 +1841,6 @@
 /* Orientation specific styles */
 @media screen and (orientation: landscape) and (max-height: 480px) {
     .jumbotron-image {
-        border-width: 6px;
         padding: 0.25rem;
         background-size: contain !important;
     }
