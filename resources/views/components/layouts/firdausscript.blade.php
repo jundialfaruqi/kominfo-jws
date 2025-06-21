@@ -84,7 +84,7 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 10 detik');
+            // console.log('Waktu server diupdate setiap 23 detik');
         }, 23000);
 
         let activePrayerStatus = null;
@@ -2266,6 +2266,8 @@
                         if (!isJumbotronActive) {
                             window.jumbotronUrls = [];
                             $jumbotronImageElement.css('display', 'none');
+                            // Hentikan animasi progress bar saat jumbotron tidak aktif
+                            $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                         }
 
                         if (window.slideUrls.length === 0) {
@@ -2278,9 +2280,7 @@
                             .getSeconds();
                         const slideCycleDuration = slideDuration * window.slideUrls
                             .length; // Durasi siklus penuh mosque-image
-                        const totalCycleDuration = isJumbotronActive ?
-                            slideCycleDuration + slideDuration :
-                            // Satu siklus mosque-image + satu jumbotron
+                        const totalCycleDuration = isJumbotronActive ? slideCycleDuration + slideDuration :
                             slideCycleDuration;
 
                         const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
@@ -2305,6 +2305,11 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
+                            // Reset dan jalankan animasi progress bar
+                            const $progressBar = $('.jumbotron-progress-bar');
+                            $progressBar.css('width', '0%');
+                            $progressBar.css('animation',
+                                `progressAnimation ${slideDuration}ms linear forwards`);
                             console.log(
                                 `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
                         } else {
@@ -2318,6 +2323,8 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
+                            // Hentikan animasi progress bar saat jumbotron tidak ditampilkan
+                            $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                             console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
@@ -2383,6 +2390,8 @@
                         'transition': 'background-image 0.5s ease-in-out'
                     });
                     $jumbotronImageElement.css('display', 'none');
+                    // Hentikan animasi progress bar pada fallback
+                    $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                     $(document).trigger('slideUpdated');
                 }
             }

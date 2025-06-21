@@ -181,8 +181,6 @@
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    border: 12px solid #d4af37;
-    padding: 1rem;
     box-sizing: border-box;
 }
 
@@ -333,7 +331,6 @@
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
-    .adzan-image-display,
     .friday-image-display {
         border-width: 16px;
         padding: 1.5rem;
@@ -388,7 +385,6 @@
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
-    .adzan-image-display,
     .friday-image-display {
         border-width: 14px;
         padding: 1.2rem;
@@ -443,7 +439,6 @@
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
-    .adzan-image-display,
     .friday-image-display {
         border-width: 12px;
         padding: 1rem;
@@ -498,7 +493,6 @@
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
-    .adzan-image-display,
     .friday-image-display {
         border-width: 10px;
         padding: 0.8rem;
@@ -553,7 +547,6 @@
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
-    .adzan-image-display,
     .friday-image-display {
         border-width: 8px;
         padding: 0.7rem;
@@ -608,7 +601,6 @@
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
-    .adzan-image-display,
     .friday-image-display {
         border-width: 6px;
         padding: 0.5rem;
@@ -725,14 +717,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        border: 8px solid #d4af37;
-        padding: 0.5rem;
+        padding: 0;
     }
 
     .adzan-image-display img {
         max-width: 100%;
         max-width: 100%;
-        object-fit: contain;
+        object-fit: cover;
     }
 }
 
@@ -796,14 +787,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        border: 6px solid #d4af37;
-        padding: 0.25rem;
+        padding: 0;
     }
 
     .adzan-image-display img {
         max-width: 100%;
         max-width: 100%;
-        object-fit: contain;
+        object-fit: cover;
     }
 
     /* Table responsiveness */
@@ -874,14 +864,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        border: 4px solid #d4af37;
-        padding: 0.125rem;
+        padding: 0;
     }
 
     .adzan-image-display img {
         max-width: 100%;
         max-width: 100%;
-        object-fit: contain;
+        object-fit: cover;
     }
 
     /* Table responsiveness */
@@ -924,7 +913,7 @@
     .adzan-image-display img {
         max-width: 100%;
         max-width: 100%;
-        object-fit: contain;
+        object-fit: cover;
     }
 
     .progress-container,
@@ -966,7 +955,7 @@
     .adzan-image-display img {
         max-width: 100%;
         max-width: 100%;
-        object-fit: contain;
+        object-fit: cover;
     }
 
     .friday-date {
@@ -1414,7 +1403,6 @@
     background-color: #000000;
     z-index: 9999;
     display: none;
-    border: 12px solid #d4af37;
     box-sizing: border-box;
     padding: 1rem;
 }
@@ -1476,83 +1464,96 @@
 /* Ultra-high resolution: 4K and above (3840px x 2160px) */
 @media (min-width: 3840px) and (min-height: 2160px) {
     .jumbotron-image {
-        border-width: 16px;
-        padding: 1.5rem;
+        padding: 2.34rem;
+        /* 1.95rem * 1.2 */
     }
 
     .jumbotron-logo {
-        top: 30px;
-        left: 30px;
-        height: 90px;
+        top: 46.8px;
+        /* 39px * 1.2 */
+        left: 46.8px;
+        /* 39px * 1.2 */
+        height: 140.4px;
+        /* 117px * 1.2 */
     }
 
     .jumbotron-countdown {
-        bottom: 30px;
-        left: 30px;
-        font-size: 3.6432rem;
-        /* 3.312rem * 1.1 */
-        padding: 28.512px 38.016px;
-        /* 25.92px 34.56px * 1.1 */
-        border-radius: 22.176px;
-        /* 20.16px * 1.1 */
-        gap: 19.008px;
-        /* 17.28px * 1.1 */
+        bottom: 78px;
+        /* 65px * 1.2 */
+        left: 46.8px;
+        /* 39px * 1.2 */
+        font-size: 5.683392rem;
+        /* 4.73616rem * 1.2 */
+        padding: 44.47872px 59.30496px;
+        /* 37.0656px 49.4208px * 1.2 */
+        border-radius: 34.59456px;
+        /* 28.8288px * 1.2 */
+        gap: 29.65248px;
+        /* 24.7104px * 1.2 */
     }
 
     .jumbotron-digital-clock {
-        bottom: 30px;
-        right: 30px;
-        font-size: 3.6432rem;
-        /* 3.312rem * 1.1 */
-        padding: 28.512px 38.016px;
-        /* 25.92px 34.56px * 1.1 */
-        border-radius: 22.176px;
-        /* 20.16px * 1.1 */
+        bottom: 78px;
+        /* 65px * 1.2 */
+        right: 46.8px;
+        /* 39px * 1.2 */
+        font-size: 5.683392rem;
+        /* 4.73616rem * 1.2 */
+        padding: 44.47872px 59.30496px;
+        /* 37.0656px 49.4208px * 1.2 */
+        border-radius: 34.59456px;
+        /* 28.8288px * 1.2 */
     }
 }
 
 /* High resolution: 2560px - 3839px (e.g., QHD+) */
 @media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
     .jumbotron-image {
-        border-width: 14px;
-        padding: 1.2rem;
+        padding: 1.44rem;
+        /* 1.2rem * 1.2 */
     }
 
     .jumbotron-logo {
-        top: 25px;
-        left: 25px;
-        height: 80px;
+        top: 30px;
+        /* 25px * 1.2 */
+        left: 30px;
+        /* 25px * 1.2 */
+        height: 96px;
+        /* 80px * 1.2 */
     }
 
     .jumbotron-countdown {
-        bottom: 25px;
-        left: 25px;
-        font-size: 3.3264rem;
-        /* 3.024rem * 1.1 */
-        padding: 22.176px 33.264px;
-        /* 20.16px 30.24px * 1.1 */
-        border-radius: 19.008px;
-        /* 17.28px * 1.1 */
-        gap: 19.008px;
-        /* 17.28px * 1.1 */
+        bottom: 40px;
+        /* 25px * 1.2 */
+        left: 30px;
+        /* 25px * 1.2 */
+        font-size: 3.99168rem;
+        /* 3.3264rem * 1.2 */
+        padding: 26.6112px 39.9168px;
+        /* 22.176px 33.264px * 1.2 */
+        border-radius: 22.8096px;
+        /* 19.008px * 1.2 */
+        gap: 22.8096px;
+        /* 19.008px * 1.2 */
     }
 
     .jumbotron-digital-clock {
-        bottom: 25px;
-        right: 25px;
-        font-size: 3.3264rem;
-        /* 3.024rem * 1.1 */
-        padding: 22.176px 33.264px;
-        /* 20.16px 30.24px * 1.1 */
-        border-radius: 19.008px;
-        /* 17.28px * 1.1 */
+        bottom: 40px;
+        /* 25px * 1.2 */
+        right: 30px;
+        /* 25px * 1.2 */
+        font-size: 3.99168rem;
+        /* 3.3264rem * 1.2 */
+        padding: 26.6112px 39.9168px;
+        /* 22.176px 33.264px * 1.2 */
+        border-radius: 22.8096px;
+        /* 19.008px * 1.2 */
     }
 }
 
 /* Full HD: 1920px - 2559px */
 @media (min-width: 1920px) and (max-width: 2559px) and (min-height: 1080px) {
     .jumbotron-image {
-        border-width: 12px;
         padding: 1rem;
     }
 
@@ -1563,7 +1564,7 @@
     }
 
     .jumbotron-countdown {
-        bottom: 20px;
+        bottom: 30px;
         left: 20px;
         font-size: 2.6136rem;
         /* 2.376rem * 1.1 */
@@ -1576,7 +1577,7 @@
     }
 
     .jumbotron-digital-clock {
-        bottom: 20px;
+        bottom: 30px;
         right: 20px;
         font-size: 2.6136rem;
         /* 2.376rem * 1.1 */
@@ -1590,7 +1591,6 @@
 /* 1600px - 1919px */
 @media (min-width: 1600px) and (max-width: 1919px) and (min-height: 900px) {
     .jumbotron-image {
-        border-width: 10px;
         padding: 0.8rem;
     }
 
@@ -1601,7 +1601,7 @@
     }
 
     .jumbotron-countdown {
-        bottom: 15px;
+        bottom: 30px;
         left: 15px;
         font-size: 2.376rem;
         /* 2.16rem * 1.1 */
@@ -1614,7 +1614,7 @@
     }
 
     .jumbotron-digital-clock {
-        bottom: 15px;
+        bottom: 30px;
         right: 15px;
         font-size: 2.376rem;
         /* 2.16rem * 1.1 */
@@ -1628,7 +1628,6 @@
 /* 1366px - 1599px */
 @media (min-width: 1366px) and (max-width: 1599px) and (min-height: 768px) {
     .jumbotron-image {
-        border-width: 8px;
         padding: 0.7rem;
     }
 
@@ -1639,7 +1638,7 @@
     }
 
     .jumbotron-countdown {
-        bottom: 12px;
+        bottom: 24px;
         left: 12px;
         font-size: 2.2176rem;
         /* 2.016rem * 1.1 */
@@ -1652,7 +1651,7 @@
     }
 
     .jumbotron-digital-clock {
-        bottom: 12px;
+        bottom: 24px;
         right: 12px;
         font-size: 2.2176rem;
         /* 2.016rem * 1.1 */
@@ -1666,7 +1665,6 @@
 /* 1024px - 1365px */
 @media (min-width: 1024px) and (max-width: 1365px) and (min-height: 768px) {
     .jumbotron-image {
-        border-width: 6px;
         padding: 0.5rem;
     }
 
@@ -1677,7 +1675,7 @@
     }
 
     .jumbotron-countdown {
-        bottom: 10px;
+        bottom: 20px;
         left: 10px;
         font-size: 1.518rem;
         /* 1.38rem * 1.1 */
@@ -1688,7 +1686,7 @@
     }
 
     .jumbotron-digital-clock {
-        bottom: 10px;
+        bottom: 20px;
         right: 10px;
         font-size: 1.518rem;
         /* 1.38rem * 1.1 */
@@ -1702,7 +1700,6 @@
 /* Tablet Portrait (768px - 991px) */
 @media screen and (max-width: 991px) {
     .jumbotron-image {
-        border-width: 8px;
         padding: 0.5rem;
     }
 
@@ -1739,7 +1736,6 @@
 /* Mobile Landscape (576px - 767px) */
 @media screen and (max-width: 767px) {
     .jumbotron-image {
-        border-width: 6px;
         padding: 0.25rem;
     }
 
@@ -1776,7 +1772,6 @@
 /* Mobile Portrait (up to 575px) */
 @media screen and (max-width: 575px) {
     .jumbotron-image {
-        border-width: 4px;
         padding: 0.125rem;
         background-size: contain !important;
     }
@@ -1814,7 +1809,6 @@
 /* Extra Small Mobile (up to 320px) */
 @media screen and (max-width: 320px) {
     .jumbotron-image {
-        border-width: 4px;
         padding: 0.125rem;
         background-size: contain !important;
     }
@@ -1852,7 +1846,6 @@
 /* Orientation specific styles */
 @media screen and (orientation: landscape) and (max-height: 480px) {
     .jumbotron-image {
-        border-width: 6px;
         padding: 0.25rem;
         background-size: contain !important;
     }
@@ -1884,5 +1877,115 @@
         /* Diperbesar dari 5px 7px */
         border-radius: 5px;
         /* Diperbesar dari 4px */
+    }
+}
+
+/* Jumbotron Progress Bar */
+.jumbotron-progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    z-index: 10000;
+}
+
+.jumbotron-progress-bar {
+    height: 100%;
+    background-color: #ff0000;
+    width: 0%;
+    animation: none;
+    /* Awalnya nonaktif */
+}
+
+/* Re-use existing progressAnimation */
+@keyframes progressAnimation {
+    from {
+        width: 0%;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+/* Responsive styles untuk .jumbotron-progress-container dan .jumbotron-progress-bar */
+
+/* Ultra-high resolution: 4K and above (3840px x 2160px) */
+@media (min-width: 3840px) and (min-height: 2160px) {
+    .jumbotron-progress-container {
+        height: 20px;
+    }
+}
+
+/* High resolution: 2560px - 3839px (e.g., QHD+) */
+@media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
+    .jumbotron-progress-container {
+        height: 15px;
+    }
+}
+
+/* Full HD: 1920px - 2559px */
+@media (min-width: 1920px) and (max-width: 2559px) and (min-height: 1080px) {
+    .jumbotron-progress-container {
+        height: 10px;
+    }
+}
+
+/* 1600px - 1919px */
+@media (min-width: 1600px) and (max-width: 1919px) and (min-height: 900px) {
+    .jumbotron-progress-container {
+        height: 10px;
+    }
+}
+
+/* 1366px - 1599px */
+@media (min-width: 1366px) and (max-width: 1599px) and (min-height: 768px) {
+    .jumbotron-progress-container {
+        height: 8px;
+    }
+}
+
+/* 1024px - 1365px */
+@media (min-width: 1024px) and (max-width: 1365px) and (min-height: 768px) {
+    .jumbotron-progress-container {
+        height: 8px;
+    }
+}
+
+/* Tablet Portrait (768px - 991px) */
+@media screen and (max-width: 991px) {
+    .jumbotron-progress-container {
+        height: 6px;
+    }
+}
+
+/* Mobile Landscape (576px - 767px) */
+@media screen and (max-width: 767px) {
+    .jumbotron-progress-container {
+        height: 6px;
+    }
+}
+
+/* Mobile Portrait (up to 575px) */
+@media screen and (max-width: 575px) {
+    .jumbotron-progress-container {
+        height: 6px;
+    }
+}
+
+/* Extra Small Mobile (up to 320px) */
+@media screen and (max-width: 320px) {
+    .jumbotron-progress-container {
+        height: 6px;
+    }
+}
+
+/* Orientation specific styles */
+@media screen and (orientation: landscape) and (max-height: 480px) {
+    .jumbotron-progress-container {
+        height: 10px;
     }
 }

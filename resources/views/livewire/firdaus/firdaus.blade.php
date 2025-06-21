@@ -224,6 +224,9 @@
             <span>JAM</span>
             <span id="jumbotron-clock-time"></span>
         </div>
+        <div class="jumbotron-progress-container">
+            <div class="jumbotron-progress-bar"></div>
+        </div>
     </div>
 
     {{-- Adzan Popup --}}
@@ -264,6 +267,7 @@
             <div id="fridayDate" class="friday-date"></div>
             <div id="fridayOfficials" class="friday-officials"></div>
             <div class="digital-clock">
+                <span>JAM</span>
                 <span class="clock-time">00:00:00</span>
             </div>
             @if ($petugas)
@@ -282,6 +286,9 @@
 
     {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
+        <div class="jumbotron-logo">
+            <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
+        </div>
         <img id="currentAdzanImage" src="" alt="Adzan Image">
     </div>
 </div>
