@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Http;
 use App\Livewire\Welcome\Welcome;
 use App\Livewire\Register\Register;
 use App\Livewire\UpdateProfile\Updateprofile;
+use App\Models\User;
+use App\Models\Theme;
+use Illuminate\Http\Request;
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -46,6 +49,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     });
 
     Route::get('/jumbotron', \App\Livewire\Jumbotron\Jumbotron::class)->name('jumbotron.index');
+
+    // Tema Routes
+    Route::get('/tema', \App\Livewire\Tema\Tema::class)->name('tema.index');
 
     // Profile Routes
     Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index');
@@ -345,6 +351,44 @@ Route::get('/api/prayer-status/{slug}', function ($slug) {
             'message' => 'Error calculating prayer status: ' . $e->getMessage()
         ]);
     }
+});
+
+Route::get('/api/theme-check/{slug}', function (Request $request, $slug) {
+    // Validasi slug agar tidak kosong atau tidak valid
+    if (empty(trim($slug))) {
+        return response()->json(['success' => false, 'message' => 'Slug tidak valid'], 400);
+    }
+
+    // Cari profil berdasarkan slug
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+
+    if (!$profil) {
+        return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan'], 404);
+    }
+
+    $user = User::find($profil->user_id);
+
+    if (!$user || !$user->theme_id) {
+        return response()->json(['success' => false, 'message' => 'Tema tidak ditemukan untuk user ini'], 404);
+    }
+
+    $theme = Theme::find($user->theme_id);
+
+    if (!$theme) {
+        return response()->json(['success' => false, 'message' => 'Tema tidak ditemukan'], 404);
+    }
+
+    // Pastikan updated_at ada, gunakan timestamp default jika null
+    $updatedAt = $theme->updated_at ? $theme->updated_at->timestamp : now()->timestamp;
+
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'theme_id' => $user->theme_id,
+            'updated_at' => $updatedAt,
+            'css_file' => $theme->css_file ? asset($theme->css_file) : asset('css/style.css') // Tambahkan css_file
+        ]
+    ]);
 });
 
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

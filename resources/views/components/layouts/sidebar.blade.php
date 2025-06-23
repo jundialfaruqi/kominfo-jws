@@ -4,19 +4,10 @@
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <h1 class="navbar-brand d-none-navbar-horizontal pt-lg-5">
+        <h1 class="navbar-brand d-none-navbar-horizontal align-items-center justify-content-start pt-lg-5">
             <a wire:navigate href="{{ route('dashboard.index') }}">
                 <span class="navbar-brand-image">
-                    {{-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-box">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5" />
-                        <path d="M12 12l8 -4.5" />
-                        <path d="M12 12l0 9" />
-                        <path d="M12 12l-8 -4.5" />
-                    </svg> --}}
-                    <a href=".">
+                    <a wire:navigate href="{{ route('dashboard.index') }}">
                         <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
                             class="navbar-brand-image">
                     </a>
@@ -117,6 +108,28 @@
                             </a>
                         </li>
                     @endif
+                    <li class="nav-item {{ request()->routeIs('tema.index') ? 'active' : '' }}">
+                        <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-template">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path
+                                        d="M4 4m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
+                                    <path
+                                        d="M4 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                    <path d="M14 12l6 0" />
+                                    <path d="M14 16l6 0" />
+                                    <path d="M14 20l6 0" />
+                                </svg>
+                            </span>
+                            <span class="nav-link-title">
+                                Tema
+                            </span>
+                        </a>
+                    </li>
                     <li class="nav-item {{ request()->routeIs('profilmasjid.index') ? 'active' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
