@@ -288,7 +288,7 @@ body {
 
 .footer-message {
   grid-area: footer;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: #000000;
   padding: 10px 20px;
   text-align: center;
   font-size: 2rem;
@@ -301,7 +301,7 @@ body {
 .scrolling-text {
   display: inline-block;
   white-space: nowrap;
-  animation: scrollText 60s linear infinite;
+  animation: scrollText 60s ease-in-out infinite;
   padding-left: 100%;
   will-change: transform;
 }
@@ -643,7 +643,7 @@ body {
   .scrolling-text {
     display: inline-block;
     white-space: nowrap;
-    animation: scrollText 60s linear infinite;
+    animation: scrollText 60s ease-in-out infinite;
     padding-left: 100%;
     will-change: transform;
   }
@@ -1001,7 +1001,7 @@ body {
   .scrolling-text {
     display: inline-block;
     white-space: nowrap;
-    animation: scrollText 60s linear infinite;
+    animation: scrollText 60s ease-in-out infinite;
     padding-left: 100%;
     will-change: transform;
   }
@@ -1317,7 +1317,7 @@ body {
   .scrolling-text {
     display: inline-block;
     white-space: nowrap;
-    animation: scrollText 60s linear infinite;
+    animation: scrollText 60s ease-in-out infinite;
     padding-left: 100%;
     will-change: transform;
   }
@@ -1658,7 +1658,7 @@ body {
   .scrolling-text {
     display: inline-block;
     white-space: nowrap;
-    animation: scrollText 60s linear infinite;
+    animation: scrollText 60s ease-in-out infinite;
     padding-left: 100%;
     will-change: transform;
   }
@@ -1999,7 +1999,7 @@ body {
   .scrolling-text {
     display: inline-block;
     white-space: nowrap;
-    animation: scrollText 60s linear infinite;
+    animation: scrollText 60s ease-in-out infinite;
     padding-left: 100%;
     will-change: transform;
   }
@@ -2340,7 +2340,7 @@ body {
   .scrolling-text {
     display: inline-block;
     white-space: nowrap;
-    animation: scrollText 60s linear infinite;
+    animation: scrollText 60s ease-in-out infinite;
     padding-left: 100%;
     will-change: transform;
   }
