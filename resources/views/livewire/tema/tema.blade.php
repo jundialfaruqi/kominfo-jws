@@ -9,7 +9,7 @@
                                 @if ($isAdmin && $showForm)
                                     {{ $isEdit ? 'Ubah Pengaturan Tema' : 'Tambah Tema Baru' }}
                                 @else
-                                    {{ $isAdmin ? 'Daftar Tema' : 'Pilih Tema' }}
+                                    {{ $isAdmin ? 'Daftar Tema' : 'Tema' }}
                                 @endif
                             </h3>
                             @if ($isAdmin && !$showForm)
@@ -233,7 +233,7 @@
                                                 <div class="col-md-10">
                                                     <select
                                                         class="form-select rounded-3 @error('selectedThemeId') is-invalid @enderror"
-                                                        wire:model="selectedThemeId">
+                                                        wire:model.live="selectedThemeId">
                                                         <option value="">Tidak ada tema (default)</option>
                                                         @foreach ($availableThemes as $theme)
                                                             <option value="{{ $theme->id }}">{{ $theme->name }}
@@ -249,17 +249,38 @@
                                     </div>
                                     <div class="row row-cards">
                                         @foreach ($availableThemes as $theme)
-                                            <div class="col-md-4">
-                                                <div class="card mb-3 rounded-4 border-0">
-                                                    <img src="{{ $theme->preview_image ? asset($theme->preview_image) : asset('images/other/default-theme.jpg') }}"
-                                                        class="card-img-top rounded-4" alt="{{ $theme->name }}"
-                                                        style="height: 200px; object-fit: cover;">
+                                            <div class="col-md-4" wire:key="theme-{{ $theme->id }}">
+                                                <div
+                                                    class="card mb-3 rounded-4 pt-3 shadow-sm {{ $selectedThemeId == $theme->id ? 'border-primary bg-light shadow-sm' : 'shadow-sm' }}">
+                                                    <div class="position-relative">
+                                                        <img src="{{ $theme->preview_image ? asset($theme->preview_image) : asset('images/other/default-theme.jpg') }}"
+                                                            class="card-img-top rounded-4 {{ $selectedThemeId == $theme->id ? 'opacity-50' : 'opacity-100' }}"
+                                                            alt="{{ $theme->name }}"
+                                                            style="height: 200px; object-fit: cover;">
+                                                        @if ($selectedThemeId == $theme->id)
+                                                            <div
+                                                                class="position-absolute top-0 end-0 me-4 mt-2 text-success avatar rounded-circle shadow-sm">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24"
+                                                                    fill="currentColor"
+                                                                    class="icon icon-tabler icons-tabler-filled icon-tabler-circle-check">
+                                                                    <path stroke="none" d="M0 0h24v24H0z"
+                                                                        fill="none" />
+                                                                    <path
+                                                                        d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                                                                </svg>
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                     <div class="card-body text-center">
-                                                        <h5 class="card-title">{{ $theme->name }}</h5>
+                                                        <h5
+                                                            class="card-title {{ $selectedThemeId == $theme->id ? 'text-primary' : '' }}">
+                                                            {{ $theme->name }}
+                                                        </h5>
                                                         <button type="button"
-                                                            wire:click="selectedThemeId = {{ $theme->id }}"
-                                                            class="btn btn-primary rounded-3 shadow-sm  {{ $selectedThemeId == $theme->id ? 'disabled' : '' }}">
-                                                            Pilih Tema
+                                                            wire:click="selectTempTheme({{ $theme->id }})"
+                                                            class="btn btn-primary rounded-3 shadow-sm {{ $selectedThemeId == $theme->id ? 'disabled' : '' }}">
+                                                            {{ $selectedThemeId == $theme->id ? 'Dipilih' : 'Pilih Tema' }}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -267,10 +288,33 @@
                                         @endforeach
                                     </div>
                                 </div>
-                                <div class="card-footer rounded-4 border-0 sticky-bottom "
+                                <div class="card-footer rounded-4 border-0 sticky-bottom"
                                     style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <button type="submit" class="btn btn-primary py-2 px-2 rounded-3 shadow-sm"
+                                        @if ($selectedThemeId !== $initialThemeId)
+                                            <button type="button" wire:click="cancelSelection"
+                                                class="btn py-2 px-2 rounded-3 shadow-sm"
+                                                wire:loading.attr="disabled">
+                                                <span wire:loading.remove wire:target="cancelSelection">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        class="icon icon-tabler icons-tabler-outline icon-tabler-x">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                        <path d="M18 6l-12 12" />
+                                                        <path d="M6 6l12 12" />
+                                                    </svg>
+                                                    Batal
+                                                </span>
+                                                <span wire:loading wire:target="cancelSelection">
+                                                    <span class="spinner-border spinner-border-sm" role="status"
+                                                        aria-hidden="true"></span>
+                                                    <span class="small">Loading...</span>
+                                                </span>
+                                            </button>
+                                        @endif
+                                        <button type="submit" class="btn py-2 px-2 rounded-3 shadow-sm"
                                             wire:loading.attr="disabled">
                                             <span wire:loading.remove wire:target="selectTheme">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

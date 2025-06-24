@@ -5,7 +5,6 @@
     width: 100%;
     height: 100%;
     background-color: #000000;
-    /* Warna hitam dengan transparansi 90% */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1413,7 +1412,6 @@
     top: 20px;
     left: 20px;
     height: 65px;
-    /* Diperbesar dari 50px */
     width: auto;
     z-index: 10000;
 }
@@ -1427,17 +1425,13 @@
     left: 20px;
     background: rgba(0, 0, 0, 0.6);
     border-radius: 9.6px;
-    /* Diperbesar dari 8px * 1.2 */
     padding: 14.4px 21.6px;
-    /* Diperbesar dari 12px 18px * 1.2 */
     color: #ffffff;
     font-size: 1.98rem;
-    /* Diperbesar dari 1.65rem * 1.2 */
     font-weight: 800;
     display: flex;
     align-items: center;
     gap: 14.4px;
-    /* Diperbesar dari 12px * 1.2 */
     z-index: 10000;
 }
 
@@ -1449,12 +1443,9 @@
     right: 20px;
     background: rgba(0, 0, 0, 0.6);
     border-radius: 9.6px;
-    /* Diperbesar dari 8px * 1.2 */
     padding: 14.4px 21.6px;
-    /* Diperbesar dari 12px 18px * 1.2 */
     color: #ffffff;
     font-size: 1.98rem;
-    /* Diperbesar dari 1.65rem * 1.2 */
     font-weight: 800;
     z-index: 10000;
 }
@@ -1464,90 +1455,61 @@
 /* Ultra-high resolution: 4K and above (3840px x 2160px) */
 @media (min-width: 3840px) and (min-height: 2160px) {
     .jumbotron-image {
-        padding: 2.34rem;
-        /* 1.95rem * 1.2 */
+        padding: 2.34rem !important;
     }
 
     .jumbotron-logo {
-        top: 46.8px;
-        /* 39px * 1.2 */
-        left: 46.8px;
-        /* 39px * 1.2 */
-        height: 140.4px;
-        /* 117px * 1.2 */
+        top: 46.8px !important;
+        left: 46.8px !important;
+        height: 140.4px !important;
     }
 
     .jumbotron-countdown {
         bottom: 78px;
-        /* 65px * 1.2 */
         left: 46.8px;
-        /* 39px * 1.2 */
         font-size: 5.683392rem;
-        /* 4.73616rem * 1.2 */
         padding: 44.47872px 59.30496px;
-        /* 37.0656px 49.4208px * 1.2 */
         border-radius: 34.59456px;
-        /* 28.8288px * 1.2 */
         gap: 29.65248px;
-        /* 24.7104px * 1.2 */
     }
 
     .jumbotron-digital-clock {
         bottom: 78px;
-        /* 65px * 1.2 */
         right: 46.8px;
-        /* 39px * 1.2 */
         font-size: 5.683392rem;
-        /* 4.73616rem * 1.2 */
         padding: 44.47872px 59.30496px;
-        /* 37.0656px 49.4208px * 1.2 */
         border-radius: 34.59456px;
-        /* 28.8288px * 1.2 */
+        gap: 29.65248px;
     }
 }
 
 /* High resolution: 2560px - 3839px (e.g., QHD+) */
 @media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
     .jumbotron-image {
-        padding: 1.44rem;
-        /* 1.2rem * 1.2 */
+        padding: 1.44rem !important;
     }
 
     .jumbotron-logo {
-        top: 30px;
-        /* 25px * 1.2 */
-        left: 30px;
-        /* 25px * 1.2 */
-        height: 96px;
-        /* 80px * 1.2 */
+        top: 30px !important;
+        left: 30px !important;
+        height: 96px !important;
     }
 
     .jumbotron-countdown {
         bottom: 40px;
-        /* 25px * 1.2 */
         left: 30px;
-        /* 25px * 1.2 */
         font-size: 3.99168rem;
-        /* 3.3264rem * 1.2 */
         padding: 26.6112px 39.9168px;
-        /* 22.176px 33.264px * 1.2 */
         border-radius: 22.8096px;
-        /* 19.008px * 1.2 */
         gap: 22.8096px;
-        /* 19.008px * 1.2 */
     }
 
     .jumbotron-digital-clock {
         bottom: 40px;
-        /* 25px * 1.2 */
         right: 30px;
-        /* 25px * 1.2 */
         font-size: 3.99168rem;
-        /* 3.3264rem * 1.2 */
         padding: 26.6112px 39.9168px;
-        /* 22.176px 33.264px * 1.2 */
         border-radius: 22.8096px;
-        /* 19.008px * 1.2 */
     }
 }
 
@@ -1567,24 +1529,17 @@
         bottom: 30px;
         left: 20px;
         font-size: 2.6136rem;
-        /* 2.376rem * 1.1 */
         padding: 19.008px 28.512px;
-        /* 17.28px 25.92px * 1.1 */
         border-radius: 15.84px;
-        /* 14.4px * 1.1 */
         gap: 19.008px;
-        /* 17.28px * 1.1 */
     }
 
     .jumbotron-digital-clock {
         bottom: 30px;
         right: 20px;
         font-size: 2.6136rem;
-        /* 2.376rem * 1.1 */
         padding: 19.008px 28.512px;
-        /* 17.28px 25.92px * 1.1 */
         border-radius: 15.84px;
-        /* 14.4px * 1.1 */
     }
 }
 

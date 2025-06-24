@@ -34,6 +34,7 @@ class Tema extends Component
     public $deleteThemeId;
     public $deleteThemeName;
     public $selectedThemeId;
+    public $initialThemeId;
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -56,6 +57,7 @@ class Tema extends Component
         $this->search = '';
         $this->showForm = false;
         $this->selectedThemeId = Auth::check() ? Auth::user()->theme_id : null; // Ambil preferensi tema dari user
+        $this->initialThemeId = Auth::check() ? Auth::user()->theme_id : null;
     }
 
     public function updatingSearch()
@@ -93,6 +95,16 @@ class Tema extends Component
             'availableThemes' => $availableThemes,
             'isAdmin' => $isAdmin,
         ]);
+    }
+
+    public function selectTempTheme($themeId)
+    {
+        $this->selectedThemeId = $themeId; // Ubah selectedThemeId sementara
+    }
+
+    public function cancelSelection()
+    {
+        $this->selectedThemeId = $this->initialThemeId; // Kembalikan ke tema awal
     }
 
     public function showAddForm()
