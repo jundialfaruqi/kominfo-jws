@@ -56,6 +56,15 @@ return [
             'throw' => false,
         ],
 
+        // New disk configuration for public css
+        'public_css' => [
+            'driver' => 'local',
+            'root' => public_path('css/themes'),
+            'url' => env('APP_URL') . '/css/themes',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         // New disk configuration for public images slides
         'public_images_slides' => [
             'driver' => 'local',

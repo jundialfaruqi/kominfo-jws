@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use App\Models\Theme;
+use App\Models\User;
 
 class Firdaus extends Component
 {
@@ -38,12 +40,19 @@ class Firdaus extends Component
     public $durasi;
     public $jumbotron; // Tambahkan properti untuk jumbotron
     public $slug;
+    public $themeCss;
+    public $theme;
 
     public function mount($slug)
     {
         $this->slug = $slug;
         $this->profil = Profil::where('slug', $slug)->firstOrFail();
         $user_id = $this->profil->user_id;
+
+        // Ambil tema dan simpan ke properti $theme
+        $user = User::find($user_id);
+        $this->theme = $user && $user->theme_id ? Theme::find($user->theme_id) : null;
+        $this->themeCss = $this->theme && $this->theme->css_file ? asset($this->theme->css_file) : asset('css/style.css');
 
         // Ambil data durasi
         $this->durasi = Durasi::where('user_id', $user_id)->first();
@@ -457,6 +466,7 @@ class Firdaus extends Component
     public function render()
     {
         return view('livewire.firdaus.firdaus', [
+            'themeCss' => $this->themeCss,
             'prayerTimes' => $this->prayerTimes,
             'currentMonth' => $this->currentMonth,
             'currentYear' => $this->currentYear,
@@ -490,6 +500,7 @@ class Firdaus extends Component
                 'imam' => $this->petugas->imam,
                 'muadzin' => $this->petugas->muadzin,
             ] : [],
+            'theme' => $this->theme,
         ]);
     }
 }

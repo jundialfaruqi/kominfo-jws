@@ -1,3 +1,6 @@
+@section('styles')
+    <link href="{{ $themeCss }}" rel="stylesheet">
+@endsection
 <div>
     <div class="container">
         <div class="prayer-times">
@@ -7,7 +10,8 @@
                     <div class="prayer-icon">
                         @if ($prayer['icon'] === 'sun')
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun">
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="lucide lucide-sun">
                                 <circle cx="12" cy="12" r="4" />
                                 <path d="M12 2v2" />
                                 <path d="M12 20v2" />
@@ -182,6 +186,10 @@
     <input type="hidden" id="active-prayer-status"
         value='{{ $activePrayerStatus ? json_encode($activePrayerStatus) : '' }}'>
     <input type="hidden" id="durasi-data" value='{{ $durasi ? json_encode($durasi->toArray()) : '' }}'>
+    <input type="hidden" id="current-theme-id" value="{{ $theme ? $theme->id : '' }}">
+    <input type="hidden" id="current-theme-updated-at" value="{{ $theme ? $theme->updated_at->timestamp : 0 }}">
+    <input type="hidden" id="current-theme-css"
+        value="{{ $theme ? asset($theme->css_file) : asset('css/style.css') }}">
 
     {{-- Hidden inputs for adzan data --}}
     @foreach ($adzanData as $key => $value)

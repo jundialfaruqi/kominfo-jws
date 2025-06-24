@@ -26,6 +26,7 @@
         </div>
     </div>
 
+    {{-- Script files --}}
     @include('components.layouts.script')
     @livewireScripts
 </body>
