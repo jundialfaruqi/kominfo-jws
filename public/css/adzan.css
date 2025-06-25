@@ -282,7 +282,7 @@
 }
 
 /* ===== RESPONSIVE STYLES ===== */
-/* Ultra-high resolution: 4K and above (3840px x 2160px) */
+/* Ultra-high resolution: 4K and above ( 3840 x 2160 ) */
 @media (min-width: 3840px) and (min-height: 2160px) {
     .adzan {
         font-size: 8rem;
@@ -325,6 +325,17 @@
     .responsive-table td {
         padding: 1rem;
         font-size: 4.5rem;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
     }
 
     .adzan-popup,
@@ -381,6 +392,17 @@
         font-size: 3rem;
     }
 
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
+    }
+
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
@@ -433,6 +455,17 @@
     .responsive-table td {
         padding: 9px 14px;
         font-size: 2.2rem;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
     }
 
     .adzan-popup,
@@ -489,6 +522,17 @@
         font-size: 1.8rem;
     }
 
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
+    }
+
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
@@ -541,6 +585,17 @@
     .responsive-table td {
         padding: 7px 10px;
         font-size: 1.6rem;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
     }
 
     .adzan-popup,
@@ -597,6 +652,17 @@
         font-size: 1rem;
     }
 
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
+    }
+
     .adzan-popup,
     .iqomah-popup,
     .friday-info-popup,
@@ -644,6 +710,17 @@
 
     .friday-date {
         font-size: 1rem;
+    }
+
+    /* Adzan Image Display */
+    .adzan-image-display {
+        padding: 0;
+    }
+
+    .adzan-image-display img {
+        max-width: 100%;
+        max-width: 100%;
+        object-fit: cover;
     }
 }
 
