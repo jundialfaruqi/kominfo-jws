@@ -53,6 +53,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Tema Routes
     Route::get('/tema', \App\Livewire\Tema\Tema::class)->name('tema.index');
 
+    // Set Tema Routes
+    Route::get('/tema/set-tema', \App\Livewire\Tema\SetTema::class)->name('tema.set-tema');
+
     // Profile Routes
     Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index');
 
