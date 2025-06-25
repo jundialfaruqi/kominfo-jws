@@ -967,15 +967,6 @@
     }
 }
 
-
-/* Tambahkan font Digital-7 (opsional, unduh dari sumber seperti dafont.com) */
-/* @font-face {
-    font-family: 'Digital-7';
-    src: url('/fonts/Digital-7.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-} */
-
 /* Styling untuk Digital Clock (berlaku untuk semua popup) */
 .digital-clock {
     font-family: 'Digital-7', monospace, sans-serif;
