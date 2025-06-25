@@ -37,7 +37,7 @@ class SetTema extends Component
         $this->search = '';
         if (!in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk mengatur tema pengguna!');
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard.index');
         }
     }
 

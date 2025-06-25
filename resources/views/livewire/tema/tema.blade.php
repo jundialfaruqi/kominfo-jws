@@ -14,7 +14,8 @@
                             </h3>
                             @if ($isAdmin && !$showForm)
                                 <div class="card-actions">
-                                    <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm"
+                                        @if (Auth::user()->role !== 'Super Admin') style="display: none;" @endif>
                                         <span wire:loading.remove wire:target="showAddForm">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -197,7 +198,7 @@
                                                 <span class="small">Loading...</span>
                                             </span>
                                         </button>
-                                        <button type="submit" class="btn btn-primary py-2 px-2 rounded-3 shadow-sm"
+                                        <button type="submit" class="btn py-2 px-2 rounded-3 shadow-sm"
                                             wire:loading.attr="disabled">
                                             <span wire:loading.remove wire:target="save">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -397,8 +398,36 @@
                                                     @endif
                                                 </td>
                                                 <td class="text-end">
+                                                    @if ($theme->css_file)
+                                                        <button wire:click="downloadCssFile('{{ $theme->id }}')"
+                                                            class="btn py-2 px-2 rounded-3 shadow-sm">
+                                                            <span wire:loading.remove
+                                                                wire:target="downloadCssFile('{{ $theme->id }}')">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                    height="24" viewBox="0 0 24 24" fill="none"
+                                                                    stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round"
+                                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-download">
+                                                                    <path stroke="none" d="M0 0h24v24H0z"
+                                                                        fill="none" />
+                                                                    <path
+                                                                        d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                                                                    <path d="M7 11l5 5l5 -5" />
+                                                                    <path d="M12 4v12" />
+                                                                </svg>
+                                                                Download
+                                                            </span>
+                                                            <span wire:loading
+                                                                wire:target="downloadCssFile('{{ $theme->id }}')">
+                                                                <span class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                                <span class="small">Loading...</span>
+                                                            </span>
+                                                        </button>
+                                                    @endif
                                                     <button wire:click="edit('{{ $theme->id }}')"
-                                                        class="btn py-2 px-2 rounded-3 shadow-sm">
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm"
+                                                        @if (Auth::user()->role !== 'Super Admin') style="display: none;" @endif>
                                                         <span wire:loading.remove
                                                             wire:target="edit('{{ $theme->id }}')">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="24"

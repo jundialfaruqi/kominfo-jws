@@ -388,4 +388,24 @@ class Tema extends Component
             $this->dispatch('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+    public function downloadCssFile($id)
+    {
+        try {
+            if (!in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
+                $this->dispatch('error', 'Anda tidak memiliki akses untuk mengunduh file CSS!');
+                return;
+            }
+
+            $theme = Theme::findOrFail($id);
+            if (!$theme->css_file || !file_exists(public_path($theme->css_file))) {
+                $this->dispatch('error', 'File CSS tidak ditemukan!');
+                return;
+            }
+
+            return response()->download(public_path($theme->css_file), basename($theme->css_file));
+        } catch (\Exception $e) {
+            $this->dispatch('error', 'Terjadi kesalahan saat mengunduh file CSS: ' . $e->getMessage());
+        }
+    }
 }
