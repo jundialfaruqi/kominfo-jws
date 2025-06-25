@@ -53,6 +53,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Tema Routes
     Route::get('/tema', \App\Livewire\Tema\Tema::class)->name('tema.index');
 
+    // Set Tema Routes
+    Route::get('/tema/set-tema', \App\Livewire\Tema\SetTema::class)->name('tema.set-tema');
+
     // Profile Routes
     Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index');
 
@@ -234,7 +237,7 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+2 hour 36 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+6 hour 36 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
