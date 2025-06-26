@@ -246,7 +246,7 @@
                 <div id="adzanProgress" class="progress-bar"></div>
             </div>
             <div id="adzanCountdown" class="countdown"></div>
-            <div class="logo-poopup">
+            <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
         </div>
@@ -260,7 +260,7 @@
                 <div id="iqomahProgress" class="iqomah-progress-bar"></div>
             </div>
             <div id="iqomahCountdown" class="iqomah-countdown"></div>
-            <div class="logo-poopup">
+            <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
         </div>
@@ -283,7 +283,7 @@
                 <input type="hidden" id="imam" value="{{ $petugas->imam }}">
                 <input type="hidden" id="muadzin" value="{{ $petugas->muadzin }}">
             @endif
-            <div class="logo-poopup">
+            <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
         </div>
