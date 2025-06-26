@@ -299,7 +299,66 @@
             });
         }
 
-        // Fungsi untuk memeriksa pembaruan tema
+        // Fungsi untuk memeriksa pembaruan tema tanpa reload
+        // function checkThemeUpdate() {
+        //     const slug = window.location.pathname.replace(/^\//, '');
+        //     $.ajax({
+        //         url: `/api/theme-check/${slug}`,
+        //         method: 'GET',
+        //         dataType: 'json',
+        //         success: function(response) {
+        //             if (response.success) {
+        //                 const newThemeId = response.data.theme_id;
+        //                 const newUpdatedAt = response.data.updated_at;
+        //                 const newCssFile = response.data
+        //                     .css_file; // Asumsikan API mengembalikan css_file
+
+        //                 // Ambil data tema yang tersimpan
+        //                 const currentThemeId = $('#current-theme-id').val() || null;
+        //                 const currentUpdatedAt = $('#current-theme-updated-at').val() || 0;
+        //                 const currentThemeCss = $('#current-theme-css').val() ||
+        //                     ''; // Tambahkan hidden input untuk css_file saat ini
+
+        //                 if (newThemeId && (newThemeId !== currentThemeId || newUpdatedAt >
+        //                         currentUpdatedAt)) {
+        //                     console.log('Tema diperbarui:', {
+        //                         newThemeId,
+        //                         newUpdatedAt,
+        //                         newCssFile
+        //                     });
+
+        //                     // Perbarui hidden input untuk menyimpan status terbaru
+        //                     $('#current-theme-id').val(newThemeId);
+        //                     $('#current-theme-updated-at').val(newUpdatedAt);
+
+        //                     // Jika ada file CSS baru, muat secara dinamis
+        //                     if (newCssFile && newCssFile !== currentThemeCss) {
+        //                         const existingLink = document.querySelector(
+        //                             `link[href="${currentThemeCss}"]`);
+        //                         if (existingLink) {
+        //                             existingLink.remove(); // Hapus CSS lama
+        //                         }
+
+        //                         const newLink = document.createElement('link');
+        //                         newLink.rel = 'stylesheet';
+        //                         newLink.href = newCssFile; // Pastikan path sesuai dengan asset
+        //                         document.head.appendChild(newLink);
+
+        //                         // Perbarui hidden input untuk CSS saat ini
+        //                         $('#current-theme-css').val(newCssFile);
+
+        //                         console.log('CSS tema diperbarui tanpa reload:', newCssFile);
+        //                     }
+        //                 }
+        //             }
+        //         },
+        //         error: function(xhr, status, error) {
+        //             console.error('Gagal memeriksa pembaruan tema:', error);
+        //         }
+        //     });
+        // }
+
+        // Fungsi untuk memeriksa pembaruan tema dengan reload
         function checkThemeUpdate() {
             const slug = window.location.pathname.replace(/^\//, '');
             $.ajax({
@@ -310,14 +369,11 @@
                     if (response.success) {
                         const newThemeId = response.data.theme_id;
                         const newUpdatedAt = response.data.updated_at;
-                        const newCssFile = response.data
-                        .css_file; // Asumsikan API mengembalikan css_file
+                        const newCssFile = response.data.css_file;
 
-                        // Ambil data tema yang tersimpan
                         const currentThemeId = $('#current-theme-id').val() || null;
                         const currentUpdatedAt = $('#current-theme-updated-at').val() || 0;
-                        const currentThemeCss = $('#current-theme-css').val() ||
-                        ''; // Tambahkan hidden input untuk css_file saat ini
+                        const currentThemeCss = $('#current-theme-css').val() || '';
 
                         if (newThemeId && (newThemeId !== currentThemeId || newUpdatedAt >
                                 currentUpdatedAt)) {
@@ -327,34 +383,14 @@
                                 newCssFile
                             });
 
-                            // Perbarui hidden input untuk menyimpan status terbaru
                             $('#current-theme-id').val(newThemeId);
                             $('#current-theme-updated-at').val(newUpdatedAt);
+                            $('#current-theme-css').val(newCssFile);
 
-                            // Jika ada file CSS baru, muat secara dinamis
                             if (newCssFile && newCssFile !== currentThemeCss) {
-                                const existingLink = document.querySelector(
-                                    `link[href="${currentThemeCss}"]`);
-                                if (existingLink) {
-                                    existingLink.remove(); // Hapus CSS lama
-                                }
-
-                                const newLink = document.createElement('link');
-                                newLink.rel = 'stylesheet';
-                                newLink.href = newCssFile; // Pastikan path sesuai dengan asset
-                                document.head.appendChild(newLink);
-
-                                // Perbarui hidden input untuk CSS saat ini
-                                $('#current-theme-css').val(newCssFile);
-
-                                console.log('CSS tema diperbarui tanpa reload:', newCssFile);
+                                console.log('Memuat ulang halaman untuk CSS baru:', newCssFile);
+                                window.location.reload();
                             }
-
-                            // Opsional: Reload hanya jika ada perubahan besar (misalnya, struktur halaman)
-                            // if (/* kondisi perubahan struktur, misalnya newThemeId berubah ke tema yang berbeda secara signifikan */) {
-                            //     console.log('Perubahan struktur tema terdeteksi, memuat ulang halaman...');
-                            //     location.reload();
-                            // }
                         }
                     }
                 },
