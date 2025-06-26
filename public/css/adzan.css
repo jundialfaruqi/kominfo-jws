@@ -329,13 +329,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .adzan-popup,
@@ -394,13 +394,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .adzan-popup,
@@ -459,13 +459,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .adzan-popup,
@@ -524,13 +524,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .adzan-popup,
@@ -589,13 +589,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .adzan-popup,
@@ -654,13 +654,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .adzan-popup,
@@ -714,12 +714,12 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
+        max-width: 100% !important;
+        max-width: 100% !important;
         object-fit: cover;
     }
 }
@@ -793,13 +793,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 }
 
@@ -863,13 +863,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     /* Table responsiveness */
@@ -940,13 +940,13 @@
 
     /* Adzan Image Display */
     .adzan-image-display {
-        padding: 0;
+        padding: 0 !important;
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     /* Table responsiveness */
@@ -987,9 +987,9 @@
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .progress-container,
@@ -1029,9 +1029,9 @@
     }
 
     .adzan-image-display img {
-        max-width: 100%;
-        max-width: 100%;
-        object-fit: cover;
+        max-width: 100% !important;
+        max-width: 100% !important;
+        object-fit: cover !important;
     }
 
     .friday-date {
@@ -1523,7 +1523,7 @@
 /* Ultra-high resolution: 4K and above (3840px x 2160px) */
 @media (min-width: 3840px) and (min-height: 2160px) {
     .jumbotron-image {
-        padding: 2.34rem !important;
+        padding: 2.34rem;
     }
 
     .jumbotron-logo {
@@ -1554,7 +1554,7 @@
 /* High resolution: 2560px - 3839px (e.g., QHD+) */
 @media (min-width: 2560px) and (max-width: 3839px) and (min-height: 1440px) {
     .jumbotron-image {
-        padding: 1.44rem !important;
+        padding: 1.44rem;
     }
 
     .jumbotron-logo {
@@ -1588,9 +1588,9 @@
     }
 
     .jumbotron-logo {
-        top: 20px;
-        left: 20px;
-        height: 65px;
+        top: 20px !important;
+        left: 20px !important;
+        height: 65px !important;
     }
 
     .jumbotron-countdown {
@@ -1618,9 +1618,9 @@
     }
 
     .jumbotron-logo {
-        top: 15px;
-        left: 15px;
-        height: 60px;
+        top: 15px !important;
+        left: 15px !important;
+        height: 60px !important;
     }
 
     .jumbotron-countdown {
@@ -1655,9 +1655,9 @@
     }
 
     .jumbotron-logo {
-        top: 12px;
-        left: 12px;
-        height: 55px;
+        top: 12px !important;
+        left: 12px !important;
+        height: 55px !important;
     }
 
     .jumbotron-countdown {
@@ -1692,9 +1692,9 @@
     }
 
     .jumbotron-logo {
-        top: 10px;
-        left: 10px;
-        height: 50px;
+        top: 10px !important;
+        left: 10px !important;
+        height: 50px !important;
     }
 
     .jumbotron-countdown {
@@ -1727,9 +1727,9 @@
     }
 
     .jumbotron-logo {
-        top: 10px;
-        left: 10px;
-        height: 40px;
+        top: 10px !important;
+        left: 10px !important;
+        height: 40px !important;
         /* Diperbesar dari 35px */
     }
 
@@ -1763,9 +1763,9 @@
     }
 
     .jumbotron-logo {
-        top: 8px;
-        left: 8px;
-        height: 35px;
+        top: 8px !important;
+        left: 8px !important;
+        height: 35px !important;
         /* Diperbesar dari 30px */
     }
 
@@ -1800,9 +1800,9 @@
     }
 
     .jumbotron-logo {
-        top: 6px;
-        left: 6px;
-        height: 30px;
+        top: 6px !important;
+        left: 6px !important;
+        height: 30px !important;
         /* Diperbesar dari 25px */
     }
 
@@ -1837,9 +1837,9 @@
     }
 
     .jumbotron-logo {
-        top: 5px;
-        left: 5px;
-        height: 25px;
+        top: 5px !important;
+        left: 5px !important;
+        height: 25px !important;
         /* Diperbesar dari 20px */
     }
 
@@ -1874,9 +1874,9 @@
     }
 
     .jumbotron-logo {
-        top: 8px;
-        left: 8px;
-        height: 35px;
+        top: 8px !important;
+        left: 8px !important;
+        height: 35px !important;
         /* Diperbesar dari 30px */
     }
 
