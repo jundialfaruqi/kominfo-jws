@@ -50,6 +50,7 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
 
     Route::get('/jumbotron', \App\Livewire\Jumbotron\Jumbotron::class)->name('jumbotron.index');
 
+    Route::get('/audios', \App\Livewire\Audios\Audio::class)->name('audios');
     // Tema Routes
     Route::get('/tema', \App\Livewire\Tema\Tema::class)->name('tema.index');
 
