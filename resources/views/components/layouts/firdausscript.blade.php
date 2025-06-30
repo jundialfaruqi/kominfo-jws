@@ -84,8 +84,8 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 23 detik');
-        }, 23000);
+            // console.log('Waktu server diupdate setiap 33 detik');
+        }, 30000);
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -2665,9 +2665,9 @@
             updateJumbotronData();
             checkThemeUpdate();
             // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 37 Detik'
+            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
             // );
-        }, 37000); // 37000 milidetik = 37 detik
+        }, 40000); // 40000 milidetik = 40 detik
 
         updateJumbotronData();
 
@@ -2675,8 +2675,8 @@
             updateMosqueInfo();
             updateMarqueeText();
             updateSlides();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 63 detik');
-        }, 63000); // 63000 milidetik = 63 detik
+            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
+        }, 50000); // 50000 milidetik = 50 detik
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
