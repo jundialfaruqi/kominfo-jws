@@ -294,9 +294,6 @@
 
     {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
-        <div class="jumbotron-logo">
-            <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
-        </div>
         <img id="currentAdzanImage" src="" alt="Adzan Image">
     </div>
 </div>
