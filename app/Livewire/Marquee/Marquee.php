@@ -291,7 +291,7 @@ class Marquee extends Component
             $this->dispatch('success', $this->isEdit ? 'Marquee berhasil diubah!' : 'Marquee berhasil ditambahkan!');
 
             //only hide form and reset fields if user is admin
-            if (Auth::user()->role === 'Admin') {
+            if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
                 $this->showForm = false;
                 $this->reset(
                     [

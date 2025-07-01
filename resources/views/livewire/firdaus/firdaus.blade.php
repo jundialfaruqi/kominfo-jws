@@ -103,7 +103,7 @@
             @livewire('firdaus.mosque-info', ['slug' => request()->route('slug')])
 
             <div class="date-info">
-                <span class="next-adzan">
+                <div class="next-adzan">
                     <div class="countdown-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -117,10 +117,10 @@
                     </div>
                     <div class="countdown-text">
                         <span id="next-prayer-label">Maghrib</span>
-                        <span> -</span>
+                        <span>&nbsp;-</span>
                         <span id="countdown-value">-01:04:00</span>
                     </div>
-                </span>
+                </div>
                 <span class="date-item"></span>
             </div>
 
@@ -246,7 +246,7 @@
                 <div id="adzanProgress" class="progress-bar"></div>
             </div>
             <div id="adzanCountdown" class="countdown"></div>
-            <div class="logo-poopup">
+            <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
         </div>
@@ -260,7 +260,7 @@
                 <div id="iqomahProgress" class="iqomah-progress-bar"></div>
             </div>
             <div id="iqomahCountdown" class="iqomah-countdown"></div>
-            <div class="logo-poopup">
+            <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
         </div>
@@ -283,7 +283,7 @@
                 <input type="hidden" id="imam" value="{{ $petugas->imam }}">
                 <input type="hidden" id="muadzin" value="{{ $petugas->muadzin }}">
             @endif
-            <div class="logo-poopup">
+            <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
         </div>
