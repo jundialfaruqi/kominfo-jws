@@ -108,7 +108,7 @@ class Audio extends Component
             $publicId = "{$timestamp}_audio{$audioNumber}_{$slugName}";
 
             $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
-                'resource_type' => 'raw',
+                'resource_type' => 'video',
                 'folder' => 'Masjid Audios/' . User::find($this->userId)->name,
                 'public_id' => $publicId,
                 'overwrite' => true,
@@ -135,10 +135,10 @@ class Audio extends Component
     /**
      * Method untuk menghasilkan URL Cloudinary dari public_id
      */
-    private function generateCloudinaryUrl($publicId)
+    public function generateCloudinaryUrl($publicId)
     {
         $cloudName = config('filesystems.disks.cloudinary.cloud');
-        return "https://res.cloudinary.com/{$cloudName}/raw/upload/{$publicId}";
+        return "https://res.cloudinary.com/{$cloudName}/video/upload/{$publicId}";
     }
 
 

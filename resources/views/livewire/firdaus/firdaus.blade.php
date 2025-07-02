@@ -220,6 +220,19 @@
         <input type="hidden" id="jumbo_is_active" value="false">
     @endif
 
+    {{-- Hidden inputs for audio data --}}
+    @if ($audio)
+        <input type="hidden" id="audio1" value="{{ $audio->audio1 ?? '' }}">
+        <input type="hidden" id="audio2" value="{{ $audio->audio2 ?? '' }}">
+        <input type="hidden" id="audio3" value="{{ $audio->audio3 ?? '' }}">
+        <input type="hidden" id="audio_status" value="{{ $audio->status ? 'true' : 'false' }}">
+    @else
+        <input type="hidden" id="audio1" value="">
+        <input type="hidden" id="audio2" value="">
+        <input type="hidden" id="audio3" value="">
+        <input type="hidden" id="audio_status" value="false">
+    @endif
+
     {{-- Jumbotron Banner --}}
     <div id="jumbotronImage" class="jumbotron-image" style="display: none;">
         <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo" class="jumbotron-logo">
@@ -294,9 +307,6 @@
 
     {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
-        {{-- <span class="jumbotron-logo">
-            <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
-        </span> --}}
         <img id="currentAdzanImage" src="" alt="Adzan Image">
     </div>
 </div>

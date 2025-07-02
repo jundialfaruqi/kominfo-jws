@@ -395,4 +395,26 @@ Route::get('/api/theme-check/{slug}', function (Request $request, $slug) {
     ]);
 });
 
+Route::get('/api/audio/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $audio = \App\Models\Audios::where('user_id', $profil->user_id)->first();
+        if ($audio && $audio->status) {
+            // Buat instance komponen Audio untuk menggunakan generateCloudinaryUrl
+            $audioComponent = new \App\Livewire\Audios\Audio();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'audio1' => $audio->audio1 ? $audioComponent->generateCloudinaryUrl($audio->audio1) : null,
+                    'audio2' => $audio->audio2 ? $audioComponent->generateCloudinaryUrl($audio->audio2) : null,
+                    'audio3' => $audio->audio3 ? $audioComponent->generateCloudinaryUrl($audio->audio3) : null,
+                    'status' => $audio->status
+                ]
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Data audio tidak ditemukan atau tidak aktif'], 404);
+});
+
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

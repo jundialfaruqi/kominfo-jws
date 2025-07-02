@@ -108,7 +108,8 @@
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 1</label>
                                                     @if ($audio1)
-                                                        <audio controls class="w-100 mb-2"
+                                                        <audio controls
+                                                            class="w-100 mb-2
                                                             wire:key="audio1-{{ $audio1->getClientOriginalName() }}">
                                                             <source src="{{ $audio1->temporaryUrl() }}"
                                                                 type="audio/mpeg">
@@ -526,10 +527,10 @@
                                         <tr>
                                             <th class="w-1">No.</th>
                                             <th>Admin Masjid</th>
-                                            <th>Audio 1</th>
-                                            <th>Audio 2</th>
-                                            <th>Audio 3</th>
-                                            <th>Status</th>
+                                            <th class="text-center">Audio 1</th>
+                                            <th class="text-center">Audio 2</th>
+                                            <th class="text-center">Audio 3</th>
+                                            <th class="text-center">Status</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -538,7 +539,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="text-wrap">{{ $audio->user->name ?? '-' }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if ($audio->audio1_url)
                                                         <div
                                                             class="text-wrap text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
@@ -564,7 +565,7 @@
                                                         <span class="text-gray-400">-</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if ($audio->audio2_url)
                                                         <div
                                                             class="text-wrap text-center mb-2 small d-flex align-items-center justify-content-center gap-1">
@@ -590,7 +591,7 @@
                                                         <span class="text-gray-400">-</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     @if ($audio->audio3_url)
                                                         <div
                                                             class="text-wrap text-center mb-2 small d-flex align-items-center justify-content-center gap-1">
@@ -616,7 +617,7 @@
                                                         <span class="text-gray-400">-</span>
                                                     @endif
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <span
                                                         class="badge {{ $audio->status ? 'bg-primary-lt' : 'bg-danger-lt' }}">
                                                         {{ $audio->status ? 'Aktif' : 'Tidak Aktif' }}
