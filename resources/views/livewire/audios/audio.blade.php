@@ -108,18 +108,50 @@
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 1</label>
                                                     @if ($audio1)
-                                                        <audio controls class="w-100 mb-2">
+                                                        <audio controls class="w-100 mb-2"
+                                                            wire:key="audio1-{{ $audio1->getClientOriginalName() }}">
                                                             <source src="{{ $audio1->temporaryUrl() }}"
                                                                 type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ $audio1->getClientOriginalName() }}
+                                                        </div>
                                                     @elseif($tmp_audio1)
-                                                        <audio controls class="w-100 mb-2">
+                                                        <audio controls class="w-100 mb-2"
+                                                            wire:key="tmp_audio1-{{ $tmp_audio1 }}">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio1) }}"
                                                                 type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ pathinfo($tmp_audio1, PATHINFO_BASENAME) }}
+                                                        </div>
                                                     @endif
                                                     <div wire:loading wire:target="audio1" class="mt-2 text-center">
                                                         <span class="spinner-border spinner-border-sm" role="status"
@@ -145,30 +177,37 @@
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio1') is-invalid @enderror"
                                                             wire:model="audio1" accept="audio/*">
-
                                                         @if ($audio1 || $tmp_audio1)
                                                             <button type="button"
                                                                 class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
                                                                 wire:click="clearAudio1" title="Hapus audio">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="icon icon-1">
-                                                                    <path d="M4 7l16 0"></path>
-                                                                    <path d="M10 11l0 6"></path>
-                                                                    <path d="M14 11l0 6"></path>
-                                                                    <path
-                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
-                                                                    </path>
-                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
-                                                                    </path>
-                                                                </svg>
-                                                                reset
+                                                                <span wire:loading.remove wire:target="clearAudio1">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                        width="24" height="24"
+                                                                        viewBox="0 0 24 24" fill="none"
+                                                                        stroke="currentColor" stroke-width="2"
+                                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                                        class="icon icon-1">
+                                                                        <path d="M4 7l16 0"></path>
+                                                                        <path d="M10 11l0 6"></path>
+                                                                        <path d="M14 11l0 6"></path>
+                                                                        <path
+                                                                            d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                        </path>
+                                                                        <path
+                                                                            d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                        </path>
+                                                                    </svg>
+                                                                    reset
+                                                                </span>
+                                                                <span wire:loading wire:target="clearAudio1">
+                                                                    <span class="spinner-border spinner-border-sm"
+                                                                        role="status" aria-hidden="true"></span>
+                                                                    <span class="small">Menghapus...</span>
+                                                                </span>
                                                             </button>
                                                         @endif
                                                     </div>
-
                                                     @error('audio1')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -178,18 +217,52 @@
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 2</label>
                                                     @if ($audio2)
-                                                        <audio controls class="w-100 mb-2">
+                                                        <audio controls class="w-100 mb-2"
+                                                            wire:key="audio2-{{ $audio2->getClientOriginalName() }}">
                                                             <source src="{{ $audio2->temporaryUrl() }}"
                                                                 type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ $audio2->getClientOriginalName() }}
+                                                        </div>
                                                     @elseif($tmp_audio2)
-                                                        <audio controls class="w-100 mb-2">
+                                                        <audio controls class="w-100 mb-2"
+                                                            wire:key="tmp_audio2-{{ $tmp_audio2 }}">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio2) }}"
                                                                 type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ pathinfo($tmp_audio2, PATHINFO_BASENAME) }}
+                                                        </div>
                                                     @endif
                                                     <div wire:loading wire:target="audio2" class="mt-2 text-center">
                                                         <span class="spinner-border spinner-border-sm" role="status"
@@ -215,30 +288,37 @@
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio2') is-invalid @enderror"
                                                             wire:model="audio2" accept="audio/*">
-
                                                         @if ($audio2 || $tmp_audio2)
                                                             <button type="button"
                                                                 class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
                                                                 wire:click="clearAudio2" title="Hapus audio">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="icon icon-1">
-                                                                    <path d="M4 7l16 0"></path>
-                                                                    <path d="M10 11l0 6"></path>
-                                                                    <path d="M14 11l0 6"></path>
-                                                                    <path
-                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
-                                                                    </path>
-                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
-                                                                    </path>
-                                                                </svg>
-                                                                reset
+                                                                <span wire:loading.remove wire:target="clearAudio2">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                        width="24" height="24"
+                                                                        viewBox="0 0 24 24" fill="none"
+                                                                        stroke="currentColor" stroke-width="2"
+                                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                                        class="icon icon-1">
+                                                                        <path d="M4 7l16 0"></path>
+                                                                        <path d="M10 11l0 6"></path>
+                                                                        <path d="M14 11l0 6"></path>
+                                                                        <path
+                                                                            d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                        </path>
+                                                                        <path
+                                                                            d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                        </path>
+                                                                    </svg>
+                                                                    reset
+                                                                </span>
+                                                                <span wire:loading wire:target="clearAudio2">
+                                                                    <span class="spinner-border spinner-border-sm"
+                                                                        role="status" aria-hidden="true"></span>
+                                                                    <span class="small">Menghapus...</span>
+                                                                </span>
                                                             </button>
                                                         @endif
                                                     </div>
-
                                                     @error('audio2')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -248,18 +328,52 @@
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 3</label>
                                                     @if ($audio3)
-                                                        <audio controls class="w-100 mb-2">
+                                                        <audio controls class="w-100 mb-2"
+                                                            wire:key="audio3-{{ $audio3->getClientOriginalName() }}">
                                                             <source src="{{ $audio3->temporaryUrl() }}"
                                                                 type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ $audio3->getClientOriginalName() }}
+                                                        </div>
                                                     @elseif($tmp_audio3)
-                                                        <audio controls class="w-100 mb-2">
+                                                        <audio controls class="w-100 mb-2"
+                                                            wire:key="tmp_audio3-{{ $tmp_audio3 }}">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio3) }}"
                                                                 type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ pathinfo($tmp_audio3, PATHINFO_BASENAME) }}
+                                                        </div>
                                                     @endif
                                                     <div wire:loading wire:target="audio3" class="mt-2 text-center">
                                                         <span class="spinner-border spinner-border-sm" role="status"
@@ -285,30 +399,37 @@
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio3') is-invalid @enderror"
                                                             wire:model="audio3" accept="audio/*">
-
                                                         @if ($audio3 || $tmp_audio3)
                                                             <button type="button"
                                                                 class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
                                                                 wire:click="clearAudio3" title="Hapus audio">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24" fill="none"
-                                                                    stroke="currentColor" stroke-width="2"
-                                                                    stroke-linecap="round" stroke-linejoin="round"
-                                                                    class="icon icon-1">
-                                                                    <path d="M4 7l16 0"></path>
-                                                                    <path d="M10 11l0 6"></path>
-                                                                    <path d="M14 11l0 6"></path>
-                                                                    <path
-                                                                        d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
-                                                                    </path>
-                                                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
-                                                                    </path>
-                                                                </svg>
-                                                                reset
+                                                                <span wire:loading.remove wire:target="clearAudio3">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                                        width="24" height="24"
+                                                                        viewBox="0 0 24 24" fill="none"
+                                                                        stroke="currentColor" stroke-width="2"
+                                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                                        class="icon icon-1">
+                                                                        <path d="M4 7l16 0"></path>
+                                                                        <path d="M10 11l0 6"></path>
+                                                                        <path d="M14 11l0 6"></path>
+                                                                        <path
+                                                                            d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                                        </path>
+                                                                        <path
+                                                                            d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                                        </path>
+                                                                    </svg>
+                                                                    reset
+                                                                </span>
+                                                                <span wire:loading wire:target="clearAudio3">
+                                                                    <span class="spinner-border spinner-border-sm"
+                                                                        role="status" aria-hidden="true"></span>
+                                                                    <span class="small">Menghapus...</span>
+                                                                </span>
                                                             </button>
                                                         @endif
                                                     </div>
-
                                                     @error('audio3')
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -419,7 +540,23 @@
                                                 <td class="text-wrap">{{ $audio->user->name ?? '-' }}</td>
                                                 <td>
                                                     @if ($audio->audio1_url)
-                                                        <audio controls style="width: 150px;">
+                                                        <div
+                                                            class="text-wrap text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            {{ pathinfo($audio->audio1, PATHINFO_BASENAME) }}
+                                                        </div>
+                                                        <audio controls>
                                                             <source src="{{ $audio->audio1_url }}" type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
@@ -429,7 +566,23 @@
                                                 </td>
                                                 <td>
                                                     @if ($audio->audio2_url)
-                                                        <audio controls style="width: 150px;">
+                                                        <div
+                                                            class="text-wrap text-center mb-2 small d-flex align-items-center justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            {{ pathinfo($audio->audio2, PATHINFO_BASENAME) }}
+                                                        </div>
+                                                        <audio controls>
                                                             <source src="{{ $audio->audio2_url }}" type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
@@ -439,7 +592,23 @@
                                                 </td>
                                                 <td>
                                                     @if ($audio->audio3_url)
-                                                        <audio controls style="width: 150px;">
+                                                        <div
+                                                            class="text-wrap text-center mb-2 small d-flex align-items-center justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            {{ pathinfo($audio->audio3, PATHINFO_BASENAME) }}
+                                                        </div>
+                                                        <audio controls>
                                                             <source src="{{ $audio->audio3_url }}" type="audio/mpeg">
                                                             Browser Anda tidak mendukung elemen audio.
                                                         </audio>
@@ -529,6 +698,33 @@
 
     @script
         <script>
+            document.addEventListener('livewire:initialized', function() {
+                Livewire.on('resetFileInput', (data) => {
+                    const inputName = data.inputName;
+                    const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
+                    if (fileInput) {
+                        fileInput.value = '';
+                        fileInput.dispatchEvent(new Event('change', {
+                            bubbles: true
+                        }));
+                    }
+                });
+
+                // Pantau perubahan pada input file dan refresh elemen <audio>
+                ['audio1', 'audio2', 'audio3'].forEach(inputName => {
+                    const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
+                    if (fileInput) {
+                        fileInput.addEventListener('change', () => {
+                            const audioElement = document.querySelector(
+                                `audio[wire\\:key*="${inputName}"]`);
+                            if (audioElement) {
+                                audioElement.load(); // Memaksa refresh elemen <audio>
+                            }
+                        });
+                    }
+                });
+            });
+
             $wire.on('closeDeleteModal', () => {
                 const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                 if (modal) {
@@ -549,19 +745,6 @@
                     title: 'Gagal',
                     message,
                     position: 'topRight'
-                });
-            });
-
-            document.addEventListener('livewire:initialized', function() {
-                Livewire.on('resetFileInput', (data) => {
-                    const inputName = data.inputName;
-                    const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
-                    if (fileInput) {
-                        fileInput.value = '';
-                        fileInput.dispatchEvent(new Event('change', {
-                            bubbles: true
-                        }));
-                    }
                 });
             });
         </script>

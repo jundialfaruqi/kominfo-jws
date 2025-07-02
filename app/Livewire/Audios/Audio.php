@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class Audio extends Component
 {
@@ -92,63 +94,45 @@ class Audio extends Component
     private function saveCloudinaryAudio($uploadedFile, $audioNumber)
     {
         try {
-            // Periksa konfigurasi Cloudinary
             $this->checkCloudinaryConfig();
 
-            // Validasi apakah file valid
             if (!$uploadedFile || !$uploadedFile->isValid()) {
-                Log::error('File audio tidak valid atau tidak ditemukan', [
-                    'audio_number' => $audioNumber,
-                    'file' => $uploadedFile ? $uploadedFile->getClientOriginalName() : 'null',
-                ]);
                 throw new \Exception('File audio tidak valid atau tidak ditemukan.');
             }
 
             $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             $extension = $uploadedFile->getClientOriginalExtension();
-            $fileName = time() . '_audio' . $audioNumber . '_' . $originalName . '.' . $extension;
+            $slugName = Str::slug($originalName);
+            $timestamp = time();
 
-            // Log informasi file untuk debugging
-            Log::info('Mengupload audio ke Cloudinary', [
-                'audio_number' => $audioNumber,
-                'original_name' => $originalName,
-                'file_name' => $fileName,
-                'file_path' => $uploadedFile->getRealPath(),
-                'file_size' => $uploadedFile->getSize(),
-                'mime_type' => $uploadedFile->getMimeType(),
-            ]);
+            // Gunakan folder dari konfigurasi atau default
+            $folder = config('filesystems.disks.cloudinary.prefix', 'masjid_audios');
+            $publicId = "{$timestamp}_audio{$audioNumber}_{$slugName}";
 
-            // Ambil prefix dari konfigurasi, default ke kosong jika tidak ada
-            $prefix = config('filesystems.disks.cloudinary.prefix', '');
-            $folder = $prefix ? $prefix : 'masjid_audios';
-
-            // Upload ke Cloudinary menggunakan disk cloudinary
-            $uploadResult = Storage::disk('cloudinary')->putFileAs(
-                $folder,
-                $uploadedFile,
-                $fileName
-            );
-
-            // Dapatkan public_id dari hasil upload
-            $publicId = $folder . '/' . $fileName;
-
-            // Log hasil upload
-            Log::info('Audio berhasil diupload ke Cloudinary', [
-                'audio_number' => $audioNumber,
+            $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
+                'resource_type' => 'raw',
+                'folder' => 'Masjid Audios/' . User::find($this->userId)->name,
                 'public_id' => $publicId,
-                'upload_result' => $uploadResult,
+                'overwrite' => true,
             ]);
 
-            return $publicId;
+            Log::info('✅ Audio berhasil diupload ke Cloudinary', [
+                'audio_number' => $audioNumber,
+                'public_id' => $result['public_id'],
+                'url' => $result['secure_url'],
+            ]);
+
+            return $result['public_id']; // ← Simpan nilai ini ke database
         } catch (\Exception $e) {
-            Log::error('Gagal mengupload audio ke Cloudinary', [
+            Log::error('❌ Gagal mengupload audio ke Cloudinary', [
                 'audio_number' => $audioNumber,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
-            throw new \Exception('Gagal mengupload audio ke Cloudinary: ' . $e->getMessage());
+            throw new \Exception('Upload gagal: ' . $e->getMessage());
         }
     }
+
+
 
     /**
      * Method untuk menghasilkan URL Cloudinary dari public_id
@@ -159,6 +143,7 @@ class Audio extends Component
         return "https://res.cloudinary.com/{$cloudName}/raw/upload/{$publicId}";
     }
 
+
     /**
      * Method untuk menghapus audio1 dan mereset input file
      */
@@ -168,22 +153,53 @@ class Audio extends Component
             $this->checkCloudinaryConfig();
 
             if ($this->isEdit && $this->tmp_audio1) {
-                // Ambil public_id dari tmp_audio1
-                $publicId = $this->tmp_audio1;
+                // Fungsi untuk menghapus file di Cloudinary
+                $deleteCloudinaryFile = function ($publicId, $field) {
+                    if (!$publicId) {
+                        return true;
+                    }
 
-                // Periksa apakah file ada sebelum menghapus
-                if (Storage::disk('cloudinary')->exists($publicId)) {
-                    $result = Storage::disk('cloudinary')->delete($publicId);
-                    Log::info('Menghapus audio1 dari Cloudinary', [
-                        'public_id' => $publicId,
-                        'result' => $result,
-                    ]);
-                } else {
-                    Log::warning('File audio1 tidak ditemukan di Cloudinary', [
-                        'public_id' => $publicId,
-                    ]);
+                    try {
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+                        if ($result['result'] === 'ok') {
+                            Log::info("Menghapus {$field} dari Cloudinary", [
+                                'public_id' => $publicId,
+                                'result' => $result,
+                            ]);
+                            return true;
+                        }
+
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
+                        if ($result['result'] === 'ok') {
+                            Log::info("Menghapus {$field} dari Cloudinary sebagai video", [
+                                'public_id' => $publicId,
+                                'result' => $result,
+                            ]);
+                            return true;
+                        }
+
+                        Log::warning("Gagal menghapus {$field} dari Cloudinary", [
+                            'public_id' => $publicId,
+                            'result' => $result,
+                        ]);
+                        return false;
+                    } catch (\Exception $ex) {
+                        Log::error("Gagal menghapus {$field}", [
+                            'public_id' => $publicId,
+                            'error' => $ex->getMessage(),
+                        ]);
+                        return false;
+                    }
+                };
+
+                // Hapus file dari Cloudinary
+                $publicId = $this->tmp_audio1;
+                if (!$deleteCloudinaryFile($publicId, 'audio1')) {
+                    $this->dispatch('error', 'Gagal menghapus audio1 dari Cloudinary.');
+                    return;
                 }
 
+                // Perbarui database
                 if ($this->audioId) {
                     $audio = Audios::find($this->audioId);
                     if ($audio) {
@@ -216,22 +232,53 @@ class Audio extends Component
             $this->checkCloudinaryConfig();
 
             if ($this->isEdit && $this->tmp_audio2) {
-                // Ambil public_id dari tmp_audio2
-                $publicId = $this->tmp_audio2;
+                // Fungsi untuk menghapus file di Cloudinary
+                $deleteCloudinaryFile = function ($publicId, $field) {
+                    if (!$publicId) {
+                        return true;
+                    }
 
-                // Periksa apakah file ada sebelum menghapus
-                if (Storage::disk('cloudinary')->exists($publicId)) {
-                    $result = Storage::disk('cloudinary')->delete($publicId);
-                    Log::info('Menghapus audio2 dari Cloudinary', [
-                        'public_id' => $publicId,
-                        'result' => $result,
-                    ]);
-                } else {
-                    Log::warning('File audio2 tidak ditemukan di Cloudinary', [
-                        'public_id' => $publicId,
-                    ]);
+                    try {
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+                        if ($result['result'] === 'ok') {
+                            Log::info("Menghapus {$field} dari Cloudinary", [
+                                'public_id' => $publicId,
+                                'result' => $result,
+                            ]);
+                            return true;
+                        }
+
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
+                        if ($result['result'] === 'ok') {
+                            Log::info("Menghapus {$field} dari Cloudinary sebagai video", [
+                                'public_id' => $publicId,
+                                'result' => $result,
+                            ]);
+                            return true;
+                        }
+
+                        Log::warning("Gagal menghapus {$field} dari Cloudinary", [
+                            'public_id' => $publicId,
+                            'result' => $result,
+                        ]);
+                        return false;
+                    } catch (\Exception $ex) {
+                        Log::error("Gagal menghapus {$field}", [
+                            'public_id' => $publicId,
+                            'error' => $ex->getMessage(),
+                        ]);
+                        return false;
+                    }
+                };
+
+                // Hapus file dari Cloudinary
+                $publicId = $this->tmp_audio2;
+                if (!$deleteCloudinaryFile($publicId, 'audio2')) {
+                    $this->dispatch('error', 'Gagal menghapus audio2 dari Cloudinary.');
+                    return;
                 }
 
+                // Perbarui database
                 if ($this->audioId) {
                     $audio = Audios::find($this->audioId);
                     if ($audio) {
@@ -264,22 +311,53 @@ class Audio extends Component
             $this->checkCloudinaryConfig();
 
             if ($this->isEdit && $this->tmp_audio3) {
-                // Ambil public_id dari tmp_audio3
-                $publicId = $this->tmp_audio3;
+                // Fungsi untuk menghapus file di Cloudinary
+                $deleteCloudinaryFile = function ($publicId, $field) {
+                    if (!$publicId) {
+                        return true;
+                    }
 
-                // Periksa apakah file ada sebelum menghapus
-                if (Storage::disk('cloudinary')->exists($publicId)) {
-                    $result = Storage::disk('cloudinary')->delete($publicId);
-                    Log::info('Menghapus audio3 dari Cloudinary', [
-                        'public_id' => $publicId,
-                        'result' => $result,
-                    ]);
-                } else {
-                    Log::warning('File audio3 tidak ditemukan di Cloudinary', [
-                        'public_id' => $publicId,
-                    ]);
+                    try {
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+                        if ($result['result'] === 'ok') {
+                            Log::info("Menghapus {$field} dari Cloudinary", [
+                                'public_id' => $publicId,
+                                'result' => $result,
+                            ]);
+                            return true;
+                        }
+
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
+                        if ($result['result'] === 'ok') {
+                            Log::info("Menghapus {$field} dari Cloudinary sebagai video", [
+                                'public_id' => $publicId,
+                                'result' => $result,
+                            ]);
+                            return true;
+                        }
+
+                        Log::warning("Gagal menghapus {$field} dari Cloudinary", [
+                            'public_id' => $publicId,
+                            'result' => $result,
+                        ]);
+                        return false;
+                    } catch (\Exception $ex) {
+                        Log::error("Gagal menghapus {$field}", [
+                            'public_id' => $publicId,
+                            'error' => $ex->getMessage(),
+                        ]);
+                        return false;
+                    }
+                };
+
+                // Hapus file dari Cloudinary
+                $publicId = $this->tmp_audio3;
+                if (!$deleteCloudinaryFile($publicId, 'audio3')) {
+                    $this->dispatch('error', 'Gagal menghapus audio3 dari Cloudinary.');
+                    return;
                 }
 
+                // Perbarui database
                 if ($this->audioId) {
                     $audio = Audios::find($this->audioId);
                     if ($audio) {
@@ -506,24 +584,58 @@ class Audio extends Component
             $audio->user_id = $this->userId;
             $audio->status = $this->status;
 
-            // Ambil prefix dari konfigurasi
+            // Ambil prefix dari konfigurasi (untuk upload, bukan penghapusan)
             $prefix = config('filesystems.disks.cloudinary.prefix', '');
             $folder = $prefix ? $prefix : 'masjid_audios';
+
+            // Fungsi untuk menghapus file di Cloudinary dengan logika dari destroyAudio()
+            $deleteCloudinaryFile = function ($publicId, $field) {
+                if (!$publicId) {
+                    return true; // Tidak ada file untuk dihapus
+                }
+
+                try {
+                    // Coba hapus sebagai RAW
+                    $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+                    if ($result['result'] === 'ok') {
+                        Log::info("Menghapus {$field} dari Cloudinary", [
+                            'public_id' => $publicId,
+                            'result' => $result,
+                        ]);
+                        return true;
+                    }
+
+                    // Jika gagal sebagai RAW, coba sebagai VIDEO
+                    $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
+                    if ($result['result'] === 'ok') {
+                        Log::info("Menghapus {$field} dari Cloudinary sebagai video", [
+                            'public_id' => $publicId,
+                            'result' => $result,
+                        ]);
+                        return true;
+                    }
+
+                    Log::warning("Gagal menghapus {$field} dari Cloudinary", [
+                        'public_id' => $publicId,
+                        'result' => $result,
+                    ]);
+                    return false;
+                } catch (\Exception $ex) {
+                    Log::error("Gagal menghapus {$field}", [
+                        'public_id' => $publicId,
+                        'error' => $ex->getMessage(),
+                    ]);
+                    return false;
+                }
+            };
 
             // Handle audio1 upload
             if ($this->audio1) {
                 if ($this->isEdit && $audio->audio1) {
-                    $publicId = $audio->audio1;
-                    if (Storage::disk('cloudinary')->exists($publicId)) {
-                        $result = Storage::disk('cloudinary')->delete($publicId);
-                        Log::info('Menghapus audio1 lama dari Cloudinary', [
-                            'public_id' => $publicId,
-                            'result' => $result,
-                        ]);
-                    } else {
-                        Log::warning('File audio1 lama tidak ditemukan di Cloudinary', [
-                            'public_id' => $publicId,
-                        ]);
+                    $publicId = $audio->audio1; // Gunakan public_id langsung dari database
+                    if (!$deleteCloudinaryFile($publicId, 'audio1')) {
+                        $this->dispatch('error', 'Gagal menghapus audio1 lama dari Cloudinary.');
+                        return;
                     }
                 }
                 $audio->audio1 = $this->saveCloudinaryAudio($this->audio1, 1);
@@ -534,17 +646,10 @@ class Audio extends Component
             // Handle audio2 upload
             if ($this->audio2) {
                 if ($this->isEdit && $audio->audio2) {
-                    $publicId = $audio->audio2;
-                    if (Storage::disk('cloudinary')->exists($publicId)) {
-                        $result = Storage::disk('cloudinary')->delete($publicId);
-                        Log::info('Menghapus audio2 lama dari Cloudinary', [
-                            'public_id' => $publicId,
-                            'result' => $result,
-                        ]);
-                    } else {
-                        Log::warning('File audio2 lama tidak ditemukan di Cloudinary', [
-                            'public_id' => $publicId,
-                        ]);
+                    $publicId = $audio->audio2; // Gunakan public_id langsung dari database
+                    if (!$deleteCloudinaryFile($publicId, 'audio2')) {
+                        $this->dispatch('error', 'Gagal menghapus audio2 lama dari Cloudinary.');
+                        return;
                     }
                 }
                 $audio->audio2 = $this->saveCloudinaryAudio($this->audio2, 2);
@@ -555,17 +660,10 @@ class Audio extends Component
             // Handle audio3 upload
             if ($this->audio3) {
                 if ($this->isEdit && $audio->audio3) {
-                    $publicId = $audio->audio3;
-                    if (Storage::disk('cloudinary')->exists($publicId)) {
-                        $result = Storage::disk('cloudinary')->delete($publicId);
-                        Log::info('Menghapus audio3 lama dari Cloudinary', [
-                            'public_id' => $publicId,
-                            'result' => $result,
-                        ]);
-                    } else {
-                        Log::warning('File audio3 lama tidak ditemukan di Cloudinary', [
-                            'public_id' => $publicId,
-                        ]);
+                    $publicId = $audio->audio3; // Gunakan public_id langsung dari database
+                    if (!$deleteCloudinaryFile($publicId, 'audio3')) {
+                        $this->dispatch('error', 'Gagal menghapus audio3 lama dari Cloudinary.');
+                        return;
                     }
                 }
                 $audio->audio3 = $this->saveCloudinaryAudio($this->audio3, 3);
@@ -582,6 +680,9 @@ class Audio extends Component
                 $this->reset([
                     'audioId',
                     'userId',
+                    'audio1',
+                    'audio2',
+                    'audio3',
                     'tmp_audio1',
                     'tmp_audio2',
                     'tmp_audio3',
@@ -593,6 +694,9 @@ class Audio extends Component
                 if ($audio) {
                     $this->audioId    = $audio->id;
                     $this->userId     = $audio->user_id;
+                    $this->audio1     = $audio->audio1;
+                    $this->audio2     = $audio->audio2;
+                    $this->audio3     = $audio->audio3;
                     $this->tmp_audio1 = $audio->audio1;
                     $this->tmp_audio2 = $audio->audio2;
                     $this->tmp_audio3 = $audio->audio3;
@@ -606,6 +710,19 @@ class Audio extends Component
                 'trace' => $e->getTraceAsString(),
             ]);
             $this->dispatch('error', 'Terjadi kesalahan saat menyimpan audio: ' . $e->getMessage());
+        }
+    }
+
+    public function updated($propertyName)
+    {
+        if ($propertyName === 'audio1' && $this->audio1) {
+            $this->tmp_audio1 = null; // Kosongkan file lama jika file baru dipilih
+        }
+        if ($propertyName === 'audio2' && $this->audio2) {
+            $this->tmp_audio2 = null; // Kosongkan file lama jika file baru dipilih
+        }
+        if ($propertyName === 'audio3' && $this->audio3) {
+            $this->tmp_audio3 = null; // Kosongkan file lama jika file baru dipilih
         }
     }
 
@@ -623,66 +740,56 @@ class Audio extends Component
             $this->checkCloudinaryConfig();
 
             $audio = Audios::findOrFail($this->deleteAudioId);
+            $audioFields = ['audio1', 'audio2', 'audio3'];
+            $allDeleted = true;
 
-            // Ambil prefix dari konfigurasi
-            $prefix = config('filesystems.disks.cloudinary.prefix', '');
-            $folder = $prefix ? $prefix : 'masjid_audios';
+            foreach ($audioFields as $field) {
+                $publicId = $audio->$field;
 
-            if ($audio->audio1) {
-                $publicId = $audio->audio1;
-                if (Storage::disk('cloudinary')->exists($publicId)) {
-                    $result = Storage::disk('cloudinary')->delete($publicId);
-                    Log::info('Menghapus audio1 dari Cloudinary', [
+                if (!$publicId) {
+                    continue;
+                }
+
+                try {
+                    // Coba hapus sebagai RAW
+                    $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
+
+                    if ($result['result'] !== 'ok') {
+                        // Jika gagal sebagai RAW, coba sebagai VIDEO
+                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
+                        if ($result['result'] !== 'ok') {
+                            $allDeleted = false;
+                            Log::warning("Gagal menghapus file dari Cloudinary", [
+                                'field' => $field,
+                                'public_id' => $publicId,
+                                'result' => $result
+                            ]);
+                        }
+                    }
+                } catch (\Exception $ex) {
+                    $allDeleted = false;
+                    Log::error("Gagal menghapus {$field}", [
                         'public_id' => $publicId,
-                        'result' => $result,
-                    ]);
-                } else {
-                    Log::warning('File audio1 tidak ditemukan di Cloudinary', [
-                        'public_id' => $publicId,
+                        'error' => $ex->getMessage()
                     ]);
                 }
             }
 
-            if ($audio->audio2) {
-                $publicId = $audio->audio2;
-                if (Storage::disk('cloudinary')->exists($publicId)) {
-                    $result = Storage::disk('cloudinary')->delete($publicId);
-                    Log::info('Menghapus audio2 dari Cloudinary', [
-                        'public_id' => $publicId,
-                        'result' => $result,
-                    ]);
-                } else {
-                    Log::warning('File audio2 tidak ditemukan di Cloudinary', [
-                        'public_id' => $publicId,
-                    ]);
-                }
+            if ($allDeleted) {
+                $audio->delete();
+                $this->dispatch('closeDeleteModal');
+                $this->dispatch('success', 'Audio dan data berhasil dihapus.');
+            } else {
+                $this->dispatch('closeDeleteModal');
+                $this->dispatch('error', 'Sebagian file gagal dihapus dari Cloudinary. Data tidak dihapus.');
             }
-
-            if ($audio->audio3) {
-                $publicId = $audio->audio3;
-                if (Storage::disk('cloudinary')->exists($publicId)) {
-                    $result = Storage::disk('cloudinary')->delete($publicId);
-                    Log::info('Menghapus audio3 dari Cloudinary', [
-                        'public_id' => $publicId,
-                        'result' => $result,
-                    ]);
-                } else {
-                    Log::warning('File audio3 tidak ditemukan di Cloudinary', [
-                        'public_id' => $publicId,
-                    ]);
-                }
-            }
-
-            $audio->delete();
-
-            $this->dispatch('closeDeleteModal');
-            $this->dispatch('success', 'Audio berhasil dihapus!');
         } catch (\Exception $e) {
-            Log::error('Gagal menghapus audio', [
+            Log::error('❌ Gagal menjalankan destroyAudio()', [
+                'audio_id' => $this->deleteAudioId,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
             ]);
-            $this->dispatch('error', 'Terjadi kesalahan: ' . $e->getMessage());
+
+            $this->dispatch('error', 'Terjadi kesalahan saat menghapus audio: ' . $e->getMessage());
         }
     }
 }
