@@ -119,6 +119,16 @@ return [
             'throw' => false,
         ],
 
+        'cloudinary' => [
+            'driver' => 'cloudinary',
+            'key' => env('CLOUDINARY_KEY'),
+            'secret' => env('CLOUDINARY_SECRET'),
+            'cloud' => env('CLOUDINARY_CLOUD_NAME'),
+            'url' => env('CLOUDINARY_URL'),
+            'secure' => env('CLOUDINARY_SECURE', true),
+            'prefix' => env('CLOUDINARY_PREFIX', 'masjid_audios'),
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

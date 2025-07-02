@@ -15,6 +15,10 @@
     $(document).ready(function() {
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
+        let audioPlayer = null;
+        let isAudioPlaying = false;
+        let audioPlayTimeout = null;
+        let lastPlayedAudioIndex = -1;
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
@@ -55,6 +59,106 @@
             const elapsed = Date.now() - pageLoadTimestamp;
             return new Date(serverTimestamp + elapsed);
         }
+
+        // Fungsi untuk memperbarui dan memutar audio
+        function updateAndPlayAudio() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) {
+                console.error('Tidak dapat menentukan slug dari URL');
+                return;
+            }
+
+            $.ajax({
+                url: `/api/audio/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success && response.data.status) {
+                        // Update nilai input hidden
+                        $('#audio1').val(response.data.audio1);
+                        $('#audio2').val(response.data.audio2);
+                        $('#audio3').val(response.data.audio3);
+                        $('#audio_status').val('true');
+
+                        // Putar audio jika tersedia
+                        playAudio();
+                    } else {
+                        $('#audio_status').val('false');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error saat mengambil data audio:', error, xhr.responseText);
+                    $('#audio_status').val('false');
+                }
+            });
+        }
+
+        // Fungsi untuk memutar audio
+        function playAudio() {
+            // Cek status audio
+            const audioStatus = $('#audio_status').val() === 'true';
+            if (!audioStatus) {
+                return;
+            }
+
+            // Ambil URL audio
+            const audio1 = $('#audio1').val();
+            const audio2 = $('#audio2').val();
+            const audio3 = $('#audio3').val();
+
+            // Buat array dari audio yang tersedia
+            const availableAudios = [];
+            if (audio1) availableAudios.push(audio1);
+            if (audio2) availableAudios.push(audio2);
+            if (audio3) availableAudios.push(audio3);
+
+            // Jika tidak ada audio tersedia, keluar dari fungsi
+            if (availableAudios.length === 0) return;
+
+            // Rotasi ke audio berikutnya
+            lastPlayedAudioIndex = (lastPlayedAudioIndex + 1) % availableAudios.length;
+            const audioUrl = availableAudios[lastPlayedAudioIndex];
+            console.log('Memutar audio index:', lastPlayedAudioIndex);
+
+            // Jika ada URL audio yang valid
+            if (audioUrl && !isAudioPlaying) {
+                // Hentikan audio yang sedang diputar (jika ada)
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer = null;
+                }
+
+                // Buat audio player baru
+                audioPlayer = new Audio(audioUrl);
+
+                // Atur event listener
+                audioPlayer.addEventListener('ended', function() {
+                    isAudioPlaying = false;
+                    audioPlayer = null;
+
+                    // Jadwalkan pemutaran ulang setelah 30 menit
+                    if (audioPlayTimeout) {
+                        clearTimeout(audioPlayTimeout);
+                    }
+                    audioPlayTimeout = setTimeout(function() {
+                        playAudio();
+                    }, 30 * 60 * 1000); // 30 menit
+                });
+
+                // Putar audio
+                audioPlayer.play().then(function() {
+                    isAudioPlaying = true;
+                    console.log('Audio berhasil diputar');
+                }).catch(function(error) {
+                    console.error('Gagal memutar audio:', error);
+                    isAudioPlaying = false;
+                    audioPlayer = null;
+                });
+            }
+        }
+
+        // Panggil fungsi updateAndPlayAudio saat halaman dimuat
+        updateAndPlayAudio();
 
         // Fungsi untuk memperbarui jam digital
         function updateDigitalClock() {
@@ -2657,6 +2761,11 @@
             $officialsElement.html(officialsHtml);
         }
 
+        // Perbarui dan putar audio setiap 30 menit
+        setInterval(function() {
+            updateAndPlayAudio();
+        }, 30 * 60 * 1000); // 30 menit
+
         setInterval(function() {
             updateFridayOfficials();
             updateFridayImages();
@@ -2675,6 +2784,7 @@
             updateMosqueInfo();
             updateMarqueeText();
             updateSlides();
+            updateAndPlayAudio();
             // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
         }, 50000); // 50000 milidetik = 50 detik
 

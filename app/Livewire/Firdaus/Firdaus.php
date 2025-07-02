@@ -15,6 +15,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Theme;
 use App\Models\User;
+use App\Models\Audios; // Tambahkan model Audios
 
 class Firdaus extends Component
 {
@@ -42,6 +43,7 @@ class Firdaus extends Component
     public $slug;
     public $themeCss;
     public $theme;
+    public $audio; // Tambahkan properti untuk audio
 
     public function mount($slug)
     {
@@ -59,6 +61,9 @@ class Firdaus extends Component
 
         // Ambil data jumbotron yang aktif
         $this->jumbotron = Jumbotron::where('is_active', true)->first();
+
+        // Ambil data audio
+        $this->audio = Audios::where('user_id', $user_id)->where('status', true)->first();
 
         $this->adzan    = Adzan::where('user_id', $user_id)->first();
         $this->marquee  = Marquee::where('user_id', $user_id)->first();
@@ -478,6 +483,7 @@ class Firdaus extends Component
             'slides' => $this->slides,
             'durasi' => $this->durasi,
             'jumbotron' => $this->jumbotron,
+            'audio' => $this->audio,
             'activePrayerStatus' => $this->activePrayerStatus,
             'apiSource' => $this->apiSource,
             'adzanData' => $this->adzan ? [
