@@ -48,6 +48,7 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
         // Add other admin routes here
     });
 
+    // Jumbotron Route
     Route::get('/jumbotron', \App\Livewire\Jumbotron\Jumbotron::class)->name('jumbotron.index');
 
     Route::get('/audios', \App\Livewire\Audios\Audio::class)->name('audios');

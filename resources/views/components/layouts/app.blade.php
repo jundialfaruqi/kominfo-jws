@@ -16,6 +16,11 @@
     <div class="page">
         {{-- Sidebar --}}
         @include('components.layouts.sidebar')
+
+        {{-- Navbar --}}
+        @include('components.layouts.navbar')
+
+        {{-- Page wrapper --}}
         <div class="page-wrapper">
             {{-- Page header --}}
             @include('components.layouts.header')

@@ -1,21 +1,19 @@
-<div x-data="serverClock({{ $serverTimestamp ?? 'null' }})" x-init="init()" class="text-lg font-mono">
-    <h2 class="font-bold mb-2">Hari ini</h2>
-
+<div class="bg-tranparent rounded-3" x-data="serverClock({{ $serverTimestamp ?? 'null' }})" x-init="init()">
     <template x-if="timestamp">
-        <div>
-            <p x-text="formattedTime + ' WIB'"></p>
-            <p class="text-sm text-gray-100">
+        <div class="flex flex-col items-start">
+            <p x-text="formattedTime + ' WIB'" class="text-3xl font-medium text-gray-800 tracking-wide mb-0"></p>
+            <i class="text-sm text-muted text-gray-400">
                 <?php if ($apiSource === 'pekanbaru'): ?>
-                Sumber : Api Pekanbaru Super App
+                Sumber: <span class="font-medium text-gray-200">Api Pekanbaru Super App</span>
                 <?php elseif ($apiSource === 'timeapi'): ?>
-                Sumber : TimeAPI.io
+                Sumber: <span class="font-medium text-gray-200">TimeAPI.io</span>
                 <?php elseif ($apiSource === 'google-script'): ?>
-                Sumber : Google Script API
+                Sumber: <span class="font-medium text-gray-200">Google Script API</span>
                 <?php else: ?>
-                Gagal menampilkan waktu, mengganti dengan waktu lokal <a href="javascript:void(0)"
-                    @click="window.location.reload()" class="text-blue-500 hover:underline">coba lagi</a>
+                Gagal menampilkan waktu, mengganti dengan waktu lokal 
+                <a href="javascript:void(0)" @click="window.location.reload()" class="text-blue-400 hover:text-blue-300 font-medium">coba lagi</a>
                 <?php endif; ?>
-            </p>
+            </i>
         </div>
     </template>
 </div>

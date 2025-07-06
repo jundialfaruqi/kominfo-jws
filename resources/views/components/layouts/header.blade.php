@@ -17,7 +17,7 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto d-none d-md-block">
-                <div class="btn-list">
+                {{-- <div class="btn-list">
                     <div class="dropdown">
                         <button
                             class="btn btn-dark rounded-pill shadow-xl dropdown-toggle d-flex align-items-center gap-2"
@@ -59,7 +59,7 @@
                         </ul>
                     </div>
 
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
