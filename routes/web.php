@@ -76,6 +76,15 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // durasi routes
     Route::get('/durasi', \App\Livewire\Durasi\Durasi::class)->name('durasi.index');
 
+    // faq routes
+    Route::get('/faq', \App\Livewire\Faq\Index::class)->name('faq.index');
+
+    // about routes
+    Route::get('/about', \App\Livewire\About\Index::class)->name('about.index');
+
+    // contact routes
+    Route::get('/contact', \App\Livewire\Contact\Index::class)->name('contact.index');
+
     // User-specific route that redirects to their own mosque page
     Route::get('/my/mosque', function () {
         // Get the authenticated user
