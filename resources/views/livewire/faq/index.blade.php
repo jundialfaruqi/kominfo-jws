@@ -3,10 +3,14 @@
         <div class="container-xl">
             <div class="card rounded-4">
                 <div class="card-body">
-                    <div class="space-y-4">
-                        <div>
+                    <div class="px-7 py-7">
+                        <div class="d-flex align-items-center">
+                            <h1 class="mb-5 flex-grow-1 text-center">FAQ</h1>
+                        </div>
+                        <div class="mb-4">
                             <h2 class="mb-3">1. Umum</h2>
-                            <div id="faq-1" class="accordion accordion-tabs" role="tablist" aria-multiselectable="true">
+                            <div id="faq-1" class="accordion accordion-tabs" role="tablist"
+                                aria-multiselectable="true">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
                                         <button class="accordion-button" data-bs-toggle="collapse"
@@ -113,7 +117,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div class="mb-4">
                             <h2 class="mb-3">2. Fitur</h2>
                             <div id="faq-2" class="accordion accordion-tabs" role="tablist"
                                 aria-multiselectable="true">
@@ -267,7 +271,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div class="mb-4">
                             <h2 class="mb-3">3. Teknis & Error</h2>
                             <div id="faq-3" class="accordion accordion-tabs" role="tablist"
                                 aria-multiselectable="true">
@@ -305,8 +309,8 @@
                                                     terhubung ke jaringan internet yang stabil. Apabila masalah masih
                                                     berlanjut, Anda dapat menunggu beberapa saat hingga server kembali
                                                     normal, atau menghubungi pihak pengelola aplikasi melalui halaman
-                                                    <a href="{{ route('contact.index') }}">Contact</a> untuk
-                                                    mendapatkan bantuan lebih lanjut.
+                                                    <a wire:navigate href="{{ route('contact.index') }}">Contact</a>
+                                                    untuk mendapatkan bantuan lebih lanjut.
                                                 </p>
                                             </div>
                                         </div>
@@ -342,8 +346,9 @@
                                                 </p>
                                                 <p>
                                                     Untuk melaporkan masalah tersebut, silakan hubungi kami melalui
-                                                    halaman <a href="{{ route('contact.index') }}">Contact</a> yang
-                                                    tersedia di dalam aplikasi. Anda juga dapat
+                                                    halaman
+                                                    <a wire:navigate href="{{ route('contact.index') }}">Contact</a>
+                                                    yang tersedia di dalam aplikasi. Anda juga dapat
                                                     mengirimkan laporan langsung melalui email ke alamat
                                                     <i>jundialfaruqi@gmail.com</i>. Sertakan penjelasan singkat mengenai
                                                     kesalahan yang ditemukan, serta tangkapan layar (jika memungkinkan),
@@ -355,8 +360,7 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div>
+                        <div class="mb-4">
                             <h2 class="mb-3">4. Privasi & Data</h2>
                             <div id="faq-4" class="accordion accordion-tabs" role="tablist"
                                 aria-multiselectable="true">

@@ -2,6 +2,7 @@
     <div class="page-body">
         <div class="container-xl">
             <div class="row row-deck row-cards">
+                {{-- Welcome Card --}}
                 <div class="col-sm-12 col-lg-6">
                     <div class="card rounded-4">
                         <div class="card-body">
@@ -278,13 +279,15 @@
                         </div>
                     </div>
                 </div>
+                {{-- / Welcome Card --}}
 
+                {{-- CALENDAR --}}
                 <div class="col-sm-12 col-lg-3">
                     <div class="card rounded-4">
-                        <div class="card-body">
-                            <div class="calendar-header text-center">
-                                <small>{{ \Carbon\Carbon::create($currentYear, $currentMonth, 1)->translatedFormat('F Y') }}</small>
-                            </div>
+                        <div class="card-body pt-3">
+                            <small
+                                class="d-block text-center mb-2">{{ \Carbon\Carbon::create($currentYear, $currentMonth, 1)->translatedFormat('F Y') }}
+                            </small>
                             <div class="table-responsive">
                                 <table class="table table-sm text-center calendar-table small">
                                     <thead>
@@ -319,41 +322,254 @@
                         </div>
                     </div>
                 </div>
+                {{-- / CALENDAR --}}
 
-                <!-- Widget Jadwal Sholat -->
+                {{-- Jadwal Sholat --}}
                 <div class="col-sm-12 col-lg-3">
                     <div class="card card-sm rounded-4">
-                        <div class="card-body p-1">
-                            <small class="d-block text-center mb-1 mt-2">Jadwal Sholat Pekanbaru</small>
+                        <div class="card-body px-4">
+                            <small class="d-block text-center">Jadwal Sholat Pekanbaru</small>
+                            <small
+                                class="d-block text-center mb-3">{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</small>
                             <div class="row">
-                                <div class="col-6">
-                                    <ul class="list-group list-group-flush">
-                                        @foreach (array_slice($prayerTimes, 0, 3) as $prayer)
-                                            <li
-                                                class="list-group-item list-group-item-action d-flex align-items-center {{ $prayer['is_active'] ? 'list-group-item-primary' : '' }} rounded-3 mb-1">
-                                                <div class="flex-grow-1 fs-6">{{ $prayer['name'] }}</div>
-                                                <span
-                                                    class="badge bg-primary text-white badge-sm">{{ $prayer['time'] }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <div class="col-6">
-                                    <ul class="list-group list-group-flush">
-                                        @foreach (array_slice($prayerTimes, 3, 3) as $prayer)
-                                            <li
-                                                class="list-group-item list-group-item-action d-flex align-items-center {{ $prayer['is_active'] ? 'list-group-item-primary' : '' }} rounded-3 mb-1">
-                                                <div class="flex-grow-1 fs-6">{{ $prayer['name'] }}</div>
-                                                <span
-                                                    class="badge bg-primary text-white badge-sm">{{ $prayer['time'] }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
+                                @if ($prayerTimes[0]['time'] === 'N/A')
+                                    <div class="col-12 text-center text-danger">
+                                        Gagal mendapatkan jadwal sholat. <a href="#" wire:click="$refresh"
+                                            class="text-primary">Reload</a>
+                                    </div>
+                                @else
+                                    <div class="col-6">
+                                        <ul class="list-group list-group-flush">
+                                            @foreach (array_slice($prayerTimes, 0, 3) as $prayer)
+                                                <li
+                                                    class="list-group-item list-group-item-action d-flex align-items-center justify-content-evenly p-2 {{ $prayer['is_active'] ? 'list-group-item-primary' : '' }} rounded-3 mb-1">
+                                                    <div class="me-0">
+                                                        @if ($prayer['icon'] === 'sun')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="lucide lucide-sun" width="20"
+                                                                height="20">
+                                                                <circle cx="12" cy="12" r="4" />
+                                                                <path d="M12 2v2" />
+                                                                <path d="M12 20v2" />
+                                                                <path d="m4.93 4.93 1.41 1.41" />
+                                                                <path d="m17.66 17.66 1.41 1.41" />
+                                                                <path d="M2 12h2" />
+                                                                <path d="M20 12h2" />
+                                                                <path d="m6.34 17.66-1.41 1.41" />
+                                                                <path d="m19.07 4.93-1.41 1.41" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'sunrise')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-sunrise"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M3 17h1m16 0h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7m-9.7 5.7a4 4 0 0 1 8 0" />
+                                                                <path d="M3 21l18 0" />
+                                                                <path d="M12 9v-6l3 3m-6 0l3 -3" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'hazemoon')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-haze-moon">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 16h18" />
+                                                                <path d="M3 20h18" />
+                                                                <path
+                                                                    d="M8.296 16c-2.268 -1.4 -3.598 -4.087 -3.237 -6.916c.443 -3.48 3.308 -6.083 6.698 -6.084v.006h.296c-1.991 1.916 -2.377 5.03 -.918 7.405c1.459 2.374 4.346 3.33 6.865 2.275a6.888 6.888 0 0 1 -2.777 3.314" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'sunset')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-haze"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 12h1" />
+                                                                <path d="M12 3v1" />
+                                                                <path d="M20 12h1" />
+                                                                <path d="M5.6 5.6l.7 .7" />
+                                                                <path d="M18.4 5.6l-.7 .7" />
+                                                                <path d="M8 12a4 4 0 1 1 8 0" />
+                                                                <path d="M3 16h18" />
+                                                                <path d="M3 20h18" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'sunwind')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-sun-wind"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M14.468 10a4 4 0 1 0 -5.466 5.46" />
+                                                                <path d="M2 12h1" />
+                                                                <path d="M11 3v1" />
+                                                                <path d="M11 20v1" />
+                                                                <path d="M4.6 5.6l.7 .7" />
+                                                                <path d="M17.4 5.6l-.7 .7" />
+                                                                <path d="M5.3 17.7l-.7 .7" />
+                                                                <path d="M15 13h5a2 2 0 1 0 0 -4" />
+                                                                <path
+                                                                    d="M12 16h5.714l.253 0a2 2 0 0 1 2.033 2a2 2 0 0 1 -2 2h-.286" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'moon')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-moon-stars"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+                                                                <path
+                                                                    d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" />
+                                                                <path d="M19 11h2m-1 -1v2" />
+                                                            </svg>
+                                                        @endif
+                                                    </div>
+                                                    <div class="d-flex flex-column">
+                                                        <div class="fs-6">{{ $prayer['name'] }}</div>
+                                                        <small class="text-muted">{{ $prayer['time'] }}</small>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    <div class="col-6">
+                                        <ul class="list-group list-group-flush">
+                                            @foreach (array_slice($prayerTimes, 3, 3) as $prayer)
+                                                <li
+                                                    class="list-group-item list-group-item-action d-flex align-items-center justify-content-evenly p-2 {{ $prayer['is_active'] ? 'list-group-item-primary' : '' }} rounded-3 mb-1">
+                                                    <div class="me-0">
+                                                        @if ($prayer['icon'] === 'sun')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="lucide lucide-sun" width="20"
+                                                                height="20">
+                                                                <circle cx="12" cy="12" r="4" />
+                                                                <path d="M12 2v2" />
+                                                                <path d="M12 20v2" />
+                                                                <path d="m4.93 4.93 1.41 1.41" />
+                                                                <path d="m17.66 17.66 1.41 1.41" />
+                                                                <path d="M2 12h2" />
+                                                                <path d="M20 12h2" />
+                                                                <path d="m6.34 17.66-1.41 1.41" />
+                                                                <path d="m19.07 4.93-1.41 1.41" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'sunrise')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-sunrise"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M3 17h1m16 0h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7m-9.7 5.7a4 4 0 0 1 8 0" />
+                                                                <path d="M3 21l18 0" />
+                                                                <path d="M12 9v-6l3 3m-6 0l3 -3" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'hazemoon')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-haze-moon">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 16h18" />
+                                                                <path d="M3 20h18" />
+                                                                <path
+                                                                    d="M8.296 16c-2.268 -1.4 -3.598 -4.087 -3.237 -6.916c.443 -3.48 3.308 -6.083 6.698 -6.084v.006h.296c-1.991 1.916 -2.377 5.03 -.918 7.405c1.459 2.374 4.346 3.33 6.865 2.275a6.888 6.888 0 0 1 -2.777 3.314" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'sunset')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-haze"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 12h1" />
+                                                                <path d="M12 3v1" />
+                                                                <path d="M20 12h1" />
+                                                                <path d="M5.6 5.6l.7 .7" />
+                                                                <path d="M18.4 5.6l-.7 .7" />
+                                                                <path d="M8 12a4 4 0 1 1 8 0" />
+                                                                <path d="M3 16h18" />
+                                                                <path d="M3 20h18" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'sunwind')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-sun-wind"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M14.468 10a4 4 0 1 0 -5.466 5.46" />
+                                                                <path d="M2 12h1" />
+                                                                <path d="M11 3v1" />
+                                                                <path d="M11 20v1" />
+                                                                <path d="M4.6 5.6l.7 .7" />
+                                                                <path d="M17.4 5.6l-.7 .7" />
+                                                                <path d="M5.3 17.7l-.7 .7" />
+                                                                <path d="M15 13h5a2 2 0 1 0 0 -4" />
+                                                                <path
+                                                                    d="M12 16h5.714l.253 0a2 2 0 0 1 2.033 2a2 2 0 0 1 -2 2h-.286" />
+                                                            </svg>
+                                                        @elseif ($prayer['icon'] === 'moon')
+                                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                                viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-moon-stars"
+                                                                width="20" height="20">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+                                                                <path
+                                                                    d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2" />
+                                                                <path d="M19 11h2m-1 -1v2" />
+                                                            </svg>
+                                                        @endif
+                                                    </div>
+                                                    <div class="d-flex flex-column">
+                                                        <div class="fs-6">{{ $prayer['name'] }}</div>
+                                                        <small class="text-muted">{{ $prayer['time'] }}</small>
+                                                    </div>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
+                {{-- / Widget Jadwal Sholat --}}
             </div>
 
             <div class="hr-text">Shortcut Menu</div>
@@ -472,7 +688,6 @@
                         </a>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

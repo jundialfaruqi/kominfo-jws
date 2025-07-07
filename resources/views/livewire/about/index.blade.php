@@ -3,9 +3,9 @@
         <div class="container-xl">
             <div class="card rounded-4">
                 <div class="card-body">
-                    <div class="space-y-4">
+                    <div class="px-7 py-7">
                         <div class="d-flex align-items-center">
-                            <h3 class="card-title mb-0 flex-grow-1 text-center">Tentang Kami</h3>
+                            <h1 class="mb-5 flex-grow-1 text-center">Tentang Kami</h1>
                         </div>
                         <div class="card-text">
                             <h4 class="fw-bold">Tentang Aplikasi</h4>
@@ -46,7 +46,8 @@
                             <p>Diskominfo Kota Pekanbaru terus berkomitmen untuk melakukan pembaruan dan penyempurnaan
                                 aplikasi secara berkelanjutan. Partisipasi masyarakat sangat kami harapkan dalam bentuk
                                 saran, masukan, atau laporan apabila ditemukan kendala teknis. Untuk itu, silakan
-                                hubungi kami melalui halaman <a href="{{ route('contact.index') }}">Contact</a> atau
+                                hubungi kami melalui halaman <a wire:navigate
+                                    href="{{ route('contact.index') }}">Contact</a> atau
                                 kirimkan email ke
                                 <a href="mailto:denihidayat1978@gmail.com">denihidayat1978@gmail.com</a>
                                 atau
