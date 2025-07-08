@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@mail.com',
             'role' => 'Admin',
-            'phone' => '082172117001',
+            'phone' => '081234567890',
             'password' => Hash::make('admin123'),
             'address' => 'Pekanbaru',
             'status' => 'Active',
@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Super Admin',
             'email' => 'superadmin@mail.com',
             'role' => 'Super Admin',
-            'phone' => '082172117002',
+            'phone' => '081234567890',
             'password' => Hash::make('admin123'),
             'address' => 'Pekanbaru',
             'status' => 'Active',
@@ -40,7 +40,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ProfilSeeder::class,
-            JadwalSholatSeeder::class,
             AdzanSeeder::class,
             MarqueeSeeder::class,
         ]);
