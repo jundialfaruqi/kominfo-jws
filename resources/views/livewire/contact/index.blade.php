@@ -48,7 +48,7 @@
                                 </svg>
                                 <span class="badge bg-red"></span>
                             </span>
-                            <h3 class="m-0 mb-1"><a href="#">Ahmad Mazlan</a></h3>
+                            <h3 class="m-0 mb-1">Ahmad Mazlan</h3>
                             <div class="text-secondary">Software / Web Developer</div>
                         </div>
                         <div class="d-flex">
