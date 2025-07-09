@@ -43,6 +43,9 @@ class Audio extends Component
         'audio1' => 'nullable|file|mimes:mp3,wav|max:10240', // Maks 10MB
         'audio2' => 'nullable|file|mimes:mp3,wav|max:10240',
         'audio3' => 'nullable|file|mimes:mp3,wav|max:10240',
+        'tmp_audio1' => 'nullable|file|mimes:mp3,wav|max:10240',
+        'tmp_audio2' => 'nullable|file|mimes:mp3,wav|max:10240',
+        'tmp_audio3' => 'nullable|file|mimes:mp3,wav|max:10240',
         'status' => 'required|boolean',
     ];
 
@@ -58,6 +61,15 @@ class Audio extends Component
         'audio1.max'      => 'Ukuran file maksimal 10MB',
         'audio2.max'      => 'Ukuran file maksimal 10MB',
         'audio3.max'      => 'Ukuran file maksimal 10MB',
+        'tmp_audio1.file' => 'File harus berupa audio',
+        'tmp_audio2.file' => 'File harus berupa audio',
+        'tmp_audio3.file' => 'File harus berupa audio',
+        'tmp_audio1.mimes' => 'File harus berupa audio mp3 atau wav',
+        'tmp_audio2.mimes' => 'File harus berupa audio mp3 atau wav',
+        'tmp_audio3.mimes' => 'File harus berupa audio mp3 atau wav',
+        'tmp_audio1.max' => 'Ukuran file maksimal 10MB',
+        'tmp_audio2.max' => 'Ukuran file maksimal 10MB',
+        'tmp_audio3.max' => 'Ukuran file maksimal 10MB',
         'status.required' => 'Status wajib diisi',
         'status.boolean'  => 'Status harus berupa aktif atau tidak aktif',
     ];
