@@ -268,6 +268,8 @@ class GambarAdzan extends Component
             // Dispatch event untuk reset input file di browser
             $this->dispatch('resetFileInput', ['inputName' => 'adzan1']);
 
+            // $this->showForm = true;
+
             $this->dispatch('success', 'Gambar Adzan 1 berhasil dihapus!');
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menghapus gambar: ' . $e->getMessage());

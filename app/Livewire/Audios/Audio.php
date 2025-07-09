@@ -384,7 +384,6 @@ class Audio extends Component
         $this->paginate = 10;
         $this->search = '';
 
-        // Log konfigurasi Cloudinary saat inisialisasi
         try {
             $this->checkCloudinaryConfig();
         } catch (\Exception $e) {
@@ -692,9 +691,6 @@ class Audio extends Component
                 if ($audio) {
                     $this->audioId    = $audio->id;
                     $this->userId     = $audio->user_id;
-                    $this->audio1     = $audio->audio1;
-                    $this->audio2     = $audio->audio2;
-                    $this->audio3     = $audio->audio3;
                     $this->tmp_audio1 = $audio->audio1;
                     $this->tmp_audio2 = $audio->audio2;
                     $this->tmp_audio3 = $audio->audio3;
@@ -713,15 +709,55 @@ class Audio extends Component
 
     public function updated($propertyName)
     {
-        if ($propertyName === 'audio1' && $this->audio1) {
-            $this->tmp_audio1 = null; // Kosongkan file lama jika file baru dipilih
+        if ($propertyName === 'audio1') {
+            Log::debug('audio1 updated', [
+                'audio1' => $this->audio1 ? get_class($this->audio1) : null,
+                'tmp_audio1' => $this->tmp_audio1,
+            ]);
+            if ($this->audio1) {
+                $this->tmp_audio1 = null;
+                $this->validateOnly('audio1');
+            }
         }
-        if ($propertyName === 'audio2' && $this->audio2) {
-            $this->tmp_audio2 = null; // Kosongkan file lama jika file baru dipilih
+        if ($propertyName === 'audio2') {
+            Log::debug('audio2 updated', [
+                'audio2' => $this->audio2 ? get_class($this->audio2) : null,
+                'tmp_audio2' => $this->tmp_audio2,
+            ]);
+            if ($this->audio2) {
+                $this->tmp_audio2 = null;
+                $this->validateOnly('audio2');
+            }
         }
-        if ($propertyName === 'audio3' && $this->audio3) {
-            $this->tmp_audio3 = null; // Kosongkan file lama jika file baru dipilih
+        if ($propertyName === 'audio3') {
+            Log::debug('audio3 updated', [
+                'audio3' => $this->audio3 ? get_class($this->audio3) : null,
+                'tmp_audio3' => $this->tmp_audio3,
+            ]);
+            if ($this->audio3) {
+                $this->tmp_audio3 = null;
+                $this->validateOnly('audio3');
+            }
         }
+    }
+
+    public function refreshAudio($data)
+    {
+        $this->dispatch('refreshAudio', inputName: $data['inputName']);
+    }
+
+    public function fileSelected($data)
+    {
+        // Log untuk debugging
+        Log::debug('fileSelected called', [
+            'inputName' => $data['inputName'],
+            'audio1' => $this->audio1 ? get_class($this->audio1) : null,
+            'audio2' => $this->audio2 ? get_class($this->audio2) : null,
+            'audio3' => $this->audio3 ? get_class($this->audio3) : null,
+        ]);
+
+        // Memaksa render ulang dengan mengirim event kembali ke JavaScript
+        $this->dispatch('fileSelected', inputName: $data['inputName']);
     }
 
     public function delete($id)
