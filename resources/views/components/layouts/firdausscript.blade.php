@@ -136,13 +136,8 @@
                     isAudioPlaying = false;
                     audioPlayer = null;
 
-                    // Jadwalkan pemutaran ulang setelah 30 menit
-                    if (audioPlayTimeout) {
-                        clearTimeout(audioPlayTimeout);
-                    }
-                    audioPlayTimeout = setTimeout(function() {
-                        playAudio();
-                    }, 30 * 60 * 1000); // 30 menit
+                    // Langsung putar audio berikutnya tanpa jeda
+                    playAudio();
                 });
 
                 // Putar audio
