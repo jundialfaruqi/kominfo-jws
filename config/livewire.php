@@ -64,30 +64,13 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => null,        // Example: 'local', 's3'              | Default: 'default'
-        'rules' => null,       // Example: ['file', 'mimes:png,jpg']  | Default: ['required', 'file', 'max:12288'] (12MB)
-        'directory' => null,   // Example: 'tmp'                      | Default: 'livewire-tmp'
-        'middleware' => null,  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
-        'preview_mimes' => [   // Supported file types for temporary pre-signed file URLs...
-            'png',
-            'gif',
-            'bmp',
-            'svg',
-            'wav',
-            'mp4',
-            'mov',
-            'avi',
-            'wmv',
-            'mp3',
-            'm4a',
-            'jpg',
-            'jpeg',
-            'mpga',
-            'webp',
-            'wma',
-        ],
-        'max_upload_time' => 5, // Max duration (in minutes) before an upload is invalidated...
-        'cleanup' => true, // Should cleanup temporary uploads older than 24 hrs...
+        'disk' => 'local',
+        'rules' => ['nullable', 'file', 'mimes:mp3,wav', 'max:10240'], // Sesuaikan dengan komponen
+        'directory' => 'livewire-tmp',
+        'middleware' => 'throttle:60,1',
+        'preview_mimes' => ['mp3', 'wav'], // Batasi ke format yang diizinkan
+        'max_upload_time' => 10, // Tambah waktu jika perlu
+        'cleanup' => true,
     ],
 
     'legacy' => [
