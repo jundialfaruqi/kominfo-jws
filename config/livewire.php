@@ -69,7 +69,7 @@ return [
         'directory' => 'livewire-tmp',
         'middleware' => 'throttle:60,1',
         'preview_mimes' => ['mp3', 'wav'], // Batasi ke format yang diizinkan
-        'max_upload_time' => 10, // Tambah waktu jika perlu
+        'max_upload_time' => 30, // Tambah waktu jika perlu
         'cleanup' => true,
     ],
 
@@ -80,7 +80,7 @@ return [
             'directory' => 'livewire-tmp',
             'middleware' => 'throttle:60,1',
             'preview_mimes' => ['mp3', 'wav'],
-            'max_upload_time' => 5,
+            'max_upload_time' => 30,
         ],
     ],
 
