@@ -292,7 +292,7 @@
                                                     {{-- Container untuk input file dan tombol trash --}}
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
-                                                            class="form-control my-2 rounded-4 @error('slide1') is-invalid @enderror"
+                                                            class="form-control my-2 rounded-4 @error('slide3') is-invalid @enderror"
                                                             wire:model="slide3" accept="image/*">
 
                                                         {{-- Tombol Trash - hanya muncul jika ada gambar --}}
