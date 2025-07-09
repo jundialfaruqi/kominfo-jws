@@ -19,6 +19,10 @@
         let isAudioPlaying = false;
         let audioPlayTimeout = null;
         let lastPlayedAudioIndex = -1;
+        let isAudioPausedForAdzan = false; // Variabel untuk melacak apakah audio dijeda karena adzan
+        let cachedAudioUrls = []; // Menyimpan URL audio yang tidak berubah selama sesi pemutaran
+        let audioRetryCount = 0; // Menghitung percobaan pemutaran ulang jika terjadi error
+        const MAX_RETRY_ATTEMPTS = 3; // Maksimum percobaan pemutaran ulang
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
@@ -60,18 +64,41 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        // Variabel untuk menyimpan timestamp terakhir pembaruan audio
+        let lastAudioUpdateTimestamp = 0;
+        let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
+
+        // Variabel untuk menandai bahwa ada audio baru yang tersedia
+        // Digunakan untuk mendeteksi perubahan audio dari admin panel
+        window.newAudioAvailable = false;
+
+        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
+        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
+        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
+
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
+            // Periksa koneksi jaringan terlebih dahulu
+            if (!checkNetworkAndRetry()) {
+                return; // Keluar jika offline, checkNetworkAndRetry akan menangani retry
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
                 return;
             }
 
+            // Selalu periksa pembaruan audio, bahkan jika sedang diputar
+
+            // Tambahkan timestamp untuk mencegah caching oleh browser
+            const requestTimestamp = Date.now();
+
             $.ajax({
-                url: `/api/audio/${slug}`,
+                url: `/api/audio/${slug}?_=${requestTimestamp}`,
                 method: 'GET',
                 dataType: 'json',
+                cache: false, // Pastikan browser tidak meng-cache respons
                 success: function(response) {
                     if (response.success && response.data.status) {
                         // Update nilai input hidden
@@ -80,8 +107,60 @@
                         $('#audio3').val(response.data.audio3);
                         $('#audio_status').val('true');
 
-                        // Putar audio jika tersedia
-                        playAudio();
+                        // Buat hash dari URL audio untuk deteksi perubahan
+                        const newAudioHash = [
+                            response.data.audio1 || '',
+                            response.data.audio2 || '',
+                            response.data.audio3 || ''
+                        ].join('|');
+
+                        // Periksa apakah audio telah berubah
+                        const currentAudioHash = cachedAudioUrls.join('|');
+                        const audioChanged = newAudioHash !== currentAudioHash;
+
+                        // Update timestamp terakhir pembaruan
+                        lastAudioUpdateTimestamp = Date.now();
+
+                        // Jika audio berubah atau cache kosong, perbarui cache
+                        if (audioChanged || cachedAudioUrls.length === 0) {
+                            // Jika audio sedang diputar dan berubah, tampilkan pesan
+                            if (audioChanged && isAudioPlaying) {
+                                console.log(
+                                    'Terdeteksi perubahan audio. Audio baru akan diputar setelah audio saat ini selesai.'
+                                );
+                                // Tandai bahwa ada audio baru tersedia
+                                window.newAudioAvailable = true;
+                            }
+
+                            // Perbarui cache
+                            cachedAudioUrls = [];
+                            if (response.data.audio1) cachedAudioUrls.push(response.data.audio1);
+                            if (response.data.audio2) cachedAudioUrls.push(response.data.audio2);
+                            if (response.data.audio3) cachedAudioUrls.push(response.data.audio3);
+                            console.log('Audio URLs di-cache untuk sesi pemutaran:', cachedAudioUrls
+                                .length, 'audio');
+
+                            // Jika audio sedang diputar, jangan reset pemutaran
+                            // Audio baru akan diputar setelah audio saat ini selesai
+                            if (!isAudioPlaying) {
+                                // Putar audio jika tersedia dan tidak sedang dijeda untuk adzan
+                                if (!isAudioPausedForAdzan) {
+                                    playAudio();
+                                } else {
+                                    console.log(
+                                        'Audio tidak diputar karena sedang dijeda untuk adzan');
+                                }
+                            }
+                        }
+
+                        // Putar audio jika tersedia dan tidak sedang dijeda untuk adzan
+                        if (!isAudioPausedForAdzan && !isAudioPlaying && !audioChanged) {
+                            playAudio();
+                        } else if (isAudioPlaying && audioChanged) {
+                            console.log('Audio baru akan diputar setelah audio saat ini selesai');
+                        } else if (isAudioPausedForAdzan) {
+                            console.log('Audio tidak diputar karena sedang dijeda untuk adzan');
+                        }
                     } else {
                         $('#audio_status').val('false');
                     }
@@ -89,71 +168,345 @@
                 error: function(xhr, status, error) {
                     console.error('Error saat mengambil data audio:', error, xhr.responseText);
                     $('#audio_status').val('false');
-                }
+
+                    // Jika masih ada audio di cache, gunakan itu meskipun request gagal
+                    if (cachedAudioUrls.length > 0) {
+                        console.log('Menggunakan audio dari cache karena request gagal');
+                        if (!isAudioPausedForAdzan && !isAudioPlaying) {
+                            playAudio();
+                        }
+                    } else {
+                        // Coba lagi setelah beberapa waktu jika tidak ada cache
+                        console.log('Mencoba mengambil audio lagi dalam 30 detik...');
+                        setTimeout(updateAndPlayAudio, 30 * 1000);
+                    }
+                },
+                timeout: 15000 // Timeout setelah 15 detik
             });
         }
 
         // Fungsi untuk memutar audio
         function playAudio() {
-            // Cek status audio
+            // Periksa koneksi jaringan terlebih dahulu
+            if (!checkNetworkAndRetry()) {
+                return; // Keluar jika offline, checkNetworkAndRetry akan menangani retry
+            }
+
+            // Cek status audio dan jika audio sedang dijeda untuk adzan
             const audioStatus = $('#audio_status').val() === 'true';
-            if (!audioStatus) {
+            if (!audioStatus || isAudioPausedForAdzan) {
                 return;
             }
 
-            // Ambil URL audio
-            const audio1 = $('#audio1').val();
-            const audio2 = $('#audio2').val();
-            const audio3 = $('#audio3').val();
+            // Gunakan audio yang sudah di-cache jika tersedia
+            let availableAudios = [];
+            if (cachedAudioUrls.length > 0) {
+                availableAudios = cachedAudioUrls;
+                console.log('Menggunakan audio dari cache');
+            } else {
+                // Ambil URL audio dari input hidden jika cache kosong
+                const audio1 = $('#audio1').val();
+                const audio2 = $('#audio2').val();
+                const audio3 = $('#audio3').val();
 
-            // Buat array dari audio yang tersedia
-            const availableAudios = [];
-            if (audio1) availableAudios.push(audio1);
-            if (audio2) availableAudios.push(audio2);
-            if (audio3) availableAudios.push(audio3);
+                // Buat array dari audio yang tersedia
+                if (audio1) availableAudios.push(audio1);
+                if (audio2) availableAudios.push(audio2);
+                if (audio3) availableAudios.push(audio3);
+
+                // Simpan ke cache untuk penggunaan selanjutnya
+                if (availableAudios.length > 0) {
+                    cachedAudioUrls = [...availableAudios];
+                    console.log('Audio URLs di-cache untuk sesi pemutaran:', cachedAudioUrls.length, 'audio');
+                }
+            }
 
             // Jika tidak ada audio tersedia, keluar dari fungsi
-            if (availableAudios.length === 0) return;
+            if (availableAudios.length === 0) {
+                console.warn('Tidak ada audio tersedia untuk diputar');
+                // Coba muat ulang audio dari server setelah 30 detik
+                setTimeout(resetAudioCache, 30 * 1000);
+                return;
+            }
 
-            // Rotasi ke audio berikutnya
-            lastPlayedAudioIndex = (lastPlayedAudioIndex + 1) % availableAudios.length;
+            // Validasi audio URLs
+            const validAudios = availableAudios.filter(url => {
+                return url && url.trim() !== '' && (url.startsWith('http') || url.startsWith('/'));
+            });
+
+            if (validAudios.length === 0) {
+                console.warn('Semua URL audio tidak valid, mencoba muat ulang dari server...');
+                setTimeout(resetAudioCache, 5 * 1000);
+                return;
+            }
+
+            // Gunakan hanya audio yang valid
+            availableAudios = validAudios;
+
+            // Reset counter percobaan jika kita beralih ke audio baru
+            if (lastPlayedAudioIndex === -1 || audioRetryCount >= MAX_RETRY_ATTEMPTS) {
+                audioRetryCount = 0;
+            }
+
+            // Rotasi ke audio berikutnya jika tidak ada percobaan ulang
+            if (audioRetryCount === 0) {
+                lastPlayedAudioIndex = (lastPlayedAudioIndex + 1) % availableAudios.length;
+            }
+
             const audioUrl = availableAudios[lastPlayedAudioIndex];
-            console.log('Memutar audio index:', lastPlayedAudioIndex);
+            console.log('Memutar audio index:', lastPlayedAudioIndex, audioRetryCount > 0 ?
+                `(percobaan ke-${audioRetryCount})` : '');
 
             // Jika ada URL audio yang valid
             if (audioUrl && !isAudioPlaying) {
                 // Hentikan audio yang sedang diputar (jika ada)
                 if (audioPlayer) {
                     audioPlayer.pause();
+                    // Bersihkan event listener untuk mencegah memory leak
+                    audioPlayer.onended = null;
+                    audioPlayer.onerror = null;
+                    audioPlayer.onplay = null;
+                    audioPlayer.onpause = null;
+                    // Hapus event listener yang ditambahkan secara eksplisit
+                    try {
+                        audioPlayer.removeEventListener('ended', null);
+                        audioPlayer.removeEventListener('error', null);
+                    } catch (e) {
+                        // Abaikan error jika event listener tidak ada
+                    }
                     audioPlayer = null;
                 }
 
                 // Buat audio player baru
                 audioPlayer = new Audio(audioUrl);
 
-                // Atur event listener
-                audioPlayer.addEventListener('ended', function() {
+                // Definisikan fungsi handler untuk event
+                const handleEnded = function() {
                     isAudioPlaying = false;
-                    audioPlayer = null;
+                    if (audioPlayer) {
+                        // Bersihkan event listener
+                        audioPlayer.removeEventListener('ended', handleEnded);
+                        audioPlayer.removeEventListener('error', handleError);
+                        audioPlayer = null;
+                    }
+                    audioRetryCount = 0; // Reset counter setelah berhasil memutar sampai selesai
 
-                    // Langsung putar audio berikutnya tanpa jeda
-                    playAudio();
-                });
+                    // Periksa apakah ada audio baru yang tersedia
+                    if (window.newAudioAvailable) {
+                        console.log('Audio baru tersedia, memuat ulang audio...');
+                        window.newAudioAvailable = false;
+                        resetAudioCache(); // Reset cache untuk memuat audio baru
+                    } else {
+                        // Langsung putar audio berikutnya tanpa jeda
+                        playAudio();
+                    }
+                };
+
+                // Atur event listener
+                audioPlayer.addEventListener('ended', handleEnded);
+
+                // Definisikan fungsi handler untuk error
+                const handleError = function(e) {
+                    console.error('Error saat memutar audio:', e);
+                    isAudioPlaying = false;
+
+                    if (audioPlayer) {
+                        // Bersihkan event listener
+                        audioPlayer.removeEventListener('ended', handleEnded);
+                        audioPlayer.removeEventListener('error', handleError);
+                        audioPlayer = null;
+                    }
+
+                    // Coba putar audio yang sama lagi jika belum mencapai batas percobaan
+                    audioRetryCount++;
+                    if (audioRetryCount <= MAX_RETRY_ATTEMPTS) {
+                        console.log(
+                            `Mencoba memutar ulang audio karena error (percobaan ke-${audioRetryCount})...`
+                        );
+                        setTimeout(playAudio, 1000); // Coba lagi setelah 1 detik
+                    } else {
+                        console.warn(
+                            `Gagal memutar audio setelah ${MAX_RETRY_ATTEMPTS} percobaan, beralih ke audio berikutnya`
+                        );
+                        audioRetryCount = 0; // Reset counter dan coba audio berikutnya
+                        setTimeout(playAudio, 1000);
+                    }
+                };
+
+                // Tambahkan event listener untuk error
+                audioPlayer.addEventListener('error', handleError);
+
+                // Tambahkan timeout untuk menangani kasus audio tidak dapat dimuat
+                const audioLoadTimeout = setTimeout(() => {
+                    console.error('Timeout: Audio tidak dapat dimuat dalam waktu yang ditentukan');
+                    isAudioPlaying = false;
+
+                    if (audioPlayer) {
+                        // Bersihkan event listener
+                        audioPlayer.removeEventListener('ended', handleEnded);
+                        audioPlayer.removeEventListener('error', handleError);
+                        audioPlayer = null;
+                    }
+
+                    // Coba putar audio yang sama lagi jika belum mencapai batas percobaan
+                    audioRetryCount++;
+                    if (audioRetryCount <= MAX_RETRY_ATTEMPTS) {
+                        console.log(
+                            `Mencoba memutar ulang audio karena timeout (percobaan ke-${audioRetryCount})...`
+                        );
+                        setTimeout(playAudio, 1000);
+                    } else {
+                        console.warn(
+                            `Gagal memutar audio setelah ${MAX_RETRY_ATTEMPTS} percobaan, beralih ke audio berikutnya`
+                        );
+                        audioRetryCount = 0; // Reset counter dan coba audio berikutnya
+                        setTimeout(playAudio, 1000);
+                    }
+                }, 10000); // 10 detik timeout
 
                 // Putar audio
                 audioPlayer.play().then(function() {
+                    clearTimeout(audioLoadTimeout); // Batalkan timeout jika berhasil
                     isAudioPlaying = true;
+                    audioRetryCount = 0; // Reset counter setelah berhasil memutar
                     console.log('Audio berhasil diputar');
                 }).catch(function(error) {
+                    clearTimeout(audioLoadTimeout); // Batalkan timeout jika gagal dengan error
                     console.error('Gagal memutar audio:', error);
                     isAudioPlaying = false;
-                    audioPlayer = null;
+
+                    if (audioPlayer) {
+                        // Bersihkan event listener
+                        audioPlayer.removeEventListener('ended', handleEnded);
+                        audioPlayer.removeEventListener('error', handleError);
+                        audioPlayer = null;
+                    }
+
+                    // Coba putar audio yang sama lagi jika belum mencapai batas percobaan
+                    audioRetryCount++;
+                    if (audioRetryCount <= MAX_RETRY_ATTEMPTS) {
+                        console.log(`Mencoba memutar ulang audio (percobaan ke-${audioRetryCount})...`);
+                        setTimeout(playAudio, 1000); // Coba lagi setelah 1 detik
+                    } else {
+                        console.warn(
+                            `Gagal memutar audio setelah ${MAX_RETRY_ATTEMPTS} percobaan, beralih ke audio berikutnya`
+                        );
+                        audioRetryCount = 0; // Reset counter dan coba audio berikutnya
+                        setTimeout(playAudio, 1000);
+                    }
                 });
             }
         }
 
+        // Fungsi untuk menjeda audio
+        function pauseAudio() {
+            // Jika audio sudah dijeda untuk adzan, tidak perlu melakukan apa-apa
+            if (isAudioPausedForAdzan) {
+                return;
+            }
+
+            isAudioPausedForAdzan = true;
+            if (audioPlayer && isAudioPlaying) {
+                audioPlayer.pause();
+                isAudioPlaying = false;
+                console.log('Audio dijeda karena adzan akan segera dimulai');
+
+                // Tidak perlu membersihkan event listener di sini karena audio akan dilanjutkan nanti
+            }
+        }
+
+        // Fungsi untuk melanjutkan audio
+        function resumeAudio() {
+            if (isAudioPausedForAdzan) {
+                console.log('Audio akan dilanjutkan setelah fase adzan selesai');
+                isAudioPausedForAdzan = false;
+
+                // Tunggu sebentar sebelum memutar audio kembali
+                setTimeout(function() {
+                    playAudio(); // Coba putar audio kembali
+                }, 1000); // Tunggu 1 detik
+            }
+        }
+
+        // Fungsi untuk mereset cache audio dan memuat ulang
+        function resetAudioCache() {
+            console.log('Mereset cache audio...');
+            cachedAudioUrls = [];
+            lastPlayedAudioIndex = -1;
+            audioRetryCount = 0;
+
+            // Hentikan audio yang sedang diputar (jika ada)
+            if (audioPlayer) {
+                audioPlayer.pause();
+                // Bersihkan event listener untuk mencegah memory leak
+                audioPlayer.onended = null;
+                audioPlayer.onerror = null;
+                audioPlayer.onplay = null;
+                audioPlayer.onpause = null;
+                audioPlayer = null;
+                isAudioPlaying = false;
+            }
+
+            // Muat ulang audio
+            updateAndPlayAudio();
+        }
+
+        // Fungsi untuk memeriksa koneksi jaringan dan mencoba ulang jika terjadi masalah
+        function checkNetworkAndRetry() {
+            // Periksa apakah browser online
+            if (!navigator.onLine) {
+                console.warn('Browser offline, menunggu koneksi kembali...');
+                // Tambahkan event listener untuk online event
+                window.addEventListener('online', function onlineHandler() {
+                    console.log('Koneksi kembali, memuat ulang audio...');
+                    window.removeEventListener('online', onlineHandler);
+                    setTimeout(resetAudioCache, 2000); // Tunggu 2 detik setelah online
+                }, {
+                    once: true
+                });
+                return false;
+            }
+            return true;
+        }
+
         // Panggil fungsi updateAndPlayAudio saat halaman dimuat
         updateAndPlayAudio();
+
+        // Reset cache audio setiap 30 menit untuk memastikan audio terbaru dimuat
+        setInterval(resetAudioCache, 30 * 60 * 1000);
+
+        // Tambahkan event listener untuk mendeteksi perubahan koneksi jaringan
+        window.addEventListener('offline', function() {
+            console.warn('Koneksi terputus, audio mungkin tidak dapat diputar');
+            // Jika sedang memutar audio, jeda sementara
+            if (audioPlayer && isAudioPlaying) {
+                audioPlayer.pause();
+            }
+        });
+
+        window.addEventListener('online', function() {
+            console.log('Koneksi kembali, mencoba melanjutkan audio...');
+            // Jika ada audio yang dijeda karena offline, coba putar lagi
+            if (audioPlayer) {
+                audioPlayer.play().catch(function(error) {
+                    console.error('Gagal melanjutkan audio setelah online:', error);
+
+                    // Bersihkan event listener sebelum reset
+                    if (audioPlayer) {
+                        audioPlayer.onended = null;
+                        audioPlayer.onerror = null;
+                        audioPlayer.onplay = null;
+                        audioPlayer.onpause = null;
+                    }
+
+                    // Jika gagal melanjutkan, reset dan coba dari awal
+                    resetAudioCache();
+                });
+            } else {
+                // Jika tidak ada audio yang sedang diputar, muat ulang
+                resetAudioCache();
+            }
+        });
 
         // Fungsi untuk memperbarui jam digital
         function updateDigitalClock() {
@@ -973,6 +1326,10 @@
                 clearTimeout(adzanImageTimeout);
                 adzanImageTimeout = null;
             }
+
+            // Lanjutkan pemutaran audio jika tidak ada fase lain yang akan ditampilkan
+            // Catatan: Tidak perlu memanggil resumeAudio() di sini karena akan dipanggil
+            // di clearFridayInfoState() atau showFinalAdzanImage() tergantung alur program
         }
 
         function clearAllAdzanStates() {
@@ -982,6 +1339,9 @@
                 'fridayInfoStartTime', 'adzanImageStartTime'
             ];
             keysToRemove.forEach(key => localStorage.removeItem(key));
+
+            // Lanjutkan pemutaran audio jika adzan dibatalkan
+            resumeAudio();
         }
 
         function checkDayChange() {
@@ -1018,6 +1378,9 @@
                 clearTimeout(shuruqAlarmTimeout);
                 shuruqAlarmTimeout = null;
             }
+
+            // Lanjutkan pemutaran audio setelah alarm Shuruq/Syuruq/Terbit selesai
+            resumeAudio();
         }
 
         function playBeepSound(times = 1) {
@@ -1162,6 +1525,9 @@
         }
 
         function showAdzanPopup(prayerName, prayerTimeStr, isRestored = false) {
+            // Pastikan audio dijeda saat adzan dimulai
+            pauseAudio();
+
             const now = getCurrentTimeFromServer();
             const currentDate = now.getDate();
             const serverMonth = now.getMonth() + 1;
@@ -1446,6 +1812,9 @@
         }
 
         function showIqomahPopup(prayerTimeStr, isRestored = false) {
+            // Pastikan audio tetap dijeda saat iqomah dimulai
+            pauseAudio();
+
             const now = getCurrentTimeFromServer();
             if (now.getDay() === 5 && currentPrayerName === "Jum'at") {
                 console.log('Tidak menampilkan iqomah untuk sholat Jumat');
@@ -1582,6 +1951,9 @@
             localStorage.removeItem('adzanImageStartTime');
             localStorage.removeItem('adzanImageEndTime');
             localStorage.removeItem('adzanImageSrc');
+
+            // Catatan: Tidak perlu memanggil resumeAudio() di sini karena akan dipanggil
+            // di showFinalAdzanImage() setelah adzanImageDisplay ditutup
         }
 
         function updateAdzanImages() {
@@ -1634,6 +2006,9 @@
         }
 
         function displayAdzanImage(imageSrc, isRestored = false, duration = 60000) {
+            // Pastikan audio tetap dijeda saat adzanImageDisplay ditampilkan
+            pauseAudio();
+
             const $imageDisplay = $('#adzanImageDisplay');
             const $imageElement = $('#currentAdzanImage');
 
@@ -1664,6 +2039,7 @@
         function showFinalAdzanImage() {
             if (currentPrayerName === "Jum'at" && getCurrentTimeFromServer().getDay() === 5) {
                 console.log('Tidak menampilkan final adzan image untuk adzan Jum\'at');
+                // Untuk sholat Jumat, audio akan dilanjutkan setelah fridayInfoPopup berakhir
                 return;
             }
 
@@ -1694,6 +2070,9 @@
                 $imageDisplay.css('display', 'none');
                 clearAdzanImageState();
                 // console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
+
+                // Lanjutkan pemutaran audio setelah fase adzanImageDisplay berakhir
+                resumeAudio();
             }, duration);
         }
 
@@ -1754,6 +2133,9 @@
                 clearInterval(fridayImageSliderInterval);
                 fridayImageSliderInterval = null;
             }
+
+            // Lanjutkan pemutaran audio setelah fase fridayInfoPopup berakhir
+            resumeAudio();
         }
 
         function updateFridayImages() {
@@ -1923,6 +2305,9 @@
         }
 
         function displayFridayInfoPopup(data, isRestored = false) {
+            // Pastikan audio tetap dijeda saat fridayInfoPopup ditampilkan
+            pauseAudio();
+
             const $popup = $('#fridayInfoPopup');
             if ($popup.css('display') === 'flex') {
                 return; // Jangan tampilkan lagi jika sudah ditampilkan
@@ -2138,15 +2523,30 @@
                 const [prayerHours, prayerMinutes] = prayer.time.split(':').map(Number);
                 const prayerTimeInMinutes = prayerHours * 60 + prayerMinutes;
                 const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+                const currentSeconds = now.getSeconds();
+
+                // Cek apakah waktu saat ini kurang dari 10 detik sebelum waktu adzan
+                const isAlmostPrayerTime =
+                    (prayerTimeInMinutes === currentTimeInMinutes && currentSeconds >= 50) ||
+                    // Kurang dari 10 detik sebelum adzan
+                    (prayerTimeInMinutes + 1 === currentTimeInMinutes && currentSeconds <
+                        10); // Kurang dari 10 detik setelah adzan
+
+                // Jeda audio jika hampir waktu adzan
+                if (isAlmostPrayerTime && !isAudioPausedForAdzan && !isAdzanPlaying) {
+                    pauseAudio();
+                }
 
                 if ((prayerTimeInMinutes === currentTimeInMinutes ||
-                        (prayerTimeInMinutes + 1 === currentTimeInMinutes && now.getSeconds() < 10)) &&
+                        (prayerTimeInMinutes + 1 === currentTimeInMinutes && currentSeconds < 10)) &&
                     !isAdzanPlaying && !adzanStartTime) {
                     if (prayer.name.toLowerCase().includes('shuruq') || prayer.name.toLowerCase()
                         .includes('syuruq') || prayer.name.toLowerCase().includes('terbit')) {
                         if (!isShuruqAlarmPlaying) {
                             isShuruqAlarmPlaying = true;
                             localStorage.setItem('shuruqAlarmTime', currentTimeFormatted);
+                            // Jeda audio saat alarm Shuruq/Syuruq/Terbit dimulai
+                            pauseAudio();
                             playBeepSound(1);
                             shuruqAlarmTimeout = setTimeout(() => {
                                 clearShuruqAlarmState();
@@ -2759,7 +3159,7 @@
         // Perbarui dan putar audio setiap 30 menit
         setInterval(function() {
             updateAndPlayAudio();
-        }, 30 * 60 * 1000); // 30 menit
+        }, 1 * 60 * 1000); // 30 menit
 
         setInterval(function() {
             updateFridayOfficials();

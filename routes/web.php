@@ -257,7 +257,7 @@ Route::get('/api/server-time', function () {
             //     $daysToFriday += 7;
             // }
             // $serverDateTime->modify("+{$daysToFriday} days");
-            // $serverDateTime->setTime(12, 19, 40);
+            // $serverDateTime->setTime(12, 21, 00);
 
             return response()->json([
                 'success' => true,
