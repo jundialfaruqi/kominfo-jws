@@ -31,7 +31,7 @@ class Audio extends Component
     public $tmp_audio2;
     public $audio3;
     public $tmp_audio3;
-    public $status = true; // Default status aktif
+    public $status = 1; // Default status aktif
 
     public $isEdit = false;
     public $showForm = false;
@@ -402,7 +402,7 @@ class Audio extends Component
                 $this->tmp_audio1 = $audio->audio1;
                 $this->tmp_audio2 = $audio->audio2;
                 $this->tmp_audio3 = $audio->audio3;
-                $this->status     = $audio->status;
+                $this->status     = $audio->status ? 1 : 0;
                 $this->isEdit     = true;
             } else {
                 $this->isEdit = false;
@@ -511,7 +511,7 @@ class Audio extends Component
         $this->tmp_audio1 = $audio->audio1;
         $this->tmp_audio2 = $audio->audio2;
         $this->tmp_audio3 = $audio->audio3;
-        $this->status     = $audio->status;
+        $this->status     = $audio->status ? 1 : 0;
 
         $this->isEdit     = true;
         $this->showForm   = true;
@@ -579,7 +579,7 @@ class Audio extends Component
             }
 
             $audio->user_id = $this->userId;
-            $audio->status = $this->status;
+            $audio->status = $this->status ? 1 : 0;
 
             // Ambil prefix dari konfigurasi (untuk upload, bukan penghapusan)
             $prefix = config('filesystems.disks.cloudinary.prefix', '');
@@ -694,7 +694,7 @@ class Audio extends Component
                     $this->tmp_audio1 = $audio->audio1;
                     $this->tmp_audio2 = $audio->audio2;
                     $this->tmp_audio3 = $audio->audio3;
-                    $this->status     = $audio->status;
+                    $this->status     = $audio->status ? 1 : 0;
                     $this->isEdit     = true;
                 }
             }

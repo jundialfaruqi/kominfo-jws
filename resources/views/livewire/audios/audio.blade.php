@@ -93,6 +93,12 @@
                                             <div class="row g-2 mb-3">
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Status</label>
+                                                    <label class="form-text small text-muted mb-2 ">
+                                                        👉
+                                                        Audio tidak akan tampil jika status tidak aktif. Audio akan
+                                                        berhenti 1 menit sebelum adzan dan akan play kembali setelah
+                                                        fase adzan, iqomah dan final selesai.
+                                                    </label>
                                                     <select
                                                         class="form-select rounded-3 @error('status') is-invalid @enderror"
                                                         wire:model="status">
