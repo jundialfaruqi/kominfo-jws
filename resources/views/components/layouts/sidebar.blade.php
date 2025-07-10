@@ -64,7 +64,8 @@
         <div class="collapse navbar-collapse" id="sidebar-menu">
             <ul class="navbar-nav pt-lg-3">
                 @if (Auth::user()->status === 'Active')
-                    <li class="nav-item mx-3 {{ request()->routeIs('dashboard.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('dashboard.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('dashboard.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -88,7 +89,8 @@
                         </a>
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-                        <li class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <li
+                            class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -108,7 +110,8 @@
                             </a>
                         </li>
                     @endif
-                    <li class="nav-item mx-3 {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -131,7 +134,8 @@
                         </a>
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-                        <li class="nav-item mx-3 {{ request()->routeIs('tema.set-tema') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <li
+                            class="nav-item mx-3 {{ request()->routeIs('tema.set-tema') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('tema.set-tema') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -151,7 +155,8 @@
                             </a>
                         </li>
                     @endif
-                    <li class="nav-item mx-3 {{ request()->routeIs('audios') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('audios') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('audios') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -170,7 +175,28 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('adzan-audio.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <a wire:navigate class="nav-link" href="{{ route('adzan-audio.index') }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-speakerphone">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M18 8a3 3 0 0 1 0 6" />
+                                    <path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5" />
+                                    <path
+                                        d="M12 8h0l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8" />
+                                </svg>
+                            </span>
+                            <span class="nav-link-title">
+                                Audio Adzan
+                            </span>
+                        </a>
+                    </li>
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -197,7 +223,8 @@
                         </a>
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-                        <li class="nav-item mx-3 {{ request()->routeIs('jumbotron.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <li
+                            class="nav-item mx-3 {{ request()->routeIs('jumbotron.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('jumbotron.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -220,7 +247,8 @@
                             </a>
                         </li>
                     @endif
-                    <li class="nav-item mx-3 {{ request()->routeIs('slide.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('slide.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('slide.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -243,7 +271,8 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 {{ request()->routeIs('petugas.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('petugas.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('petugas.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -264,7 +293,8 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 {{ request()->routeIs('marquee.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('marquee.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('marquee.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -283,7 +313,8 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 {{ request()->routeIs('adzan.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('adzan.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
                         <a wire:navigate class="nav-link" href="{{ route('adzan.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -302,7 +333,8 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 {{ request()->routeIs('durasi.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
+                    <li
+                        class="nav-item mx-3 {{ request()->routeIs('durasi.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
                         <a wire:navigate class="nav-link" href="{{ route('durasi.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

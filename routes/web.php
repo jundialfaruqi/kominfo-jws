@@ -73,6 +73,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // adzan routes
     Route::get('/adzan', \App\Livewire\Adzan\GambarAdzan::class)->name('adzan.index');
 
+    // adzan audio routes
+    Route::get('/adzan-audio', \App\Livewire\AdzanAudio\AdzanAudio::class)->name('adzan-audio.index');
+
     // durasi routes
     Route::get('/durasi', \App\Livewire\Durasi\Durasi::class)->name('durasi.index');
 
@@ -425,6 +428,25 @@ Route::get('/api/audio/{slug}', function ($slug) {
         }
     }
     return response()->json(['success' => false, 'message' => 'Data audio tidak ditemukan atau tidak aktif'], 404);
+});
+
+Route::get('/api/adzan-audio/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $audio = \App\Models\AdzanAudio::where('user_id', $profil->user_id)->first();
+        if ($audio) {
+            // Buat instance komponen AdzanAudio untuk menggunakan generateCloudinaryUrl
+            $audioComponent = new \App\Livewire\AdzanAudio\AdzanAudio();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'audioadzan' => $audio->audioadzan ? $audioComponent->generateCloudinaryUrl($audio->audioadzan) : null,
+                ]
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Data audio adzan tidak ditemukan'], 404);
 });
 
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
