@@ -494,6 +494,7 @@ class Audio extends Component
 
         $this->isEdit = false;
         $this->showForm = true;
+        $this->status = 0;
     }
 
     public function edit($id)
@@ -696,6 +697,10 @@ class Audio extends Component
                     $this->tmp_audio3 = $audio->audio3;
                     $this->status     = $audio->status ? 1 : 0;
                     $this->isEdit     = true;
+
+                    $this->audio1 = null;
+                    $this->audio2 = null;
+                    $this->audio3 = null;
                 }
             }
         } catch (\Exception $e) {

@@ -16,6 +16,7 @@ use Livewire\Component;
 use App\Models\Theme;
 use App\Models\User;
 use App\Models\Audios; // Tambahkan model Audios
+use App\Models\AdzanAudio;
 
 class Firdaus extends Component
 {
@@ -44,6 +45,7 @@ class Firdaus extends Component
     public $themeCss;
     public $theme;
     public $audio; // Tambahkan properti untuk audio
+    public $adzanaudio;
 
     public function mount($slug)
     {
@@ -61,6 +63,9 @@ class Firdaus extends Component
 
         // Ambil data jumbotron yang aktif
         $this->jumbotron = Jumbotron::where('is_active', true)->first();
+
+        // Ambil data adzanaudio berdasarkan user_id dari profil
+        $this->adzanaudio = AdzanAudio::where('user_id', $user_id)->where('status', true)->first();
 
         // Ambil data audio
         $this->audio = Audios::where('user_id', $user_id)->where('status', true)->first();
@@ -470,6 +475,15 @@ class Firdaus extends Component
 
     public function render()
     {
+        // Jika $adzanaudio ada, konversi public_id menjadi URL lengkap
+        if ($this->adzanaudio) {
+            $cloudName = config('filesystems.disks.cloudinary.cloud');
+            $this->adzanaudio->audioadzan_url = $this->adzanaudio->audioadzan ?
+                "https://res.cloudinary.com/{$cloudName}/video/upload/{$this->adzanaudio->audioadzan}" : '';
+            $this->adzanaudio->adzanshubuh_url = $this->adzanaudio->adzanshubuh ?
+                "https://res.cloudinary.com/{$cloudName}/video/upload/{$this->adzanaudio->adzanshubuh}" : '';
+        }
+
         return view('livewire.firdaus.firdaus', [
             'themeCss' => $this->themeCss,
             'prayerTimes' => $this->prayerTimes,
@@ -507,6 +521,7 @@ class Firdaus extends Component
                 'muadzin' => $this->petugas->muadzin,
             ] : [],
             'theme' => $this->theme,
+            'adzanaudio' => $this->adzanaudio,
         ]);
     }
 }
