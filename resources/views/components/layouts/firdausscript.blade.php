@@ -3151,6 +3151,7 @@
             updateIqomahImages();
             updateAdzanImages();
             updateJumbotronData();
+            updateMarqueeText();
             checkThemeUpdate();
             // console.log(
             //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
@@ -3161,7 +3162,6 @@
 
         setInterval(function() {
             updateMosqueInfo();
-            updateMarqueeText();
             updateSlides();
             updateAndPlayAudio();
             // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');

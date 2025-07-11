@@ -37,15 +37,12 @@ class AdzanAudio extends Component
     public $deleteAdzanAudioName;
 
     protected $rules = [
-        'userId' => 'required|exists:users,id',
         'audioadzan' => 'nullable|file|mimes:mp3,wav|max:10240', // Maks 10MB
         'adzanshubuh' => 'nullable|file|mimes:mp3,wav|max:10240', // Maks 10MB
         'status' => 'required|boolean',
     ];
 
     protected $messages = [
-        'userId.required' => 'Admin Masjid wajib diisi',
-        'userId.exists'   => 'Admin Masjid tidak ditemukan',
         'audioadzan.file'     => 'File harus berupa audio',
         'audioadzan.mimes'    => 'File harus berupa audio mp3 atau wav',
         'audioadzan.max'      => 'Ukuran file maksimal 10MB',
@@ -195,7 +192,7 @@ class AdzanAudio extends Component
             $this->dispatch('error', 'Terjadi kesalahan saat menghapus audio: ' . $e->getMessage());
         }
     }
-    
+
     public function clearAdzanShubuh()
     {
         try {
@@ -282,20 +279,11 @@ class AdzanAudio extends Component
             ]);
         }
 
+        // Hanya Super Admin dan Admin yang memiliki akses ke manajemen adzan-audio
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            $adzanAudio = AdzanAudioModel::where('user_id', Auth::id())->first();
-            $this->showForm = true;
-            $this->userId = Auth::id();
-
-            if ($adzanAudio) {
-                $this->adzanAudioId    = $adzanAudio->id;
-                $this->tmp_audioadzan = $adzanAudio->audioadzan;
-                $this->tmp_adzanshubuh = $adzanAudio->adzanshubuh;
-                $this->status     = $adzanAudio->status ? 1 : 0;
-                $this->isEdit     = true;
-            } else {
-                $this->isEdit = false;
-            }
+            // Redirect atau tampilkan pesan error jika bukan Super Admin atau Admin
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk mengelola audio adzan!');
+            return redirect()->route('dashboard.index');
         }
     }
 
@@ -306,7 +294,6 @@ class AdzanAudio extends Component
         $this->resetValidation();
         $this->reset([
             'adzanAudioId',
-            'userId',
             'audioadzan',
             'tmp_audioadzan',
             'adzanshubuh',
@@ -318,21 +305,24 @@ class AdzanAudio extends Component
     public function render()
     {
         $currentUser = Auth::user();
-        $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
+
+        // Hanya Super Admin dan Admin yang dapat melihat daftar audio adzan
+        if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk melihat daftar audio adzan!');
+            return redirect()->route('dashboard.index');
+        }
+
+        $isAdmin = true; // Karena sudah difilter di atas
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         $query = AdzanAudioModel::with('user')
             ->select('id', 'user_id', 'audioadzan', 'adzanshubuh', 'status', 'created_at');
 
-        if (!$isAdmin) {
-            $query->where('user_id', $currentUser->id);
-        } else {
-            $query->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
-                });
+        $query->where(function ($query) {
+            $query->whereHas('user', function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%');
             });
-        }
+        });
 
         $adzanAudioList = $query->orderBy('id', 'asc')->paginate($this->paginate);
 
@@ -341,39 +331,31 @@ class AdzanAudio extends Component
             $adzanAudio->adzanshubuh_url = $adzanAudio->adzanshubuh ? $this->generateCloudinaryUrl($adzanAudio->adzanshubuh) : null;
         }
 
-        $users = collect([]);
-        if ($isAdmin) {
-            $usersWithAudios = AdzanAudioModel::pluck('user_id')->toArray();
-            $usersQuery = User::whereNotIn('id', $usersWithAudios);
-            if (!$isSuperAdmin) {
-                $usersQuery->whereNotIn('role', ['Super Admin', 'Admin']);
-            }
-            $users = $usersQuery->orderBy('name')->get();
-        }
-
         return view('livewire.adzan-audio.adzan-audio', [
-            'adzanAudioList' => $adzanAudioList,
-            'users' => $users
+            'adzanAudioList' => $adzanAudioList
         ]);
     }
 
     public function showAddForm()
     {
+        // Verifikasi bahwa hanya Super Admin dan Admin yang dapat menambahkan audio adzan
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            $this->dispatch('error', 'Anda tidak memiliki akses untuk menambah audio!');
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk menambahkan audio adzan!');
             return;
         }
 
         $this->resetValidation();
         $this->reset([
             'adzanAudioId',
-            'userId',
             'audioadzan',
             'tmp_audioadzan',
             'adzanshubuh',
             'tmp_adzanshubuh',
             'status'
         ]);
+        
+        // Set user_id ke ID user yang sedang login
+        $this->userId = Auth::id();
 
         $this->isEdit = false;
         $this->showForm = true;
@@ -381,19 +363,26 @@ class AdzanAudio extends Component
 
     public function edit($id)
     {
+        // Verifikasi bahwa hanya Super Admin dan Admin yang dapat mengedit audio adzan
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit audio adzan!');
+            return;
+        }
+
         $this->resetValidation();
         $adzanAudio = AdzanAudioModel::findOrFail($id);
-
-        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin']) && Auth::id() !== $adzanAudio->user_id) {
-            $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit audio ini!');
+        
+        // Verifikasi bahwa user hanya dapat mengedit audio adzan miliknya sendiri
+        if (Auth::id() != $adzanAudio->user_id && Auth::user()->role !== 'Super Admin') {
+            $this->dispatch('error', 'Anda hanya dapat mengedit audio adzan milik Anda sendiri!');
             return;
         }
 
         $this->adzanAudioId    = $adzanAudio->id;
-        $this->userId     = $adzanAudio->user_id;
-        $this->tmp_audioadzan = $adzanAudio->audioadzan;
+        $this->userId          = $adzanAudio->user_id; // Tetap simpan user_id asli untuk audio yang diedit
+        $this->tmp_audioadzan  = $adzanAudio->audioadzan;
         $this->tmp_adzanshubuh = $adzanAudio->adzanshubuh;
-        $this->status     = $adzanAudio->status ? 1 : 0;
+        $this->status          = $adzanAudio->status ? 1 : 0;
 
         $this->isEdit     = true;
         $this->showForm   = true;
@@ -418,14 +407,19 @@ class AdzanAudio extends Component
     {
         $currentUser = Auth::user();
 
+        // Verifikasi bahwa hanya Super Admin dan Admin yang dapat menyimpan audio adzan
         if (!in_array($currentUser->role, ['Super Admin', 'Admin'])) {
-            $this->userId = $currentUser->id;
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk menyimpan audio adzan!');
+            return;
         }
+        
+        // Set user_id ke ID user yang sedang login
+        $this->userId = Auth::id();
 
         if (!$this->isEdit) {
             $existingAudio = AdzanAudioModel::where('user_id', $this->userId)->first();
             if ($existingAudio) {
-                $this->dispatch('error', 'User ini sudah memiliki audio adzan!');
+                $this->dispatch('error', 'Anda sudah memiliki audio adzan!');
                 return;
             }
         } else {
@@ -433,7 +427,7 @@ class AdzanAudio extends Component
                 ->where('id', '!=', $this->adzanAudioId)
                 ->first();
             if ($existingAudio) {
-                $this->dispatch('error', 'User ini sudah memiliki audio adzan!');
+                $this->dispatch('error', 'Anda sudah memiliki audio adzan!');
                 return;
             }
         }
@@ -445,15 +439,7 @@ class AdzanAudio extends Component
 
             if ($this->isEdit) {
                 $adzanAudio = AdzanAudioModel::findOrFail($this->adzanAudioId);
-                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $currentUser->id !== $adzanAudio->user_id) {
-                    $this->dispatch('error', 'Anda tidak memiliki akses untuk mengedit audio ini!');
-                    return;
-                }
             } else {
-                if (!in_array($currentUser->role, ['Super Admin', 'Admin']) && $this->userId !== $currentUser->id) {
-                    $this->dispatch('error', 'Anda tidak memiliki akses untuk membuat audio untuk user lain!');
-                    return;
-                }
                 $adzanAudio = new AdzanAudioModel();
             }
 
@@ -510,7 +496,7 @@ class AdzanAudio extends Component
             } else {
                 $adzanAudio->audioadzan = $this->tmp_audioadzan;
             }
-            
+
             if ($this->adzanshubuh) {
                 if ($this->isEdit && $adzanAudio->adzanshubuh) {
                     $publicId = $adzanAudio->adzanshubuh;
@@ -532,29 +518,17 @@ class AdzanAudio extends Component
             $this->dispatch('fileSelected', ['inputName' => 'audioadzan']);
             $this->dispatch('fileSelected', ['inputName' => 'adzanshubuh']);
 
-            if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-                $this->showForm = false;
-                $this->reset([
-                    'adzanAudioId',
-                    'userId',
-                    'audioadzan',
-                    'tmp_audioadzan',
-                    'adzanshubuh',
-                    'tmp_adzanshubuh',
-                    'status'
-                ]);
-            } else {
-                $this->showForm = true;
-                $adzanAudio = AdzanAudioModel::where('user_id', Auth::id())->first();
-                if ($adzanAudio) {
-                    $this->adzanAudioId    = $adzanAudio->id;
-                    $this->userId     = $adzanAudio->user_id;
-                    $this->tmp_audioadzan = $adzanAudio->audioadzan;
-                    $this->tmp_adzanshubuh = $adzanAudio->adzanshubuh;
-                    $this->status     = $adzanAudio->status ? 1 : 0;
-                    $this->isEdit     = true;
-                }
-            }
+            // Reset form setelah menyimpan
+            $this->showForm = false;
+            $this->reset([
+                'adzanAudioId',
+                'userId',
+                'audioadzan',
+                'tmp_audioadzan',
+                'adzanshubuh',
+                'tmp_adzanshubuh',
+                'status'
+            ]);
         } catch (\Exception $e) {
             Log::error('Gagal menyimpan audio adzan', [
                 'error' => $e->getMessage(),
@@ -567,20 +541,29 @@ class AdzanAudio extends Component
     public function delete($id)
     {
         $this->showForm = false;
+        // Verifikasi bahwa hanya Super Admin dan Admin yang dapat menghapus audio adzan
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            $this->dispatch('error', 'Anda tidak memiliki akses untuk menghapus audio!');
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk menghapus audio adzan!');
+            return;
+        }
+
+        $adzanAudio = AdzanAudioModel::findOrFail($id);
+        
+        // Verifikasi bahwa user hanya dapat menghapus audio adzan miliknya sendiri
+        if (Auth::id() != $adzanAudio->user_id && Auth::user()->role !== 'Super Admin') {
+            $this->dispatch('error', 'Anda hanya dapat menghapus audio adzan milik Anda sendiri!');
             return;
         }
         
-        $adzanAudio = AdzanAudioModel::findOrFail($id);
         $this->deleteAdzanAudioId = $adzanAudio->id;
         $this->deleteAdzanAudioName = $adzanAudio->user->name;
     }
 
     public function destroyAdzanAudio()
     {
+        // Verifikasi bahwa hanya Super Admin dan Admin yang dapat menghapus audio adzan
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            $this->dispatch('error', 'Anda tidak memiliki akses untuk menghapus audio!');
+            $this->dispatch('error', 'Anda tidak memiliki akses untuk menghapus audio adzan!');
             return;
         }
 
@@ -588,6 +571,12 @@ class AdzanAudio extends Component
             $this->checkCloudinaryConfig();
 
             $adzanAudio = AdzanAudioModel::findOrFail($this->deleteAdzanAudioId);
+            
+            // Verifikasi bahwa user hanya dapat menghapus audio adzan miliknya sendiri
+            if (Auth::id() != $adzanAudio->user_id && Auth::user()->role !== 'Super Admin') {
+                $this->dispatch('error', 'Anda hanya dapat menghapus audio adzan milik Anda sendiri!');
+                return;
+            }
             $allDeleted = true;
 
             // Hapus audioadzan
@@ -618,7 +607,7 @@ class AdzanAudio extends Component
                     ]);
                 }
             }
-            
+
             // Hapus adzanshubuh
             $publicId = $adzanAudio->adzanshubuh;
 
