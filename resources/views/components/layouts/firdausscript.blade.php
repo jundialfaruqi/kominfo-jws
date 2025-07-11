@@ -1276,6 +1276,12 @@
             localStorage.removeItem('currentPrayerTime');
             localStorage.removeItem('iqomahSliderStartTime');
             localStorage.removeItem('jumatAdzanShown');
+            
+            // Hentikan audio adzan jika sedang diputar
+            if (window.adzanAudioPlayer) {
+                window.adzanAudioPlayer.pause();
+                window.adzanAudioPlayer.currentTime = 0;
+            }
 
             if (isAudioPausedForAdzan) {
                 resumeAudio();
@@ -1520,10 +1526,59 @@
 
             $title.text(` ${prayerName}`);
             $popup.css('display', 'flex');
-
-            // Putar alarm hanya saat popup adzan dimulai (bukan saat dipulihkan)
+            
+            // Inisialisasi audio adzan jika belum ada
+             if (!window.adzanAudioPlayer) {
+                 window.adzanAudioPlayer = new Audio();
+                 
+                 // Tambahkan event handler untuk error
+                 window.adzanAudioPlayer.onerror = function(e) {
+                     console.error('Error saat memutar audio adzan:', e);
+                     // Fallback ke beep sound jika terjadi error
+                     playBeepSound(1);
+                 };
+             }
+            
+            // Putar beep sound terlebih dahulu
             if (!isRestored) {
-                playBeepSound(1); // Alarm tetap diputar untuk semua adzan, termasuk Jumat
+                // Selalu putar beep sound terlebih dahulu
+                playBeepSound(1);
+                
+                const prayerLower = prayerName.toLowerCase();
+                const adzanStatus = $('#adzan_status').val() === 'true';
+                
+                // Setelah beep sound, putar audio adzan jika status aktif
+                if (adzanStatus) {
+                    // Hentikan audio adzan yang sedang diputar (jika ada)
+                    if (window.adzanAudioPlayer) {
+                        window.adzanAudioPlayer.pause();
+                        window.adzanAudioPlayer.currentTime = 0;
+                    }
+                    
+                    // Tunggu beep sound selesai baru putar audio adzan (5 detik)
+                    setTimeout(() => {
+                        // Pilih audio adzan berdasarkan waktu sholat
+                        if (prayerLower === 'shubuh') {
+                            // Gunakan adzan_shubuh untuk waktu shubuh
+                            const adzanShubuhUrl = $('#adzan_shubuh').val();
+                            if (adzanShubuhUrl && adzanShubuhUrl.trim() !== '') {
+                                window.adzanAudioPlayer.src = adzanShubuhUrl;
+                                window.adzanAudioPlayer.play();
+                                console.log('Memutar audio adzan shubuh');
+                            }
+                        } else if (prayerLower !== 'shuruq' && prayerLower !== 'syuruq' && prayerLower !== 'terbit') {
+                            // Gunakan adzan_audio untuk waktu dzuhur, ashar, maghrib, isya dan jumat
+                            const adzanAudioUrl = $('#adzan_audio').val();
+                            if (adzanAudioUrl && adzanAudioUrl.trim() !== '') {
+                                window.adzanAudioPlayer.src = adzanAudioUrl;
+                                window.adzanAudioPlayer.play();
+                                console.log(`Memutar audio adzan untuk ${prayerName}`);
+                            }
+                        }
+                        // Untuk waktu shuruq, hanya putar beep sound (sudah diputar di awal)
+                    }, 5000); // Tunggu 5 detik setelah beep sound
+                }
+                
                 $progress.css('width', '0%');
                 // console.log(`Memutar alarm untuk ${prayerName} pada ${prayerTimeStr}`);
             } else if (activePrayerStatus && activePrayerStatus.phase === 'adzan') {
@@ -1569,6 +1624,12 @@
                     isAdzanPlaying = false;
                     if (animationId) {
                         cancelAnimationFrame(animationId);
+                    }
+                    
+                    // Hentikan audio adzan jika sedang diputar
+                    if (window.adzanAudioPlayer) {
+                        window.adzanAudioPlayer.pause();
+                        window.adzanAudioPlayer.currentTime = 0;
                     }
 
                     // Logika setelah adzan selesai
@@ -3151,6 +3212,7 @@
             updateIqomahImages();
             updateAdzanImages();
             updateJumbotronData();
+            updateMarqueeText();
             checkThemeUpdate();
             // console.log(
             //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
@@ -3161,7 +3223,6 @@
 
         setInterval(function() {
             updateMosqueInfo();
-            updateMarqueeText();
             updateSlides();
             updateAndPlayAudio();
             // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
@@ -3183,6 +3244,15 @@
         // Event listener untuk double-click
         $(document).on('dblclick', function() {
             toggleFullScreen();
+        });
+        
+        // Event handler untuk menghentikan audio adzan saat halaman di-refresh atau ditutup
+        $(window).on('beforeunload', function() {
+            // Hentikan audio adzan jika sedang diputar
+            if (window.adzanAudioPlayer) {
+                window.adzanAudioPlayer.pause();
+                window.adzanAudioPlayer.currentTime = 0;
+            }
         });
 
     });

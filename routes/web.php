@@ -148,7 +148,7 @@ Route::get('/api/marquee/{slug}', function ($slug) {
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 })->name('api.marquee');
 
 // API route untuk mendapatkan data slide
@@ -170,7 +170,7 @@ Route::get('/api/slides/{slug}', function ($slug) {
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 })->name('api.slides');
 
 // API route untuk mendapatkan data jumbotron
@@ -190,7 +190,7 @@ Route::get('/api/jumbotron', function () {
             ]
         ]);
     }
-    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 })->name('api.jumbotron');
 
 // API route untuk mendapatkan data petugas jumat
@@ -210,7 +210,7 @@ Route::get('/api/petugas/{slug}', function ($slug) {
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 })->name('api.petugas');
 
 // API route untuk mendapatkan data adzan
@@ -239,7 +239,7 @@ Route::get('/api/adzan/{slug}', function ($slug) {
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 })->name('api.adzan');
 
 Route::get('/api/server-time', function () {
@@ -251,7 +251,7 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+0 hour 48 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+0 hour 54 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
@@ -427,26 +427,46 @@ Route::get('/api/audio/{slug}', function ($slug) {
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data audio tidak ditemukan atau tidak aktif'], 404);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 });
 
+// New route with slug parameter
 Route::get('/api/adzan-audio/{slug}', function ($slug) {
     $profil = \App\Models\Profil::where('slug', $slug)->first();
     if ($profil) {
-        $audio = \App\Models\AdzanAudio::where('user_id', $profil->user_id)->first();
-        if ($audio) {
-            // Buat instance komponen AdzanAudio untuk menggunakan generateCloudinaryUrl
+        $adzanaudio = \App\Models\AdzanAudio::where('user_id', $profil->user_id)->first();
+        if ($adzanaudio && $adzanaudio->status) {
             $audioComponent = new \App\Livewire\AdzanAudio\AdzanAudio();
-
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'audioadzan' => $audio->audioadzan ? $audioComponent->generateCloudinaryUrl($audio->audioadzan) : null,
+                    'adzan_audio' => $adzanaudio->audioadzan ? $audioComponent->generateCloudinaryUrl($adzanaudio->audioadzan) : '',
+                    'adzan_shubuh' => $adzanaudio->adzanshubuh ? $audioComponent->generateCloudinaryUrl($adzanaudio->adzanshubuh) : '',
+                    'status' => $adzanaudio->status
                 ]
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data audio adzan tidak ditemukan'], 404);
-});
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan, Resource not found'], 200);
+})->name('api.adzan-audio');
+
+// Legacy route for backward compatibility
+Route::get('/api/adzan-audio', function () {
+    // Get the first active adzan audio (old behavior)
+    $adzanaudio = \App\Models\AdzanAudio::where('status', 1)->first();
+    if ($adzanaudio) {
+        $audioComponent = new \App\Livewire\AdzanAudio\AdzanAudio();
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'adzan_audio' => $adzanaudio->audioadzan ? $audioComponent->generateCloudinaryUrl($adzanaudio->audioadzan) : '',
+                'adzan_shubuh' => $adzanaudio->adzanshubuh ? $audioComponent->generateCloudinaryUrl($adzanaudio->adzanshubuh) : '',
+                'status' => $adzanaudio->status,
+                'deprecated' => 'This endpoint is deprecated. Please use /api/adzan-audio/{slug} instead.'
+            ]
+        ]);
+    }
+    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan, Resource not found'], 200);
+})->name('api.adzan-audio.legacy');
 
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');

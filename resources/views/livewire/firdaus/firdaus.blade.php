@@ -233,6 +233,19 @@
         <input type="hidden" id="audio_status" value="false">
     @endif
 
+    {{-- Hidden inputs for adzan-audio data --}}
+    @if ($adzanaudio)
+        <input type="hidden" id="adzan_audio"
+            value="{{ $adzanaudio->audioadzan ? 'https://res.cloudinary.com/' . config('filesystems.disks.cloudinary.cloud') . '/video/upload/' . $adzanaudio->audioadzan : '' }}">
+        <input type="hidden" id="adzan_shubuh"
+            value="{{ $adzanaudio->adzanshubuh ? 'https://res.cloudinary.com/' . config('filesystems.disks.cloudinary.cloud') . '/video/upload/' . $adzanaudio->adzanshubuh : '' }}">
+        <input type="hidden" id="adzan_status" value="{{ $adzanaudio->status ? 'true' : 'false' }}">
+    @else
+        <input type="hidden" id="adzan_audio" value="">
+        <input type="hidden" id="adzan_shubuh" value="">
+        <input type="hidden" id="adzan_status" value="false">
+    @endif
+
     {{-- Jumbotron Banner --}}
     <div id="jumbotronImage" class="jumbotron-image" style="display: none;">
         <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo" class="jumbotron-logo">
