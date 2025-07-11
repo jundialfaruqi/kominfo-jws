@@ -9,6 +9,8 @@ class AdzanAudio extends Model
 {
     use HasFactory;
 
+    protected $table = 'adzan_audio';
+
     protected $fillable = [
         'user_id',
         'audioadzan',

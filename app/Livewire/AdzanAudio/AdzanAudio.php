@@ -48,7 +48,7 @@ class AdzanAudio extends Component
             if ($this->isEdit) {
                 $rules['userId'] = 'required|exists:users,id';
             } else {
-                $rules['userId'] = 'required|exists:users,id|unique:adzan_audios,user_id';
+                $rules['userId'] = 'required|exists:users,id|unique:adzan_audio,user_id';
             }
         }
 
