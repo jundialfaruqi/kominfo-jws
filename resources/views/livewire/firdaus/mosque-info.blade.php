@@ -8,8 +8,8 @@
             @endif
         </div>
         <div class="mosque-text">
-            <h1><span class="mosque-name-highlight">{{ ucwords(strtolower($profil->name)) }}</span></h1>
-            <p class="mosque-address">{{ ucwords(strtolower($profil->address)) }}</p>
+            <h1><span class="mosque-name-highlight">{{ $profil->name }}</span></h1>
+            <p class="mosque-address">{{ $profil->address }}</p>
         </div>
     </div>
 </div>
