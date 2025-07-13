@@ -720,7 +720,6 @@ class Audio extends Component
                 'tmp_audio1' => $this->tmp_audio1,
             ]);
             if ($this->audio1) {
-                $this->tmp_audio1 = null;
                 $this->validateOnly('audio1');
             }
         }
@@ -730,7 +729,6 @@ class Audio extends Component
                 'tmp_audio2' => $this->tmp_audio2,
             ]);
             if ($this->audio2) {
-                $this->tmp_audio2 = null;
                 $this->validateOnly('audio2');
             }
         }
@@ -740,7 +738,6 @@ class Audio extends Component
                 'tmp_audio3' => $this->tmp_audio3,
             ]);
             if ($this->audio3) {
-                $this->tmp_audio3 = null;
                 $this->validateOnly('audio3');
             }
         }
