@@ -88,7 +88,7 @@
                                     <div class="col-auto py-2">
                                         <button type="button" class="btn btn-danger rounded-3 shadow-sm"
                                             wire:click="clearPhoto" wire:loading.attr="disabled">
-                                            <span wire:loading.remove wire:target="clearPhoto">Hapus Foto</span>
+                                            <span wire:loading.remove wire:target="clearPhoto">Hapus</span>
                                             <span wire:loading wire:target="clearPhoto">
                                                 <span class="spinner-border spinner-border-sm me-1"
                                                     role="status"></span>

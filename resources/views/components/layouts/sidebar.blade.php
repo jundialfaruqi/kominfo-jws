@@ -111,6 +111,33 @@
                         </li>
                     @endif
                     <li
+                        class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
+                                    <path d="M4 21v-10" />
+                                    <path d="M20 21v-10" />
+                                    <path d="M4 16h3v-3h10v3h3" />
+                                    <path d="M17 13a5 5 0 0 0 -10 0" />
+                                    <path
+                                        d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
+                                    <path
+                                        d="M5 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
+                                    <path d="M12 2a2 2 0 1 0 2 2" />
+                                    <path d="M12 6v2" />
+                                </svg>
+                            </span>
+                            <span class="nav-link-title">
+                                Profil Masjid
+                            </span>
+                        </a>
+                    </li>
+                    <li
                         class="nav-item mx-3 {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -129,7 +156,7 @@
                                 </svg>
                             </span>
                             <span class="nav-link-title">
-                                Tema
+                                Tema JWS
                             </span>
                         </a>
                     </li>
@@ -171,7 +198,7 @@
                                 </svg>
                             </span>
                             <span class="nav-link-title">
-                                Audio
+                                Audio Musik
                             </span>
                         </a>
                     </li>
@@ -182,43 +209,16 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-speakerphone">
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-volume">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M18 8a3 3 0 0 1 0 6" />
-                                    <path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5" />
+                                    <path d="M15 8a5 5 0 0 1 0 8" />
+                                    <path d="M17.7 5a9 9 0 0 1 0 14" />
                                     <path
-                                        d="M12 8h0l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8" />
+                                        d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
                                 </svg>
                             </span>
                             <span class="nav-link-title">
                                 Audio Adzan
-                            </span>
-                        </a>
-                    </li>
-                    <li
-                        class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
-                                    <path d="M4 21v-10" />
-                                    <path d="M20 21v-10" />
-                                    <path d="M4 16h3v-3h10v3h3" />
-                                    <path d="M17 13a5 5 0 0 0 -10 0" />
-                                    <path
-                                        d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
-                                    <path
-                                        d="M5 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
-                                    <path d="M12 2a2 2 0 1 0 2 2" />
-                                    <path d="M12 6v2" />
-                                </svg>
-                            </span>
-                            <span class="nav-link-title">
-                                Profil Masjid
                             </span>
                         </a>
                     </li>
@@ -267,7 +267,7 @@
                                 </svg>
                             </span>
                             <span class="nav-link-title">
-                                Slider Utama
+                                Slide Utama
                             </span>
                         </a>
                     </li>
@@ -300,12 +300,15 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-abc">
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-text-grammar">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M3 16v-6a2 2 0 1 1 4 0v6" />
-                                    <path d="M3 13h4" />
-                                    <path d="M10 8v6a2 2 0 1 0 4 0v-1a2 2 0 1 0 -4 0v1" />
-                                    <path d="M20.732 12a2 2 0 0 0 -3.732 1v1a2 2 0 0 0 3.726 1.01" />
+                                    <path d="M14 9a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                    <path d="M4 12v-5a3 3 0 1 1 6 0v5" />
+                                    <path d="M4 9h6" />
+                                    <path d="M20 6v6" />
+                                    <path d="M4 16h12" />
+                                    <path d="M4 20h6" />
+                                    <path d="M14 20l2 2l5 -5" />
                                 </svg>
                             </span>
                             <span class="nav-link-title">
@@ -320,12 +323,14 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-speakerphone">
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-photo-video">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M18 8a3 3 0 0 1 0 6" />
-                                    <path d="M10 8v11a1 1 0 0 1 -1 1h-1a1 1 0 0 1 -1 -1v-5" />
+                                    <path d="M9 15h-3a3 3 0 0 1 -3 -3v-6a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v3" />
                                     <path
-                                        d="M12 8h0l4.524 -3.77a.9 .9 0 0 1 1.476 .692v12.156a.9 .9 0 0 1 -1.476 .692l-4.524 -3.77h-8a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h8" />
+                                        d="M9 9m0 3a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-6a3 3 0 0 1 -3 -3z" />
+                                    <path d="M3 12l2.296 -2.296a2.41 2.41 0 0 1 3.408 0l.296 .296" />
+                                    <path d="M14 13.5v3l2.5 -1.5z" />
+                                    <path d="M7 6v.01" />
                                 </svg>
                             </span>
                             <span class="nav-link-title">

@@ -40,9 +40,9 @@ class Audio extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
-        'audio1' => 'nullable|file|mimes:mp3,wav|max:10240', // Maks 10MB
-        'audio2' => 'nullable|file|mimes:mp3,wav|max:10240',
-        'audio3' => 'nullable|file|mimes:mp3,wav|max:10240',
+        'audio1' => 'nullable|file|mimes:mp3,wav|max:51200', // Maks 50MB
+        'audio2' => 'nullable|file|mimes:mp3,wav|max:51200', // Maks 50MB
+        'audio3' => 'nullable|file|mimes:mp3,wav|max:51200', // Maks 50MB
         'status' => 'required|boolean',
     ];
 
@@ -55,9 +55,9 @@ class Audio extends Component
         'audio1.mimes'    => 'File harus berupa audio mp3 atau wav',
         'audio2.mimes'    => 'File harus berupa audio mp3 atau wav',
         'audio3.mimes'    => 'File harus berupa audio mp3 atau wav',
-        'audio1.max'      => 'Ukuran file maksimal 10MB',
-        'audio2.max'      => 'Ukuran file maksimal 10MB',
-        'audio3.max'      => 'Ukuran file maksimal 10MB',
+        'audio1.max'      => 'Ukuran file maksimal 50MB',
+        'audio2.max'      => 'Ukuran file maksimal 50MB',
+        'audio3.max'      => 'Ukuran file maksimal 50MB',
         'status.required' => 'Status wajib diisi',
         'status.boolean'  => 'Status harus berupa aktif atau tidak aktif',
     ];

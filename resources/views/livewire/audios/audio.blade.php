@@ -115,7 +115,7 @@
                                                 {{-- Audio 1 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 1</label>
-                                                    @if($tmp_audio1)
+                                                    @if ($tmp_audio1)
                                                         <audio controls class="w-100 mb-2" wire:key="tmp_audio1">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio1) }}"
@@ -152,6 +152,19 @@
                                                                 class="text-danger">*</span>Ukuran maksimal:
                                                             10MB</small>
                                                     </div>
+                                                    <!-- Progress Bar untuk Audio 1 -->
+                                                    @if($audio1)
+                                                    <div wire:loading wire:target="save" class="mt-2 w-100">
+                                                        <div class="progress w-100" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                                 style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
+                                                                 role="progressbar" 
+                                                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted mt-1 d-block">Mengupload Audio 1...</small>
+                                                    </div>
+                                                    @endif
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio1') is-invalid @enderror"
@@ -195,7 +208,7 @@
                                                 {{-- Audio 2 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 2</label>
-                                                    @if($tmp_audio2)
+                                                    @if ($tmp_audio2)
                                                         <audio controls class="w-100 mb-2" wire:key="tmp_audio2">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio2) }}"
@@ -233,6 +246,19 @@
                                                                 class="text-danger">*</span>Ukuran maksimal:
                                                             10MB</small>
                                                     </div>
+                                                    <!-- Progress Bar untuk Audio 2 -->
+                                                    @if($audio2)
+                                                    <div wire:loading wire:target="save" class="mt-2 w-100">
+                                                        <div class="progress w-100" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                                 style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
+                                                                 role="progressbar" 
+                                                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted mt-1 d-block">Mengupload Audio 2...</small>
+                                                    </div>
+                                                    @endif
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio2') is-invalid @enderror"
@@ -276,7 +302,7 @@
                                                 {{-- Audio 3 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 3</label>
-                                                    @if($tmp_audio3)
+                                                    @if ($tmp_audio3)
                                                         <audio controls class="w-100 mb-2" wire:key="tmp_audio3">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio3) }}"
@@ -315,6 +341,19 @@
                                                                 class="text-danger">*</span>Ukuran maksimal:
                                                             10MB</small>
                                                     </div>
+                                                    <!-- Progress Bar untuk Audio 3 -->
+                                                    @if($audio3)
+                                                    <div wire:loading wire:target="save" class="mt-2 w-100">
+                                                        <div class="progress w-100" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                                                 style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
+                                                                 role="progressbar" 
+                                                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                            </div>
+                                                        </div>
+                                                        <small class="text-muted mt-1 d-block">Mengupload Audio 3...</small>
+                                                    </div>
+                                                    @endif
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio3') is-invalid @enderror"

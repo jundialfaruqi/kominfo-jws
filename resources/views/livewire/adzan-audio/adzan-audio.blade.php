@@ -96,10 +96,12 @@
                                                     <label class="form-label">Status</label>
                                                     <label class="form-text small text-muted mb-2 ">
                                                         👉
-                                                        Audio Adzan tidak akan tampil jika status tidak aktif. Jika
-                                                        status Audio Adzan aktif, maka audio akan di tampilkan pada
-                                                        halaman adzan setelah bunyi alarm beep adzan berakhir. Dan akan
-                                                        berhenti saat durasi adzan selesai.
+                                                        Audio Adzan hanya akan diputar jika statusnya aktif. Jika
+                                                        status aktif, audio akan mulai diputar di halaman adzan setelah
+                                                        bunyi alarm beep berakhir, dan akan berhenti secara otomatis
+                                                        saat durasi adzan selesai. Pastikan panjang file audio adzan
+                                                        sesuai dengan durasi adzan yang ditentukan di <a wire:navigate
+                                                            href="{{ route('durasi.index') }}">Pengaturan Durasi</a>.
                                                     </label>
                                                     <select
                                                         class="form-select rounded-3 @error('status') is-invalid @enderror"
@@ -421,7 +423,7 @@
                                     <thead>
                                         <tr>
                                             <th class="w-1">No.</th>
-                                            <th>Pengunggah</th>
+                                            <th>Admin Masjid</th>
                                             <th class="text-center">Audio Adzan</th>
                                             <th class="text-center">Adzan Shubuh</th>
                                             <th class="text-center">Status</th>
@@ -442,7 +444,8 @@
                                                                 stroke="currentColor" stroke-width="2"
                                                                 stroke-linecap="round" stroke-linejoin="round"
                                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-music">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
                                                                 <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                                                 <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                                                 <path d="M9 17v-13h10v13" />
