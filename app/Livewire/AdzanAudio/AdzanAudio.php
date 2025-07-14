@@ -31,6 +31,10 @@ class AdzanAudio extends Component
     public $tmp_adzanshubuh;
     public $status = 1; // Default status aktif
 
+    // Properti untuk menandai file berhasil diupload
+    public $audioadzanUploaded = false;
+    public $adzanshubuhUploaded = false;
+
     public $isEdit = false;
     public $showForm = false;
     public $deleteAdzanAudioId;
@@ -197,6 +201,7 @@ class AdzanAudio extends Component
 
             $this->audioadzan = null;
             $this->tmp_audioadzan = null;
+            $this->audioadzanUploaded = false;
             $this->resetValidation(['audioadzan']);
             $this->dispatch('resetFileInput', ['inputName' => 'audioadzan']);
             $this->dispatch('success', 'Audio Adzan berhasil dihapus!');
@@ -270,6 +275,7 @@ class AdzanAudio extends Component
 
             $this->adzanshubuh = null;
             $this->tmp_adzanshubuh = null;
+            $this->adzanshubuhUploaded = false;
             $this->resetValidation(['adzanshubuh']);
             $this->dispatch('resetFileInput', ['inputName' => 'adzanshubuh']);
             $this->dispatch('success', 'Audio Adzan Shubuh berhasil dihapus!');
@@ -286,6 +292,8 @@ class AdzanAudio extends Component
     {
         $this->paginate = 10;
         $this->search = '';
+        $this->audioadzanUploaded = false;
+        $this->adzanshubuhUploaded = false;
 
         try {
             $this->checkCloudinaryConfig();
@@ -325,6 +333,8 @@ class AdzanAudio extends Component
             'tmp_adzanshubuh',
             'status'
         ]);
+        $this->audioadzanUploaded = false;
+        $this->adzanshubuhUploaded = false;
     }
 
     public function getUsersProperty()
@@ -417,6 +427,8 @@ class AdzanAudio extends Component
         $this->showForm = true;
         $this->reset(['adzanAudioId', 'userId', 'audioadzan', 'adzanshubuh', 'status', 'tmp_audioadzan', 'tmp_adzanshubuh']);
         $this->status = 0;
+        $this->audioadzanUploaded = false;
+        $this->adzanshubuhUploaded = false;
         $this->resetValidation();
 
         // Ambil daftar pengguna yang tersedia
@@ -446,6 +458,8 @@ class AdzanAudio extends Component
         $this->tmp_audioadzan = $adzanAudio->audioadzan;
         $this->tmp_adzanshubuh = $adzanAudio->adzanshubuh;
         $this->status = $adzanAudio->status ? 1 : 0;
+        $this->audioadzanUploaded = false;
+        $this->adzanshubuhUploaded = false;
 
         $this->isEdit = true;
         $this->showForm = true;
@@ -465,6 +479,8 @@ class AdzanAudio extends Component
             'tmp_adzanshubuh',
             'status'
         ]);
+        $this->audioadzanUploaded = false;
+        $this->adzanshubuhUploaded = false;
     }
 
     public function closeForm()
@@ -480,6 +496,8 @@ class AdzanAudio extends Component
             'tmp_adzanshubuh',
             'status'
         ]);
+        $this->audioadzanUploaded = false;
+        $this->adzanshubuhUploaded = false;
     }
 
     public function save()
@@ -537,6 +555,8 @@ class AdzanAudio extends Component
                     // Reset properti file setelah menyimpan untuk mencegah upload ulang
                     $this->audioadzan = null;
                     $this->adzanshubuh = null;
+                    $this->audioadzanUploaded = false;
+                    $this->adzanshubuhUploaded = false;
                 }
             }
         } catch (\Exception $e) {
@@ -569,7 +589,10 @@ class AdzanAudio extends Component
             ]);
             if ($this->audioadzan) {
                 $this->tmp_audioadzan = null;
+                $this->audioadzanUploaded = true;
                 $this->validateOnly('audioadzan');
+            } else {
+                $this->audioadzanUploaded = false;
             }
         }
         if ($propertyName === 'adzanshubuh') {
@@ -579,7 +602,10 @@ class AdzanAudio extends Component
             ]);
             if ($this->adzanshubuh) {
                 $this->tmp_adzanshubuh = null;
+                $this->adzanshubuhUploaded = true;
                 $this->validateOnly('adzanshubuh');
+            } else {
+                $this->adzanshubuhUploaded = false;
             }
         }
     }

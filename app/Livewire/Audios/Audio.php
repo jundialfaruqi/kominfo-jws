@@ -33,6 +33,11 @@ class Audio extends Component
     public $tmp_audio3;
     public $status = 1; // Default status aktif
 
+    // Upload validation success indicators
+    public $audio1Uploaded = false;
+    public $audio2Uploaded = false;
+    public $audio3Uploaded = false;
+
     public $isEdit = false;
     public $showForm = false;
     public $deleteAudioId;
@@ -209,6 +214,7 @@ class Audio extends Component
 
             $this->audio1 = null;
             $this->tmp_audio1 = null;
+            $this->audio1Uploaded = false;
             $this->resetValidation(['audio1']);
             $this->dispatch('resetFileInput', ['inputName' => 'audio1']);
             $this->dispatch('success', 'Audio 1 berhasil dihapus!');
@@ -288,6 +294,7 @@ class Audio extends Component
 
             $this->audio2 = null;
             $this->tmp_audio2 = null;
+            $this->audio2Uploaded = false;
             $this->resetValidation(['audio2']);
             $this->dispatch('resetFileInput', ['inputName' => 'audio2']);
             $this->dispatch('success', 'Audio 2 berhasil dihapus!');
@@ -367,6 +374,7 @@ class Audio extends Component
 
             $this->audio3 = null;
             $this->tmp_audio3 = null;
+            $this->audio3Uploaded = false;
             $this->resetValidation(['audio3']);
             $this->dispatch('resetFileInput', ['inputName' => 'audio3']);
             $this->dispatch('success', 'Audio 3 berhasil dihapus!');
@@ -404,8 +412,14 @@ class Audio extends Component
                 $this->tmp_audio3 = $audio->audio3;
                 $this->status     = $audio->status ? 1 : 0;
                 $this->isEdit     = true;
+                $this->audio1Uploaded = false;
+                $this->audio2Uploaded = false;
+                $this->audio3Uploaded = false;
             } else {
                 $this->isEdit = false;
+                $this->audio1Uploaded = false;
+                $this->audio2Uploaded = false;
+                $this->audio3Uploaded = false;
             }
         }
     }
@@ -424,7 +438,10 @@ class Audio extends Component
             'tmp_audio2',
             'audio3',
             'tmp_audio3',
-            'status'
+            'status',
+            'audio1Uploaded',
+            'audio2Uploaded',
+            'audio3Uploaded'
         ]);
     }
 
@@ -489,7 +506,10 @@ class Audio extends Component
             'tmp_audio2',
             'audio3',
             'tmp_audio3',
-            'status'
+            'status',
+            'audio1Uploaded',
+            'audio2Uploaded',
+            'audio3Uploaded'
         ]);
 
         $this->isEdit = false;
@@ -513,6 +533,9 @@ class Audio extends Component
         $this->tmp_audio2 = $audio->audio2;
         $this->tmp_audio3 = $audio->audio3;
         $this->status     = $audio->status ? 1 : 0;
+        $this->audio1Uploaded = false;
+        $this->audio2Uploaded = false;
+        $this->audio3Uploaded = false;
 
         $this->isEdit     = true;
         $this->showForm   = true;
@@ -531,7 +554,10 @@ class Audio extends Component
             'tmp_audio2',
             'audio3',
             'tmp_audio3',
-            'status'
+            'status',
+            'audio1Uploaded',
+            'audio2Uploaded',
+            'audio3Uploaded'
         ]);
     }
 
@@ -637,6 +663,7 @@ class Audio extends Component
                     }
                 }
                 $audio->audio1 = $this->saveCloudinaryAudio($this->audio1, 1);
+                $this->audio1Uploaded = true;
             } else {
                 $audio->audio1 = $this->tmp_audio1;
             }
@@ -651,6 +678,7 @@ class Audio extends Component
                     }
                 }
                 $audio->audio2 = $this->saveCloudinaryAudio($this->audio2, 2);
+                $this->audio2Uploaded = true;
             } else {
                 $audio->audio2 = $this->tmp_audio2;
             }
@@ -665,6 +693,7 @@ class Audio extends Component
                     }
                 }
                 $audio->audio3 = $this->saveCloudinaryAudio($this->audio3, 3);
+                $this->audio3Uploaded = true;
             } else {
                 $audio->audio3 = $this->tmp_audio3;
             }
@@ -684,7 +713,10 @@ class Audio extends Component
                     'tmp_audio1',
                     'tmp_audio2',
                     'tmp_audio3',
-                    'status'
+                    'status',
+                    'audio1Uploaded',
+                    'audio2Uploaded',
+                    'audio3Uploaded'
                 ]);
             } else {
                 $this->showForm = true;
@@ -701,6 +733,9 @@ class Audio extends Component
                     $this->audio1 = null;
                     $this->audio2 = null;
                     $this->audio3 = null;
+                    $this->audio1Uploaded = false;
+                    $this->audio2Uploaded = false;
+                    $this->audio3Uploaded = false;
                 }
             }
         } catch (\Exception $e) {
@@ -721,6 +756,12 @@ class Audio extends Component
             ]);
             if ($this->audio1) {
                 $this->validateOnly('audio1');
+                // Set success indicator after validation passes
+                if (!$this->getErrorBag()->has('audio1')) {
+                    $this->audio1Uploaded = true;
+                }
+            } else {
+                $this->audio1Uploaded = false;
             }
         }
         if ($propertyName === 'audio2') {
@@ -730,6 +771,12 @@ class Audio extends Component
             ]);
             if ($this->audio2) {
                 $this->validateOnly('audio2');
+                // Set success indicator after validation passes
+                if (!$this->getErrorBag()->has('audio2')) {
+                    $this->audio2Uploaded = true;
+                }
+            } else {
+                $this->audio2Uploaded = false;
             }
         }
         if ($propertyName === 'audio3') {
@@ -739,6 +786,12 @@ class Audio extends Component
             ]);
             if ($this->audio3) {
                 $this->validateOnly('audio3');
+                // Set success indicator after validation passes
+                if (!$this->getErrorBag()->has('audio3')) {
+                    $this->audio3Uploaded = true;
+                }
+            } else {
+                $this->audio3Uploaded = false;
             }
         }
     }

@@ -23,61 +23,69 @@
         <script>
             document.addEventListener('livewire:initialized', function() {
                 Livewire.on('resetFileInput', (data) => {
-                    const inputName = data.inputName;
-                    const fileInput = document.querySelector(`input[wire\:model="${inputName}"]`);
-                    if (fileInput) {
-                        fileInput.value = '';
-                        fileInput.dispatchEvent(new Event('change', {
-                            bubbles: true
-                        }));
+                    if (data && data.inputName && typeof data.inputName === 'string' && data.inputName.trim() !== '') {
+                        const inputName = data.inputName;
+                        const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
+                        if (fileInput) {
+                            fileInput.value = '';
+                            fileInput.dispatchEvent(new Event('change', {
+                                bubbles: true
+                            }));
+                        }
                     }
                 });
 
-                // Pantau perubahan pada input file
-                const fileInput = document.querySelector(`input[wire\:model="audioadzan"]`);
-                if (fileInput) {
-                    fileInput.addEventListener('change', () => {
-                        // Beri tahu Livewire untuk memperbarui komponen
-                        Livewire.dispatch('fileSelected', {
-                            inputName: 'audioadzan'
+                // Pantau perubahan pada input file dengan delay untuk memastikan DOM siap
+                setTimeout(() => {
+                    const fileInput = document.querySelector(`input[wire\\:model="audioadzan"]`);
+                    if (fileInput) {
+                        fileInput.addEventListener('change', () => {
+                            // Beri tahu Livewire untuk memperbarui komponen
+                            Livewire.dispatch('fileSelected', {
+                                inputName: 'audioadzan'
+                            });
                         });
-                    });
-                }
+                    }
 
-                // Pantau perubahan pada input file adzanshubuh
-                const fileInputShubuh = document.querySelector(`input[wire\:model="adzanshubuh"]`);
-                if (fileInputShubuh) {
-                    fileInputShubuh.addEventListener('change', () => {
-                        // Beri tahu Livewire untuk memperbarui komponen
-                        Livewire.dispatch('fileSelected', {
-                            inputName: 'adzanshubuh'
+                    // Pantau perubahan pada input file adzanshubuh
+                    const fileInputShubuh = document.querySelector(`input[wire\\:model="adzanshubuh"]`);
+                    if (fileInputShubuh) {
+                        fileInputShubuh.addEventListener('change', () => {
+                            // Beri tahu Livewire untuk memperbarui komponen
+                            Livewire.dispatch('fileSelected', {
+                                inputName: 'adzanshubuh'
+                            });
                         });
-                    });
-                }
+                    }
+                }, 100);
             });
 
             // Dengarkan event fileSelected dari Livewire
             $wire.on('fileSelected', (data) => {
-                const inputName = data.inputName;
-                // Tunggu sebentar untuk memastikan DOM diperbarui
-                setTimeout(() => {
-                    const audioElement = document.querySelector(`audio[wire\:key="${inputName}"]`);
-                    if (audioElement) {
-                        audioElement.load(); // Memaksa refresh elemen <audio>
-                    }
-                }, 100); // Delay kecil untuk memastikan DOM diperbarui
+                if (data && data.inputName && typeof data.inputName === 'string' && data.inputName.trim() !== '') {
+                    const inputName = data.inputName;
+                    // Tunggu sebentar untuk memastikan DOM diperbarui
+                    setTimeout(() => {
+                        const audioElement = document.querySelector(`audio[wire\\:key="${inputName}"]`);
+                        if (audioElement) {
+                            audioElement.load(); // Memaksa refresh elemen <audio>
+                        }
+                    }, 100); // Delay kecil untuk memastikan DOM diperbarui
+                }
             });
 
             // Dengarkan event refreshAudio dari Livewire
             $wire.on('refreshAudio', (data) => {
-                const inputName = data.inputName;
-                // Tunggu sebentar untuk memastikan DOM diperbarui
-                setTimeout(() => {
-                    const audioElement = document.querySelector(`audio[wire\:key="${inputName}"]`);
-                    if (audioElement) {
-                        audioElement.load(); // Memaksa refresh elemen <audio>
-                    }
-                }, 100); // Delay kecil untuk memastikan DOM diperbarui
+                if (data && data.inputName && typeof data.inputName === 'string' && data.inputName.trim() !== '') {
+                    const inputName = data.inputName;
+                    // Tunggu sebentar untuk memastikan DOM diperbarui
+                    setTimeout(() => {
+                        const audioElement = document.querySelector(`audio[wire\\:key="${inputName}"]`);
+                        if (audioElement) {
+                            audioElement.load(); // Memaksa refresh elemen <audio>
+                        }
+                    }, 100); // Delay kecil untuk memastikan DOM diperbarui
+                }
             });
 
             $wire.on('closeDeleteModal', () => {

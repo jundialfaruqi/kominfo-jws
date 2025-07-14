@@ -1335,14 +1335,16 @@
             document.addEventListener('livewire:initialized', function() {
                 // Listen untuk event resetFileInput dari Livewire
                 Livewire.on('resetFileInput', (data) => {
-                    const inputName = data.inputName;
-                    const fileInput = document.querySelector(`input[wire\\:model="${inputName}"]`);
-                    if (fileInput) {
-                        fileInput.value = '';
-                        // Trigger change event untuk memastikan Livewire mendeteksi perubahan
-                        fileInput.dispatchEvent(new Event('change', {
-                            bubbles: true
-                        }));
+                    if (data && data.inputName) {
+                        const inputName = data.inputName;
+                        const fileInput = document.querySelector(`input[wire\\\\:model="${inputName}"]`);
+                        if (fileInput) {
+                            fileInput.value = '';
+                            // Trigger change event untuk memastikan Livewire mendeteksi perubahan
+                            fileInput.dispatchEvent(new Event('change', {
+                                bubbles: true
+                            }));
+                        }
                     }
                 });
             });
