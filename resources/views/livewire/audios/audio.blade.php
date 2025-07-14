@@ -4,39 +4,7 @@
             <div class="row row-cards">
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
-                            <h3 class="card-title d-none d-md-block">
-                                @if ($showForm)
-                                    {{ $isEdit ? 'Ubah Pengaturan Audio Masjid' : 'Tambah Audio Masjid Baru' }}
-                                @else
-                                    {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Audio Masjid' : 'Ubah Pengaturan Audio Masjid' }}
-                                @endif
-                            </h3>
-                            @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
-                                <div class="card-actions">
-                                    <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
-                                        <span wire:loading.remove wire:target="showAddForm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-plus">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                                                <path d="M13.5 6.5l4 4" />
-                                                <path d="M16 19h6" />
-                                                <path d="M19 16v6" />
-                                            </svg>
-                                            Tambah Audio
-                                        </span>
-                                        <span wire:loading wire:target="showAddForm">
-                                            <span class="spinner-border spinner-border-sm" role="status"
-                                                aria-hidden="true"></span>
-                                            <span class="small">Loading...</span>
-                                        </span>
-                                    </button>
-                                </div>
-                            @endif
-                        </div>
+                        @include('livewire.audios.section-header')
 
                         @if ($showForm)
                             <form wire:submit.prevent="save">
@@ -115,7 +83,28 @@
                                                 {{-- Audio 1 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 1</label>
-                                                    @if ($tmp_audio1)
+                                                    @if ($audio1 && $audio1 instanceof \Livewire\TemporaryUploadedFile)
+                                                        <audio controls class="w-100 mb-2" wire:key="audio1">
+                                                            <source src="{{ $audio1->temporaryUrl() }}"
+                                                                type="audio/mpeg">
+                                                            Browser Anda tidak mendukung elemen audio.
+                                                        </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ $audio1->getClientOriginalName() }}
+                                                        </div>
+                                                    @elseif($tmp_audio1)
                                                         <audio controls class="w-100 mb-2" wire:key="tmp_audio1">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio1) }}"
@@ -153,18 +142,25 @@
                                                             10MB</small>
                                                     </div>
                                                     <!-- Progress Bar untuk Audio 1 -->
-                                                    @if($audio1)
-                                                    <div wire:loading wire:target="save" class="mt-2 w-100">
-                                                        <div class="progress w-100" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
-                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                                                 style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
-                                                                 role="progressbar" 
-                                                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                    @if ($audio1)
+                                                        <div wire:loading wire:target="save" class="mt-2 w-100">
+                                                            <div class="progress w-100"
+                                                                style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                                    style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
+                                                                    role="progressbar" aria-valuenow="100"
+                                                                    aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
                                                             </div>
+                                                            <small class="text-muted mt-1 d-block">Mengupload Audio
+                                                                1...</small>
                                                         </div>
-                                                        <small class="text-muted mt-1 d-block">Mengupload Audio 1...</small>
-                                                    </div>
                                                     @endif
+                                                    <div wire:loading wire:target="audio1" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Loading...</span>
+                                                    </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio1') is-invalid @enderror"
@@ -208,7 +204,29 @@
                                                 {{-- Audio 2 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 2</label>
-                                                    @if ($tmp_audio2)
+                                                    @if ($audio2 && $audio2 instanceof \Livewire\TemporaryUploadedFile)
+                                                        <audio controls class="w-100 mb-2" wire:key="audio2">
+                                                            <source src="{{ $audio2->temporaryUrl() }}"
+                                                                type="audio/mpeg">
+                                                            Browser Anda tidak mendukung elemen audio.
+                                                        </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ $audio2->getClientOriginalName() }}
+                                                        </div>
+                                                    @elseif($tmp_audio2)
                                                         <audio controls class="w-100 mb-2" wire:key="tmp_audio2">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio2) }}"
@@ -227,7 +245,6 @@
                                                                 <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                                                 <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                                                 <path d="M9 17v-13h10v13" />
-                                                                <path d="M9 8h10" />
                                                             </svg>
                                                             File: {{ pathinfo($tmp_audio2, PATHINFO_BASENAME) }}
                                                         </div>
@@ -247,18 +264,25 @@
                                                             10MB</small>
                                                     </div>
                                                     <!-- Progress Bar untuk Audio 2 -->
-                                                    @if($audio2)
-                                                    <div wire:loading wire:target="save" class="mt-2 w-100">
-                                                        <div class="progress w-100" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
-                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                                                 style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
-                                                                 role="progressbar" 
-                                                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                    @if ($audio2)
+                                                        <div wire:loading wire:target="save" class="mt-2 w-100">
+                                                            <div class="progress w-100"
+                                                                style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                                    style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
+                                                                    role="progressbar" aria-valuenow="100"
+                                                                    aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
                                                             </div>
+                                                            <small class="text-muted mt-1 d-block">Mengupload Audio
+                                                                2...</small>
                                                         </div>
-                                                        <small class="text-muted mt-1 d-block">Mengupload Audio 2...</small>
-                                                    </div>
                                                     @endif
+                                                    <div wire:loading wire:target="audio2" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Loading...</span>
+                                                    </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio2') is-invalid @enderror"
@@ -302,7 +326,29 @@
                                                 {{-- Audio 3 --}}
                                                 <div class="col-md-4 mb-2 px-2">
                                                     <label class="form-label">Audio 3</label>
-                                                    @if ($tmp_audio3)
+                                                    @if ($audio3 && $audio3 instanceof \Livewire\TemporaryUploadedFile)
+                                                        <audio controls class="w-100 mb-2" wire:key="audio3">
+                                                            <source src="{{ $audio3->temporaryUrl() }}"
+                                                                type="audio/mpeg">
+                                                            Browser Anda tidak mendukung elemen audio.
+                                                        </audio>
+                                                        <div
+                                                            class="text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-music">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                                                <path d="M9 17v-13h10v13" />
+                                                                <path d="M9 8h10" />
+                                                            </svg>
+                                                            File: {{ $audio3->getClientOriginalName() }}
+                                                        </div>
+                                                    @elseif($tmp_audio3)
                                                         <audio controls class="w-100 mb-2" wire:key="tmp_audio3">
                                                             <source
                                                                 src="{{ $this->generateCloudinaryUrl($tmp_audio3) }}"
@@ -342,18 +388,25 @@
                                                             10MB</small>
                                                     </div>
                                                     <!-- Progress Bar untuk Audio 3 -->
-                                                    @if($audio3)
-                                                    <div wire:loading wire:target="save" class="mt-2 w-100">
-                                                        <div class="progress w-100" style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
-                                                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                                                                 style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
-                                                                 role="progressbar" 
-                                                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                                    @if ($audio3)
+                                                        <div wire:loading wire:target="save" class="mt-2 w-100">
+                                                            <div class="progress w-100"
+                                                                style="height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden;">
+                                                                <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                                    style="width: 100%; background-color: #0d6efd; transition: width 0.6s ease;"
+                                                                    role="progressbar" aria-valuenow="100"
+                                                                    aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
                                                             </div>
+                                                            <small class="text-muted mt-1 d-block">Mengupload Audio
+                                                                3...</small>
                                                         </div>
-                                                        <small class="text-muted mt-1 d-block">Mengupload Audio 3...</small>
-                                                    </div>
                                                     @endif
+                                                    <div wire:loading wire:target="audio3" class="mt-2 text-center">
+                                                        <span class="spinner-border spinner-border-sm" role="status"
+                                                            aria-hidden="true"></span>
+                                                        <span class="small">Loading...</span>
+                                                    </div>
                                                     <div class="d-flex align-items-center gap-2">
                                                         <input type="file"
                                                             class="form-control my-2 rounded-4 @error('audio3') is-invalid @enderror"
