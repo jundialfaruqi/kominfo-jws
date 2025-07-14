@@ -40,6 +40,8 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td class="text-wrap">{{ $adzanAudio->user->name ?? '-' }}</td>
+
+                        {{-- Audio Adzan --}}
                         <td class="text-center">
                             @if ($adzanAudio->audioadzan)
                                 <div
@@ -56,7 +58,7 @@
                                     </svg>
                                     {{ pathinfo($adzanAudio->audioadzan, PATHINFO_BASENAME) }}
                                 </div>
-                                <audio controls>
+                                <audio controls class="w-50 rounded-3">
                                     <source src="{{ $this->generateCloudinaryUrl($adzanAudio->audioadzan) }}"
                                         type="audio/mpeg">
                                     Browser Anda tidak mendukung elemen audio.
@@ -65,6 +67,8 @@
                                 <span class="text-gray-400">-</span>
                             @endif
                         </td>
+
+                        {{-- Adzan Shubuh --}}
                         <td class="text-center">
                             @if ($adzanAudio->adzanshubuh)
                                 <div
@@ -81,7 +85,7 @@
                                     </svg>
                                     {{ pathinfo($adzanAudio->adzanshubuh, PATHINFO_BASENAME) }}
                                 </div>
-                                <audio controls>
+                                <audio controls class="w-50 rounded-3">
                                     <source src="{{ $this->generateCloudinaryUrl($adzanAudio->adzanshubuh) }}"
                                         type="audio/mpeg">
 

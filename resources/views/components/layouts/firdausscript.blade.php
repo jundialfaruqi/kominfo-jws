@@ -23,8 +23,55 @@
         let cachedAudioUrls = []; // Menyimpan URL audio yang tidak berubah selama sesi pemutaran
         let audioRetryCount = 0; // Menghitung percobaan pemutaran ulang jika terjadi error
         const MAX_RETRY_ATTEMPTS = 3; // Maksimum percobaan pemutaran ulang
+
+        // Variabel untuk tracking status koneksi dan notifikasi
+        let isOffline = false;
+        let offlineNotificationShown = false;
+        let connectionStatusElement = null;
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
+
+        // Fungsi untuk menampilkan notifikasi status koneksi
+        function showConnectionStatus(message, type = 'info') {
+            // Hapus notifikasi sebelumnya jika ada
+            if (connectionStatusElement) {
+                connectionStatusElement.remove();
+            }
+
+            // Buat elemen notifikasi
+            connectionStatusElement = document.createElement('div');
+            connectionStatusElement.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${type === 'warning' ? '#ff9800' : '#4caf50'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 6px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transition: all 0.3s ease;
+                max-width: 300px;
+             `;
+            connectionStatusElement.textContent = message;
+            document.body.appendChild(connectionStatusElement);
+
+            // Auto-hide setelah 5 detik untuk notifikasi online
+            if (type !== 'warning') {
+                setTimeout(() => {
+                    if (connectionStatusElement) {
+                        connectionStatusElement.style.opacity = '0';
+                        setTimeout(() => {
+                            if (connectionStatusElement) {
+                                connectionStatusElement.remove();
+                                connectionStatusElement = null;
+                            }
+                        }, 300);
+                    }
+                }, 5000);
+            }
+        }
 
         function syncServerTime(callback) {
             const startTime = Date.now();
@@ -79,8 +126,19 @@
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
             // Periksa koneksi jaringan terlebih dahulu
-            if (!checkNetworkAndRetry()) {
-                return; // Keluar jika offline, checkNetworkAndRetry akan menangani retry
+            const networkAvailable = checkNetworkAndRetry();
+
+            // Jika offline dan ada cache, gunakan cache
+            if (!networkAvailable && cachedAudioUrls.length > 0) {
+                console.log('Mode offline: Menggunakan audio dari cache');
+                // Putar audio dari cache jika tidak sedang dijeda untuk adzan
+                if (!isAudioPausedForAdzan && !isAudioPlaying) {
+                    playAudioFromCache();
+                }
+                return;
+            } else if (!networkAvailable) {
+                console.warn('Offline dan tidak ada cache audio tersedia');
+                return; // Keluar jika offline dan tidak ada cache
             }
 
             const slug = window.location.pathname.replace(/^\//, '');
@@ -185,11 +243,100 @@
             });
         }
 
+        // Fungsi untuk memutar audio dari cache saat offline
+        function playAudioFromCache() {
+            console.log('Memutar audio dari cache:', cachedAudioUrls.length, 'audio tersedia');
+
+            if (cachedAudioUrls.length === 0) {
+                console.warn('Cache audio kosong');
+                return;
+            }
+
+            // Reset retry counter
+            audioRetryCount = 0;
+
+            // Bersihkan audio player sebelumnya jika ada
+            if (audioPlayer) {
+                audioPlayer.onended = null;
+                audioPlayer.onerror = null;
+                audioPlayer.onplay = null;
+                audioPlayer.onpause = null;
+                audioPlayer = null;
+            }
+
+            // Mulai dari audio pertama di cache
+            currentAudioIndex = 0;
+
+            function playNextFromCache() {
+                if (currentAudioIndex >= cachedAudioUrls.length) {
+                    // Jika sudah mencapai akhir playlist, mulai dari awal
+                    currentAudioIndex = 0;
+                }
+
+                const audioUrl = cachedAudioUrls[currentAudioIndex];
+                console.log(`Memutar audio dari cache [${currentAudioIndex + 1}/${cachedAudioUrls.length}]:`,
+                    audioUrl);
+
+                // Buat audio player baru
+                audioPlayer = new Audio(audioUrl);
+
+                // Set event listeners
+                audioPlayer.onended = function() {
+                    console.log('Audio dari cache selesai, melanjutkan ke audio berikutnya');
+                    currentAudioIndex++;
+                    playNextFromCache();
+                };
+
+                audioPlayer.onerror = function(error) {
+                    console.error('Error saat memutar audio dari cache:', error);
+                    currentAudioIndex++;
+                    if (currentAudioIndex < cachedAudioUrls.length) {
+                        console.log('Mencoba audio berikutnya dari cache...');
+                        playNextFromCache();
+                    } else {
+                        console.warn('Semua audio di cache gagal diputar');
+                        isAudioPlaying = false;
+                    }
+                };
+
+                audioPlayer.onplay = function() {
+                    isAudioPlaying = true;
+                    console.log('Audio dari cache mulai diputar');
+                };
+
+                audioPlayer.onpause = function() {
+                    isAudioPlaying = false;
+                    console.log('Audio dari cache dijeda');
+                };
+
+                // Putar audio
+                audioPlayer.play().catch(function(error) {
+                    console.error('Gagal memutar audio dari cache:', error);
+                    currentAudioIndex++;
+                    if (currentAudioIndex < cachedAudioUrls.length) {
+                        playNextFromCache();
+                    } else {
+                        isAudioPlaying = false;
+                    }
+                });
+            }
+
+            playNextFromCache();
+        }
+
         // Fungsi untuk memutar audio
         function playAudio() {
             // Periksa koneksi jaringan terlebih dahulu
-            if (!checkNetworkAndRetry()) {
-                return; // Keluar jika offline, checkNetworkAndRetry akan menangani retry
+            const networkAvailable = checkNetworkAndRetry();
+
+            // Jika offline, gunakan cache
+            if (!networkAvailable) {
+                if (cachedAudioUrls.length > 0) {
+                    playAudioFromCache();
+                } else {
+                    console.warn('Offline dan tidak ada cache audio');
+                }
+                return;
             }
 
             // Cek status audio dan jika audio sedang dijeda untuk adzan
@@ -422,17 +569,49 @@
         function checkNetworkAndRetry() {
             // Periksa apakah browser online
             if (!navigator.onLine) {
-                console.warn('Browser offline, menunggu koneksi kembali...');
+                if (!isOffline) {
+                    isOffline = true;
+                    console.warn('Browser offline, beralih ke mode cache-first playback...');
+
+                    // Tampilkan notifikasi offline hanya sekali
+                    if (!offlineNotificationShown) {
+                        showConnectionStatus('Mode Offline: Internet tidak tersedia. Audio berjalan dari cache',
+                            'warning');
+                        offlineNotificationShown = true;
+                    }
+                }
+
                 // Tambahkan event listener untuk online event
                 window.addEventListener('online', function onlineHandler() {
-                    console.log('Koneksi kembali, memuat ulang audio...');
+                    console.log('Koneksi kembali, memperbarui cache audio...');
+                    isOffline = false;
+                    offlineNotificationShown = false;
+
+                    // Hapus notifikasi offline
+                    if (connectionStatusElement) {
+                        connectionStatusElement.remove();
+                        connectionStatusElement = null;
+                    }
+
+                    // Tampilkan notifikasi online
+                    showConnectionStatus('Koneksi kembali - Cache audio diperbarui', 'info');
+
                     window.removeEventListener('online', onlineHandler);
                     setTimeout(updateAndPlayAudio, 2000); // Tunggu 2 detik setelah online
                 }, {
                     once: true
                 });
-                return false;
+
+                // Return true jika ada cache, false jika tidak ada cache sama sekali
+                return cachedAudioUrls.length > 0;
             }
+
+            // Reset status offline jika online
+            if (isOffline) {
+                isOffline = false;
+                offlineNotificationShown = false;
+            }
+
             return true;
         }
 
@@ -442,19 +621,44 @@
         // Reset cache audio setiap 30 menit untuk memastikan audio terbaru dimuat
         setInterval(updateAndPlayAudio, 30 * 60 * 1000);
 
-        // Tambahkan event listener untuk mendeteksi perubahan koneksi jaringan
+        // Tambahkan event listener untuk mendeteksi perubahan koneksi jaringan - Cache-first strategy
         window.addEventListener('offline', function() {
-            console.warn('Koneksi terputus, audio mungkin tidak dapat diputar');
-            // Jika sedang memutar audio, jeda sementara
-            if (audioPlayer && isAudioPlaying) {
+            console.log('Browser offline - Mode cache-first aktif');
+            isOffline = true;
+
+            // Jangan pause audio jika sedang bermain dari cache
+            // Audio akan tetap berjalan selama ada cache
+            if (cachedAudioUrls.length === 0 && audioPlayer && isAudioPlaying) {
                 audioPlayer.pause();
+                console.log('Audio dijeda karena offline dan tidak ada cache');
+                showConnectionStatus('Tidak ada koneksi dan cache kosong', 'warning');
+            } else if (cachedAudioUrls.length > 0) {
+                console.log('Audio tetap berjalan dari cache saat offline');
+                if (!offlineNotificationShown) {
+                    showConnectionStatus(
+                        'Mode Offline: Koneksi Internet tidak tersedia. Audio berjalan dari cache',
+                        'warning');
+                    offlineNotificationShown = true;
+                }
             }
         });
 
         window.addEventListener('online', function() {
-            console.log('Koneksi kembali, mencoba melanjutkan audio...');
-            // Jika ada audio yang dijeda karena offline, coba putar lagi
-            if (audioPlayer) {
+            console.log('Browser online kembali - Memperbarui cache');
+            isOffline = false;
+            offlineNotificationShown = false;
+
+            // Hapus notifikasi offline
+            if (connectionStatusElement) {
+                connectionStatusElement.remove();
+                connectionStatusElement = null;
+            }
+
+            // Tampilkan notifikasi online
+            showConnectionStatus('Koneksi kembali - Cache audio diperbarui', 'info');
+
+            // Refresh cache dan lanjutkan audio jika diperlukan
+            if (audioPlayer && !isAudioPlaying && !isAudioPausedForAdzan) {
                 audioPlayer.play().catch(function(error) {
                     console.error('Gagal melanjutkan audio setelah online:', error);
 
@@ -469,9 +673,12 @@
                     // Jika gagal melanjutkan, reset dan coba dari awal
                     updateAndPlayAudio();
                 });
-            } else {
+            } else if (!audioPlayer || (!isAudioPlaying && !isAudioPausedForAdzan)) {
                 // Jika tidak ada audio yang sedang diputar, muat ulang
                 updateAndPlayAudio();
+            } else if (isAudioPlaying) {
+                // Jika audio sedang berjalan, refresh cache di background
+                setTimeout(updateAndPlayAudio, 5000);
             }
         });
 
