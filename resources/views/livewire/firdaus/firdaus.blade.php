@@ -296,12 +296,15 @@
     </div>
 
     {{-- Friday Info Popup --}}
+    {{-- DEBUG: Popup ini hanya muncul pada hari Jumat saat waktu Zuhur --}}
+    {{-- DEBUG: Untuk testing, uncomment baris di bawah untuk memaksa tampil --}}
+    {{-- <div id="fridayInfoPopup" class="friday-info-popup" style="display: flex;"> --}}
     <div id="fridayInfoPopup" class="friday-info-popup" style="display: none;">
         <div class="friday-info-content">
             <div id="fridayDate" class="friday-date"></div>
             <div id="fridayOfficials" class="friday-officials"></div>
             <div class="digital-clock">
-                <span>JAM</span>
+                <span style="text-align: top">JAM</span>
                 <span class="clock-time">00:00:00</span>
             </div>
             @if ($petugas)
@@ -317,6 +320,11 @@
             <div id="currentFridayImage" class="currentFridayImage"></div>
         </div>
     </div>
+
+    {{-- DEBUG: Button untuk testing Friday Info Popup (hapus setelah selesai debug) --}}
+    {{-- <button onclick="testFridayPopup()"
+        style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px; border: none; cursor: pointer;">Test
+        Friday Popup</button> --}}
 
     {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
