@@ -251,7 +251,7 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+0 hour 54 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+0 hour 7 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
@@ -260,7 +260,7 @@ Route::get('/api/server-time', function () {
             //     $daysToFriday += 7;
             // }
             // $serverDateTime->modify("+{$daysToFriday} days");
-            // $serverDateTime->setTime(12, 21, 00);
+            // $serverDateTime->setTime(12, 22, 40);
 
             return response()->json([
                 'success' => true,

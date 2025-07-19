@@ -36,6 +36,11 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatedPaginate()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $query = User::select('id', 'name', 'phone', 'email', 'role', 'status')

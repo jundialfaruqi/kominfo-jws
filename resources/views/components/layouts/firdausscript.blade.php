@@ -203,7 +203,16 @@
                             if (!isAudioPlaying) {
                                 // Putar audio jika tersedia dan tidak sedang dijeda untuk adzan
                                 if (!isAudioPausedForAdzan) {
-                                    playAudio();
+                                    // Cek apakah Friday Info popup sedang ditampilkan
+                                    const now = getCurrentTimeFromServer().getTime();
+                                    if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                        fridayInfoStartTime && now < fridayInfoEndTime) {
+                                        console.log(
+                                            'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                        );
+                                    } else {
+                                        playAudio();
+                                    }
                                 } else {
                                     console.log(
                                         'Audio tidak diputar karena sedang dijeda untuk adzan');
@@ -213,7 +222,16 @@
 
                         // Putar audio jika tersedia dan tidak sedang dijeda untuk adzan
                         if (!isAudioPausedForAdzan && !isAudioPlaying && !audioChanged) {
-                            playAudio();
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
                         } else if (isAudioPlaying && audioChanged) {
                             console.log('Audio baru akan diputar setelah audio saat ini selesai');
                         } else if (isAudioPausedForAdzan) {
@@ -231,7 +249,16 @@
                     if (cachedAudioUrls.length > 0) {
                         console.log('Menggunakan audio dari cache karena request gagal');
                         if (!isAudioPausedForAdzan && !isAudioPlaying) {
-                            playAudio();
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
                         }
                     } else {
                         // Coba lagi setelah beberapa waktu jika tidak ada cache
@@ -345,6 +372,14 @@
                 return;
             }
 
+            // Cek apakah Friday Info popup sedang ditampilkan
+            const now = getCurrentTimeFromServer().getTime();
+            if (fridayInfoStartTime && fridayInfoEndTime && now >= fridayInfoStartTime && now <
+                fridayInfoEndTime) {
+                console.log('Audio tidak diputar karena Friday Info popup sedang ditampilkan');
+                return;
+            }
+
             // Ambil URL audio dari input hidden setiap kali fungsi dipanggil
             const audioUrls = [
                 $('#audio1').val(),
@@ -433,7 +468,14 @@
                         updateAndPlayAudio(); // Reset cache untuk memuat audio baru
                     } else {
                         // Langsung putar audio berikutnya tanpa jeda
-                        playAudio();
+                        // Cek apakah Friday Info popup sedang ditampilkan
+                        const now = getCurrentTimeFromServer().getTime();
+                        if (fridayInfoStartTime && fridayInfoEndTime && now >= fridayInfoStartTime && now <
+                            fridayInfoEndTime) {
+                            console.log('Audio tidak diputar karena Friday Info popup sedang ditampilkan');
+                        } else {
+                            playAudio();
+                        }
                     }
                 };
 
@@ -458,13 +500,35 @@
                         console.log(
                             `Mencoba memutar ulang audio karena error (percobaan ke-${audioRetryCount})...`
                         );
-                        setTimeout(playAudio, 1000); // Coba lagi setelah 1 detik
+                        setTimeout(function() {
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
+                        }, 1000); // Coba lagi setelah 1 detik
                     } else {
                         console.warn(
                             `Gagal memutar audio setelah ${MAX_RETRY_ATTEMPTS} percobaan, beralih ke audio berikutnya`
                         );
                         audioRetryCount = 0; // Reset counter dan coba audio berikutnya
-                        setTimeout(playAudio, 1000);
+                        setTimeout(function() {
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
+                        }, 1000);
                     }
                 };
 
@@ -489,13 +553,35 @@
                         console.log(
                             `Mencoba memutar ulang audio karena timeout (percobaan ke-${audioRetryCount})...`
                         );
-                        setTimeout(playAudio, 1000);
+                        setTimeout(function() {
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
+                        }, 1000);
                     } else {
                         console.warn(
                             `Gagal memutar audio setelah ${MAX_RETRY_ATTEMPTS} percobaan, beralih ke audio berikutnya`
                         );
                         audioRetryCount = 0; // Reset counter dan coba audio berikutnya
-                        setTimeout(playAudio, 1000);
+                        setTimeout(function() {
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
+                        }, 1000);
                     }
                 }, 10000); // 10 detik timeout
 
@@ -521,13 +607,35 @@
                     audioRetryCount++;
                     if (audioRetryCount <= MAX_RETRY_ATTEMPTS) {
                         console.log(`Mencoba memutar ulang audio (percobaan ke-${audioRetryCount})...`);
-                        setTimeout(playAudio, 1000); // Coba lagi setelah 1 detik
+                        setTimeout(function() {
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
+                        }, 1000); // Coba lagi setelah 1 detik
                     } else {
                         console.warn(
                             `Gagal memutar audio setelah ${MAX_RETRY_ATTEMPTS} percobaan, beralih ke audio berikutnya`
                         );
                         audioRetryCount = 0; // Reset counter dan coba audio berikutnya
-                        setTimeout(playAudio, 1000);
+                        setTimeout(function() {
+                            // Cek apakah Friday Info popup sedang ditampilkan
+                            const now = getCurrentTimeFromServer().getTime();
+                            if (fridayInfoStartTime && fridayInfoEndTime && now >=
+                                fridayInfoStartTime && now < fridayInfoEndTime) {
+                                console.log(
+                                    'Audio tidak diputar karena Friday Info popup sedang ditampilkan'
+                                );
+                            } else {
+                                playAudio();
+                            }
+                        }, 1000);
                     }
                 });
             }
@@ -558,12 +666,17 @@
 
                 // Tunggu sebentar sebelum memutar audio kembali
                 setTimeout(function() {
-                    playAudio(); // Coba putar audio kembali
+                    // Cek apakah Friday Info popup sedang ditampilkan
+                    const now = getCurrentTimeFromServer().getTime();
+                    if (fridayInfoStartTime && fridayInfoEndTime && now >= fridayInfoStartTime && now <
+                        fridayInfoEndTime) {
+                        console.log('Audio tidak diputar karena Friday Info popup sedang ditampilkan');
+                    } else {
+                        playAudio(); // Coba putar audio kembali
+                    }
                 }, 1000); // Tunggu 1 detik
             }
         }
-
-
 
         // Fungsi untuk memeriksa koneksi jaringan dan mencoba ulang jika terjadi masalah
         function checkNetworkAndRetry() {
@@ -1480,7 +1593,12 @@
             }
 
             if (isAudioPausedForAdzan) {
-                resumeAudio();
+                // Hanya panggil resumeAudio jika tidak sedang dalam periode Friday Info popup
+                const now = getCurrentTimeFromServer().getTime();
+                if (!(fridayInfoStartTime && fridayInfoEndTime && now >= fridayInfoStartTime && now <
+                        fridayInfoEndTime)) {
+                    resumeAudio();
+                }
                 isAudioPausedForAdzan = false;
             }
 
@@ -1513,6 +1631,13 @@
                 'fridayInfoStartTime', 'adzanImageStartTime'
             ];
             keysToRemove.forEach(key => localStorage.removeItem(key));
+
+            // Bersihkan semua flag fridayAdzanCleared
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('fridayAdzanCleared_')) {
+                    localStorage.removeItem(key);
+                }
+            });
 
             // Lanjutkan pemutaran audio jika adzan dibatalkan
             resumeAudio();
@@ -2359,6 +2484,13 @@
             localStorage.removeItem('fridayInfoData');
             localStorage.removeItem('fridaySliderStartTime');
 
+            // Bersihkan semua flag fridayAdzanCleared
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('fridayAdzanCleared_')) {
+                    localStorage.removeItem(key);
+                }
+            });
+
             if (fridayImageSliderInterval) {
                 clearInterval(fridayImageSliderInterval);
                 fridayImageSliderInterval = null;
@@ -2797,7 +2929,13 @@
                     } else if (prayer.name === "Jum'at" && fridayInfoStartTime && now.getTime() <
                         fridayInfoEndTime) {
                         // Jangan memulai adzan Jumat jika popup Friday Info aktif
-                        clearAdzanState();
+                        // Hanya panggil clearAdzanState jika belum dipanggil untuk periode ini
+                        if (!localStorage.getItem('fridayAdzanCleared_' + currentTimeFormatted
+                                .substring(0, 16))) {
+                            clearAdzanState();
+                            localStorage.setItem('fridayAdzanCleared_' + currentTimeFormatted.substring(
+                                0, 16), 'true');
+                        }
                     } else {
                         showAdzanPopup(prayer.name, prayer.time);
                     }
