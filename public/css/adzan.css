@@ -38,7 +38,7 @@
 .iqomah-popup,
 .friday-info-popup {
     border: 12px solid #d4af37;
-    padding: 1rem;
+    padding: 0;
 }
 
 .friday-image-display {
@@ -124,9 +124,14 @@
 }
 
 .friday-date {
-    text-align: left;
-    margin-bottom: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
     font-weight: bold;
+}
+
+.day-name-popup {
+    font-size: 3.5rem;
+    color: #d4af37;
 }
 
 .progress-container,
@@ -173,15 +178,25 @@
 
 .responsive-table {
     width: 100%;
+    margin: 0.5rem 1rem;
     border-collapse: collapse;
     color: white;
 }
 
 .responsive-table td {
-    padding: 8px 12px;
+    padding: 5px 7px;
     border: none;
     vertical-align: top;
     text-align: left;
+}
+
+.responsive-table .official-name {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.responsive-table .official-name-value {
+    font-size: 2.5rem;
 }
 
 .logo-popup {
@@ -257,7 +272,7 @@
     background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.9));
     padding: 0.6rem 1.2rem;
     border-radius: 12px;
-    margin: 1.5rem auto;
+    margin: 1rem auto;
     display: inline-block;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
     text-align: center;
@@ -267,26 +282,11 @@
     transition: all 0.3s ease;
 }
 
-.digital-clock::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
-}
-
-.digital-clock:hover {
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
 .clock-time {
     letter-spacing: 3px;
     font-weight: bold;
     text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-    font-size: 4rem;
+    font-size: 2.5rem;
 }
 
 .adzan-popup .digital-clock {
@@ -317,7 +317,6 @@
     .friday-info-popup,
     .friday-image-display {
         border-width: 16px;
-        padding: 1.5rem;
     }
 
     .adzan {
@@ -347,9 +346,21 @@
         font-size: 6rem;
     }
 
+    .day-name-popup {
+        font-size: 10rem;
+    }
+
     .responsive-table td {
-        padding: 1rem;
-        font-size: 4.5rem;
+        padding: 1rem 9rem;
+        font-size: 4rem;
+    }
+
+    .responsive-table .official-name {
+        font-size: 4rem;
+    }
+
+    .responsive-table .official-name-value {
+        font-size: 6.5rem;
     }
 
     .adzan-image-display {
@@ -420,7 +431,7 @@
     }
 
     .clock-time {
-        font-size: 19rem;
+        font-size: 10rem;
         letter-spacing: 4px;
     }
 }
@@ -433,7 +444,6 @@
     .friday-info-popup,
     .friday-image-display {
         border-width: 14px;
-        padding: 1.2rem;
     }
 
     .adzan {
@@ -467,9 +477,21 @@
         font-size: 4rem;
     }
 
+    .day-name-popup {
+        font-size: 5rem;
+    }
+
     .responsive-table td {
-        padding: 10px 15px;
+        padding: 1rem 5rem;
         font-size: 3rem;
+    }
+
+    .responsive-table .official-name {
+        font-size: 3rem;
+    }
+
+    .responsive-table .official-name-value {
+        font-size: 4rem;
     }
 
     .adzan-image-display {
@@ -537,6 +559,14 @@
         padding: 0.7rem 1.4rem;
         border-radius: 16px;
     }
+
+    .clock-time {
+        letter-spacing: 3px;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        font-size: 4rem;
+    }
+
 }
 
 /* Full HD: 1920px–2559px */
@@ -547,7 +577,6 @@
     .friday-info-popup,
     .friday-image-display {
         border-width: 12px;
-        padding: 1rem;
     }
 
     .adzan {
@@ -577,9 +606,21 @@
         font-size: 3rem;
     }
 
+    .day-name-popup {
+        font-size: 4rem;
+    }
+
     .responsive-table td {
-        padding: 9px 14px;
-        font-size: 2.2rem;
+        padding: 0.2rem 4rem;
+        font-size: 3rem;
+    }
+
+    .responsive-table .official-name {
+        font-size: 2rem;
+    }
+
+    .responsive-table .official-name-value {
+        font-size: 3rem;
     }
 
     .adzan-image-display {
@@ -647,6 +688,10 @@
         padding: 0.65rem 1.3rem;
         border-radius: 14px;
     }
+
+    .clock-time {
+        font-size: 3.2rem;
+    }
 }
 
 /* 1600px–1919px */
@@ -657,7 +702,6 @@
     .friday-info-popup,
     .friday-image-display {
         border-width: 10px;
-        padding: 0.8rem;
     }
 
     .adzan {
@@ -688,7 +732,7 @@
     }
 
     .responsive-table td {
-        padding: 8px 12px;
+        padding: 0.2rem 3rem;
         font-size: 1.8rem;
     }
 
@@ -767,7 +811,6 @@
     .friday-info-popup,
     .friday-image-display {
         border-width: 8px;
-        padding: 0.7rem;
     }
 
     .adzan {
@@ -877,7 +920,6 @@
     .friday-info-popup,
     .friday-image-display {
         border-width: 6px;
-        padding: 0.5rem;
     }
 
     .adzan {
@@ -1031,7 +1073,6 @@
     .iqomah-popup,
     .friday-info-popup {
         border: 8px solid #d4af37;
-        padding: 0.5rem;
     }
 
     .adzan-title {
@@ -1057,7 +1098,7 @@
     .friday-info-content {
         flex: none;
         height: 50%;
-        padding: 1rem;
+        padding: 0;
     }
 
     .iqomah-image,
@@ -1160,7 +1201,6 @@
     .iqomah-popup,
     .friday-info-popup {
         border: 6px solid #d4af37;
-        padding: 0.25rem;
     }
 
     .adzan-title {
@@ -1178,7 +1218,7 @@
 
     .iqomah-popup-content,
     .friday-info-content {
-        padding: 0.5rem;
+        padding: 0;
     }
 
     .iqomah-title,
@@ -1280,7 +1320,6 @@
     .iqomah-popup,
     .friday-info-popup {
         border: 4px solid #d4af37;
-        padding: 0.125rem;
     }
 
     .adzan-title {
@@ -1299,7 +1338,7 @@
 
     .iqomah-popup-content,
     .friday-info-content {
-        padding: 0.25rem;
+        padding: 0;
     }
 
     .iqomah-title,

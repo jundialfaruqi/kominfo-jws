@@ -13,6 +13,15 @@
 
 <script>
     $(document).ready(function() {
+        // Tambahkan di awal script
+        let userHasInteracted = false;
+
+        // Event listener untuk mendeteksi interaksi user
+        $(document).one('click touchstart keydown', function() {
+            userHasInteracted = true;
+            console.log('User interaction detected - audio autoplay enabled');
+        });
+
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
         let audioPlayer = null;
@@ -3497,7 +3506,7 @@
                 const tanggalMasehi = moment(now).format('D MMMM YYYY');
 
                 let formattedDate =
-                    `<span class="day-name" style="font-size: 5rem;">${hari}</span>, <br />${tanggalMasehi}`;
+                    `<span class="day-name-popup">${hari}</span>, <br />${tanggalMasehi}`;
 
 
                 if (typeof moment().iDate === 'function') {
@@ -3522,14 +3531,15 @@
 
             if (khatib) {
                 officialsHtml +=
-                    `<tr><td style="font-weight: bold;">KHATIB</td><td>:</td><td>${khatib}</td></tr>`;
+                    `<tr><td class="official-name">KHATIB</td></tr><tr><td class="official-name-value" style="font-weight: bold;">${khatib}</td></tr>`;
             }
             if (imam) {
-                officialsHtml += `<tr><td style="font-weight: bold;">IMAM</td><td>:</td><td>${imam}</td></tr>`;
+                officialsHtml +=
+                    `<tr><td class="official-name">IMAM</td></tr><tr><td class="official-name-value" style="font-weight: bold;">${imam}</td></tr>`;
             }
             if (muadzin) {
                 officialsHtml +=
-                    `<tr><td style="font-weight: bold;">MUADZIN</td><td>:</td><td>${muadzin}</td></tr>`;
+                    `<tr><td class="official-name">MUADZIN</td></tr><tr><td class="official-name-value" style="font-weight: bold;">${muadzin}</td></tr>`;
             }
             officialsHtml += '</table>';
 
@@ -3589,6 +3599,43 @@
                 window.adzanAudioPlayer.currentTime = 0;
             }
         });
+
+        // DEBUG: Fungsi untuk testing Friday Info Popup (hapus setelah selesai debug)
+        // window.testFridayPopup = function() {
+        //     console.log('Testing Friday Info Popup...');
+
+        //     // Simulasi data Friday
+        //     const now = getCurrentTimeFromServer();
+        //     const options = {
+        //         weekday: 'long',
+        //         day: '2-digit',
+        //         month: '2-digit',
+        //         year: '2-digit'
+        //     };
+        //     const formattedDate = now.toLocaleDateString('id-ID', options);
+        //     const khatib = $('#khatib').val() || 'Test Khatib';
+        //     const imam = $('#imam').val() || 'Test Imam';
+        //     const muadzin = $('#muadzin').val() || 'Test Muadzin';
+
+        //     const fridayData = {
+        //         date: formattedDate,
+        //         khatib,
+        //         imam,
+        //         muadzin
+        //     };
+
+        //     // Tampilkan popup
+        //     displayFridayInfoPopup(fridayData);
+        //     console.log('Friday Info Popup ditampilkan untuk testing');
+        // };
+
+        // // DEBUG: Fungsi untuk menutup Friday Info Popup
+        // window.closeFridayPopup = function() {
+        //     const $popup = $('#fridayInfoPopup');
+        //     $popup.css('display', 'none');
+        //     clearFridayInfoState();
+        //     console.log('Friday Info Popup ditutup');
+        // };
 
     });
 </script>
