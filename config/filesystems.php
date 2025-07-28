@@ -119,6 +119,24 @@ return [
             'throw' => false,
         ],
 
+        // New disk configuration for public sounds musik
+        'public_sounds_musik' => [
+            'driver' => 'local',
+            'root' => public_path('sounds/musik'),
+            'url' => env('APP_URL') . '/sounds/musik',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        // New disk configuration for public sounds adzan
+        'public_sounds_adzan' => [
+            'driver' => 'local',
+            'root' => public_path('sounds/adzan'),
+            'url' => env('APP_URL') . '/sounds/adzan',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         'cloudinary' => [
             'driver' => 'cloudinary',
             'key' => env('CLOUDINARY_KEY'),

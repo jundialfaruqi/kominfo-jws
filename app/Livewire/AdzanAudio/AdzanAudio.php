@@ -10,8 +10,9 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class AdzanAudio extends Component
 {
@@ -73,34 +74,36 @@ class AdzanAudio extends Component
         'status.boolean'  => 'Status harus berupa aktif atau tidak aktif',
     ];
 
-    private function checkCloudinaryConfig()
-    {
-        $config = config('filesystems.disks.cloudinary');
-        if (empty($config['key']) || empty($config['secret']) || empty($config['cloud'])) {
-            Log::error('Konfigurasi Cloudinary tidak lengkap', [
-                'cloud_name' => $config['cloud'] ?? 'null',
-                'api_key' => $config['key'] ?? 'null',
-                'api_secret' => $config['secret'] ? 'set' : 'null',
-                'url' => $config['url'] ?? 'null',
-                'prefix' => $config['prefix'] ?? 'null',
-            ]);
-            throw new \Exception('Konfigurasi Cloudinary tidak lengkap. Pastikan CLOUDINARY_KEY, CLOUDINARY_SECRET, dan CLOUDINARY_CLOUD_NAME diatur di file .env.');
-        }
 
-        Log::info('Konfigurasi Cloudinary valid', [
-            'cloud_name' => $config['cloud'],
-            'api_key' => $config['key'],
-            'prefix' => $config['prefix'] ?? 'null',
-        ]);
+
+    /**
+     * Method untuk mengecek konfigurasi penyimpanan lokal
+     */
+    private function checkLocalStorageConfig()
+    {
+        $audioPath = public_path('sounds/adzan');
+        
+        if (!file_exists($audioPath)) {
+            mkdir($audioPath, 0755, true);
+        }
+        
+        if (!is_writable($audioPath)) {
+            throw new \Exception('Direktori audio adzan tidak dapat ditulis: ' . $audioPath);
+        }
+        
+        Log::info('Konfigurasi penyimpanan lokal adzan valid', ['path' => $audioPath]);
     }
 
-    private function saveCloudinaryAudio($uploadedFile, $fieldName = 'audioadzan')
+    /**
+     * Method untuk menyimpan audio adzan secara lokal
+     */
+    private function saveLocalAdzanAudio($uploadedFile, $audioType)
     {
         try {
-            $this->checkCloudinaryConfig();
+            $this->checkLocalStorageConfig();
 
             if (!$uploadedFile || !$uploadedFile->isValid()) {
-                throw new \Exception('File audio tidak valid atau tidak ditemukan.');
+                throw new \Exception('File audio adzan tidak valid atau tidak ditemukan.');
             }
 
             $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -108,85 +111,106 @@ class AdzanAudio extends Component
             $slugName = Str::slug($originalName);
             $timestamp = time();
 
-            $folder = config('filesystems.disks.cloudinary.prefix', 'masjid_adzan_audios');
-            $publicId = "{$timestamp}_{$fieldName}_{$slugName}";
+            // Generate nama file
+            $fileName = "{$timestamp}_{$audioType}_{$slugName}.{$extension}";
+            $filePath = public_path('sounds/adzan/' . $fileName);
 
-            $result = Cloudinary::uploadApi()->upload($uploadedFile->getRealPath(), [
-                'resource_type' => 'video',
-                'folder' => 'Masjid Adzan Audios/' . User::find($this->userId)->name,
-                'public_id' => $publicId,
-                'overwrite' => true,
+            // Pastikan directory ada
+            $directory = dirname($filePath);
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Pindahkan file ke direktori tujuan menggunakan Livewire method
+            $uploadedFile->storeAs('', $fileName, 'public_sounds_adzan');
+            
+            // Verifikasi file berhasil dipindahkan
+            if (!file_exists($filePath)) {
+                throw new \Exception('Gagal memindahkan file audio adzan.');
+            }
+
+            Log::info('✅ Audio adzan berhasil disimpan secara lokal', [
+                'audio_type' => $audioType,
+                'file_name' => $fileName,
+                'file_path' => $filePath,
             ]);
 
-            $fieldLabel = $fieldName === 'adzanshubuh' ? 'Audio Adzan Shubuh' : 'Audio Adzan';
-            Log::info("✅ {$fieldLabel} berhasil diupload ke Cloudinary", [
-                'public_id' => $result['public_id'],
-                'url' => $result['secure_url'],
-            ]);
-
-            return $result['public_id'];
+            return '/sounds/adzan/' . $fileName; // ← Simpan path relatif ke database
         } catch (\Exception $e) {
-            $fieldLabel = $fieldName === 'adzanshubuh' ? 'audio adzan shubuh' : 'audio adzan';
-            Log::error("❌ Gagal mengupload {$fieldLabel} ke Cloudinary", [
+            Log::error('❌ Gagal menyimpan audio adzan secara lokal', [
+                'audio_type' => $audioType,
                 'error' => $e->getMessage(),
             ]);
             throw new \Exception('Upload gagal: ' . $e->getMessage());
         }
     }
 
-    public function generateCloudinaryUrl($publicId)
+    /**
+     * Method untuk menghasilkan URL lokal dari path file adzan
+     */
+    public function generateLocalUrl($filePath)
     {
-        $cloudName = config('filesystems.disks.cloudinary.cloud');
-        return "https://res.cloudinary.com/{$cloudName}/video/upload/{$publicId}";
+        if (!$filePath) {
+            return null;
+        }
+        
+        // Jika sudah berupa URL lengkap, return as is
+        if (str_starts_with($filePath, 'http')) {
+            return $filePath;
+        }
+        
+        // Jika path dimulai dengan /, hapus leading slash untuk menghindari double slash
+        $cleanPath = ltrim($filePath, '/');
+        
+        return url($cleanPath);
     }
 
     public function clearAudioAdzan()
     {
         try {
-            $this->checkCloudinaryConfig();
+            $this->checkLocalStorageConfig();
 
             if ($this->isEdit && $this->tmp_audioadzan) {
-                $deleteCloudinaryFile = function ($publicId, $field) {
-                    if (!$publicId) {
+                $deleteLocalFile = function ($filename, $field) {
+                    if (!$filename) {
                         return true;
                     }
 
                     try {
-                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
-                        if ($result['result'] === 'ok') {
-                            Log::info("Menghapus {$field} dari Cloudinary", [
-                                'public_id' => $publicId,
-                                'result' => $result,
+                        $filePath = public_path('sounds/adzan/' . $filename);
+                        if (file_exists($filePath)) {
+                            if (unlink($filePath)) {
+                                Log::info("Menghapus {$field} dari penyimpanan lokal", [
+                                    'filename' => $filename,
+                                    'path' => $filePath,
+                                ]);
+                                return true;
+                            } else {
+                                Log::warning("Gagal menghapus {$field} dari penyimpanan lokal", [
+                                    'filename' => $filename,
+                                    'path' => $filePath,
+                                ]);
+                                return false;
+                            }
+                        } else {
+                            Log::info("File {$field} tidak ditemukan, mungkin sudah dihapus", [
+                                'filename' => $filename,
+                                'path' => $filePath,
                             ]);
                             return true;
                         }
-
-                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
-                        if ($result['result'] === 'ok') {
-                            Log::info("Menghapus {$field} dari Cloudinary sebagai video", [
-                                'public_id' => $publicId,
-                                'result' => $result,
-                            ]);
-                            return true;
-                        }
-
-                        Log::warning("Gagal menghapus {$field} dari Cloudinary", [
-                            'public_id' => $publicId,
-                            'result' => $result,
-                        ]);
-                        return false;
                     } catch (\Exception $ex) {
                         Log::error("Gagal menghapus {$field}", [
-                            'public_id' => $publicId,
+                            'filename' => $filename,
                             'error' => $ex->getMessage(),
                         ]);
                         return false;
                     }
                 };
 
-                $publicId = $this->tmp_audioadzan;
-                if (!$deleteCloudinaryFile($publicId, 'audioadzan')) {
-                    $this->dispatch('error', 'Gagal menghapus audio adzan dari Cloudinary.');
+                $filename = $this->tmp_audioadzan;
+                if (!$deleteLocalFile($filename, 'audioadzan')) {
+                    $this->dispatch('error', 'Gagal menghapus audio adzan dari penyimpanan lokal.');
                     return;
                 }
 
@@ -217,50 +241,49 @@ class AdzanAudio extends Component
     public function clearAdzanShubuh()
     {
         try {
-            $this->checkCloudinaryConfig();
+            $this->checkLocalStorageConfig();
 
             if ($this->isEdit && $this->tmp_adzanshubuh) {
-                $deleteCloudinaryFile = function ($publicId, $field) {
-                    if (!$publicId) {
+                $deleteLocalFile = function ($filename, $field) {
+                    if (!$filename) {
                         return true;
                     }
 
                     try {
-                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
-                        if ($result['result'] === 'ok') {
-                            Log::info("Menghapus {$field} dari Cloudinary", [
-                                'public_id' => $publicId,
-                                'result' => $result,
+                        $filePath = public_path('sounds/adzan/' . $filename);
+                        if (file_exists($filePath)) {
+                            if (unlink($filePath)) {
+                                Log::info("Menghapus {$field} dari penyimpanan lokal", [
+                                    'filename' => $filename,
+                                    'path' => $filePath,
+                                ]);
+                                return true;
+                            } else {
+                                Log::warning("Gagal menghapus {$field} dari penyimpanan lokal", [
+                                    'filename' => $filename,
+                                    'path' => $filePath,
+                                ]);
+                                return false;
+                            }
+                        } else {
+                            Log::info("File {$field} tidak ditemukan, mungkin sudah dihapus", [
+                                'filename' => $filename,
+                                'path' => $filePath,
                             ]);
                             return true;
                         }
-
-                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
-                        if ($result['result'] === 'ok') {
-                            Log::info("Menghapus {$field} dari Cloudinary sebagai video", [
-                                'public_id' => $publicId,
-                                'result' => $result,
-                            ]);
-                            return true;
-                        }
-
-                        Log::warning("Gagal menghapus {$field} dari Cloudinary", [
-                            'public_id' => $publicId,
-                            'result' => $result,
-                        ]);
-                        return false;
                     } catch (\Exception $ex) {
                         Log::error("Gagal menghapus {$field}", [
-                            'public_id' => $publicId,
+                            'filename' => $filename,
                             'error' => $ex->getMessage(),
                         ]);
                         return false;
                     }
                 };
 
-                $publicId = $this->tmp_adzanshubuh;
-                if (!$deleteCloudinaryFile($publicId, 'adzanshubuh')) {
-                    $this->dispatch('error', 'Gagal menghapus audio adzan shubuh dari Cloudinary.');
+                $filename = $this->tmp_adzanshubuh;
+                if (!$deleteLocalFile($filename, 'adzanshubuh')) {
+                    $this->dispatch('error', 'Gagal menghapus audio adzan shubuh dari penyimpanan lokal.');
                     return;
                 }
 
@@ -296,9 +319,9 @@ class AdzanAudio extends Component
         $this->adzanshubuhUploaded = false;
 
         try {
-            $this->checkCloudinaryConfig();
+            $this->checkLocalStorageConfig();
         } catch (\Exception $e) {
-            Log::error('Gagal memeriksa konfigurasi Cloudinary saat inisialisasi', [
+            Log::error('Gagal memeriksa konfigurasi penyimpanan lokal saat inisialisasi', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -395,8 +418,8 @@ class AdzanAudio extends Component
         $adzanAudioList = $query->orderBy('id', 'asc')->paginate($this->paginate);
 
         foreach ($adzanAudioList as $adzanAudio) {
-            $adzanAudio->audioadzan_url = $adzanAudio->audioadzan ? $this->generateCloudinaryUrl($adzanAudio->audioadzan) : null;
-            $adzanAudio->adzanshubuh_url = $adzanAudio->adzanshubuh ? $this->generateCloudinaryUrl($adzanAudio->adzanshubuh) : null;
+            $adzanAudio->audioadzan_url = $adzanAudio->audioadzan ? $this->generateLocalUrl($adzanAudio->audioadzan) : null;
+            $adzanAudio->adzanshubuh_url = $adzanAudio->adzanshubuh ? $this->generateLocalUrl($adzanAudio->adzanshubuh) : null;
         }
 
         // Ambil daftar users untuk dropdown
@@ -517,11 +540,11 @@ class AdzanAudio extends Component
             ];
 
             if ($this->audioadzan) {
-                $data['audioadzan'] = $this->saveCloudinaryAudio($this->audioadzan, 'audioadzan');
+                $data['audioadzan'] = $this->saveLocalAdzanAudio($this->audioadzan, 'audioadzan');
             }
 
             if ($this->adzanshubuh) {
-                $data['adzanshubuh'] = $this->saveCloudinaryAudio($this->adzanshubuh, 'adzanshubuh');
+                $data['adzanshubuh'] = $this->saveLocalAdzanAudio($this->adzanshubuh, 'adzanshubuh');
             }
 
             if ($this->isEdit) {
@@ -637,7 +660,7 @@ class AdzanAudio extends Component
         }
 
         try {
-            $this->checkCloudinaryConfig();
+            $this->checkLocalStorageConfig();
 
             $adzanAudio = AdzanAudioModel::findOrFail($this->deleteAdzanAudioId);
 
@@ -649,58 +672,70 @@ class AdzanAudio extends Component
             $allDeleted = true;
 
             // Hapus audioadzan
-            $publicId = $adzanAudio->audioadzan;
+            $filename = $adzanAudio->audioadzan;
 
-            if ($publicId) {
+            if ($filename) {
                 try {
-                    // Coba hapus sebagai RAW
-                    $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
-
-                    if ($result['result'] !== 'ok') {
-                        // Jika gagal sebagai RAW, coba sebagai VIDEO
-                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
-                        if ($result['result'] !== 'ok') {
+                    $filePath = public_path('sounds/adzan/' . $filename);
+                    if (file_exists($filePath)) {
+                        if (!unlink($filePath)) {
                             $allDeleted = false;
-                            Log::warning("Gagal menghapus file dari Cloudinary", [
+                            Log::warning("Gagal menghapus file dari penyimpanan lokal", [
                                 'field' => 'audioadzan',
-                                'public_id' => $publicId,
-                                'result' => $result
+                                'filename' => $filename,
+                                'path' => $filePath
+                            ]);
+                        } else {
+                            Log::info("Berhasil menghapus audioadzan dari penyimpanan lokal", [
+                                'filename' => $filename,
+                                'path' => $filePath
                             ]);
                         }
+                    } else {
+                        Log::info("File audioadzan tidak ditemukan, mungkin sudah dihapus", [
+                            'filename' => $filename,
+                            'path' => $filePath
+                        ]);
                     }
                 } catch (\Exception $ex) {
                     $allDeleted = false;
                     Log::error("Gagal menghapus audioadzan", [
-                        'public_id' => $publicId,
+                        'filename' => $filename,
                         'error' => $ex->getMessage()
                     ]);
                 }
             }
 
             // Hapus adzanshubuh
-            $publicId = $adzanAudio->adzanshubuh;
+            $filename = $adzanAudio->adzanshubuh;
 
-            if ($publicId) {
+            if ($filename) {
                 try {
-                    // Coba hapus sebagai RAW
-                    $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'raw']);
-
-                    if ($result['result'] !== 'ok') {
-                        // Jika gagal sebagai RAW, coba sebagai VIDEO
-                        $result = Cloudinary::uploadApi()->destroy($publicId, ['resource_type' => 'video']);
-                        if ($result['result'] !== 'ok') {
+                    $filePath = public_path('sounds/adzan/' . $filename);
+                    if (file_exists($filePath)) {
+                        if (!unlink($filePath)) {
                             $allDeleted = false;
-                            Log::warning("Gagal menghapus file dari Cloudinary", [
+                            Log::warning("Gagal menghapus file dari penyimpanan lokal", [
                                 'field' => 'adzanshubuh',
-                                'public_id' => $publicId,
-                                'result' => $result
+                                'filename' => $filename,
+                                'path' => $filePath
+                            ]);
+                        } else {
+                            Log::info("Berhasil menghapus adzanshubuh dari penyimpanan lokal", [
+                                'filename' => $filename,
+                                'path' => $filePath
                             ]);
                         }
+                    } else {
+                        Log::info("File adzanshubuh tidak ditemukan, mungkin sudah dihapus", [
+                            'filename' => $filename,
+                            'path' => $filePath
+                        ]);
                     }
                 } catch (\Exception $ex) {
                     $allDeleted = false;
                     Log::error("Gagal menghapus adzanshubuh", [
-                        'public_id' => $publicId,
+                        'filename' => $filename,
                         'error' => $ex->getMessage()
                     ]);
                 }
@@ -713,7 +748,7 @@ class AdzanAudio extends Component
                 $this->reset(['deleteAdzanAudioId', 'deleteAdzanAudioName']);
             } else {
                 $this->dispatch('closeDeleteModal');
-                $this->dispatch('error', 'File gagal dihapus dari Cloudinary. Data tidak dihapus.');
+                $this->dispatch('error', 'File gagal dihapus dari penyimpanan lokal. Data tidak dihapus.');
             }
         } catch (\Exception $e) {
             Log::error('❌ Gagal menjalankan destroyAdzanAudio()', [

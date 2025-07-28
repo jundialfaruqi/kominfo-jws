@@ -59,8 +59,8 @@
                                     {{ pathinfo($adzanAudio->audioadzan, PATHINFO_BASENAME) }}
                                 </div>
                                 <audio controls class="w-50 rounded-3">
-                                    <source src="{{ $this->generateCloudinaryUrl($adzanAudio->audioadzan) }}"
-                                        type="audio/mpeg">
+                                    <source src="{{ $this->generateLocalUrl($adzanAudio->audioadzan) }}"
+                                    type="audio/mpeg">
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
                             @else
@@ -86,8 +86,8 @@
                                     {{ pathinfo($adzanAudio->adzanshubuh, PATHINFO_BASENAME) }}
                                 </div>
                                 <audio controls class="w-50 rounded-3">
-                                    <source src="{{ $this->generateCloudinaryUrl($adzanAudio->adzanshubuh) }}"
-                                        type="audio/mpeg">
+                                    <source src="{{ $this->generateLocalUrl($adzanAudio->adzanshubuh) }}"
+                                    type="audio/mpeg">
 
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
