@@ -94,7 +94,7 @@
                                 </div>
                             @elseif($tmp_audio1)
                                 <audio controls class="w-100 mb-2" wire:key="tmp_audio1">
-                                    <source src="{{ $this->generateCloudinaryUrl($tmp_audio1) }}" type="audio/mpeg">
+                                    <source src="{{ $this->generateLocalUrl($tmp_audio1) }}" type="audio/mpeg">
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
                                 <div
@@ -229,7 +229,7 @@
                                 </div>
                             @elseif($tmp_audio2)
                                 <audio controls class="w-100 mb-2" wire:key="tmp_audio2">
-                                    <source src="{{ $this->generateCloudinaryUrl($tmp_audio2) }}" type="audio/mpeg">
+                                    <source src="{{ $this->generateLocalUrl($tmp_audio2) }}" type="audio/mpeg">
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
                                 <div
@@ -365,7 +365,7 @@
                                 </div>
                             @elseif($tmp_audio3)
                                 <audio controls class="w-100 mb-2" wire:key="tmp_audio3">
-                                    <source src="{{ $this->generateCloudinaryUrl($tmp_audio3) }}" type="audio/mpeg">
+                                    <source src="{{ $this->generateLocalUrl($tmp_audio3) }}" type="audio/mpeg">
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
                                 <div

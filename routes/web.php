@@ -251,7 +251,7 @@ Route::get('/api/server-time', function () {
             $serverTime = $response['serverTime'];
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            // $serverDateTime->modify('+0 hour 7 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+5 hour 59 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
@@ -413,21 +413,21 @@ Route::get('/api/audio/{slug}', function ($slug) {
     if ($profil) {
         $audio = \App\Models\Audios::where('user_id', $profil->user_id)->first();
         if ($audio && $audio->status) {
-            // Buat instance komponen Audio untuk menggunakan generateCloudinaryUrl
+            // Buat instance komponen Audio untuk menggunakan generateLocalUrl
             $audioComponent = new \App\Livewire\Audios\Audio();
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'audio1' => $audio->audio1 ? $audioComponent->generateCloudinaryUrl($audio->audio1) : null,
-                    'audio2' => $audio->audio2 ? $audioComponent->generateCloudinaryUrl($audio->audio2) : null,
-                    'audio3' => $audio->audio3 ? $audioComponent->generateCloudinaryUrl($audio->audio3) : null,
+                    'audio1' => $audio->audio1 ? $audioComponent->generateLocalUrl($audio->audio1) : null,
+                    'audio2' => $audio->audio2 ? $audioComponent->generateLocalUrl($audio->audio2) : null,
+                    'audio3' => $audio->audio3 ? $audioComponent->generateLocalUrl($audio->audio3) : null,
                     'status' => $audio->status
                 ]
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 404);
 });
 
 // New route with slug parameter
@@ -440,14 +440,14 @@ Route::get('/api/adzan-audio/{slug}', function ($slug) {
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'adzan_audio' => $adzanaudio->audioadzan ? $audioComponent->generateCloudinaryUrl($adzanaudio->audioadzan) : '',
-                    'adzan_shubuh' => $adzanaudio->adzanshubuh ? $audioComponent->generateCloudinaryUrl($adzanaudio->adzanshubuh) : '',
+                    'adzan_audio' => $adzanaudio->audioadzan ? $audioComponent->generateLocalUrl($adzanaudio->audioadzan) : '',
+                    'adzan_shubuh' => $adzanaudio->adzanshubuh ? $audioComponent->generateLocalUrl($adzanaudio->adzanshubuh) : '',
                     'status' => $adzanaudio->status
                 ]
             ]);
         }
     }
-    return response()->json(['success' => false, 'message' => 'Data tidak ditemukan, Resource not found'], 200);
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 404);
 })->name('api.adzan-audio');
 
 // Legacy route for backward compatibility
@@ -459,8 +459,8 @@ Route::get('/api/adzan-audio', function () {
         return response()->json([
             'success' => true,
             'data' => [
-                'adzan_audio' => $adzanaudio->audioadzan ? $audioComponent->generateCloudinaryUrl($adzanaudio->audioadzan) : '',
-                'adzan_shubuh' => $adzanaudio->adzanshubuh ? $audioComponent->generateCloudinaryUrl($adzanaudio->adzanshubuh) : '',
+                'adzan_audio' => $adzanaudio->audioadzan ? $audioComponent->generateLocalUrl($adzanaudio->audioadzan) : '',
+                'adzan_shubuh' => $adzanaudio->adzanshubuh ? $audioComponent->generateLocalUrl($adzanaudio->adzanshubuh) : '',
                 'status' => $adzanaudio->status,
                 'deprecated' => 'This endpoint is deprecated. Please use /api/adzan-audio/{slug} instead.'
             ]

@@ -1907,7 +1907,7 @@
                             }
                         }
                         // Untuk waktu shuruq, hanya putar beep sound (sudah diputar di awal)
-                    }, 5000); // Tunggu 5 detik setelah beep sound
+                    }, 3000); // Tunggu 3 detik setelah beep sound
                 }
 
                 $progress.css('width', '0%');

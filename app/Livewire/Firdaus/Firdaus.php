@@ -475,13 +475,12 @@ class Firdaus extends Component
 
     public function render()
     {
-        // Jika $adzanaudio ada, konversi public_id menjadi URL lengkap
+        // Jika $adzanaudio ada, konversi filename menjadi URL lokal lengkap
         if ($this->adzanaudio) {
-            $cloudName = config('filesystems.disks.cloudinary.cloud');
             $this->adzanaudio->audioadzan_url = $this->adzanaudio->audioadzan ?
-                "https://res.cloudinary.com/{$cloudName}/video/upload/{$this->adzanaudio->audioadzan}" : '';
+                asset($this->adzanaudio->audioadzan) : '';
             $this->adzanaudio->adzanshubuh_url = $this->adzanaudio->adzanshubuh ?
-                "https://res.cloudinary.com/{$cloudName}/video/upload/{$this->adzanaudio->adzanshubuh}" : '';
+                asset($this->adzanaudio->adzanshubuh) : '';
         }
 
         return view('livewire.firdaus.firdaus', [

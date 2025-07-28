@@ -236,9 +236,9 @@
     {{-- Hidden inputs for adzan-audio data --}}
     @if ($adzanaudio)
         <input type="hidden" id="adzan_audio"
-            value="{{ $adzanaudio->audioadzan ? 'https://res.cloudinary.com/' . config('filesystems.disks.cloudinary.cloud') . '/video/upload/' . $adzanaudio->audioadzan : '' }}">
+            value="{{ $adzanaudio->audioadzan ? asset($adzanaudio->audioadzan) : '' }}">
         <input type="hidden" id="adzan_shubuh"
-            value="{{ $adzanaudio->adzanshubuh ? 'https://res.cloudinary.com/' . config('filesystems.disks.cloudinary.cloud') . '/video/upload/' . $adzanaudio->adzanshubuh : '' }}">
+            value="{{ $adzanaudio->adzanshubuh ? asset($adzanaudio->adzanshubuh) : '' }}">
         <input type="hidden" id="adzan_status" value="{{ $adzanaudio->status ? 'true' : 'false' }}">
     @else
         <input type="hidden" id="adzan_audio" value="">
