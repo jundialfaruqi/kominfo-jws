@@ -156,20 +156,62 @@
                             <p class="card-subtitle">Biarkan kosong jika tidak ingin mengubah password.</p>
                             <div class="col-md-6 mb-3">
                                 <div class="form-label">Password Lama</div>
-                                <input type="password"
-                                    class="form-control rounded-3 @error('password_old') is-invalid @enderror"
-                                    wire:model="password_old" autocomplete="new-password"
-                                    placeholder="Masukkan Password Lama">
+                                <div class="input-group">
+                                    <input type="password" id="password_old"
+                                        class="form-control rounded-start-3 @error('password_old') is-invalid @enderror"
+                                        wire:model="password_old" autocomplete="new-password"
+                                        placeholder="Masukkan Password Lama">
+                                    <button type="button" class="btn btn-outline-secondary-lt rounded-end-3"
+                                        onclick="togglePassword('password_old')">
+                                        <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            style="display: none;">
+                                            <path
+                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                            </path>
+                                            <line x1="1" y1="1" x2="23" y2="23">
+                                            </line>
+                                        </svg>
+                                    </button>
+                                </div>
                                 @error('password_old')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-label">Password Baru</div>
-                                <input type="password"
-                                    class="form-control rounded-3 @error('password_new') is-invalid @enderror"
-                                    wire:model="password_new" placeholder="Masukkan Password Baru"
-                                    autocomplete="new-password">
+                                <div class="input-group">
+                                    <input type="password" id="password_new"
+                                        class="form-control rounded-start-3 @error('password_new') is-invalid @enderror"
+                                        wire:model="password_new" placeholder="Masukkan Password Baru"
+                                        autocomplete="new-password">
+                                    <button type="button" class="btn btn-outline-secondary-lt rounded-end-3"
+                                        onclick="togglePassword('password_new')">
+                                        <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            style="display: none;">
+                                            <path
+                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                            </path>
+                                            <line x1="1" y1="1" x2="23" y2="23">
+                                            </line>
+                                        </svg>
+                                    </button>
+                                </div>
                                 @error('password_new')
                                     <div class="invalid-feedback">{{ $message }}
                                     </div>
@@ -177,10 +219,31 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-label">Konfirmasi Password Baru</div>
-                                <input type="password"
-                                    class="form-control rounded-3 @error('password_new_confirmation') is-invalid @enderror"
-                                    wire:model="password_new_confirmation"
-                                    placeholder="Masukkan Konfirmasi Password Baru" autocomplete="new-password">
+                                <div class="input-group">
+                                    <input type="password" id="password_new_confirmation"
+                                        class="form-control rounded-start-3 @error('password_new_confirmation') is-invalid @enderror"
+                                        wire:model="password_new_confirmation"
+                                        placeholder="Masukkan Konfirmasi Password Baru" autocomplete="new-password">
+                                    <button type="button" class="btn btn-outline-secondary-lt rounded-end-3"
+                                        onclick="togglePassword('password_new_confirmation')">
+                                        <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        <svg class="icon-eye-off" xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            style="display: none;">
+                                            <path
+                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                            </path>
+                                            <line x1="1" y1="1" x2="23" y2="23">
+                                            </line>
+                                        </svg>
+                                    </button>
+                                </div>
                                 @error('password_new_confirmation')
                                     <div class="invalid-feedback">{{ $message }}
                                     </div>
