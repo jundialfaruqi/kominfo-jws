@@ -59,18 +59,52 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password<span class="text-danger">*</span></label>
-                    <input wire:model="password" type="password"
-                        class="form-control rounded-3 @error('password') is-invalid @enderror"
-                        placeholder="Masukkan Password">
+                    <div class="input-group">
+                        <input wire:model="password" type="password" id="password-create"
+                            class="form-control rounded-start-3 @error('password') is-invalid @enderror"
+                            placeholder="Masukkan Password">
+                        <button type="button" class="btn btn-outline-secondary rounded-end-3" 
+                                onclick="togglePassword('password-create', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                 stroke-linejoin="round" class="icon-eye">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                 stroke-linejoin="round" class="icon-eye-off" style="display: none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
                     @error('password')
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Konfirmasi Password<span class="text-danger">*</span></label>
-                    <input wire:model="password_confirmation" type="password"
-                        class="form-control rounded-3 @error('password_confirmation') is-invalid @enderror"
-                        placeholder="Masukkan Konfirmasi Password">
+                    <div class="input-group">
+                        <input wire:model="password_confirmation" type="password" id="password-confirmation-create"
+                            class="form-control rounded-start-3 @error('password_confirmation') is-invalid @enderror"
+                            placeholder="Masukkan Konfirmasi Password">
+                        <button type="button" class="btn btn-outline-secondary rounded-end-3" 
+                                onclick="togglePassword('password-confirmation-create', this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                 stroke-linejoin="round" class="icon-eye">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                 stroke-linejoin="round" class="icon-eye-off" style="display: none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                        </button>
+                    </div>
                     @error('password_confirmation')
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
