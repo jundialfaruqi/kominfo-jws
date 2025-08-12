@@ -1289,8 +1289,8 @@
 
             // Hitung durasi animasi
             const textLength = combinedText.length;
-            const baseDuration = 60;
-            const calculatedDuration = Math.max(baseDuration, textLength / 10);
+            const baseDuration = 240;
+            const calculatedDuration = Math.max(baseDuration, textLength / 20);
 
             // Gunakan waktu server untuk sinkronisasi
             const now = getCurrentTimeFromServer().getTime();
