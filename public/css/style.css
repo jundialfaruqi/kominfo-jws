@@ -340,7 +340,7 @@ body {
 .footer-message {
   grid-area: footer;
   background-color: rgba(0, 0, 0, 0.7);
-  padding: 10px 20px;
+  padding: 20px 20px;
   text-align: center;
   font-weight: bold;
   font-size: 3.5rem;
@@ -355,9 +355,9 @@ body {
 .scrolling-text {
   display: inline-block;
   white-space: nowrap;
-  animation: scrollText 60s linear infinite;
+  animation: scrollText 120s linear infinite;
   padding-left: 100%;
-  /* margin-left: 375px; */
+  margin-left: 375px;
   /* Mulai dari setelah prayer-times untuk desktop */
   will-change: transform;
   /* Optimasi performa */
