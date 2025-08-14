@@ -348,8 +348,26 @@ class Jumbotron extends Component
         $this->paginate = 10;
         $this->search = '';
 
-        if (!Auth::check() || !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            abort(403, 'Unauthorized');
+        // Check access using both role and permission
+        $this->checkAccess();
+    }
+
+    /**
+     * Check if user has access to jumbotron
+     */
+    private function checkAccess()
+    {
+        if (!Auth::check()) {
+            abort(403, 'Unauthorized - Not authenticated');
+        }
+
+        // Check legacy role-based access OR Spatie permission (salah satu saja)
+        $hasRoleAccess = in_array(Auth::user()->role, ['Super Admin', 'Admin']);
+        $hasPermission = Auth::user()->can('view-jumbotron');
+
+        // User hanya perlu memiliki SALAH SATU akses (role ATAU permission)
+        if (!$hasRoleAccess && !$hasPermission) {
+            abort(403, 'Unauthorized - Anda tidak memiliki akses ke halaman jumbotron');
         }
     }
 
