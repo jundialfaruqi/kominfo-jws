@@ -26,6 +26,7 @@ class ProfilMasjid extends Component
     public $profileId;
     public $userId;
     public $name;
+    public $slug;
     public $address;
     public $phone;
     public $logo_masjid;
@@ -41,6 +42,7 @@ class ProfilMasjid extends Component
     protected $rules = [
         'userId'            => 'required|exists:users,id',
         'name'              => 'required|string|max:255',
+        'slug'              => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:profils,slug',
         'address'           => 'required|string',
         'phone'             => 'required|string|max:15',
         'logo_masjid'       => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
@@ -50,6 +52,10 @@ class ProfilMasjid extends Component
     protected $messages = [
         'userId.exists'             => 'Admin Masjid tidak ditemukan',
         'userId.required'           => 'Wajib memilih Admin/User',
+        'slug.required'             => 'Slug wajib diisi!',
+        'slug.unique'               => 'Slug sudah digunakan, silakan gunakan slug lain!',
+        'slug.regex'                => 'Slug hanya boleh mengandung huruf kecil, angka, dan tanda hubung (-)!',
+        'slug.max'                  => 'Slug maksimal 255 karakter!',
         'logo_masjid.image'         => 'File harus berupa gambar',
         'logo_masjid.mimes'         => 'Format file tidak valid. File harus berupa gambar jpg, jpeg, png, webp, atau gif!',
         'logo_masjid.max'           => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
@@ -82,6 +88,7 @@ class ProfilMasjid extends Component
                 // If profile exists, load the data
                 $this->profileId                = $profil->id;
                 $this->name                     = $profil->name;
+                $this->slug                     = $profil->slug;
                 $this->address                  = $profil->address;
                 $this->phone                    = $profil->phone;
                 $this->temp_logo                = $profil->logo_masjid;
@@ -104,6 +111,7 @@ class ProfilMasjid extends Component
                 'profileId',
                 'userId',
                 'name',
+                'slug',
                 'address',
                 'phone',
                 'logo_masjid',
@@ -184,6 +192,7 @@ class ProfilMasjid extends Component
                 'profileId',
                 'userId',
                 'name',
+                'slug',
                 'address',
                 'phone',
                 'logo_masjid',
@@ -211,6 +220,7 @@ class ProfilMasjid extends Component
         $this->profileId            = $profil->id;
         $this->userId               = $profil->user_id;
         $this->name                 = $profil->name;
+        $this->slug                 = $profil->slug;
         $this->address              = $profil->address;
         $this->phone                = $profil->phone;
         $this->temp_logo            = $profil->logo_masjid;
@@ -229,6 +239,7 @@ class ProfilMasjid extends Component
                 'profileId',
                 'userId',
                 'name',
+                'slug',
                 'address',
                 'phone',
                 'logo_masjid',
@@ -418,6 +429,26 @@ class ProfilMasjid extends Component
         }
     }
 
+    public function generateSlugFromName()
+    {
+        // Hanya generate slug otomatis saat membuat profil baru (bukan edit)
+        if ($this->name && !$this->isEdit) {
+            $this->slug = Str::slug($this->name);
+        }
+    }
+
+    private function validateUniqueSlug($slug, $id = null)
+    {
+        $query = Profil::where('slug', $slug);
+
+        // Exclude current profile when updating
+        if ($id) {
+            $query->where('id', '!=', $id);
+        }
+
+        return !$query->exists();
+    }
+
     private function generateSlug($name, $id = null)
     {
         // Generate base slug
@@ -473,7 +504,13 @@ class ProfilMasjid extends Component
             }
         }
 
-        $this->validate();
+        // Custom validation for slug uniqueness
+        $rules = $this->rules;
+        if ($this->isEdit) {
+            $rules['slug'] = 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:profils,slug,' . $this->profileId;
+        }
+
+        $this->validate($rules);
 
         try {
             if ($this->isEdit) {
@@ -494,13 +531,9 @@ class ProfilMasjid extends Component
 
             $profil->user_id = $this->userId;
             $profil->name    = $this->name;
+            $profil->slug    = $this->slug;
             $profil->address = $this->address;
             $profil->phone   = $this->phone;
-
-            // Generate slug saat pembuatan dan pembaruan
-            if (!$this->isEdit) {
-                $profil->slug = $this->generateSlug($this->name);
-            }
 
             // Handle logo masjid upload
             if ($this->logo_masjid) {
@@ -540,6 +573,7 @@ class ProfilMasjid extends Component
                         'profileId',
                         'userId',
                         'name',
+                        'slug',
                         'address',
                         'phone',
                         'logo_masjid',
@@ -556,6 +590,7 @@ class ProfilMasjid extends Component
                     $this->profileId            = $profil->id;
                     $this->userId               = $profil->user_id;
                     $this->name                 = $profil->name;
+                    $this->slug                 = $profil->slug;
                     $this->address              = $profil->address;
                     $this->phone                = $profil->phone;
                     $this->temp_logo            = $profil->logo_masjid;
