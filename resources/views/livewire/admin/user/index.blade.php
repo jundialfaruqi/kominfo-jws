@@ -138,7 +138,8 @@
                                             <td>
                                                 @if ($users->roles->count() > 0)
                                                     @foreach ($users->roles as $role)
-                                                        <span class="badge bg-info-lt me-1 mb-1">
+                                                        <span
+                                                            class="badge bg-info-lt d-inline-flex align-items-center gap-1">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="16"
                                                                 height="16" viewBox="0 0 24 24" fill="none"
                                                                 stroke="currentColor" stroke-width="2"
