@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // Middleware lainnya
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'ensure-user-is-active' => \App\Http\Middleware\EnsureUserIsActive::class,
+            'jumbotron.permission' => \App\Http\Middleware\JumbotronPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

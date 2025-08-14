@@ -89,27 +89,136 @@
                         </a>
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-                        <li
-                            class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                            <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                        @can('view-users')
+                            <div class="hr-text mb-3 mt-5">
+                                <b>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-users">
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
                                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                        <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                        <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+                                        <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
+                                        <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
                                     </svg>
-                                </span>
-                                <span class="nav-link-title">
-                                    User
-                                </span>
-                            </a>
-                        </li>
+                                    Manajemen User
+                                </b>
+                            </div>
+                            <li
+                                class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-users">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                                            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        User
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('view-roles')
+                            <li
+                                class="nav-item mx-3 {{ request()->routeIs('admin.role.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                <a wire:navigate class="nav-link" href="{{ route('admin.role.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-shield-cog">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M12 21a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3c.568 1.933 .635 3.957 .223 5.89" />
+                                            <path d="M19.001 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                            <path d="M19.001 15.5v1.5" />
+                                            <path d="M19.001 21v1.5" />
+                                            <path d="M22.032 17.25l-1.299 .75" />
+                                            <path d="M17.27 20l-1.3 .75" />
+                                            <path d="M15.97 17.25l1.3 .75" />
+                                            <path d="M20.733 20l1.3 .75" />
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Role
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('view-permissions')
+                            <li
+                                class="nav-item mx-3 {{ request()->routeIs('admin.permission.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                <a wire:navigate class="nav-link" href="{{ route('admin.permission.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-lock-open-2">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M3 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />
+                                            <path d="M9 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" />
+                                            <path d="M13 11v-4a4 4 0 1 1 8 0v4" />
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Permission
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
+
+                        @can('view-user-role-assignment')
+                            <li
+                                class="nav-item mx-3 {{ request()->routeIs('admin.user-role-assignment.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                <a wire:navigate class="nav-link" href="{{ route('admin.user-role-assignment.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-cog">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                                            <path d="M6 21v-2a4 4 0 0 1 4 -4h2.5" />
+                                            <path d="M19.001 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                            <path d="M19.001 15.5v1.5" />
+                                            <path d="M19.001 21v1.5" />
+                                            <path d="M22.032 17.25l-1.299 .75" />
+                                            <path d="M17.27 20l-1.3 .75" />
+                                            <path d="M15.97 17.25l1.3 .75" />
+                                            <path d="M20.733 20l1.3 .75" />
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title">
+                                        Assign User Roles
+                                    </span>
+                                </a>
+                            </li>
+                        @endcan
                     @endif
+                    <div class="hr-text mb-3 mt-5">
+                        <b>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-file-minus">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                                <path d="M9 14l6 0" />
+                            </svg>
+                            Manajemen Konten
+                        </b>
+                    </div>
                     <li
                         class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
@@ -222,7 +331,7 @@
                             </span>
                         </a>
                     </li>
-                    @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
+                    @if (Auth::check() && (in_array(Auth::user()->role, ['Super Admin', 'Admin']) || Auth::user()->can('view-jumbotron')))
                         <li
                             class="nav-item mx-3 {{ request()->routeIs('jumbotron.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('jumbotron.index') }}">

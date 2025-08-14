@@ -44,12 +44,17 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
 
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
-        Route::get('/user', UserIndex::class)->name('user.index');
+        Route::get('/user', UserIndex::class)->name('user.index')->middleware('can:view-users');
+        Route::get('/role', \App\Livewire\Admin\Role::class)->name('role.index')->middleware('can:view-roles');
+        Route::get('/permission', \App\Livewire\Admin\Permission::class)->name('permission.index')->middleware('can:view-permissions');
+        Route::get('/user-role-assignment', \App\Livewire\Admin\UserRoleAssignment::class)->name('user-role-assignment.index')->middleware('can:view-user-role-assignment');
         // Add other admin routes here
     });
 
     // Jumbotron Route
-    Route::get('/jumbotron', \App\Livewire\Jumbotron\Jumbotron::class)->name('jumbotron.index');
+    Route::get('/jumbotron', \App\Livewire\Jumbotron\Jumbotron::class)
+        ->name('jumbotron.index')
+        ->middleware('jumbotron.permission');
 
     Route::get('/audios', \App\Livewire\Audios\Audio::class)->name('audios');
     // Tema Routes
@@ -59,7 +64,7 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     Route::get('/tema/set-tema', \App\Livewire\Tema\SetTema::class)->name('tema.set-tema');
 
     // Profile Routes
-    Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index');
+    Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index')->middleware('can:view-profil-masjid');
 
     // Slider Routes
     Route::get('/slider-utama', Slide::class)->name('slide.index');

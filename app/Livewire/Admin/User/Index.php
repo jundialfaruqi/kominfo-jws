@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class Index extends Component
 {
@@ -14,7 +15,7 @@ class Index extends Component
 
     #[Title('Data User')]
     protected $paginationTheme = 'bootstrap';
-    public $paginate = '5';
+    public $paginate = '10';
     public $search = '';
     public $userId;
     public $deleteUserId;
@@ -22,6 +23,7 @@ class Index extends Component
     public $isLoading = false;
 
     public $name, $email, $phone, $address, $password, $password_confirmation, $role, $status;
+    public $selectedRoles = [];
 
     public function mount()
     {
@@ -43,7 +45,8 @@ class Index extends Component
 
     public function render()
     {
-        $query = User::select('id', 'name', 'phone', 'email', 'role', 'status')
+        $query = User::with('roles')
+            ->select('id', 'name', 'phone', 'email', 'role', 'status')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('email', 'like', '%' . $this->search . '%')
@@ -57,10 +60,14 @@ class Index extends Component
             $query->where('role', 'User');
         }
 
+        // Get available roles for dropdowns
+        $availableRoles = $this->getAvailableRoles();
+
         $data = array(
             'user' => $query->orderBy('role', 'asc')
                 ->orderBy('status', 'asc')
                 ->paginate($this->paginate),
+            'availableRoles' => $availableRoles,
         );
 
         return view('livewire.admin.user.index', $data);
@@ -87,6 +94,7 @@ class Index extends Component
                 'password_confirmation',
                 'role',
                 'status',
+                'selectedRoles',
             ]
         );
     }
@@ -149,6 +157,12 @@ class Index extends Component
         $user->role     = $this->role;
         $user->status   = $this->status;
         $user->save();
+
+        // Assign roles using Spatie Permission
+        if (!empty($this->selectedRoles)) {
+            $user->assignRole($this->selectedRoles);
+        }
+
         $this->dispatch('success', 'Data user berhasil ditambahkan');
         $this->dispatch('closeCreateModal');
         $this->cancel();
@@ -183,6 +197,9 @@ class Index extends Component
             $this->address  = $user->address;
             $this->role     = $user->role;
             $this->status   = $user->status;
+
+            // Get user's current roles
+            $this->selectedRoles = $user->roles->pluck('name')->toArray();
 
             // Reset password fields
             $this->password = '';
@@ -267,6 +284,13 @@ class Index extends Component
         }
 
         $user->save();
+
+        // Sync roles using Spatie Permission
+        if (!empty($this->selectedRoles)) {
+            $user->syncRoles($this->selectedRoles);
+        } else {
+            $user->syncRoles([]);
+        }
 
         $this->dispatch('success', 'Data user berhasil diperbarui');
         $this->dispatch('closeEditModal');
@@ -405,5 +429,20 @@ class Index extends Component
         }
 
         return 'User';
+    }
+
+    private function getAvailableRoles()
+    {
+        $currentUserRole = Auth::user()->role;
+
+        if ($currentUserRole === 'Super Admin') {
+            // Super Admin can assign any role
+            return Role::all();
+        } elseif ($currentUserRole === 'Admin') {
+            // Admin can only assign User and Admin Masjid roles
+            return Role::whereIn('name', ['User', 'Admin Masjid'])->get();
+        }
+
+        return collect([]);
     }
 }
