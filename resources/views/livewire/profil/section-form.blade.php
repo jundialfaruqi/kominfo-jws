@@ -20,19 +20,19 @@
 
                     <div class="row g-2 mb-3">
                         <div class="col-md-2">
-                            <label class="form-label required">Slug</label>
+                            <label class="form-label required">ID JWS</label>
                         </div>
                         <div class="col-md-10">
                             <input type="text" class="form-control rounded-3 @error('slug') is-invalid @enderror"
                                 wire:model="slug" placeholder="Masukkan slug (URL-friendly)">
                             <div class="form-text">
-                                <small class="text-muted">Slug akan digunakan untuk URL. Hanya boleh mengandung huruf
+                                <small class="text-muted">ID JWS akan digunakan untuk URL. Hanya boleh mengandung huruf
                                     kecil, angka, dan tanda hubung (-)</small>
                                 @if ($isEdit)
-                                    <br><small class="text-info">Saat edit, slug tidak akan otomatis berubah meskipun
-                                        nama diubah</small>
+                                    <br><small class="text-info">Saat edit, ID JWS tidak akan otomatis berubah meskipun
+                                        nama masjid diubah</small>
                                 @else
-                                    <br><small class="text-success">Slug akan otomatis dibuat dari nama masjid</small>
+                                    <br><small class="text-success">ID JWS akan otomatis dibuat dari nama masjid</small>
                                 @endif
                             </div>
                             @error('slug')
