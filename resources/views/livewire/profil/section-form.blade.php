@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-md-10">
                             <input type="text" class="form-control rounded-3 @error('slug') is-invalid @enderror"
-                                wire:model="slug" placeholder="Masukkan slug (URL-friendly)">
+                                wire:model="slug" placeholder="Masukkan ID JWS (URL-friendly)">
                             <div class="form-text">
                                 <small class="text-muted">ID JWS akan digunakan untuk URL. Hanya boleh mengandung huruf
                                     kecil, angka, dan tanda hubung (-)</small>

@@ -36,7 +36,77 @@
                         <small class="text-muted">Pilih permissions yang akan diberikan ke role ini</small>
                     </div>
 
+                    <!-- Search Input for Permissions -->
+                    <div class="mb-3">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                    <path d="M21 21l-6 -6" />
+                                </svg>
+                            </span>
+                            <input wire:model.live="permissionSearch" type="text" class="form-control"
+                                placeholder="Cari permission...">
+                            @if ($permissionSearch)
+                                <button wire:click="$set('permissionSearch', '')" type="button"
+                                    class="btn btn-outline-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-x">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M18 6l-12 12" />
+                                        <path d="M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                        @if ($permissionSearch)
+                            <div class="form-text">
+                                <small class="text-info">Menampilkan hasil pencarian untuk:
+                                    "{{ $permissionSearch }}"</small>
+                            </div>
+                        @endif
+                    </div>
+
                     @if ($permissions->count() > 0)
+                        <!-- Select All/Deselect All Controls -->
+                        <div class="mb-2">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                    wire:click="$set('selectedPermissions', {{ $permissions->pluck('id')->toJson() }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-check-all">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M7 12l5 5l10 -10" />
+                                        <path d="M2 12l5 5m5 -5l5 -5" />
+                                    </svg>
+                                    Pilih Semua
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    wire:click="$set('selectedPermissions', [])">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-square">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path
+                                            d="M3 3m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
+                                    </svg>
+                                    Hapus Semua
+                                </button>
+                                <span class="text-muted small align-self-center">
+                                    {{ count($selectedPermissions) }} dari {{ $permissions->count() }} dipilih
+                                </span>
+                            </div>
+                        </div>
+
                         <div class="row">
                             @foreach ($permissions as $permission)
                                 <div class="col-md-6 col-lg-4 mb-2">
@@ -50,14 +120,20 @@
                         </div>
                     @else
                         <div class="alert alert-info">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="icon alert-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="icon alert-icon">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <line x1="12" y1="16" x2="12" y2="12"></line>
                                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
                             </svg>
-                            <div>Belum ada permission yang tersedia. Silakan buat permission terlebih dahulu.</div>
+                            <div>
+                                @if ($permissionSearch)
+                                    Tidak ada permission yang ditemukan dengan kata kunci "{{ $permissionSearch }}".
+                                @else
+                                    Belum ada permission yang tersedia. Silakan buat permission terlebih dahulu.
+                                @endif
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -78,7 +154,8 @@
                     </svg>
                     Batal
                 </a>
-                <button wire:loading.attr="disabled" wire:click="update" type="button" class="btn ms-auto rounded-3">
+                <button wire:loading.attr="disabled" wire:click="update" type="button"
+                    class="btn ms-auto rounded-3">
                     <span wire:loading.remove wire:target="update">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

@@ -40,10 +40,10 @@ class RolePermissionSeeder extends Seeder
             'delete-permissions',
 
             // Profile Management
-            'view-profiles',
-            'create-profiles',
-            'edit-profiles',
-            'delete-profiles',
+            'view-profil-masjid',
+            'create-profil-masjid',
+            'edit-profil-masjid',
+            'delete-profil-masjid',
 
             // Jumbotron Management
             'view-jumbotron',

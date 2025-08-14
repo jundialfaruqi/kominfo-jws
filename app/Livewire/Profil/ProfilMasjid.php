@@ -73,7 +73,7 @@ class ProfilMasjid extends Component
     public function mount()
     {
         $this->search = '';
-        $this->paginate = 5;
+        $this->paginate = 10;
 
         // If user is not admin
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {

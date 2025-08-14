@@ -24,6 +24,7 @@ class Role extends Component
     public $name;
     public $guard_name = 'web';
     public $selectedPermissions = [];
+    public $permissionSearch = '';
 
     // Modal states
     public $showCreateModal = false;
@@ -63,7 +64,12 @@ class Role extends Component
             ->orderBy('name', 'asc')
             ->paginate($this->paginate);
 
-        $permissions = Permission::orderBy('name', 'asc')->get();
+        // Filter permissions based on search
+        $permissions = Permission::when($this->permissionSearch, function ($query) {
+            return $query->where('name', 'like', '%' . $this->permissionSearch . '%');
+        })
+            ->orderBy('name', 'asc')
+            ->get();
 
         return view('livewire.admin.role', [
             'roles' => $roles,
@@ -185,7 +191,8 @@ class Role extends Component
             'guard_name',
             'selectedPermissions',
             'deleteRoleId',
-            'deleteRoleName'
+            'deleteRoleName',
+            'permissionSearch'
         ]);
         $this->guard_name = 'web';
         $this->resetValidation();

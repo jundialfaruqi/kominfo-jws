@@ -64,7 +64,7 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     Route::get('/tema/set-tema', \App\Livewire\Tema\SetTema::class)->name('tema.set-tema');
 
     // Profile Routes
-    Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index');
+    Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index')->middleware('can:view-profil-masjid');
 
     // Slider Routes
     Route::get('/slider-utama', Slide::class)->name('slide.index');
