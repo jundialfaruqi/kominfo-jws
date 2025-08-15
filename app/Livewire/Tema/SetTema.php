@@ -17,7 +17,7 @@ class SetTema extends Component
     #[Title('Set Tema Pengguna')]
 
     public $search;
-    public $paginate = 5;
+    public $paginate = 10;
     protected $paginationTheme = 'bootstrap';
 
     public $userId;
