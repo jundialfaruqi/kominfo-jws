@@ -31,20 +31,27 @@
                                     <input wire:model="password" type="password" id="password"
                                         class="form-control rounded-4 border-0 @error('password') is-invalid @enderror"
                                         placeholder="Masukkan Password" autocomplete="off">
-                                    <span class="input-group-text rounded-4 border-0">
-                                        <span class="link-secondary" title="Show password" data-bs-toggle="tooltip"
-                                            onclick="togglePassword('password')">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24"
-                                                height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                stroke="currentColor" fill="none" stroke-linecap="round"
-                                                stroke-linejoin="round" id="eyeIcon">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                                <path
-                                                    d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-                                            </svg>
-                                        </span>
-                                    </span>
+                                    <button type="button" class="btn btn-link rounded-4 border-0 p-1"
+                                        onclick="togglePassword('password', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-eye" width="24"
+                                            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                            <path
+                                                d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                        </svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-eye-off" width="24"
+                                            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                            fill="none" stroke-linecap="round" stroke-linejoin="round"
+                                            style="display: none;">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                            </path>
+                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                        </svg>
+                                    </button>
                                 </div>
                                 @error('password')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -144,15 +151,5 @@
         </div>
     </div>
 
-    <script>
-        function togglePassword(fieldId) {
-            event.preventDefault(); // Cegah perilaku default elemen <a>
-            const field = document.getElementById(fieldId);
-            if (field.type === 'password') {
-                field.type = 'text';
-            } else {
-                field.type = 'password';
-            }
-        }
-    </script>
+
 </div>
