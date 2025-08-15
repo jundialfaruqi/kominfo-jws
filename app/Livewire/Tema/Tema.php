@@ -20,7 +20,7 @@ class Tema extends Component
     #[Title('Pengaturan Tema')]
 
     public $search;
-    public $paginate = 5;
+    public $paginate = 10;
     protected $paginationTheme = 'bootstrap';
 
     public $themeId;
