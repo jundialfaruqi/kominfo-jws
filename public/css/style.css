@@ -44,13 +44,9 @@ body {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
   border-top-right-radius: 50%;
-  /* Sudut kanan atas melengkung besar */
   border-bottom-right-radius: 50%;
-  /* Sudut kanan bawah melengkung besar */
   padding-right: 0px;
-  /* Padding yang lebih besar untuk menyesuaikan dengan radius */
   overflow: hidden;
-  /* Penting: mencegah child elements melewati border */
 }
 
 /* Prayer time items */
@@ -61,20 +57,14 @@ body {
   padding-top: 20px;
   padding-bottom: 15px;
   padding-right: 60px;
-  /* Tambahan padding kanan untuk mengikuti lengkungan */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   width: 100%;
-  /* Memastikan lebar penuh dalam container */
   box-sizing: border-box;
-  /* Memastikan padding termasuk dalam width */
   position: relative;
-  /* Untuk memposisikan elemen dengan tepat */
 }
 
-/* Menyesuaikan border untuk prayer-time terakhir */
 .prayer-times .prayer-time:last-child {
   border-bottom: none;
-  /* Menghilangkan border pada elemen terakhir */
 }
 
 .prayer-icon {
@@ -157,7 +147,6 @@ body {
   background-color: #003366;
   box-shadow: 5px 10px 30px rgba(0, 0, 0, 1);
   overflow: hidden;
-  /* To make sure canvas stays within circle */
 }
 
 .clock canvas {
@@ -179,18 +168,6 @@ body {
   font-weight: 500;
   z-index: 10;
 }
-
-/* .brand-text {
-  position: absolute;
-  bottom: 55%;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  font-size: 1.3rem;
-  color: white;
-  font-weight: 500;
-  z-index: 4;
-} */
 
 .right-content {
   grid-area: right-content;
@@ -1418,8 +1395,7 @@ body {
     background-size: 100% 100%;
     background-position: center;
     position: relative;
-    margin-left: 396px;
-    /* transition: background-image 0.5s ease-in-out; */
+    margin-left: 450px;
     will-change: background-image;
   }
 
