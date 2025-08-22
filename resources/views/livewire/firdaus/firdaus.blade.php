@@ -125,27 +125,33 @@
             </div>
 
             <div class="mosque-image">
-                {{-- Hidden inputs to store slide URLs with default fallback --}}
+                {{-- Mosque images with object-fit stretch --}}
                 @if ($slides)
-                    <input type="hidden" id="slide1"
-                        value="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide2"
-                        value="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide3"
-                        value="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide4"
-                        value="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide5"
-                        value="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide6"
-                        value="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}">
+                    <img id="slide1" src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
+                    <img id="slide2" src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
+                    <img id="slide3" src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
+                    <img id="slide4" src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
+                    <img id="slide5" src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
+                    <img id="slide6" src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @else
-                    <input type="hidden" id="slide1" value="{{ asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide2" value="{{ asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide3" value="{{ asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide4" value="{{ asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide5" value="{{ asset('images/other/slide-jws-default.jpg') }}">
-                    <input type="hidden" id="slide6" value="{{ asset('images/other/slide-jws-default.jpg') }}">
+                    <img id="slide1" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
+                    <img id="slide2" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
+                    <img id="slide3" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
+                    <img id="slide4" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
+                    <img id="slide5" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
+                    <img id="slide6" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
+                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @endif
             </div>
         </div>

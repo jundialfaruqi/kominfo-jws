@@ -70,7 +70,7 @@ class Slide extends Component
     ];
 
     /**
-     * Method untuk resize gambar dengan aspect ratio 16:9 dan ukuran maksimal 990KB
+     * Method untuk resize gambar dengan ukuran maksimal 990KB
      */
     private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
     {
@@ -80,34 +80,6 @@ class Slide extends Component
 
             // Baca gambar menggunakan Intervention Image
             $image = Image::read($uploadedFile->getRealPath());
-
-            // Target aspect ratio 16:9
-            $targetRatio = 16 / 9;
-            $targetWidth = 1920;
-            $targetHeight = 1080;
-
-            // Dapatkan dimensi asli
-            $originalWidth = $image->width();
-            $originalHeight = $image->height();
-            $originalRatio = $originalWidth / $originalHeight;
-
-            // Crop gambar ke aspect ratio 16:9 jika diperlukan
-            if (abs($originalRatio - $targetRatio) > 0.01) {
-                if ($originalRatio > $targetRatio) {
-                    // Gambar terlalu lebar, crop dari kiri-kanan
-                    $newWidth = (int)($originalHeight * $targetRatio);
-                    $x = (int)(($originalWidth - $newWidth) / 2);
-                    $image->crop($newWidth, $originalHeight, $x, 0);
-                } else {
-                    // Gambar terlalu tinggi, crop dari atas-bawah
-                    $newHeight = (int)($originalWidth / $targetRatio);
-                    $y = (int)(($originalHeight - $newHeight) / 2);
-                    $image->crop($originalWidth, $newHeight, 0, $y);
-                }
-            }
-
-            // Resize ke dimensi target 1920x1080
-            $image->resize($targetWidth, $targetHeight);
 
             // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
             $quality = 95;
@@ -133,12 +105,12 @@ class Slide extends Component
                 }
             } while ($quality >= $minQuality);
 
-            // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil
+            // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil dengan mempertahankan aspect ratio
             if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
                 $scaleFactor = 0.9;
                 while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                    $newWidth = (int)($targetWidth * $scaleFactor);
-                    $newHeight = (int)($targetHeight * $scaleFactor);
+                    $newWidth = (int)($image->width() * $scaleFactor);
+                    $newHeight = (int)($image->height() * $scaleFactor);
                     $image->resize($newWidth, $newHeight);
                     $scaleFactor -= 0.05;
                 }
@@ -156,7 +128,7 @@ class Slide extends Component
     private function saveProcessedImage($uploadedFile, $slideNumber)
     {
         try {
-            // Proses resize gambar dengan aspect ratio 16:9 dan ukuran maksimal 990KB
+            // Proses resize gambar dengan ukuran maksimal 990KB
             $processedImage = $this->resizeImageToLimit($uploadedFile);
 
             // Generate nama file dengan ekstensi .jpg (karena kita convert ke JPEG)
