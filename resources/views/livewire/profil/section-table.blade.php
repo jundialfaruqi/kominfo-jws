@@ -29,12 +29,11 @@
             <thead>
                 <tr>
                     <th class="w-1">No.</th>
-                    <th>Masjid</th>
-                    <th>Admin</th>
+                    <th>Masjid & Admin</th>
                     <th>Alamat</th>
                     <th>No Hp</th>
                     <th>Logo</th>
-                    <th>Lihat JWS</th>
+                    <th class="text-center">Lihat JWS</th>
                     <th></th>
                 </tr>
             </thead>
@@ -42,8 +41,10 @@
                 @foreach ($profilList as $profil)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td class="text-wrap">{{ $profil->name }}</td>
-                        <td class="text-wrap">{{ $profil->user->name ?? '-' }}</td>
+                        <td class="text-wrap">
+                            <div>{{ $profil->name }}</div>
+                            <div class="text-muted">{{ $profil->user->name ?? '-' }}</div>
+                        </td>
                         <td class="text-wrap">{{ $profil->address }}</td>
                         <td class="text-wrap">{{ $profil->phone }}</td>
                         <td>
