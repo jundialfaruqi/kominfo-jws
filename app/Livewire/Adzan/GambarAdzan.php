@@ -59,6 +59,7 @@ class GambarAdzan extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteAdzanId;
     public $deleteAdzanName;
 
@@ -993,6 +994,7 @@ class GambarAdzan extends Component
         );
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function edit($id)
@@ -1026,11 +1028,13 @@ class GambarAdzan extends Component
         $this->tmp_adzan15 = $adzan->adzan15;
         $this->isEdit      = true;
         $this->showForm    = true;
+        $this->showTable = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset(
             [
@@ -1317,6 +1321,7 @@ class GambarAdzan extends Component
             $adzan->save();
 
             $this->dispatch('success', $this->isEdit ? 'Adzan berhasil diubah!' : 'Adzan berhasil ditambahkan!');
+            $this->showTable = true;
 
             // only hide form and reset fields if user is not admin
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
