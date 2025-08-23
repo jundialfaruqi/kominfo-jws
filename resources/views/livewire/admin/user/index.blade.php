@@ -64,9 +64,9 @@
                                 <thead>
                                     <tr>
                                         <th class="w-1">No.</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
+                                        <th>Nama & Email</th>
+                                        <th>Nama Masjid</th>
+                                        <th>No. HP</th>
                                         <th>Role (Legacy)</th>
                                         <th>Spatie Roles</th>
                                         <th>Status</th>
@@ -77,8 +77,17 @@
                                     @foreach ($user as $users)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $users->name }}</td>
-                                            <td>{{ $users->email }}</td>
+                                            <td>
+                                                <div>
+                                                    {{ $users->name }}
+                                                </div>
+                                                <div class="text-muted">
+                                                    {{ $users->email }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ $users->profil->name ?? '-' }}
+                                            </td>
                                             <td>{{ $users->phone }}</td>
                                             @if ($users->role == 'Super Admin')
                                                 <td>

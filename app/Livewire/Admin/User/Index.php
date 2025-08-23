@@ -22,7 +22,7 @@ class Index extends Component
     public $deleteUserName;
     public $isLoading = false;
 
-    public $name, $email, $phone, $address, $password, $password_confirmation, $role, $status;
+    public $name, $email, $phone, $address, $password, $password_confirmation, $role, $status, $profil;
     public $selectedRoles = [];
 
     public function mount()
@@ -45,13 +45,16 @@ class Index extends Component
 
     public function render()
     {
-        $query = User::with('roles')
+        $query = User::with(['roles', 'profil']) // Tambahkan relasi profil
             ->select('id', 'name', 'phone', 'email', 'role', 'status')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('email', 'like', '%' . $this->search . '%')
                     ->orWhere('role', 'like', '%' . $this->search . '%')
-                    ->orWhere('status', 'like', '%' . $this->search . '%');
+                    ->orWhere('status', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('profil', function ($q) { // Pencarian di tabel Profil
+                        $q->where('name', 'like', '%' . $this->search . '%');
+                    });
             });
 
         // Filter users based on current user's role
