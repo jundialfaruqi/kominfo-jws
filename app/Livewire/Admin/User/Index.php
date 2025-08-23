@@ -66,11 +66,21 @@ class Index extends Component
         // Get available roles for dropdowns
         $availableRoles = $this->getAvailableRoles();
 
+        // Get statistics data
+        $baseQuery = User::query();
+        if (!$this->isSuperAdmin()) {
+            $baseQuery->where('role', 'User');
+        }
+
         $data = array(
             'user' => $query->orderBy('role', 'asc')
                 ->orderBy('status', 'asc')
                 ->paginate($this->paginate),
             'availableRoles' => $availableRoles,
+            'totalUsers' => $baseQuery->count(),
+            'activeUsers' => (clone $baseQuery)->where('status', 'Active')->count(),
+            'inactiveUsers' => (clone $baseQuery)->where('status', 'Inactive')->count(),
+            'userRoleCount' => User::where('role', 'User')->count(),
         );
 
         return view('livewire.admin.user.index', $data);
