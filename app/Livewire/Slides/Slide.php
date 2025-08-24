@@ -39,6 +39,7 @@ class Slide extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteSlideId;
     public $deleteSlideName;
 
@@ -502,6 +503,7 @@ class Slide extends Component
         );
 
         $this->isEdit = false;
+        $this->showTable = false;
         $this->showForm = true;
     }
 
@@ -528,11 +530,13 @@ class Slide extends Component
 
         $this->isEdit       = true;
         $this->showForm     = true;
+        $this->showTable    = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset(
             [
@@ -680,6 +684,7 @@ class Slide extends Component
             $slide->save();
 
             $this->dispatch('success', $this->isEdit ? 'Gambar Slide berhasil diubah!' : 'Gambar Slide berhasil ditambahkan!');
+            $this->showTable = true;
 
             // Only hide form and reset fields if user is not admin
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {

@@ -39,6 +39,7 @@ class Jumbotron extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteJumboId;
     public $deleteJumboName;
 
@@ -432,6 +433,7 @@ class Jumbotron extends Component
         $this->isEdit = false;
         $this->showForm = true;
         $this->is_active = true;
+        $this->showTable = false;
     }
 
     public function edit($id)
@@ -450,11 +452,13 @@ class Jumbotron extends Component
 
         $this->isEdit = true;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'jumboId',
@@ -546,6 +550,7 @@ class Jumbotron extends Component
 
             $this->dispatch('success', $this->isEdit ? 'Jumbotron berhasil diubah!' : 'Jumbotron berhasil ditambahkan!');
             $this->showForm = false;
+            $this->showTable = true;
             $this->reset([
                 'jumboId',
                 'jumbo1',

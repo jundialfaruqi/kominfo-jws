@@ -36,6 +36,7 @@ class ProfilMasjid extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteProfileId;
     public $deleteProfileName;
 
@@ -203,6 +204,7 @@ class ProfilMasjid extends Component
         );
         $this->isEdit   = false;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function edit($id)
@@ -228,11 +230,13 @@ class ProfilMasjid extends Component
 
         $this->isEdit               = true;
         $this->showForm             = true;
+        $this->showTable            = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset(
             [
@@ -564,6 +568,7 @@ class ProfilMasjid extends Component
             $profil->save();
 
             $this->dispatch('success', $this->isEdit ? 'Profil masjid berhasil diperbarui!' : 'Profil masjid berhasil ditambahkan!');
+            $this->showTable = true;
 
             // Only hide form and reset fields if user is admin
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
