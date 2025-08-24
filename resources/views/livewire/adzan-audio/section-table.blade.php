@@ -38,7 +38,9 @@
             <tbody>
                 @foreach ($adzanAudioList as $adzanAudio)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td class="text-center text-muted">
+                            {{ $loop->iteration + ($adzanAudioList->currentPage() - 1) * $adzanAudioList->perPage() }}
+                        </td>
                         <td class="text-wrap">{{ $adzanAudio->user->name ?? '-' }}</td>
 
                         {{-- Audio Adzan --}}
@@ -60,7 +62,7 @@
                                 </div>
                                 <audio controls class="w-50 rounded-3">
                                     <source src="{{ $this->generateLocalUrl($adzanAudio->audioadzan) }}"
-                                    type="audio/mpeg">
+                                        type="audio/mpeg">
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
                             @else
@@ -87,7 +89,7 @@
                                 </div>
                                 <audio controls class="w-50 rounded-3">
                                     <source src="{{ $this->generateLocalUrl($adzanAudio->adzanshubuh) }}"
-                                    type="audio/mpeg">
+                                        type="audio/mpeg">
 
                                     Browser Anda tidak mendukung elemen audio.
                                 </audio>
@@ -153,7 +155,7 @@
             </tbody>
         </table>
     </div>
-    <div class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+    <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
         {{ $adzanAudioList->links() }}
     </div>
 @endif

@@ -4,7 +4,7 @@
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <h1 class="navbar-brand navbar-brand-autodark me-lg-3 me-3">
+        <h1 class="navbar-brand me-lg-3 me-3">
             <a wire:navigate href="{{ route('dashboard.index') }}">
                 <span class="navbar-brand-image">
                     <a wire:navigate href="{{ route('dashboard.index') }}">

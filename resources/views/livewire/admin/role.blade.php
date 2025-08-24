@@ -74,7 +74,8 @@
                                 <tbody>
                                     @forelse ($roles as $role)
                                         <tr>
-                                            <td>{{ $loop->iteration + ($roles->currentPage() - 1) * $roles->perPage() }}
+                                            <td class="text-center text-muted">
+                                                {{ $loop->iteration + ($roles->currentPage() - 1) * $roles->perPage() }}
                                             </td>
                                             <td>
                                                 <span class="badge bg-blue-lt d-inline-flex align-items-center gap-1">
@@ -186,8 +187,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div
-                            class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
                             {{ $roles->links() }}
                         </div>
                     </div>

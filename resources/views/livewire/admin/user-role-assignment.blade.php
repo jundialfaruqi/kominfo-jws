@@ -8,11 +8,6 @@
                             <h3 class="card-title d-none d-md-block">
                                 Assign Roles to Users
                             </h3>
-                            <div class="card-actions">
-                                <div class="text-muted">
-                                    <small>Kelola role Spatie Permission untuk setiap user</small>
-                                </div>
-                            </div>
                         </div>
                         <div class="card-body border-bottom py-3">
                             <div class="d-flex">
@@ -43,8 +38,7 @@
                                 <thead>
                                     <tr>
                                         <th class="w-1">No.</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
+                                        <th>Nama & Email</th>
                                         <th>Legacy Role</th>
                                         <th>Spatie Roles</th>
                                         <th>Status</th>
@@ -54,10 +48,25 @@
                                 <tbody>
                                     @forelse ($users as $user)
                                         <tr>
-                                            <td>{{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}
+                                            <td class="text-center text-muted">
+                                                {{ $loop->iteration + ($users->currentPage() - 1) * $users->perPage() }}
                                             </td>
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->email }}</td>
+                                            <td>
+                                                <div>{{ $user->name }}</div>
+                                                <div class="text-muted">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                        height="24" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round"
+                                                        class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
+                                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                        <path
+                                                            d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+                                                        <path d="M3 7l9 6l9 -6" />
+                                                    </svg>
+                                                    {{ $user->email }}
+                                                </div>
+                                            </td>
                                             <td>
                                                 @if ($user->role == 'Super Admin')
                                                     <span class="badge bg-purple-lt">{{ $user->role }}</span>
@@ -156,7 +165,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
                             {{ $users->links() }}
                         </div>
                     </div>

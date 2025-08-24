@@ -1,5 +1,5 @@
 @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-    {{-- Pagination and search control --}}
+    {{-- Pagination & Search Controls --}}
     <div class="card-body border-bottom py-3">
         <div class="d-flex">
             <div class="text-secondary">
@@ -23,34 +23,52 @@
             </div>
         </div>
     </div>
-    {{-- Table petugas --}}
+    {{-- Table --}}
     <div class="table-responsive">
         <table class="table card-table table-vcenter table-hover text-nowrap datatable">
             <thead>
                 <tr>
-                    <th class="w-1">No</th>
+                    <th class="w-1">No.</th>
                     <th>Nama Admin Masjid</th>
-                    <th>Hari</th>
-                    <th>Khatib</th>
-                    <th>Imam</th>
-                    <th>Muadzin</th>
+                    <th>Teks Marquee 1</th>
+                    <th>Teks Marquee 2</th>
+                    <th>Teks Marquee 3</th>
+                    <th>Teks Marquee 4</th>
+                    <th>Teks Marquee 5</th>
+                    <th>Teks Marquee 6</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($petugasList as $petugas)
+                @foreach ($marqueeList as $marquee)
                     <tr>
                         <td class="text-center text-muted">
-                            {{ $loop->iteration + ($petugasList->currentPage() - 1) * $petugasList->perPage() }}
+                            {{ $loop->iteration + ($marqueeList->currentPage() - 1) * $marqueeList->perPage() }}
                         </td>
-                        <td class="text-wrap">{{ $petugas->user->name }}</td>
-                        <td>{{ $petugas->hari }}</td>
-                        <td>{{ $petugas->khatib }}</td>
-                        <td>{{ $petugas->imam }}</td>
-                        <td>{{ $petugas->muadzin }}</td>
+                        <td class="text-wrap">
+                            {{ $marquee->user->name }}
+                        </td>
+                        <td class="text-wrap">
+                            {{ $marquee->marquee1 }}
+                        </td>
+                        <td class="text-wrap">
+                            {{ $marquee->marquee2 }}
+                        </td>
+                        <td class="text-wrap">
+                            {{ $marquee->marquee3 }}
+                        </td>
+                        <td class="text-wrap">
+                            {{ $marquee->marquee4 }}
+                        </td>
+                        <td class="text-wrap">
+                            {{ $marquee->marquee5 }}
+                        </td>
+                        <td class="text-wrap">
+                            {{ $marquee->marquee6 }}
+                        </td>
                         <td class="text-end">
-                            <button wire:click="edit({{ $petugas->id }})" class="btn py-2 px-2 rounded-3 shadow-sm">
-                                <span wire:loading.remove wire:target="edit({{ $petugas->id }})">
+                            <button wire:click="edit('{{ $marquee->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                <span wire:loading.remove wire:target="edit('{{ $marquee->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -63,15 +81,16 @@
                                     </svg>
                                     Ubah
                                 </span>
-                                <span wire:loading wire:target="edit({{ $petugas->id }})"><span
-                                        class="spinner-border spinner-border-sm" role="status"
+                                <span wire:loading wire:target="edit('{{ $marquee->id }}')">
+                                    <span class="spinner-border spinner-border-sm" role="status"
                                         aria-hidden="true"></span>
-                                    <span class="small">loading...</span>
+                                    <span class="small">Loading...</span>
                                 </span>
                             </button>
-                            <button wire:click="delete('{{ $petugas->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm"
-                                data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                <span wire:loading.remove wire:target="delete('{{ $petugas->id }}')">
+                            <button wire:click="delete('{{ $marquee->id }}')"
+                                class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                                <span wire:loading.remove wire:target="delete('{{ $marquee->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -85,10 +104,10 @@
                                     </svg>
                                     Hapus
                                 </span>
-                                <span wire:loading wire:target="delete('{{ $petugas->id }}')">
+                                <span wire:loading wire:target="delete('{{ $marquee->id }}')">
                                     <span class="spinner-border spinner-border-sm" role="status"
                                         aria-hidden="true"></span>
-                                    <span class="small">loading...</span>
+                                    <span class="small">Loading...</span>
                                 </span>
                             </button>
                         </td>
@@ -99,6 +118,6 @@
     </div>
 
     <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-        {{ $petugasList->links() }}
+        {{ $marqueeList->links() }}
     </div>
 @endif

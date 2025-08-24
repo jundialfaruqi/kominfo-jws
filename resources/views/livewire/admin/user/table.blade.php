@@ -15,7 +15,8 @@
         <tbody>
             @foreach ($user as $users)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td class="text-center text-muted">
+                        {{ $loop->iteration + ($user->currentPage() - 1) * $user->perPage() }}</td>
                     <td>
                         <div>
                             {{ $users->name }}

@@ -16,7 +16,9 @@
         <tbody>
             @foreach ($durasiList as $durasi)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td class="text-center text-muted">
+                        {{ $loop->iteration + ($durasiList->currentPage() - 1) * $durasiList->perPage() }}
+                    </td>
                     <td class="text-wrap">{{ $durasi->user->name }}</td>
                     <td>{{ $durasi->adzan_shubuh }}/{{ $durasi->iqomah_shubuh }}/{{ $durasi->final_shubuh }}
                     </td>
