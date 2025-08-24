@@ -39,7 +39,9 @@
             <tbody>
                 @foreach ($audioList as $audio)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
+                        <td class="text-center text-muted">
+                            {{ $loop->iteration + ($audioList->currentPage() - 1) * $audioList->perPage() }}
+                        </td>
                         <td class="text-wrap">{{ $audio->user->name ?? '-' }}</td>
                         {{-- Audio 1 --}}
                         <td class="text-center">
@@ -173,7 +175,7 @@
             </tbody>
         </table>
     </div>
-    <div class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+    <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
         {{ $audioList->links() }}
     </div>
 @endif

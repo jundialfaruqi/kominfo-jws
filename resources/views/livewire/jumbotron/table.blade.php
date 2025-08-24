@@ -17,7 +17,9 @@
         <tbody>
             @foreach ($jumboList as $jumbo)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td class="text-center text-muted">
+                        {{ $loop->iteration + ($jumboList->currentPage() - 1) * $jumboList->perPage() }}
+                    </td>
                     <td class="text-wrap">{{ $jumbo->user->name ?? '-' }}</td>
                     <td>
                         @if ($jumbo->jumbo1)

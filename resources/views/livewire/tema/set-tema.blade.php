@@ -188,7 +188,9 @@
                                 <tbody>
                                     @foreach ($profilList as $profil)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
+                                            <td class="text-center text-muted">
+                                                {{ $loop->iteration + ($profilList->currentPage() - 1) * $profilList->perPage() }}
+                                            </td>
                                             <td class="text-wrap">{{ $profil->masjid_name }}</td>
                                             <td>
                                                 {{ $profil->theme_name }}
@@ -224,8 +226,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div
-                            class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
                             {{ $profilList->links() }}
                         </div>
                     </div>

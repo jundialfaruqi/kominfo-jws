@@ -381,7 +381,9 @@
                                     <tbody>
                                         @foreach ($themeList as $theme)
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
+                                                <td class="text-center text-muted">
+                                                    {{ $loop->iteration + ($themeList->currentPage() - 1) * $themeList->perPage() }}
+                                                </td>
                                                 <td class="text-wrap">{{ $theme->name }}</td>
                                                 <td>
                                                     @if ($theme->preview_image)
@@ -487,9 +489,7 @@
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div
-                                class="card-footer d-flex align-items-center justify-content-end pb-0 rounded-4 shadow-sm">
+                            <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
                                 {{ $themeList->links() }}
                             </div>
                         @endif

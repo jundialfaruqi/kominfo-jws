@@ -16,7 +16,9 @@
         <tbody>
             @foreach ($slideList as $slide)
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td class="text-center text-muted">
+                        {{ $loop->iteration + ($slideList->currentPage() - 1) * $slideList->perPage() }}
+                    </td>
                     <td class="text-wrap">{{ $slide->user->name ?? '-' }}</td>
                     <td>
                         @if ($slide->slide1)
