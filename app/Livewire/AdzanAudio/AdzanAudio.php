@@ -185,7 +185,7 @@ class AdzanAudio extends Component
                         } else {
                             $filePath = public_path('sounds/adzan/' . $filename);
                         }
-                        
+
                         if (file_exists($filePath)) {
                             File::delete($filePath);
                             Log::info("Menghapus {$field} dari penyimpanan lokal", [
@@ -258,7 +258,7 @@ class AdzanAudio extends Component
                         } else {
                             $filePath = public_path('sounds/adzan/' . $filename);
                         }
-                        
+
                         if (file_exists($filePath)) {
                             File::delete($filePath);
                             Log::info("Menghapus {$field} dari penyimpanan lokal", [
@@ -694,7 +694,7 @@ class AdzanAudio extends Component
                     } else {
                         $filePath = public_path('sounds/adzan/' . $filename);
                     }
-                    
+
                     if (file_exists($filePath)) {
                         File::delete($filePath);
                         Log::info("Berhasil menghapus file {$field} dari penyimpanan lokal", [

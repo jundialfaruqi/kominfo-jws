@@ -120,27 +120,16 @@
             return new Date(serverTimestamp + elapsed);
         }
 
-        // Variabel untuk menyimpan timestamp terakhir pembaruan audio
         let lastAudioUpdateTimestamp = 0;
-        let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
+        let audioVersions = {};
 
-        // Variabel untuk menandai bahwa ada audio baru yang tersedia
-        // Digunakan untuk mendeteksi perubahan audio dari admin panel
         window.newAudioAvailable = false;
 
-        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
-        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
-        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
-
-        // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
-            // Periksa koneksi jaringan terlebih dahulu
             const networkAvailable = checkNetworkAndRetry();
 
-            // Jika offline dan ada cache, gunakan cache
             if (!networkAvailable && cachedAudioUrls.length > 0) {
                 console.log('Mode offline: Menggunakan audio dari cache');
-                // Putar audio dari cache jika tidak sedang dijeda untuk adzan
                 if (!isAudioPausedForAdzan && !isAudioPlaying) {
                     playAudioFromCache();
                 }
@@ -832,8 +821,8 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 33 detik');
-        }, 30000);
+            // console.log('Waktu server diupdate setiap 1 menit');
+        }, 60000); // 60000 milidetik = 1 menit
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -3552,26 +3541,26 @@
         }, 1 * 60 * 1000); // 30 menit
 
         setInterval(function() {
-            updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
+            updateAndPlayAudio();
             // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
+            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 10 menit'
             // );
-        }, 40000); // 40000 milidetik = 40 detik
+        }, 600000); // 600000 milidetik = 10 menit
 
         updateJumbotronData();
 
         setInterval(function() {
+            updateFridayOfficials();
+            updateJumbotronData();
+            updateMarqueeText();
+            checkThemeUpdate();
             updateMosqueInfo();
             updateSlides();
-            updateAndPlayAudio();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
-        }, 50000); // 50000 milidetik = 50 detik
+            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 2 menit');
+        }, 120000); // 120000 milidetik = 2 menit
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
@@ -3599,43 +3588,6 @@
                 window.adzanAudioPlayer.currentTime = 0;
             }
         });
-
-        // DEBUG: Fungsi untuk testing Friday Info Popup (hapus setelah selesai debug)
-        // window.testFridayPopup = function() {
-        //     console.log('Testing Friday Info Popup...');
-
-        //     // Simulasi data Friday
-        //     const now = getCurrentTimeFromServer();
-        //     const options = {
-        //         weekday: 'long',
-        //         day: '2-digit',
-        //         month: '2-digit',
-        //         year: '2-digit'
-        //     };
-        //     const formattedDate = now.toLocaleDateString('id-ID', options);
-        //     const khatib = $('#khatib').val() || 'Test Khatib';
-        //     const imam = $('#imam').val() || 'Test Imam';
-        //     const muadzin = $('#muadzin').val() || 'Test Muadzin';
-
-        //     const fridayData = {
-        //         date: formattedDate,
-        //         khatib,
-        //         imam,
-        //         muadzin
-        //     };
-
-        //     // Tampilkan popup
-        //     displayFridayInfoPopup(fridayData);
-        //     console.log('Friday Info Popup ditampilkan untuk testing');
-        // };
-
-        // // DEBUG: Fungsi untuk menutup Friday Info Popup
-        // window.closeFridayPopup = function() {
-        //     const $popup = $('#fridayInfoPopup');
-        //     $popup.css('display', 'none');
-        //     clearFridayInfoState();
-        //     console.log('Friday Info Popup ditutup');
-        // };
 
     });
 </script>
