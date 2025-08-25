@@ -120,16 +120,27 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        // Variabel untuk menyimpan timestamp terakhir pembaruan audio
         let lastAudioUpdateTimestamp = 0;
-        let audioVersions = {};
+        let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
+        // Variabel untuk menandai bahwa ada audio baru yang tersedia
+        // Digunakan untuk mendeteksi perubahan audio dari admin panel
         window.newAudioAvailable = false;
 
+        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
+        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
+        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
+
+        // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
+            // Periksa koneksi jaringan terlebih dahulu
             const networkAvailable = checkNetworkAndRetry();
 
+            // Jika offline dan ada cache, gunakan cache
             if (!networkAvailable && cachedAudioUrls.length > 0) {
                 console.log('Mode offline: Menggunakan audio dari cache');
+                // Putar audio dari cache jika tidak sedang dijeda untuk adzan
                 if (!isAudioPausedForAdzan && !isAudioPlaying) {
                     playAudioFromCache();
                 }
@@ -821,8 +832,8 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 1 menit');
-        }, 60000); // 60000 milidetik = 1 menit
+            // console.log('Waktu server diupdate setiap 33 detik');
+        }, 30000);
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -1035,65 +1046,6 @@
                 }
             });
         }
-
-        // Fungsi untuk memeriksa pembaruan tema tanpa reload
-        // function checkThemeUpdate() {
-        //     const slug = window.location.pathname.replace(/^\//, '');
-        //     $.ajax({
-        //         url: `/api/theme-check/${slug}`,
-        //         method: 'GET',
-        //         dataType: 'json',
-        //         success: function(response) {
-        //             if (response.success) {
-        //                 const newThemeId = response.data.theme_id;
-        //                 const newUpdatedAt = response.data.updated_at;
-        //                 const newCssFile = response.data
-        //                     .css_file; // Asumsikan API mengembalikan css_file
-
-        //                 // Ambil data tema yang tersimpan
-        //                 const currentThemeId = $('#current-theme-id').val() || null;
-        //                 const currentUpdatedAt = $('#current-theme-updated-at').val() || 0;
-        //                 const currentThemeCss = $('#current-theme-css').val() ||
-        //                     ''; // Tambahkan hidden input untuk css_file saat ini
-
-        //                 if (newThemeId && (newThemeId !== currentThemeId || newUpdatedAt >
-        //                         currentUpdatedAt)) {
-        //                     console.log('Tema diperbarui:', {
-        //                         newThemeId,
-        //                         newUpdatedAt,
-        //                         newCssFile
-        //                     });
-
-        //                     // Perbarui hidden input untuk menyimpan status terbaru
-        //                     $('#current-theme-id').val(newThemeId);
-        //                     $('#current-theme-updated-at').val(newUpdatedAt);
-
-        //                     // Jika ada file CSS baru, muat secara dinamis
-        //                     if (newCssFile && newCssFile !== currentThemeCss) {
-        //                         const existingLink = document.querySelector(
-        //                             `link[href="${currentThemeCss}"]`);
-        //                         if (existingLink) {
-        //                             existingLink.remove(); // Hapus CSS lama
-        //                         }
-
-        //                         const newLink = document.createElement('link');
-        //                         newLink.rel = 'stylesheet';
-        //                         newLink.href = newCssFile; // Pastikan path sesuai dengan asset
-        //                         document.head.appendChild(newLink);
-
-        //                         // Perbarui hidden input untuk CSS saat ini
-        //                         $('#current-theme-css').val(newCssFile);
-
-        //                         console.log('CSS tema diperbarui tanpa reload:', newCssFile);
-        //                     }
-        //                 }
-        //             }
-        //         },
-        //         error: function(xhr, status, error) {
-        //             console.error('Gagal memeriksa pembaruan tema:', error);
-        //         }
-        //     });
-        // }
 
         // Fungsi untuk memeriksa pembaruan tema dengan reload
         function checkThemeUpdate() {
@@ -3541,26 +3493,26 @@
         }, 1 * 60 * 1000); // 30 menit
 
         setInterval(function() {
+            updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateAndPlayAudio();
+            updateJumbotronData();
+            updateMarqueeText();
+            checkThemeUpdate();
             // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 10 menit'
+            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
             // );
-        }, 600000); // 600000 milidetik = 10 menit
+        }, 40000); // 40000 milidetik = 40 detik
 
         updateJumbotronData();
 
         setInterval(function() {
-            updateFridayOfficials();
-            updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
             updateMosqueInfo();
             updateSlides();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 2 menit');
-        }, 120000); // 120000 milidetik = 2 menit
+            updateAndPlayAudio();
+            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
+        }, 50000); // 50000 milidetik = 50 detik
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
@@ -3588,6 +3540,5 @@
                 window.adzanAudioPlayer.currentTime = 0;
             }
         });
-
     });
 </script>
