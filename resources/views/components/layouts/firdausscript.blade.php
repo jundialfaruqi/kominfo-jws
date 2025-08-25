@@ -1,16 +1,16 @@
 {{-- Moment.js core --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
-
 {{-- Moment Hijri --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
-
 {{-- Locale Indonesia --}}
 <script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
-
 {{-- jQuery --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
+{{-- Laravel Echo and Pusher for WebSocket --}}
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
 <script>
     $(document).ready(function() {
         // Tambahkan di awal script
@@ -39,6 +39,216 @@
         let connectionStatusElement = null;
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
+
+        // WebSocket connection status
+        let wsConnected = false;
+        let wsReconnectAttempts = 0;
+        const MAX_RECONNECT_ATTEMPTS = 5;
+
+        // Initialize WebSocket connection
+        function initializeWebSocket() {
+            try {
+                // Configure Laravel Echo with Reverb
+                window.Echo = new Echo({
+                    broadcaster: 'reverb',
+                    key: '{{ env("REVERB_APP_KEY") }}',
+                    wsHost: '{{ env("REVERB_HOST", "localhost") }}',
+                    wsPort: {{ env('REVERB_PORT', 8080) }},
+                    wssPort: {{ env('REVERB_PORT', 8080) }},
+                    forceTLS: {{ env('REVERB_SCHEME', 'http') === 'https' ? 'true' : 'false' }},
+                    enabledTransports: ['ws', 'wss'],
+                    disableStats: true,
+                });
+
+                // Connection event handlers
+                window.Echo.connector.pusher.connection.bind('connected', function() {
+                    wsConnected = true;
+                    wsReconnectAttempts = 0;
+                    console.log('WebSocket connected successfully');
+                    showConnectionStatus('Real-time connection established', 'success');
+                });
+
+                window.Echo.connector.pusher.connection.bind('disconnected', function() {
+                    wsConnected = false;
+                    console.log('WebSocket disconnected');
+                    showConnectionStatus('Connection lost, attempting to reconnect...', 'warning');
+                    attemptReconnect();
+                });
+
+                window.Echo.connector.pusher.connection.bind('error', function(error) {
+                    console.error('WebSocket error:', error);
+                    wsConnected = false;
+                    attemptReconnect();
+                });
+
+                // Setup channels and listeners
+                setupWebSocketChannels();
+
+            } catch (error) {
+                console.error('Failed to initialize WebSocket:', error);
+                // Continue with existing polling behavior as fallback
+            }
+        }
+
+        function attemptReconnect() {
+            if (wsReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+                wsReconnectAttempts++;
+                const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempts), 30000);
+                console.log(`Attempting WebSocket reconnection ${wsReconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
+                
+                setTimeout(() => {
+                    try {
+                        window.Echo.disconnect();
+                        initializeWebSocket();
+                    } catch (error) {
+                        console.error('Reconnection failed:', error);
+                    }
+                }, delay);
+            }
+        }
+
+        function setupWebSocketChannels() {
+            const slug = window.location.pathname.replace(/^\//, '') || 'default';
+
+            // Server time updates
+            window.Echo.channel('server-updates')
+                .listen('.server.time.updated', (data) => {
+                    console.log('Server time updated via WebSocket:', data);
+                    if (data.server_time) {
+                        const latency = 50; // Estimate WebSocket latency
+                        serverTimestamp = parseInt(data.server_time) + latency;
+                        pageLoadTimestamp = Date.now();
+                    }
+                });
+
+            // Audio updates
+            window.Echo.channel('audio-updates')
+                .listen('.audio.updated', (data) => {
+                    console.log('Audio updated via WebSocket:', data);
+                    if (data.audio && data.audio.urls) {
+                        cachedAudioUrls = data.audio.urls;
+                        updateAndPlayAudio();
+                    }
+                });
+
+            // Content updates (marquee, slides, jumbotron, petugas)
+            window.Echo.channel('content-updates')
+                .listen('.content.updated', (data) => {
+                    console.log('Content updated via WebSocket:', data);
+                    handleContentUpdate(data.type, data.data);
+                });
+
+            // Adzan updates
+            window.Echo.channel('adzan-updates')
+                .listen('.adzan.updated', (data) => {
+                    console.log('Adzan updated via WebSocket:', data);
+                    if (data.adzan) {
+                        handleAdzanUpdate(data.adzan);
+                    }
+                });
+
+            // Profile updates
+            window.Echo.channel('profile-updates')
+                .listen('.profile.updated', (data) => {
+                    console.log('Profile updated via WebSocket:', data);
+                    if (data.profile) {
+                        handleProfileUpdate(data.profile);
+                    }
+                });
+        }
+
+        // WebSocket event handlers
+        function handleContentUpdate(type, data) {
+            switch (type) {
+                case 'marquee':
+                    if (data.text) {
+                        updateMarqueeTextFromWebSocket(data.text);
+                    }
+                    break;
+                case 'slides':
+                    if (data.slides) {
+                        updateSlidesFromWebSocket(data.slides);
+                    }
+                    break;
+                case 'jumbotron':
+                    if (data.jumbotron) {
+                        updateJumbotronFromWebSocket(data.jumbotron);
+                    }
+                    break;
+                case 'petugas':
+                    if (data.petugas) {
+                        updatePetugasFromWebSocket(data.petugas);
+                    }
+                    break;
+            }
+        }
+
+        function handleAdzanUpdate(adzanData) {
+            // Update adzan images and related content
+            console.log('Handling adzan update:', adzanData);
+        }
+
+        function handleProfileUpdate(profileData) {
+            // Update mosque information
+            console.log('Handling profile update:', profileData);
+        }
+
+        // WebSocket-specific update functions
+        function updateMarqueeTextFromWebSocket(text) {
+            const $marqueeElement = $('.marquee-text');
+            if ($marqueeElement.length && $marqueeElement.text() !== text) {
+                $marqueeElement.text(text);
+                console.log('Marquee text updated via WebSocket');
+                // Reinitialize marquee if needed
+                setTimeout(function() {
+                    initMarquee();
+                }, 100);
+            }
+        }
+
+        function updateSlidesFromWebSocket(slides) {
+            if (Array.isArray(slides) && slides.length > 0) {
+                const newUrls = slides.filter(url => url && url.trim() !== '');
+                if (JSON.stringify(window.slideUrls) !== JSON.stringify(newUrls)) {
+                    window.slideUrls = newUrls;
+                    $(document).trigger('slidesUpdated', [newUrls]);
+                    console.log('Slides updated via WebSocket');
+                }
+            }
+        }
+
+        function updateJumbotronFromWebSocket(jumbotronData) {
+            let updated = false;
+            ['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'].forEach(key => {
+                if (jumbotronData[key] && $('#' + key).val() !== jumbotronData[key]) {
+                    $('#' + key).val(jumbotronData[key]);
+                    updated = true;
+                }
+            });
+            
+            if (updated) {
+                $(document).trigger('jumbotronUpdated');
+                console.log('Jumbotron updated via WebSocket');
+            }
+        }
+
+        function updatePetugasFromWebSocket(petugasData) {
+            let updated = false;
+            ['khatib', 'imam', 'muadzin'].forEach(key => {
+                if (petugasData[key] && $('#' + key).val() !== petugasData[key]) {
+                    $('#' + key).val(petugasData[key]);
+                    updated = true;
+                }
+            });
+            
+            if (updated) {
+                // Update Friday info content if popup is visible
+                if ($('#fridayInfoPopup').is(':visible')) {
+                    updateFridayInfoContent();
+                }
+                console.log('Petugas updated via WebSocket');
+            }
+        }
 
         // Fungsi untuk menampilkan notifikasi status koneksi
         function showConnectionStatus(message, type = 'info') {
@@ -1036,67 +1246,14 @@
             });
         }
 
-        // Fungsi untuk memeriksa pembaruan tema tanpa reload
-        // function checkThemeUpdate() {
-        //     const slug = window.location.pathname.replace(/^\//, '');
-        //     $.ajax({
-        //         url: `/api/theme-check/${slug}`,
-        //         method: 'GET',
-        //         dataType: 'json',
-        //         success: function(response) {
-        //             if (response.success) {
-        //                 const newThemeId = response.data.theme_id;
-        //                 const newUpdatedAt = response.data.updated_at;
-        //                 const newCssFile = response.data
-        //                     .css_file; // Asumsikan API mengembalikan css_file
-
-        //                 // Ambil data tema yang tersimpan
-        //                 const currentThemeId = $('#current-theme-id').val() || null;
-        //                 const currentUpdatedAt = $('#current-theme-updated-at').val() || 0;
-        //                 const currentThemeCss = $('#current-theme-css').val() ||
-        //                     ''; // Tambahkan hidden input untuk css_file saat ini
-
-        //                 if (newThemeId && (newThemeId !== currentThemeId || newUpdatedAt >
-        //                         currentUpdatedAt)) {
-        //                     console.log('Tema diperbarui:', {
-        //                         newThemeId,
-        //                         newUpdatedAt,
-        //                         newCssFile
-        //                     });
-
-        //                     // Perbarui hidden input untuk menyimpan status terbaru
-        //                     $('#current-theme-id').val(newThemeId);
-        //                     $('#current-theme-updated-at').val(newUpdatedAt);
-
-        //                     // Jika ada file CSS baru, muat secara dinamis
-        //                     if (newCssFile && newCssFile !== currentThemeCss) {
-        //                         const existingLink = document.querySelector(
-        //                             `link[href="${currentThemeCss}"]`);
-        //                         if (existingLink) {
-        //                             existingLink.remove(); // Hapus CSS lama
-        //                         }
-
-        //                         const newLink = document.createElement('link');
-        //                         newLink.rel = 'stylesheet';
-        //                         newLink.href = newCssFile; // Pastikan path sesuai dengan asset
-        //                         document.head.appendChild(newLink);
-
-        //                         // Perbarui hidden input untuk CSS saat ini
-        //                         $('#current-theme-css').val(newCssFile);
-
-        //                         console.log('CSS tema diperbarui tanpa reload:', newCssFile);
-        //                     }
-        //                 }
-        //             }
-        //         },
-        //         error: function(xhr, status, error) {
-        //             console.error('Gagal memeriksa pembaruan tema:', error);
-        //         }
-        //     });
-        // }
-
         // Fungsi untuk memeriksa pembaruan tema dengan reload
         function checkThemeUpdate() {
+            // Skip AJAX if WebSocket is connected (profile updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX theme update check');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             $.ajax({
                 url: `/api/theme-check/${slug}`,
@@ -1139,6 +1296,12 @@
 
 
         function updateMosqueInfo() {
+            // Skip AJAX if WebSocket is connected (profile updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX mosque info update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
 
             if (typeof $.ajax === 'undefined') {
@@ -1309,6 +1472,12 @@
         }
 
         function updateMarqueeText() {
+            // Skip AJAX if WebSocket is connected (marquee updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX marquee update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (typeof $.ajax === 'undefined') {
                 console.error('jQuery AJAX tidak tersedia. Gunakan versi jQuery lengkap, bukan slim.');
@@ -2020,6 +2189,12 @@
             .getItem('iqomahSliderStartTime')) : null;
 
         function updateIqomahImages() {
+            // Skip AJAX if WebSocket is connected (adzan updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX iqomah images update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
@@ -2310,6 +2485,12 @@
         }
 
         function updateAdzanImages() {
+            // Skip AJAX if WebSocket is connected (adzan updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX adzan images update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 return;
@@ -2499,6 +2680,12 @@
         }
 
         function updateFridayImages() {
+            // Skip AJAX if WebSocket is connected (adzan updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX friday images update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
@@ -2952,6 +3139,12 @@
         }
 
         function updateSlides() {
+            // Skip AJAX if WebSocket is connected (slides updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX slides update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
@@ -3171,6 +3364,12 @@
         });
 
         function updateJumbotronData() {
+            // Skip AJAX if WebSocket is connected (jumbotron updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX jumbotron update');
+                return;
+            }
+
             $.ajax({
                 url: '/api/jumbotron',
                 method: 'GET',
@@ -3422,6 +3621,12 @@
         }, 60000);
 
         function updateFridayOfficials() {
+            // Skip AJAX if WebSocket is connected (petugas updates come via WebSocket)
+            if (wsConnected) {
+                console.log('WebSocket connected, skipping AJAX petugas update');
+                return;
+            }
+
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 // console.error('Tidak dapat menentukan slug dari URL');
@@ -3588,6 +3793,5 @@
                 window.adzanAudioPlayer.currentTime = 0;
             }
         });
-
     });
 </script>
