@@ -197,8 +197,6 @@
                         const latency = (endTime - startTime) / 2;
                         serverTimestamp = parseInt(response.data.timestamp) + latency;
                         pageLoadTimestamp = endTime;
-                        // console.log('Waktu server diperbarui dari:', response.data.source, new Date(
-                        //     serverTimestamp).toISOString());
                     }
                     if (callback) callback();
                 },
@@ -226,13 +224,7 @@
         let lastAudioUpdateTimestamp = 0;
         let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
-        // Variabel untuk menandai bahwa ada audio baru yang tersedia
-        // Digunakan untuk mendeteksi perubahan audio dari admin panel
         window.newAudioAvailable = false;
-
-        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
-        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
-        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
 
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
@@ -3491,7 +3483,6 @@
                 `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const storedMonthYear = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
             if (currentMonthYear !== storedMonthYear) {
-                console.log("Bulan/tahun berubah, memperbarui jadwal sholat");
                 fetchPrayerTimes();
             }
         }, 60000);
@@ -3499,11 +3490,8 @@
         function updateFridayOfficials() {
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
-                // console.error('Tidak dapat menentukan slug dari URL');
                 return;
             }
-
-            // console.log('Memperbarui data petugas Jumat untuk slug:', slug);
 
             $.ajax({
                 url: `/api/petugas/${slug}`,
@@ -3623,9 +3611,6 @@
             updateJumbotronData();
             updateMarqueeText();
             checkThemeUpdate();
-            // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
-            // );
         }, 40000); // 40000 milidetik = 40 detik
 
         updateJumbotronData();
@@ -3634,7 +3619,6 @@
             updateMosqueInfo();
             updateSlides();
             updateAndPlayAudio();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
         }, 50000); // 50000 milidetik = 50 detik
 
         // Fungsi untuk toggle full screen
