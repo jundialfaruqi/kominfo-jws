@@ -955,7 +955,7 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 33 detik');
+            // console.log('Waktu server diupdate setiap 30 detik');
         }, 30000);
 
         let activePrayerStatus = null;
