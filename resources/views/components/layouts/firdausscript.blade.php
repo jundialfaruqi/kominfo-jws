@@ -22,9 +22,6 @@
             console.log('User interaction detected - audio autoplay enabled');
         });
 
-        // Inisialisasi cache audio dari localStorage
-        initializeAudioCache();
-
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
         let audioPlayer = null;
@@ -41,6 +38,9 @@
         const AUDIO_CACHE_TIMESTAMP_KEY = 'audioCacheTimestamp';
         const AUDIO_CACHE_SLUG_KEY = 'audioCacheSlug';
         const AUDIO_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 jam dalam milliseconds
+
+        // Inisialisasi cache audio dari localStorage
+        initializeAudioCache();
 
         // Variabel untuk tracking status koneksi dan notifikasi
         let isOffline = false;
