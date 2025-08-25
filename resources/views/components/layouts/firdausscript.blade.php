@@ -330,16 +330,27 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        // Variabel untuk menyimpan timestamp terakhir pembaruan audio
         let lastAudioUpdateTimestamp = 0;
-        let audioVersions = {};
+        let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
+        // Variabel untuk menandai bahwa ada audio baru yang tersedia
+        // Digunakan untuk mendeteksi perubahan audio dari admin panel
         window.newAudioAvailable = false;
 
+        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
+        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
+        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
+
+        // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
+            // Periksa koneksi jaringan terlebih dahulu
             const networkAvailable = checkNetworkAndRetry();
 
+            // Jika offline dan ada cache, gunakan cache
             if (!networkAvailable && cachedAudioUrls.length > 0) {
                 console.log('Mode offline: Menggunakan audio dari cache');
+                // Putar audio dari cache jika tidak sedang dijeda untuk adzan
                 if (!isAudioPausedForAdzan && !isAudioPlaying) {
                     playAudioFromCache();
                 }
@@ -1031,8 +1042,8 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 1 menit');
-        }, 60000); // 60000 milidetik = 1 menit
+            // console.log('Waktu server diupdate setiap 33 detik');
+        }, 30000);
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -3746,26 +3757,26 @@
         }, 1 * 60 * 1000); // 30 menit
 
         setInterval(function() {
+            updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateAndPlayAudio();
+            updateJumbotronData();
+            updateMarqueeText();
+            checkThemeUpdate();
             // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 10 menit'
+            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
             // );
-        }, 600000); // 600000 milidetik = 10 menit
+        }, 40000); // 40000 milidetik = 40 detik
 
         updateJumbotronData();
 
         setInterval(function() {
-            updateFridayOfficials();
-            updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
             updateMosqueInfo();
             updateSlides();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 2 menit');
-        }, 120000); // 120000 milidetik = 2 menit
+            updateAndPlayAudio();
+            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
+        }, 50000); // 50000 milidetik = 50 detik
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
