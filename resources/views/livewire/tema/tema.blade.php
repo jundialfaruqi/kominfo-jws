@@ -41,7 +41,9 @@
                         {{-- Form --}}
                         @include('livewire.tema.form')
                         {{-- Table Section --}}
-                        @include('livewire.tema.table')
+                        @if ($showTable)
+                            @include('livewire.tema.table')
+                        @endif
                     </div>
                 </div>
             </div>
