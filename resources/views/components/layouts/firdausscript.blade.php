@@ -330,42 +330,16 @@
             return new Date(serverTimestamp + elapsed);
         }
 
-        // Variabel untuk menyimpan timestamp terakhir pembaruan audio
         let lastAudioUpdateTimestamp = 0;
-        let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
+        let audioVersions = {};
 
-        // Variabel untuk menandai bahwa ada audio baru yang tersedia
-        // Digunakan untuk mendeteksi perubahan audio dari admin panel
         window.newAudioAvailable = false;
 
-        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
-        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
-        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
-
-        // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
-            // Skip AJAX if WebSocket is connected (audio updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX audio update');
-                // Still play audio if available and not paused
-                if (!isAudioPausedForAdzan && !isAudioPlaying && cachedAudioUrls.length > 0) {
-                    const now = getCurrentTimeFromServer().getTime();
-                    if (fridayInfoStartTime && fridayInfoEndTime && now >= fridayInfoStartTime && now < fridayInfoEndTime) {
-                        console.log('Audio tidak diputar karena Friday Info popup sedang ditampilkan');
-                    } else {
-                        playAudio();
-                    }
-                }
-                return;
-            }
-
-            // Periksa koneksi jaringan terlebih dahulu
             const networkAvailable = checkNetworkAndRetry();
 
-            // Jika offline dan ada cache, gunakan cache
             if (!networkAvailable && cachedAudioUrls.length > 0) {
                 console.log('Mode offline: Menggunakan audio dari cache');
-                // Putar audio dari cache jika tidak sedang dijeda untuk adzan
                 if (!isAudioPausedForAdzan && !isAudioPlaying) {
                     playAudioFromCache();
                 }
@@ -1057,8 +1031,8 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 33 detik');
-        }, 30000);
+            // console.log('Waktu server diupdate setiap 1 menit');
+        }, 60000); // 60000 milidetik = 1 menit
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -3772,26 +3746,26 @@
         }, 1 * 60 * 1000); // 30 menit
 
         setInterval(function() {
-            updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
+            updateAndPlayAudio();
             // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
+            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 10 menit'
             // );
-        }, 40000); // 40000 milidetik = 40 detik
+        }, 600000); // 600000 milidetik = 10 menit
 
         updateJumbotronData();
 
         setInterval(function() {
+            updateFridayOfficials();
+            updateJumbotronData();
+            updateMarqueeText();
+            checkThemeUpdate();
             updateMosqueInfo();
             updateSlides();
-            updateAndPlayAudio();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
-        }, 50000); // 50000 milidetik = 50 detik
+            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 2 menit');
+        }, 120000); // 120000 milidetik = 2 menit
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
@@ -3819,102 +3793,5 @@
                 window.adzanAudioPlayer.currentTime = 0;
             }
         });
-
-        // WebSocket-specific update functions
-        function updateMarqueeTextFromWebSocket(text) {
-            const $marqueeElement = $('.marquee-text');
-            if ($marqueeElement.length && $marqueeElement.text() !== text) {
-                $marqueeElement.text(text);
-                console.log('Marquee text updated via WebSocket');
-            }
-        }
-
-        function updateSlidesFromWebSocket(slides) {
-            if (Array.isArray(slides) && slides.length > 0) {
-                const newUrls = slides.filter(url => url && url.trim() !== '');
-                if (JSON.stringify(window.slideUrls) !== JSON.stringify(newUrls)) {
-                    window.slideUrls = newUrls;
-                    $(document).trigger('slidesUpdated', [newUrls]);
-                    console.log('Slides updated via WebSocket');
-                }
-            }
-        }
-
-        function updateJumbotronFromWebSocket(jumbotronData) {
-            let updated = false;
-            if (jumbotronData.jumbo1 && $('#jumbo1').val() !== jumbotronData.jumbo1) {
-                $('#jumbo1').val(jumbotronData.jumbo1);
-                updated = true;
-            }
-            if (jumbotronData.jumbo2 && $('#jumbo2').val() !== jumbotronData.jumbo2) {
-                $('#jumbo2').val(jumbotronData.jumbo2);
-                updated = true;
-            }
-            if (jumbotronData.jumbo3 && $('#jumbo3').val() !== jumbotronData.jumbo3) {
-                $('#jumbo3').val(jumbotronData.jumbo3);
-                updated = true;
-            }
-            if (jumbotronData.jumbo4 && $('#jumbo4').val() !== jumbotronData.jumbo4) {
-                $('#jumbo4').val(jumbotronData.jumbo4);
-                updated = true;
-            }
-            if (jumbotronData.jumbo5 && $('#jumbo5').val() !== jumbotronData.jumbo5) {
-                $('#jumbo5').val(jumbotronData.jumbo5);
-                updated = true;
-            }
-            if (jumbotronData.jumbo6 && $('#jumbo6').val() !== jumbotronData.jumbo6) {
-                $('#jumbo6').val(jumbotronData.jumbo6);
-                updated = true;
-            }
-            
-            if (updated) {
-                $(document).trigger('jumbotronUpdated');
-                console.log('Jumbotron updated via WebSocket');
-            }
-        }
-
-        function updatePetugasFromWebSocket(petugasData) {
-            let updated = false;
-            if (petugasData.khatib && $('#khatib').val() !== petugasData.khatib) {
-                $('#khatib').val(petugasData.khatib);
-                updated = true;
-            }
-            if (petugasData.imam && $('#imam').val() !== petugasData.imam) {
-                $('#imam').val(petugasData.imam);
-                updated = true;
-            }
-            if (petugasData.muadzin && $('#muadzin').val() !== petugasData.muadzin) {
-                $('#muadzin').val(petugasData.muadzin);
-                updated = true;
-            }
-            
-            if (updated) {
-                // Update Friday info content if popup is visible
-                if ($('#fridayInfoPopup').is(':visible')) {
-                    updateFridayInfoContent();
-                }
-                console.log('Petugas updated via WebSocket');
-            }
-        }
-
-        function updateAdzanImagesFromWebSocket(images) {
-            // Update adzan images logic here
-            console.log('Adzan images updated via WebSocket');
-        }
-
-        function updateIqomahImagesFromWebSocket(images) {
-            // Update iqomah images logic here
-            console.log('Iqomah images updated via WebSocket');
-        }
-
-        function updateMosqueInfoFromWebSocket(mosqueInfo) {
-            if (mosqueInfo.name) {
-                $('.mosque-name-highlight').text(mosqueInfo.name);
-            }
-            if (mosqueInfo.address) {
-                $('.mosque-address').text(mosqueInfo.address);
-            }
-            console.log('Mosque info updated via WebSocket');
-        }
     });
 </script>
