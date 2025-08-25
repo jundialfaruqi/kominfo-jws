@@ -1,4 +1,4 @@
-@if ($isAdmin && $showTable)
+@if ($isAdmin)
     <div class="card-body border-bottom py-3">
         <div class="d-flex">
             <div class="text-secondary">

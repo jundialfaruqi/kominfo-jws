@@ -1,16 +1,16 @@
 {{-- Moment.js core --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+
 {{-- Moment Hijri --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
+
 {{-- Locale Indonesia --}}
 <script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
+
 {{-- jQuery --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
-{{-- Laravel Echo and Pusher for WebSocket --}}
-<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
 <script>
     $(document).ready(function() {
         // Tambahkan di awal script
@@ -33,6 +33,15 @@
         let audioRetryCount = 0; // Menghitung percobaan pemutaran ulang jika terjadi error
         const MAX_RETRY_ATTEMPTS = 3; // Maksimum percobaan pemutaran ulang
 
+        // Konstanta untuk localStorage audio cache
+        const AUDIO_CACHE_KEY = 'audioCache';
+        const AUDIO_CACHE_TIMESTAMP_KEY = 'audioCacheTimestamp';
+        const AUDIO_CACHE_SLUG_KEY = 'audioCacheSlug';
+        const AUDIO_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 jam dalam milliseconds
+
+        // Inisialisasi cache audio dari localStorage
+        initializeAudioCache();
+
         // Variabel untuk tracking status koneksi dan notifikasi
         let isOffline = false;
         let offlineNotificationShown = false;
@@ -40,213 +49,96 @@
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
 
-        // WebSocket connection status
-        let wsConnected = false;
-        let wsReconnectAttempts = 0;
-        const MAX_RECONNECT_ATTEMPTS = 5;
-
-        // Initialize WebSocket connection
-        function initializeWebSocket() {
+        // Fungsi untuk menyimpan cache audio ke localStorage
+        function saveAudioCacheToLocalStorage(audioUrls, slug) {
             try {
-                // Configure Laravel Echo with Reverb
-                window.Echo = new Echo({
-                    broadcaster: 'reverb',
-                    key: '{{ env("REVERB_APP_KEY") }}',
-                    wsHost: '{{ env("REVERB_HOST", "localhost") }}',
-                    wsPort: {{ env('REVERB_PORT', 8080) }},
-                    wssPort: {{ env('REVERB_PORT', 8080) }},
-                    forceTLS: {{ env('REVERB_SCHEME', 'http') === 'https' ? 'true' : 'false' }},
-                    enabledTransports: ['ws', 'wss'],
-                    disableStats: true,
-                });
-
-                // Connection event handlers
-                window.Echo.connector.pusher.connection.bind('connected', function() {
-                    wsConnected = true;
-                    wsReconnectAttempts = 0;
-                    console.log('WebSocket connected successfully');
-                    showConnectionStatus('Real-time connection established', 'success');
-                });
-
-                window.Echo.connector.pusher.connection.bind('disconnected', function() {
-                    wsConnected = false;
-                    console.log('WebSocket disconnected');
-                    showConnectionStatus('Connection lost, attempting to reconnect...', 'warning');
-                    attemptReconnect();
-                });
-
-                window.Echo.connector.pusher.connection.bind('error', function(error) {
-                    console.error('WebSocket error:', error);
-                    wsConnected = false;
-                    attemptReconnect();
-                });
-
-                // Setup channels and listeners
-                setupWebSocketChannels();
-
+                const cacheData = {
+                    urls: audioUrls,
+                    timestamp: Date.now(),
+                    slug: slug
+                };
+                localStorage.setItem(AUDIO_CACHE_KEY, JSON.stringify(cacheData));
+                localStorage.setItem(AUDIO_CACHE_TIMESTAMP_KEY, Date.now().toString());
+                localStorage.setItem(AUDIO_CACHE_SLUG_KEY, slug);
+                console.log('Cache audio disimpan ke localStorage:', audioUrls.length, 'audio untuk slug:',
+                    slug);
             } catch (error) {
-                console.error('Failed to initialize WebSocket:', error);
-                // Continue with existing polling behavior as fallback
+                console.warn('Gagal menyimpan cache audio ke localStorage:', error);
             }
         }
 
-        function attemptReconnect() {
-            if (wsReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-                wsReconnectAttempts++;
-                const delay = Math.min(1000 * Math.pow(2, wsReconnectAttempts), 30000);
-                console.log(`Attempting WebSocket reconnection ${wsReconnectAttempts}/${MAX_RECONNECT_ATTEMPTS} in ${delay}ms`);
-                
-                setTimeout(() => {
-                    try {
-                        window.Echo.disconnect();
-                        initializeWebSocket();
-                    } catch (error) {
-                        console.error('Reconnection failed:', error);
-                    }
-                }, delay);
-            }
-        }
+        // Fungsi untuk memuat cache audio dari localStorage
+        function loadAudioCacheFromLocalStorage(currentSlug) {
+            try {
+                const cacheData = localStorage.getItem(AUDIO_CACHE_KEY);
+                const cacheTimestamp = localStorage.getItem(AUDIO_CACHE_TIMESTAMP_KEY);
+                const cacheSlug = localStorage.getItem(AUDIO_CACHE_SLUG_KEY);
 
-        function setupWebSocketChannels() {
-            const slug = window.location.pathname.replace(/^\//, '') || 'default';
-
-            // Server time updates
-            window.Echo.channel('server-updates')
-                .listen('.server.time.updated', (data) => {
-                    console.log('Server time updated via WebSocket:', data);
-                    if (data.server_time) {
-                        const latency = 50; // Estimate WebSocket latency
-                        serverTimestamp = parseInt(data.server_time) + latency;
-                        pageLoadTimestamp = Date.now();
-                    }
-                });
-
-            // Audio updates
-            window.Echo.channel('audio-updates')
-                .listen('.audio.updated', (data) => {
-                    console.log('Audio updated via WebSocket:', data);
-                    if (data.audio && data.audio.urls) {
-                        cachedAudioUrls = data.audio.urls;
-                        updateAndPlayAudio();
-                    }
-                });
-
-            // Content updates (marquee, slides, jumbotron, petugas)
-            window.Echo.channel('content-updates')
-                .listen('.content.updated', (data) => {
-                    console.log('Content updated via WebSocket:', data);
-                    handleContentUpdate(data.type, data.data);
-                });
-
-            // Adzan updates
-            window.Echo.channel('adzan-updates')
-                .listen('.adzan.updated', (data) => {
-                    console.log('Adzan updated via WebSocket:', data);
-                    if (data.adzan) {
-                        handleAdzanUpdate(data.adzan);
-                    }
-                });
-
-            // Profile updates
-            window.Echo.channel('profile-updates')
-                .listen('.profile.updated', (data) => {
-                    console.log('Profile updated via WebSocket:', data);
-                    if (data.profile) {
-                        handleProfileUpdate(data.profile);
-                    }
-                });
-        }
-
-        // WebSocket event handlers
-        function handleContentUpdate(type, data) {
-            switch (type) {
-                case 'marquee':
-                    if (data.text) {
-                        updateMarqueeTextFromWebSocket(data.text);
-                    }
-                    break;
-                case 'slides':
-                    if (data.slides) {
-                        updateSlidesFromWebSocket(data.slides);
-                    }
-                    break;
-                case 'jumbotron':
-                    if (data.jumbotron) {
-                        updateJumbotronFromWebSocket(data.jumbotron);
-                    }
-                    break;
-                case 'petugas':
-                    if (data.petugas) {
-                        updatePetugasFromWebSocket(data.petugas);
-                    }
-                    break;
-            }
-        }
-
-        function handleAdzanUpdate(adzanData) {
-            // Update adzan images and related content
-            console.log('Handling adzan update:', adzanData);
-        }
-
-        function handleProfileUpdate(profileData) {
-            // Update mosque information
-            console.log('Handling profile update:', profileData);
-        }
-
-        // WebSocket-specific update functions
-        function updateMarqueeTextFromWebSocket(text) {
-            const $marqueeElement = $('.marquee-text');
-            if ($marqueeElement.length && $marqueeElement.text() !== text) {
-                $marqueeElement.text(text);
-                console.log('Marquee text updated via WebSocket');
-                // Reinitialize marquee if needed
-                setTimeout(function() {
-                    initMarquee();
-                }, 100);
-            }
-        }
-
-        function updateSlidesFromWebSocket(slides) {
-            if (Array.isArray(slides) && slides.length > 0) {
-                const newUrls = slides.filter(url => url && url.trim() !== '');
-                if (JSON.stringify(window.slideUrls) !== JSON.stringify(newUrls)) {
-                    window.slideUrls = newUrls;
-                    $(document).trigger('slidesUpdated', [newUrls]);
-                    console.log('Slides updated via WebSocket');
+                if (!cacheData || !cacheTimestamp || !cacheSlug) {
+                    console.log('Tidak ada cache audio di localStorage');
+                    return null;
                 }
+
+                const timestamp = parseInt(cacheTimestamp);
+                const now = Date.now();
+
+                // Periksa apakah cache sudah expired
+                if (now - timestamp > AUDIO_CACHE_EXPIRY) {
+                    console.log('Cache audio di localStorage sudah expired, menghapus...');
+                    clearAudioCacheFromLocalStorage();
+                    return null;
+                }
+
+                // Periksa apakah slug masih sama
+                if (cacheSlug !== currentSlug) {
+                    console.log('Slug berubah, menghapus cache audio lama dari localStorage');
+                    clearAudioCacheFromLocalStorage();
+                    return null;
+                }
+
+                const parsedData = JSON.parse(cacheData);
+                if (parsedData && parsedData.urls && Array.isArray(parsedData.urls)) {
+                    console.log('Cache audio dimuat dari localStorage:', parsedData.urls.length,
+                        'audio untuk slug:', currentSlug);
+                    return parsedData.urls;
+                }
+
+                return null;
+            } catch (error) {
+                console.warn('Gagal memuat cache audio dari localStorage:', error);
+                clearAudioCacheFromLocalStorage();
+                return null;
             }
         }
 
-        function updateJumbotronFromWebSocket(jumbotronData) {
-            let updated = false;
-            ['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'].forEach(key => {
-                if (jumbotronData[key] && $('#' + key).val() !== jumbotronData[key]) {
-                    $('#' + key).val(jumbotronData[key]);
-                    updated = true;
-                }
-            });
-            
-            if (updated) {
-                $(document).trigger('jumbotronUpdated');
-                console.log('Jumbotron updated via WebSocket');
+        // Fungsi untuk menghapus cache audio dari localStorage
+        function clearAudioCacheFromLocalStorage() {
+            try {
+                localStorage.removeItem(AUDIO_CACHE_KEY);
+                localStorage.removeItem(AUDIO_CACHE_TIMESTAMP_KEY);
+                localStorage.removeItem(AUDIO_CACHE_SLUG_KEY);
+                console.log('Cache audio dihapus dari localStorage');
+            } catch (error) {
+                console.warn('Gagal menghapus cache audio dari localStorage:', error);
             }
         }
 
-        function updatePetugasFromWebSocket(petugasData) {
-            let updated = false;
-            ['khatib', 'imam', 'muadzin'].forEach(key => {
-                if (petugasData[key] && $('#' + key).val() !== petugasData[key]) {
-                    $('#' + key).val(petugasData[key]);
-                    updated = true;
+        // Fungsi untuk memuat cache audio saat halaman dimuat
+        function initializeAudioCache() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (slug) {
+                const cachedUrls = loadAudioCacheFromLocalStorage(slug);
+                if (cachedUrls && cachedUrls.length > 0) {
+                    cachedAudioUrls = cachedUrls;
+                    console.log('Cache audio diinisialisasi dari localStorage:', cachedAudioUrls.length,
+                        'audio');
+
+                    // Update input hidden dengan data dari cache
+                    if (cachedUrls[0]) $('#audio1').val(cachedUrls[0]);
+                    if (cachedUrls[1]) $('#audio2').val(cachedUrls[1]);
+                    if (cachedUrls[2]) $('#audio3').val(cachedUrls[2]);
+                    $('#audio_status').val('true');
                 }
-            });
-            
-            if (updated) {
-                // Update Friday info content if popup is visible
-                if ($('#fridayInfoPopup').is(':visible')) {
-                    updateFridayInfoContent();
-                }
-                console.log('Petugas updated via WebSocket');
             }
         }
 
@@ -305,8 +197,6 @@
                         const latency = (endTime - startTime) / 2;
                         serverTimestamp = parseInt(response.data.timestamp) + latency;
                         pageLoadTimestamp = endTime;
-                        // console.log('Waktu server diperbarui dari:', response.data.source, new Date(
-                        //     serverTimestamp).toISOString());
                     }
                     if (callback) callback();
                 },
@@ -334,13 +224,7 @@
         let lastAudioUpdateTimestamp = 0;
         let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
-        // Variabel untuk menandai bahwa ada audio baru yang tersedia
-        // Digunakan untuk mendeteksi perubahan audio dari admin panel
         window.newAudioAvailable = false;
-
-        // PERUBAHAN: Sistem ini telah dimodifikasi untuk mendeteksi perubahan audio
-        // bahkan ketika audio sedang diputar. Audio baru akan diputar setelah
-        // audio saat ini selesai, sehingga tidak mengganggu pengalaman pengguna.
 
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
@@ -356,6 +240,17 @@
                 }
                 return;
             } else if (!networkAvailable) {
+                // Coba muat dari localStorage jika tidak ada cache di memori
+                const slug = window.location.pathname.replace(/^\//, '');
+                const cachedUrls = loadAudioCacheFromLocalStorage(slug);
+                if (cachedUrls && cachedUrls.length > 0) {
+                    cachedAudioUrls = cachedUrls;
+                    console.log('Mode offline: Menggunakan audio dari localStorage cache');
+                    if (!isAudioPausedForAdzan && !isAudioPlaying) {
+                        playAudioFromCache();
+                    }
+                    return;
+                }
                 console.warn('Offline dan tidak ada cache audio tersedia');
                 return; // Keluar jika offline dan tidak ada cache
             }
@@ -417,6 +312,9 @@
                             console.log('Audio URLs di-cache untuk sesi pemutaran:', cachedAudioUrls
                                 .length, 'audio');
 
+                            // Simpan cache ke localStorage untuk persistensi
+                            saveAudioCacheToLocalStorage(cachedAudioUrls, slug);
+
                             // Jika audio sedang diputar, jangan reset pemutaran
                             // Audio baru akan diputar setelah audio saat ini selesai
                             if (!isAudioPlaying) {
@@ -463,6 +361,13 @@
                 error: function(xhr, status, error) {
                     console.error('Error saat mengambil data audio:', error, xhr.responseText);
                     $('#audio_status').val('false');
+
+                    // Jika error 404 atau 500, hapus cache localStorage yang mungkin tidak valid
+                    if (xhr.status === 404 || xhr.status === 500) {
+                        const slug = window.location.pathname.replace(/^\//, '');
+                        clearAudioCacheFromLocalStorage(slug);
+                        console.log('Cache localStorage dibersihkan karena error server');
+                    }
 
                     // Jika masih ada audio di cache, gunakan itu meskipun request gagal
                     if (cachedAudioUrls.length > 0) {
@@ -1042,7 +947,7 @@
 
         setInterval(() => {
             syncServerTime();
-            // console.log('Waktu server diupdate setiap 33 detik');
+            // console.log('Waktu server diupdate setiap 30 detik');
         }, 30000);
 
         let activePrayerStatus = null;
@@ -1259,12 +1164,6 @@
 
         // Fungsi untuk memeriksa pembaruan tema dengan reload
         function checkThemeUpdate() {
-            // Skip AJAX if WebSocket is connected (profile updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX theme update check');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             $.ajax({
                 url: `/api/theme-check/${slug}`,
@@ -1307,12 +1206,6 @@
 
 
         function updateMosqueInfo() {
-            // Skip AJAX if WebSocket is connected (profile updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX mosque info update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
 
             if (typeof $.ajax === 'undefined') {
@@ -1483,12 +1376,6 @@
         }
 
         function updateMarqueeText() {
-            // Skip AJAX if WebSocket is connected (marquee updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX marquee update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             if (typeof $.ajax === 'undefined') {
                 console.error('jQuery AJAX tidak tersedia. Gunakan versi jQuery lengkap, bukan slim.');
@@ -2200,12 +2087,6 @@
             .getItem('iqomahSliderStartTime')) : null;
 
         function updateIqomahImages() {
-            // Skip AJAX if WebSocket is connected (adzan updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX iqomah images update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
@@ -2496,12 +2377,6 @@
         }
 
         function updateAdzanImages() {
-            // Skip AJAX if WebSocket is connected (adzan updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX adzan images update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 return;
@@ -2691,12 +2566,6 @@
         }
 
         function updateFridayImages() {
-            // Skip AJAX if WebSocket is connected (adzan updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX friday images update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
@@ -3150,12 +3019,6 @@
         }
 
         function updateSlides() {
-            // Skip AJAX if WebSocket is connected (slides updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX slides update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
                 console.error('Tidak dapat menentukan slug dari URL');
@@ -3375,12 +3238,6 @@
         });
 
         function updateJumbotronData() {
-            // Skip AJAX if WebSocket is connected (jumbotron updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX jumbotron update');
-                return;
-            }
-
             $.ajax({
                 url: '/api/jumbotron',
                 method: 'GET',
@@ -3626,25 +3483,15 @@
                 `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const storedMonthYear = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
             if (currentMonthYear !== storedMonthYear) {
-                console.log("Bulan/tahun berubah, memperbarui jadwal sholat");
                 fetchPrayerTimes();
             }
         }, 60000);
 
         function updateFridayOfficials() {
-            // Skip AJAX if WebSocket is connected (petugas updates come via WebSocket)
-            if (wsConnected) {
-                console.log('WebSocket connected, skipping AJAX petugas update');
-                return;
-            }
-
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
-                // console.error('Tidak dapat menentukan slug dari URL');
                 return;
             }
-
-            // console.log('Memperbarui data petugas Jumat untuk slug:', slug);
 
             $.ajax({
                 url: `/api/petugas/${slug}`,
@@ -3764,9 +3611,6 @@
             updateJumbotronData();
             updateMarqueeText();
             checkThemeUpdate();
-            // console.log(
-            //     'Data Petugas Jumat, Slide Jumat, Gambar Iqomah, dan Final diperbarui setiap 40 Detik'
-            // );
         }, 40000); // 40000 milidetik = 40 detik
 
         updateJumbotronData();
@@ -3775,7 +3619,6 @@
             updateMosqueInfo();
             updateSlides();
             updateAndPlayAudio();
-            // console.log('Data Masjid, marquee, dan slide diperbarui setiap 50 detik');
         }, 50000); // 50000 milidetik = 50 detik
 
         // Fungsi untuk toggle full screen
