@@ -38,6 +38,7 @@ class AdzanAudio extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteAdzanAudioId;
     public $deleteAdzanAudioName;
 
@@ -82,15 +83,15 @@ class AdzanAudio extends Component
     private function checkLocalStorageConfig()
     {
         $audioPath = public_path('sounds/adzan');
-        
+
         if (!file_exists($audioPath)) {
             mkdir($audioPath, 0755, true);
         }
-        
+
         if (!is_writable($audioPath)) {
             throw new \Exception('Direktori audio adzan tidak dapat ditulis: ' . $audioPath);
         }
-        
+
         Log::info('Konfigurasi penyimpanan lokal adzan valid', ['path' => $audioPath]);
     }
 
@@ -123,7 +124,7 @@ class AdzanAudio extends Component
 
             // Pindahkan file ke direktori tujuan menggunakan Livewire method
             $uploadedFile->storeAs('', $fileName, 'public_sounds_adzan');
-            
+
             // Verifikasi file berhasil dipindahkan
             if (!file_exists($filePath)) {
                 throw new \Exception('Gagal memindahkan file audio adzan.');
@@ -153,15 +154,15 @@ class AdzanAudio extends Component
         if (!$filePath) {
             return null;
         }
-        
+
         // Jika sudah berupa URL lengkap, return as is
         if (str_starts_with($filePath, 'http')) {
             return $filePath;
         }
-        
+
         // Jika path dimulai dengan /, hapus leading slash untuk menghindari double slash
         $cleanPath = ltrim($filePath, '/');
-        
+
         return url($cleanPath);
     }
 
@@ -448,6 +449,7 @@ class AdzanAudio extends Component
 
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
         $this->reset(['adzanAudioId', 'userId', 'audioadzan', 'adzanshubuh', 'status', 'tmp_audioadzan', 'tmp_adzanshubuh']);
         $this->status = 0;
         $this->audioadzanUploaded = false;
@@ -486,12 +488,14 @@ class AdzanAudio extends Component
 
         $this->isEdit = true;
         $this->showForm = true;
+        $this->showTable = false;
         $this->resetValidation();
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'adzanAudioId',
@@ -509,6 +513,7 @@ class AdzanAudio extends Component
     public function closeForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'adzanAudioId',
@@ -563,6 +568,7 @@ class AdzanAudio extends Component
 
             if (in_array($currentUser->role, ['Super Admin', 'Admin'])) {
                 $this->cancelForm();
+                $this->showTable = true;
             } else {
                 // Untuk non-admin, tetap tampilkan form dan perbarui data
                 $this->showForm = true;

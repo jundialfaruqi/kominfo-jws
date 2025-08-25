@@ -40,6 +40,7 @@ class Durasi extends Component
 
     public $showForm = false;
     public $isEdit = false;
+    public $showTable = true;
     public $deleteDurasiId;
     public $deleteDurasiName;
 
@@ -284,6 +285,7 @@ class Durasi extends Component
         ]);
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function edit($id)
@@ -319,11 +321,13 @@ class Durasi extends Component
 
         $this->showForm = true;
         $this->isEdit = true;
+        $this->showTable = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'durasiId',
@@ -414,6 +418,7 @@ class Durasi extends Component
             $durasi->save();
 
             $this->dispatch('success', $this->isEdit ? 'Durasi berhasil diubah!' : 'Durasi berhasil ditambahkan!');
+            $this->showTable = true;
 
             // Hanya sembunyikan form dan reset field jika user adalah admin
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {

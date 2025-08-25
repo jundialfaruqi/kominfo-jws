@@ -1,16 +1,15 @@
-@if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && $showTable)
-    {{-- Pagination & Search Controls --}}
+@if ($isAdmin && $showTable)
     <div class="card-body border-bottom py-3">
         <div class="d-flex">
             <div class="text-secondary">
                 Lihat
                 <div class="mx-2 d-inline-block">
                     <select wire:model.live="paginate" class="form-select form-select py-1 rounded-3">
-                        <option>5</option>
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                        <option>100</option>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
                     </select>
                 </div>
             </div>
@@ -23,52 +22,64 @@
             </div>
         </div>
     </div>
-    {{-- Table --}}
     <div class="table-responsive">
         <table class="table card-table table-vcenter table-hover text-nowrap datatable">
             <thead>
                 <tr>
                     <th class="w-1">No.</th>
-                    <th>Nama Admin Masjid</th>
-                    <th>Teks Marquee 1</th>
-                    <th>Teks Marquee 2</th>
-                    <th>Teks Marquee 3</th>
-                    <th>Teks Marquee 4</th>
-                    <th>Teks Marquee 5</th>
-                    <th>Teks Marquee 6</th>
+                    <th>Nama Tema</th>
+                    <th>Gambar Pratinjau</th>
+                    <th>File CSS</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($marqueeList as $marquee)
+                @foreach ($themeList as $theme)
                     <tr>
                         <td class="text-center text-muted">
-                            {{ $loop->iteration + ($marqueeList->currentPage() - 1) * $marqueeList->perPage() }}
+                            {{ $loop->iteration + ($themeList->currentPage() - 1) * $themeList->perPage() }}
                         </td>
-                        <td class="text-wrap">
-                            {{ $marquee->user->name }}
+                        <td class="text-wrap">{{ $theme->name }}</td>
+                        <td>
+                            @if ($theme->preview_image)
+                                <img src="{{ asset($theme->preview_image) }}" width="40" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
                         </td>
-                        <td class="text-wrap">
-                            {{ $marquee->marquee1 }}
-                        </td>
-                        <td class="text-wrap">
-                            {{ $marquee->marquee2 }}
-                        </td>
-                        <td class="text-wrap">
-                            {{ $marquee->marquee3 }}
-                        </td>
-                        <td class="text-wrap">
-                            {{ $marquee->marquee4 }}
-                        </td>
-                        <td class="text-wrap">
-                            {{ $marquee->marquee5 }}
-                        </td>
-                        <td class="text-wrap">
-                            {{ $marquee->marquee6 }}
+                        <td>
+                            @if ($theme->css_file)
+                                <span>{{ basename($theme->css_file) }}</span>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
                         </td>
                         <td class="text-end">
-                            <button wire:click="edit('{{ $marquee->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm">
-                                <span wire:loading.remove wire:target="edit('{{ $marquee->id }}')">
+                            @if ($theme->css_file)
+                                <button wire:click="downloadCssFile('{{ $theme->id }}')"
+                                    class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    <span wire:loading.remove wire:target="downloadCssFile('{{ $theme->id }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-download">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                                            <path d="M7 11l5 5l5 -5" />
+                                            <path d="M12 4v12" />
+                                        </svg>
+                                        Download
+                                    </span>
+                                    <span wire:loading wire:target="downloadCssFile('{{ $theme->id }}')">
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        <span class="small">Loading...</span>
+                                    </span>
+                                </button>
+                            @endif
+                            <button wire:click="edit('{{ $theme->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm"
+                                @if (Auth::user()->role !== 'Super Admin') style="display: none;" @endif>
+                                <span wire:loading.remove wire:target="edit('{{ $theme->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -81,16 +92,17 @@
                                     </svg>
                                     Ubah
                                 </span>
-                                <span wire:loading wire:target="edit('{{ $marquee->id }}')">
+                                <span wire:loading wire:target="edit('{{ $theme->id }}')">
                                     <span class="spinner-border spinner-border-sm" role="status"
                                         aria-hidden="true"></span>
                                     <span class="small">Loading...</span>
                                 </span>
                             </button>
-                            <button wire:click="delete('{{ $marquee->id }}')"
+                            <button wire:click="delete('{{ $theme->id }}')"
                                 class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal">
-                                <span wire:loading.remove wire:target="delete('{{ $marquee->id }}')">
+                                data-bs-target="#deleteModal"
+                                @if (Auth::user()->role !== 'Super Admin') style="display: none;" @endif>
+                                <span wire:loading.remove wire:target="delete('{{ $theme->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -104,7 +116,7 @@
                                     </svg>
                                     Hapus
                                 </span>
-                                <span wire:loading wire:target="delete('{{ $marquee->id }}')">
+                                <span wire:loading wire:target="delete('{{ $theme->id }}')">
                                     <span class="spinner-border spinner-border-sm" role="status"
                                         aria-hidden="true"></span>
                                     <span class="small">Loading...</span>
@@ -116,8 +128,7 @@
             </tbody>
         </table>
     </div>
-
     <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-        {{ $marqueeList->links() }}
+        {{ $themeList->links() }}
     </div>
 @endif

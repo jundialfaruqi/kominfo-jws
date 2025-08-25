@@ -41,7 +41,7 @@
                         {{-- Form untuk tambah/edit durasi --}}
                         @include('livewire.durasi.form')
 
-                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
+                        @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && $showTable)
                             {{-- Pagination and search control --}}
                             <div class="card-body border-bottom py-3">
                                 <div class="d-flex">

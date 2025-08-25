@@ -30,6 +30,7 @@ class Marquee extends Component
 
     public $showForm = false;
     public $isEdit = false;
+    public $showTable = true;
     public $deleteMarqueeId;
     public $deleteMarqueeName;
 
@@ -187,6 +188,7 @@ class Marquee extends Component
         );
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function edit($id)
@@ -212,11 +214,13 @@ class Marquee extends Component
 
         $this->showForm  = true;
         $this->isEdit    = true;
+        $this->showTable = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset(
             [
@@ -289,6 +293,7 @@ class Marquee extends Component
             $marquee->save();
 
             $this->dispatch('success', $this->isEdit ? 'Marquee berhasil diubah!' : 'Marquee berhasil ditambahkan!');
+            $this->showTable = true;
 
             //only hide form and reset fields if user is admin
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {

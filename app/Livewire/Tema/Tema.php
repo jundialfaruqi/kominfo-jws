@@ -31,6 +31,7 @@ class Tema extends Component
     public $temp_css_file;
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteThemeId;
     public $deleteThemeName;
     public $selectedThemeId;
@@ -125,6 +126,7 @@ class Tema extends Component
         ]);
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function edit($id)
@@ -145,11 +147,13 @@ class Tema extends Component
 
         $this->isEdit = true;
         $this->showForm = true;
+        $this->showTable = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'themeId',
@@ -311,6 +315,7 @@ class Tema extends Component
             $theme->save();
 
             $this->dispatch('success', $this->isEdit ? 'Tema berhasil diperbarui!' : 'Tema berhasil ditambahkan!');
+            $this->showTable = true;
 
             $this->showForm = false;
             $this->reset([

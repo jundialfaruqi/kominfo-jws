@@ -40,6 +40,7 @@ class Audio extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteAudioId;
     public $deleteAudioName;
 
@@ -73,16 +74,16 @@ class Audio extends Component
     private function checkLocalStorageConfig()
     {
         $audioPath = public_path('sounds/musik');
-        
+
         if (!file_exists($audioPath)) {
             mkdir($audioPath, 0755, true);
             Log::info('Direktori audio berhasil dibuat', ['path' => $audioPath]);
         }
-        
+
         if (!is_writable($audioPath)) {
             throw new \Exception('Direktori audio tidak dapat ditulis: ' . $audioPath);
         }
-        
+
         Log::info('Konfigurasi penyimpanan lokal valid', ['path' => $audioPath]);
     }
 
@@ -115,7 +116,7 @@ class Audio extends Component
 
             // Pindahkan file ke direktori tujuan menggunakan Livewire method
             $uploadedFile->storeAs('', $fileName, 'public_sounds_musik');
-            
+
             // Verifikasi file berhasil dipindahkan
             if (!file_exists($filePath)) {
                 throw new \Exception('Gagal memindahkan file audio.');
@@ -147,15 +148,15 @@ class Audio extends Component
         if (!$filePath) {
             return null;
         }
-        
+
         // Jika sudah berupa URL lengkap, return as is
         if (str_starts_with($filePath, 'http')) {
             return $filePath;
         }
-        
+
         // Jika path dimulai dengan /, hapus leading slash untuk menghindari double slash
         $cleanPath = ltrim($filePath, '/');
-        
+
         return url($cleanPath);
     }
 
@@ -426,6 +427,7 @@ class Audio extends Component
 
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
         $this->status = 0;
     }
 
@@ -451,11 +453,13 @@ class Audio extends Component
 
         $this->isEdit     = true;
         $this->showForm   = true;
+        $this->showTable  = false;
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'audioId',
@@ -592,6 +596,7 @@ class Audio extends Component
             $audio->save();
 
             $this->dispatch('success', $this->isEdit ? 'Audio berhasil diubah!' : 'Audio berhasil ditambahkan!');
+            $this->showTable = true;
 
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
                 $this->showForm = false;
