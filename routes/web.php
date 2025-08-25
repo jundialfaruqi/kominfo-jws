@@ -474,4 +474,17 @@ Route::get('/api/adzan-audio', function () {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan, Resource not found'], 200);
 })->name('api.adzan-audio.legacy');
 
+// Broadcasting routes for WebSocket events
+Route::prefix('broadcast')->group(function () {
+    Route::post('/server-time', [\App\Http\Controllers\BroadcastController::class, 'broadcastServerTime'])->name('broadcast.server-time');
+    Route::post('/audio/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastAudio'])->name('broadcast.audio');
+    Route::post('/marquee/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastMarquee'])->name('broadcast.marquee');
+    Route::post('/slides/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastSlides'])->name('broadcast.slides');
+    Route::post('/jumbotron', [\App\Http\Controllers\BroadcastController::class, 'broadcastJumbotron'])->name('broadcast.jumbotron');
+    Route::post('/petugas/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastPetugas'])->name('broadcast.petugas');
+    Route::post('/adzan/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastAdzan'])->name('broadcast.adzan');
+    Route::post('/profile/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastProfile'])->name('broadcast.profile');
+    Route::post('/theme-check/{slug}', [\App\Http\Controllers\BroadcastController::class, 'broadcastThemeCheck'])->name('broadcast.theme-check');
+});
+
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
