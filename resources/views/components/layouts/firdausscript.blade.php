@@ -1,16 +1,12 @@
 {{-- Moment.js core --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
-
 {{-- Moment Hijri --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.0/moment-hijri.min.js"></script>
-
 {{-- Locale Indonesia --}}
 <script data-navigate-once src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/id.min.js"></script>
-
 {{-- jQuery --}}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
 <script>
     $(document).ready(function() {
         // Tambahkan di awal script
@@ -3599,43 +3595,5 @@
                 window.adzanAudioPlayer.currentTime = 0;
             }
         });
-
-        // DEBUG: Fungsi untuk testing Friday Info Popup (hapus setelah selesai debug)
-        // window.testFridayPopup = function() {
-        //     console.log('Testing Friday Info Popup...');
-
-        //     // Simulasi data Friday
-        //     const now = getCurrentTimeFromServer();
-        //     const options = {
-        //         weekday: 'long',
-        //         day: '2-digit',
-        //         month: '2-digit',
-        //         year: '2-digit'
-        //     };
-        //     const formattedDate = now.toLocaleDateString('id-ID', options);
-        //     const khatib = $('#khatib').val() || 'Test Khatib';
-        //     const imam = $('#imam').val() || 'Test Imam';
-        //     const muadzin = $('#muadzin').val() || 'Test Muadzin';
-
-        //     const fridayData = {
-        //         date: formattedDate,
-        //         khatib,
-        //         imam,
-        //         muadzin
-        //     };
-
-        //     // Tampilkan popup
-        //     displayFridayInfoPopup(fridayData);
-        //     console.log('Friday Info Popup ditampilkan untuk testing');
-        // };
-
-        // // DEBUG: Fungsi untuk menutup Friday Info Popup
-        // window.closeFridayPopup = function() {
-        //     const $popup = $('#fridayInfoPopup');
-        //     $popup.css('display', 'none');
-        //     clearFridayInfoState();
-        //     console.log('Friday Info Popup ditutup');
-        // };
-
     });
 </script>
