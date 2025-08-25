@@ -1,4 +1,4 @@
-@if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
+@if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && $showTable)
     <div class="card-body border-bottom py-3">
         <div class="d-flex">
             <div class="text-secondary">

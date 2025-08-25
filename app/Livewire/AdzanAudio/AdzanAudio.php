@@ -38,6 +38,7 @@ class AdzanAudio extends Component
 
     public $isEdit = false;
     public $showForm = false;
+    public $showTable = true;
     public $deleteAdzanAudioId;
     public $deleteAdzanAudioName;
 
@@ -82,15 +83,15 @@ class AdzanAudio extends Component
     private function checkLocalStorageConfig()
     {
         $audioPath = public_path('sounds/adzan');
-        
+
         if (!file_exists($audioPath)) {
             mkdir($audioPath, 0755, true);
         }
-        
+
         if (!is_writable($audioPath)) {
             throw new \Exception('Direktori audio adzan tidak dapat ditulis: ' . $audioPath);
         }
-        
+
         Log::info('Konfigurasi penyimpanan lokal adzan valid', ['path' => $audioPath]);
     }
 
@@ -123,7 +124,7 @@ class AdzanAudio extends Component
 
             // Pindahkan file ke direktori tujuan menggunakan Livewire method
             $uploadedFile->storeAs('', $fileName, 'public_sounds_adzan');
-            
+
             // Verifikasi file berhasil dipindahkan
             if (!file_exists($filePath)) {
                 throw new \Exception('Gagal memindahkan file audio adzan.');
@@ -153,15 +154,15 @@ class AdzanAudio extends Component
         if (!$filePath) {
             return null;
         }
-        
+
         // Jika sudah berupa URL lengkap, return as is
         if (str_starts_with($filePath, 'http')) {
             return $filePath;
         }
-        
+
         // Jika path dimulai dengan /, hapus leading slash untuk menghindari double slash
         $cleanPath = ltrim($filePath, '/');
-        
+
         return url($cleanPath);
     }
 
@@ -177,21 +178,21 @@ class AdzanAudio extends Component
                     }
 
                     try {
-                        $filePath = public_path('sounds/adzan/' . $filename);
+                        // Jika filename sudah berisi path lengkap, gunakan public_path langsung
+                        // Jika hanya nama file, gabungkan dengan path sounds/adzan/
+                        if (str_starts_with($filename, '/sounds/adzan/')) {
+                            $filePath = public_path($filename);
+                        } else {
+                            $filePath = public_path('sounds/adzan/' . $filename);
+                        }
+                        
                         if (file_exists($filePath)) {
-                            if (unlink($filePath)) {
-                                Log::info("Menghapus {$field} dari penyimpanan lokal", [
-                                    'filename' => $filename,
-                                    'path' => $filePath,
-                                ]);
-                                return true;
-                            } else {
-                                Log::warning("Gagal menghapus {$field} dari penyimpanan lokal", [
-                                    'filename' => $filename,
-                                    'path' => $filePath,
-                                ]);
-                                return false;
-                            }
+                            File::delete($filePath);
+                            Log::info("Menghapus {$field} dari penyimpanan lokal", [
+                                'filename' => $filename,
+                                'path' => $filePath,
+                            ]);
+                            return true;
                         } else {
                             Log::info("File {$field} tidak ditemukan, mungkin sudah dihapus", [
                                 'filename' => $filename,
@@ -250,21 +251,21 @@ class AdzanAudio extends Component
                     }
 
                     try {
-                        $filePath = public_path('sounds/adzan/' . $filename);
+                        // Jika filename sudah berisi path lengkap, gunakan public_path langsung
+                        // Jika hanya nama file, gabungkan dengan path sounds/adzan/
+                        if (str_starts_with($filename, '/sounds/adzan/')) {
+                            $filePath = public_path($filename);
+                        } else {
+                            $filePath = public_path('sounds/adzan/' . $filename);
+                        }
+                        
                         if (file_exists($filePath)) {
-                            if (unlink($filePath)) {
-                                Log::info("Menghapus {$field} dari penyimpanan lokal", [
-                                    'filename' => $filename,
-                                    'path' => $filePath,
-                                ]);
-                                return true;
-                            } else {
-                                Log::warning("Gagal menghapus {$field} dari penyimpanan lokal", [
-                                    'filename' => $filename,
-                                    'path' => $filePath,
-                                ]);
-                                return false;
-                            }
+                            File::delete($filePath);
+                            Log::info("Menghapus {$field} dari penyimpanan lokal", [
+                                'filename' => $filename,
+                                'path' => $filePath,
+                            ]);
+                            return true;
                         } else {
                             Log::info("File {$field} tidak ditemukan, mungkin sudah dihapus", [
                                 'filename' => $filename,
@@ -448,6 +449,7 @@ class AdzanAudio extends Component
 
         $this->isEdit = false;
         $this->showForm = true;
+        $this->showTable = false;
         $this->reset(['adzanAudioId', 'userId', 'audioadzan', 'adzanshubuh', 'status', 'tmp_audioadzan', 'tmp_adzanshubuh']);
         $this->status = 0;
         $this->audioadzanUploaded = false;
@@ -486,12 +488,14 @@ class AdzanAudio extends Component
 
         $this->isEdit = true;
         $this->showForm = true;
+        $this->showTable = false;
         $this->resetValidation();
     }
 
     public function cancelForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'adzanAudioId',
@@ -509,6 +513,7 @@ class AdzanAudio extends Component
     public function closeForm()
     {
         $this->showForm = false;
+        $this->showTable = true;
         $this->resetValidation();
         $this->reset([
             'adzanAudioId',
@@ -563,6 +568,7 @@ class AdzanAudio extends Component
 
             if (in_array($currentUser->role, ['Super Admin', 'Admin'])) {
                 $this->cancelForm();
+                $this->showTable = true;
             } else {
                 // Untuk non-admin, tetap tampilkan form dan perbarui data
                 $this->showForm = true;
@@ -671,70 +677,40 @@ class AdzanAudio extends Component
             }
             $allDeleted = true;
 
-            // Hapus audioadzan
-            $filename = $adzanAudio->audioadzan;
+            $audioFields = ['audioadzan', 'adzanshubuh'];
 
-            if ($filename) {
-                try {
-                    $filePath = public_path('sounds/adzan/' . $filename);
-                    if (file_exists($filePath)) {
-                        if (!unlink($filePath)) {
-                            $allDeleted = false;
-                            Log::warning("Gagal menghapus file dari penyimpanan lokal", [
-                                'field' => 'audioadzan',
-                                'filename' => $filename,
-                                'path' => $filePath
-                            ]);
-                        } else {
-                            Log::info("Berhasil menghapus audioadzan dari penyimpanan lokal", [
-                                'filename' => $filename,
-                                'path' => $filePath
-                            ]);
-                        }
-                    } else {
-                        Log::info("File audioadzan tidak ditemukan, mungkin sudah dihapus", [
-                            'filename' => $filename,
-                            'path' => $filePath
-                        ]);
-                    }
-                } catch (\Exception $ex) {
-                    $allDeleted = false;
-                    Log::error("Gagal menghapus audioadzan", [
-                        'filename' => $filename,
-                        'error' => $ex->getMessage()
-                    ]);
+            foreach ($audioFields as $field) {
+                $filename = $adzanAudio->$field;
+
+                if (!$filename) {
+                    continue;
                 }
-            }
 
-            // Hapus adzanshubuh
-            $filename = $adzanAudio->adzanshubuh;
-
-            if ($filename) {
                 try {
-                    $filePath = public_path('sounds/adzan/' . $filename);
-                    if (file_exists($filePath)) {
-                        if (!unlink($filePath)) {
-                            $allDeleted = false;
-                            Log::warning("Gagal menghapus file dari penyimpanan lokal", [
-                                'field' => 'adzanshubuh',
-                                'filename' => $filename,
-                                'path' => $filePath
-                            ]);
-                        } else {
-                            Log::info("Berhasil menghapus adzanshubuh dari penyimpanan lokal", [
-                                'filename' => $filename,
-                                'path' => $filePath
-                            ]);
-                        }
+                    // Jika filename sudah berisi path lengkap, gunakan public_path langsung
+                    // Jika hanya nama file, gabungkan dengan path sounds/adzan/
+                    if (str_starts_with($filename, '/sounds/adzan/')) {
+                        $filePath = public_path($filename);
                     } else {
-                        Log::info("File adzanshubuh tidak ditemukan, mungkin sudah dihapus", [
+                        $filePath = public_path('sounds/adzan/' . $filename);
+                    }
+                    
+                    if (file_exists($filePath)) {
+                        File::delete($filePath);
+                        Log::info("Berhasil menghapus file {$field} dari penyimpanan lokal", [
+                            'field' => $field,
+                            'filename' => $filename,
+                            'path' => $filePath
+                        ]);
+                    } else {
+                        Log::info("File {$field} tidak ditemukan, mungkin sudah dihapus", [
                             'filename' => $filename,
                             'path' => $filePath
                         ]);
                     }
                 } catch (\Exception $ex) {
                     $allDeleted = false;
-                    Log::error("Gagal menghapus adzanshubuh", [
+                    Log::error("Gagal menghapus {$field}", [
                         'filename' => $filename,
                         'error' => $ex->getMessage()
                     ]);
