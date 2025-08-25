@@ -22,6 +22,9 @@
             console.log('User interaction detected - audio autoplay enabled');
         });
 
+        // Inisialisasi cache audio dari localStorage
+        initializeAudioCache();
+
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
         let audioPlayer = null;
@@ -33,12 +36,111 @@
         let audioRetryCount = 0; // Menghitung percobaan pemutaran ulang jika terjadi error
         const MAX_RETRY_ATTEMPTS = 3; // Maksimum percobaan pemutaran ulang
 
+        // Konstanta untuk localStorage audio cache
+        const AUDIO_CACHE_KEY = 'audioCache';
+        const AUDIO_CACHE_TIMESTAMP_KEY = 'audioCacheTimestamp';
+        const AUDIO_CACHE_SLUG_KEY = 'audioCacheSlug';
+        const AUDIO_CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 jam dalam milliseconds
+
         // Variabel untuk tracking status koneksi dan notifikasi
         let isOffline = false;
         let offlineNotificationShown = false;
         let connectionStatusElement = null;
         const currentMonth = $('#current-month').val() || new Date().getMonth() + 1;
         const currentYear = $('#current-year').val() || new Date().getFullYear();
+
+        // Fungsi untuk menyimpan cache audio ke localStorage
+        function saveAudioCacheToLocalStorage(audioUrls, slug) {
+            try {
+                const cacheData = {
+                    urls: audioUrls,
+                    timestamp: Date.now(),
+                    slug: slug
+                };
+                localStorage.setItem(AUDIO_CACHE_KEY, JSON.stringify(cacheData));
+                localStorage.setItem(AUDIO_CACHE_TIMESTAMP_KEY, Date.now().toString());
+                localStorage.setItem(AUDIO_CACHE_SLUG_KEY, slug);
+                console.log('Cache audio disimpan ke localStorage:', audioUrls.length, 'audio untuk slug:',
+                    slug);
+            } catch (error) {
+                console.warn('Gagal menyimpan cache audio ke localStorage:', error);
+            }
+        }
+
+        // Fungsi untuk memuat cache audio dari localStorage
+        function loadAudioCacheFromLocalStorage(currentSlug) {
+            try {
+                const cacheData = localStorage.getItem(AUDIO_CACHE_KEY);
+                const cacheTimestamp = localStorage.getItem(AUDIO_CACHE_TIMESTAMP_KEY);
+                const cacheSlug = localStorage.getItem(AUDIO_CACHE_SLUG_KEY);
+
+                if (!cacheData || !cacheTimestamp || !cacheSlug) {
+                    console.log('Tidak ada cache audio di localStorage');
+                    return null;
+                }
+
+                const timestamp = parseInt(cacheTimestamp);
+                const now = Date.now();
+
+                // Periksa apakah cache sudah expired
+                if (now - timestamp > AUDIO_CACHE_EXPIRY) {
+                    console.log('Cache audio di localStorage sudah expired, menghapus...');
+                    clearAudioCacheFromLocalStorage();
+                    return null;
+                }
+
+                // Periksa apakah slug masih sama
+                if (cacheSlug !== currentSlug) {
+                    console.log('Slug berubah, menghapus cache audio lama dari localStorage');
+                    clearAudioCacheFromLocalStorage();
+                    return null;
+                }
+
+                const parsedData = JSON.parse(cacheData);
+                if (parsedData && parsedData.urls && Array.isArray(parsedData.urls)) {
+                    console.log('Cache audio dimuat dari localStorage:', parsedData.urls.length,
+                        'audio untuk slug:', currentSlug);
+                    return parsedData.urls;
+                }
+
+                return null;
+            } catch (error) {
+                console.warn('Gagal memuat cache audio dari localStorage:', error);
+                clearAudioCacheFromLocalStorage();
+                return null;
+            }
+        }
+
+        // Fungsi untuk menghapus cache audio dari localStorage
+        function clearAudioCacheFromLocalStorage() {
+            try {
+                localStorage.removeItem(AUDIO_CACHE_KEY);
+                localStorage.removeItem(AUDIO_CACHE_TIMESTAMP_KEY);
+                localStorage.removeItem(AUDIO_CACHE_SLUG_KEY);
+                console.log('Cache audio dihapus dari localStorage');
+            } catch (error) {
+                console.warn('Gagal menghapus cache audio dari localStorage:', error);
+            }
+        }
+
+        // Fungsi untuk memuat cache audio saat halaman dimuat
+        function initializeAudioCache() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (slug) {
+                const cachedUrls = loadAudioCacheFromLocalStorage(slug);
+                if (cachedUrls && cachedUrls.length > 0) {
+                    cachedAudioUrls = cachedUrls;
+                    console.log('Cache audio diinisialisasi dari localStorage:', cachedAudioUrls.length,
+                        'audio');
+
+                    // Update input hidden dengan data dari cache
+                    if (cachedUrls[0]) $('#audio1').val(cachedUrls[0]);
+                    if (cachedUrls[1]) $('#audio2').val(cachedUrls[1]);
+                    if (cachedUrls[2]) $('#audio3').val(cachedUrls[2]);
+                    $('#audio_status').val('true');
+                }
+            }
+        }
 
         // Fungsi untuk menampilkan notifikasi status koneksi
         function showConnectionStatus(message, type = 'info') {
@@ -146,6 +248,17 @@
                 }
                 return;
             } else if (!networkAvailable) {
+                // Coba muat dari localStorage jika tidak ada cache di memori
+                const slug = window.location.pathname.replace(/^\//, '');
+                const cachedUrls = loadAudioCacheFromLocalStorage(slug);
+                if (cachedUrls && cachedUrls.length > 0) {
+                    cachedAudioUrls = cachedUrls;
+                    console.log('Mode offline: Menggunakan audio dari localStorage cache');
+                    if (!isAudioPausedForAdzan && !isAudioPlaying) {
+                        playAudioFromCache();
+                    }
+                    return;
+                }
                 console.warn('Offline dan tidak ada cache audio tersedia');
                 return; // Keluar jika offline dan tidak ada cache
             }
@@ -207,6 +320,9 @@
                             console.log('Audio URLs di-cache untuk sesi pemutaran:', cachedAudioUrls
                                 .length, 'audio');
 
+                            // Simpan cache ke localStorage untuk persistensi
+                            saveAudioCacheToLocalStorage(cachedAudioUrls, slug);
+
                             // Jika audio sedang diputar, jangan reset pemutaran
                             // Audio baru akan diputar setelah audio saat ini selesai
                             if (!isAudioPlaying) {
@@ -253,6 +369,13 @@
                 error: function(xhr, status, error) {
                     console.error('Error saat mengambil data audio:', error, xhr.responseText);
                     $('#audio_status').val('false');
+
+                    // Jika error 404 atau 500, hapus cache localStorage yang mungkin tidak valid
+                    if (xhr.status === 404 || xhr.status === 500) {
+                        const slug = window.location.pathname.replace(/^\//, '');
+                        clearAudioCacheFromLocalStorage(slug);
+                        console.log('Cache localStorage dibersihkan karena error server');
+                    }
 
                     // Jika masih ada audio di cache, gunakan itu meskipun request gagal
                     if (cachedAudioUrls.length > 0) {
