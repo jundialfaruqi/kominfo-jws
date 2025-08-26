@@ -386,8 +386,8 @@
                         }
                     } else {
                         // Coba lagi setelah beberapa waktu jika tidak ada cache
-                        console.log('Mencoba mengambil audio lagi dalam 30 detik...');
-                        setTimeout(updateAndPlayAudio, 30 * 1000);
+                        console.log('Mencoba mengambil audio lagi dalam 5 menit...');
+                        setTimeout(updateAndPlayAudio, 5 * 60 * 1000);
                     }
                 },
                 timeout: 15000 // Timeout setelah 15 detik
@@ -3601,25 +3601,21 @@
         // Perbarui dan putar audio setiap 30 menit
         setInterval(function() {
             updateAndPlayAudio();
-        }, 1 * 60 * 1000); // 30 menit
-
-        setInterval(function() {
-            updateFridayOfficials();
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
-        }, 40000); // 40000 milidetik = 40 detik
+            updateFridayOfficials();
+        }, 1 * 60 * 1000); // 30 menit
 
         updateJumbotronData();
 
         setInterval(function() {
             updateMosqueInfo();
+            updateJumbotronData();
+            updateMarqueeText();
+            checkThemeUpdate();
             updateSlides();
-            updateAndPlayAudio();
-        }, 50000); // 50000 milidetik = 50 detik
+        }, 12 * 60 * 1000); // 120000 milidetik = 120 detik
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
