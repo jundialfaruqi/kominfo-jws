@@ -3605,7 +3605,7 @@
             updateIqomahImages();
             updateAdzanImages();
             updateFridayOfficials();
-        }, 1 * 60 * 1000); // 30 menit
+        }, 1200000); // 1200000 milidetik = 30 menit
 
         updateJumbotronData();
 
@@ -3615,7 +3615,7 @@
             updateMarqueeText();
             checkThemeUpdate();
             updateSlides();
-        }, 12 * 60 * 1000); // 120000 milidetik = 120 detik
+        }, 120000); // 120000 milidetik = 2 menit
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
