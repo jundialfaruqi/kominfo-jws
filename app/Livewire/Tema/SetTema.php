@@ -73,11 +73,6 @@ class SetTema extends Component
         $this->selectedThemeId = $themeId;
     }
 
-    public function resetTheme()
-    {
-        $this->selectedThemeId = null;
-    }
-
     public function edit($userId)
     {
         if (!in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {

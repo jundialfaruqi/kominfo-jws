@@ -64,40 +64,6 @@
                                                 </div>
                                             </div>
                                         @endforeach
-
-                                        {{-- Card Reset Tema --}}
-                                        <div class="col-md-4" wire:key="reset-theme">
-                                            <div
-                                                class="card mb-3 rounded-4 pt-3 shadow-sm {{ $selectedThemeId === null ? 'border-danger bg-light shadow-sm' : 'shadow-sm' }}">
-                                                <div class="position-relative">
-                                                    <img src="{{ asset('images/themes/default-style.webp') }}"
-                                                        class="card-img-top rounded-4 {{ $selectedThemeId === null ? 'opacity-50' : 'opacity-100' }}"
-                                                        alt="Reset Tema" style="height: 200px; object-fit: cover;">
-                                                    @if ($selectedThemeId === null)
-                                                        <div
-                                                            class="position-absolute top-0 end-0 me-4 mt-2 text-danger avatar rounded-circle shadow-sm">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                height="24" viewBox="0 0 24 24" fill="currentColor"
-                                                                class="icon icon-tabler icons-tabler-filled icon-tabler-circle-check">
-                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                                <path
-                                                                    d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 .083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-                                                            </svg>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                                <div class="card-body text-center">
-                                                    <h5
-                                                        class="card-title {{ $selectedThemeId === null ? 'text-danger' : '' }}">
-                                                        Default Theme
-                                                    </h5>
-                                                    <button type="button" wire:click="resetTheme"
-                                                        class="btn btn-outline-danger rounded-3 shadow-sm {{ $selectedThemeId === null ? 'disabled' : '' }}">
-                                                        {{ $selectedThemeId === null ? 'Dipilih' : 'Reset ke Default' }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-footer rounded-bottom border-0 sticky-bottom"

@@ -72,7 +72,7 @@
                                 <select class="form-select rounded-3 @error('iqomah_shubuh') is-invalid @enderror"
                                     wire:model="iqomah_shubuh">
                                     <option value="">Pilih durasi iqomah</option>
-                                    @for ($i = 1; $i <= 10; $i++)
+                                    @for ($i = 1; $i <= 25; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
