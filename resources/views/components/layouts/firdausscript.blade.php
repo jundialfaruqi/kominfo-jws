@@ -366,7 +366,7 @@
                     if (xhr.status === 404 || xhr.status === 500) {
                         const slug = window.location.pathname.replace(/^\//, '');
                         clearAudioCacheFromLocalStorage(slug);
-                        console.log('Cache localStorage dibersihkan karena error server');
+                        console.log('Cache localStorage dibersihkan');
                     }
 
                     // Jika masih ada audio di cache, gunakan itu meskipun request gagal
@@ -969,15 +969,29 @@
                 const url =
                     `https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/pekanbaru/${year}/${monthFormatted}.json`;
 
-                if (month !== parseInt(currentMonth) || year !== parseInt(currentYear)) {
+                // Ambil nilai bulan dan tahun saat ini dari input hidden
+                const currentMonthValue = $('#current-month').val() || new Date().getMonth() + 1;
+                const currentYearValue = $('#current-year').val() || new Date().getFullYear();
+
+                if (month !== parseInt(currentMonthValue) || year !== parseInt(currentYearValue)) {
                     console.log(`Mengambil data jadwal baru: ${url}`);
-                    const response = await $.ajax({
-                        url,
-                        method: 'GET'
-                    });
-                    console.log("Data bulan baru tersedia, memuat ulang halaman...");
-                    location.reload();
-                    return response;
+                    try {
+                        const response = await $.ajax({
+                            url,
+                            method: 'GET'
+                        });
+                        console.log("Data bulan baru berhasil diambil, memperbarui input hidden...");
+
+                        // Update input hidden dengan bulan dan tahun baru
+                        $('#current-month').val(month);
+                        $('#current-year').val(year);
+
+                        console.log(`Input hidden diperbarui: bulan=${month}, tahun=${year}`);
+                        return response;
+                    } catch (fetchError) {
+                        console.error("Error saat mengambil data jadwal sholat:", fetchError);
+                        return null;
+                    }
                 }
                 return null;
             } catch (error) {
@@ -1717,7 +1731,42 @@
             if (currentDate !== storedDate) {
                 clearAllAdzanStates();
                 localStorage.setItem('lastCheckedDate', currentDate);
-                location.reload();
+
+                // Perbarui halaman tanpa reload dengan memanggil fungsi-fungsi yang diperlukan
+                console.log('Hari berubah, memperbarui konten tanpa reload...');
+
+                // Update tanggal dan waktu
+                updateDate();
+
+                // Update jadwal sholat untuk hari baru
+                fetchPrayerTimes();
+
+                // Update informasi masjid
+                updateMosqueInfo();
+
+                // Update teks marquee
+                updateScrollingText();
+
+                // Update tema jika ada perubahan
+                checkThemeUpdate();
+
+                // Update slides
+                updateSlides();
+
+                // Update jumbotron data
+                updateJumbotronData();
+
+                // Update audio dan gambar
+                updateAndPlayAudio();
+                updateFridayImages();
+                updateIqomahImages();
+                updateAdzanImages();
+                updateFridayOfficials();
+
+                // Reset prayer times handling untuk hari baru
+                handlePrayerTimes();
+
+                console.log('Konten berhasil diperbarui untuk hari baru');
             }
         }
 
@@ -1900,8 +1949,21 @@
             const scheduleYear = parseInt($('#current-year').val());
 
             if (scheduleMonth !== serverMonth || scheduleYear !== serverYear) {
-                // console.log('Jadwal tidak sesuai dengan tanggal server, memuat ulang halaman...');
-                location.reload();
+                console.log(
+                    'Jadwal tidak sesuai dengan tanggal server, memperbarui input hidden dan mengambil data baru...'
+                );
+
+                // Update input hidden dengan bulan dan tahun server saat ini
+                $('#current-month').val(serverMonth);
+                $('#current-year').val(serverYear);
+
+                // Ambil data jadwal sholat baru
+                fetchPrayerTimes().then(() => {
+                    console.log('Data jadwal sholat berhasil diperbarui');
+                }).catch(error => {
+                    console.error('Error saat memperbarui jadwal sholat:', error);
+                });
+
                 return;
             }
 
@@ -3481,7 +3543,13 @@
             const now = getCurrentTimeFromServer();
             const currentMonthYear =
                 `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-            const storedMonthYear = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+
+            // Ambil nilai bulan dan tahun saat ini dari input hidden
+            const currentMonthValue = $('#current-month').val() || new Date().getMonth() + 1;
+            const currentYearValue = $('#current-year').val() || new Date().getFullYear();
+            const storedMonthYear =
+                `${currentYearValue}-${currentMonthValue.toString().padStart(2, '0')}`;
+
             if (currentMonthYear !== storedMonthYear) {
                 fetchPrayerTimes();
             }
