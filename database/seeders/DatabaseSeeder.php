@@ -16,8 +16,6 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(50)->create();
 
-
-
         // User::factory()->create([
         //     'name' => 'Admin',
         //     'email' => 'admin@mail.com',
@@ -39,6 +37,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // $this->call([
+        //     UserSeeder::class,
         //     ProfilSeeder::class,
         //     AdzanSeeder::class,
         //     MarqueeSeeder::class,
@@ -50,6 +49,11 @@ class DatabaseSeeder extends Seeder
         //     'role' => 'User',
         //     'password' => Hash::make('admin123'),
         //     'address' => 'Pekanbaru',
+        // ]);
+
+        // $this->call([
+        //     RolePermissionSeeder::class,
+        //     AssignRolesToUsersSeeder::class,
         // ]);
     }
 }
