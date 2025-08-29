@@ -23,6 +23,7 @@ class SetTema extends Component
     public $userId;
     public $selectedThemeId;
     public $profilName;
+    public $showTable = true;
 
     protected $rules = [
         'selectedThemeId' => 'nullable|exists:themes,id',
@@ -71,6 +72,7 @@ class SetTema extends Component
     public function selectTempTheme($themeId)
     {
         $this->selectedThemeId = $themeId;
+        $this->showTable = false;
     }
 
     public function edit($userId)
@@ -88,6 +90,8 @@ class SetTema extends Component
         $this->userId = $user->id;
         $this->selectedThemeId = $user->theme_id;
         $this->profilName = $profil->name;
+
+        $this->showTable = false;
     }
 
     public function save()
@@ -105,6 +109,7 @@ class SetTema extends Component
             $user->save();
 
             $this->dispatch('success', 'Tema pengguna berhasil diperbarui!');
+            $this->showTable = true;
             $this->reset(['userId', 'selectedThemeId', 'profilName']);
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -115,5 +120,6 @@ class SetTema extends Component
     {
         $this->reset(['userId', 'selectedThemeId', 'profilName']);
         $this->resetValidation();
+        $this->showTable = true;
     }
 }

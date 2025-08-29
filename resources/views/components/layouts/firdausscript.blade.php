@@ -941,6 +941,7 @@
             syncServerTime(() => {
                 checkAndRestoreSessions();
                 updateSlides();
+                updateDate(); // Update tanggal setelah sinkronisasi waktu server selesai
                 // console.log('Waktu server diupdate setelah 3 detik halaman di muat');
             });
         }, 3000); // 3000 milidetik = 3 detik
@@ -997,6 +998,88 @@
             } catch (error) {
                 console.error("Error saat mengambil jadwal sholat:", error);
                 return null;
+            }
+        }
+
+        function updateDailyPrayerTimes() {
+            try {
+                const now = getCurrentTimeFromServer();
+                const today = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0');
+
+                // Ambil data jadwal sholat dari hidden input
+                const prayerTimesData = $('#prayer-times').val();
+                if (!prayerTimesData) {
+                    console.log('Data jadwal sholat tidak tersedia di hidden input');
+                    return false;
+                }
+
+                let jadwalSholat;
+                try {
+                    jadwalSholat = JSON.parse(prayerTimesData);
+                } catch (e) {
+                    console.error('Error parsing prayer times data:', e);
+                    return false;
+                }
+
+                // Cari jadwal untuk hari ini
+                const jadwalHariIni = jadwalSholat.find(item => item.tanggal === today);
+
+                if (!jadwalHariIni) {
+                    console.log(`Jadwal sholat tidak ditemukan untuk tanggal: ${today}`);
+                    return false;
+                }
+
+                // Update tampilan jadwal sholat
+                const isFriday = now.getDay() === 5;
+                const dzuhurLabel = isFriday ? "Jum'at" : "Dzuhur";
+
+                const prayerTimes = [{
+                        name: 'Shubuh',
+                        time: jadwalHariIni.shubuh
+                    },
+                    {
+                        name: 'Shuruq',
+                        time: jadwalHariIni.terbit
+                    },
+                    {
+                        name: dzuhurLabel,
+                        time: jadwalHariIni.dzuhur
+                    },
+                    {
+                        name: 'Ashar',
+                        time: jadwalHariIni.ashr
+                    },
+                    {
+                        name: 'Maghrib',
+                        time: jadwalHariIni.magrib
+                    },
+                    {
+                        name: 'Isya',
+                        time: jadwalHariIni.isya
+                    }
+                ];
+
+                // Update elemen DOM
+                $('.prayer-time').each(function(index) {
+                    if (index < prayerTimes.length) {
+                        const $nameElement = $(this).find('.prayer-name');
+                        const $timeElement = $(this).find('.prayer-time-value');
+
+                        if ($nameElement.length && $timeElement.length) {
+                            $nameElement.text(prayerTimes[index].name);
+                            $timeElement.text(prayerTimes[index].time);
+                        }
+                    }
+                });
+
+                console.log(`Jadwal sholat berhasil diperbarui untuk tanggal: ${today}`);
+                return true;
+
+            } catch (error) {
+                console.error('Error saat memperbarui jadwal sholat harian:', error);
+                return false;
             }
         }
 
@@ -1738,7 +1821,33 @@
                 // Update tanggal dan waktu
                 updateDate();
 
-                // Update jadwal sholat untuk hari baru
+                // Update jadwal sholat untuk hari baru dari 
+                if (typeof Livewire !== 'undefined' && Livewire.find) {
+                    try {
+                        const component = Livewire.find(document.querySelector('[wire\\:id]').getAttribute(
+                            'wire:id'));
+                        if (component) {
+                            component.call('refreshPrayerTimes').then(() => {
+                                console.log(' prayer times refreshed successfully');
+                                // Update frontend display setelah diperbarui
+                                updateDailyPrayerTimes();
+                            }).catch(error => {
+                                console.error('Error refreshing prayer times:', error);
+                                // Fallback ke update frontend saja
+                                updateDailyPrayerTimes();
+                            });
+                        } else {
+                            updateDailyPrayerTimes();
+                        }
+                    } catch (error) {
+                        console.error('Error calling Livewire refreshPrayerTimes:', error);
+                        updateDailyPrayerTimes();
+                    }
+                } else {
+                    updateDailyPrayerTimes();
+                }
+
+                // Juga cek apakah perlu mengambil data bulan baru
                 fetchPrayerTimes();
 
                 // Update informasi masjid
@@ -1783,6 +1892,30 @@
 
         checkDayChange();
         scheduleMidnightCheck();
+
+        // Update jadwal sholat untuk hari ini saat halaman dimuat
+        // Pertama refresh dari , lalu update frontend display
+        if (typeof Livewire !== 'undefined' && Livewire.find) {
+            try {
+                const component = Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
+                if (component) {
+                    component.call('refreshPrayerTimes').then(() => {
+                        console.log('Initial prayer times refreshed successfully');
+                        updateDailyPrayerTimes();
+                    }).catch(error => {
+                        console.error('Error refreshing initial prayer times:', error);
+                        updateDailyPrayerTimes();
+                    });
+                } else {
+                    updateDailyPrayerTimes();
+                }
+            } catch (error) {
+                console.error('Error calling initial Livewire refreshPrayerTimes:', error);
+                updateDailyPrayerTimes();
+            }
+        } else {
+            updateDailyPrayerTimes();
+        }
 
         function clearShuruqAlarmState() {
             isShuruqAlarmPlaying = false;
@@ -3531,6 +3664,8 @@
 
         handlePrayerTimes();
         setInterval(handlePrayerTimes, 1000);
+
+        // Update tanggal awal dengan waktu lokal, akan diperbarui setelah sinkronisasi server
         updateDate();
         setInterval(updateDate, 60000);
         updateMarqueeText();
@@ -3570,21 +3705,45 @@
                 success: function(response) {
                     // console.log('Respons API petugas:', response);
                     if (response.success) {
-                        // Simpan nilai sebelumnya untuk perbandingan
-                        const previousKhatib = $('#khatib').val();
-                        const previousImam = $('#imam').val();
-                        const previousMuadzin = $('#muadzin').val();
+                        // Cek apakah tanggal dan bulan pada field hari sesuai dengan waktu server
+                        const currentServerTime = getCurrentTimeFromServer();
+                        const petugasDate = new Date(response.data.hari);
 
-                        // Perbarui nilai input hidden untuk petugas
-                        $('#khatib').val(response.data.khatib);
-                        $('#imam').val(response.data.imam);
-                        $('#muadzin').val(response.data.muadzin);
+                        // Bandingkan tanggal dan bulan
+                        const currentDay = currentServerTime.getDate();
+                        const currentMonth = currentServerTime.getMonth();
+                        const petugasDay = petugasDate.getDate();
+                        const petugasMonth = petugasDate.getMonth();
 
-                        // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
-                        if ($('#fridayInfoPopup').is(':visible')) {
-                            updateFridayInfoContent();
+                        // Hanya update data petugas jika tanggal dan bulan cocok
+                        if (currentDay === petugasDay && currentMonth === petugasMonth) {
+                            // Simpan nilai sebelumnya untuk perbandingan
+                            const previousKhatib = $('#khatib').val();
+                            const previousImam = $('#imam').val();
+                            const previousMuadzin = $('#muadzin').val();
+
+                            // Perbarui nilai input hidden untuk petugas
+                            $('#khatib').val(response.data.khatib);
+                            $('#imam').val(response.data.imam);
+                            $('#muadzin').val(response.data.muadzin);
+
+                            // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
+                            if ($('#fridayInfoPopup').is(':visible')) {
+                                updateFridayInfoContent();
+                            }
+                            // console.log('Data petugas Jumat diperbarui');
+                        } else {
+                            // Kosongkan data petugas jika tanggal dan bulan tidak cocok
+                            $('#khatib').val('');
+                            $('#imam').val('');
+                            $('#muadzin').val('');
+
+                            // Jika popup sedang ditampilkan, perbarui kontennya
+                            if ($('#fridayInfoPopup').is(':visible')) {
+                                updateFridayInfoContent();
+                            }
+                            // console.log('Data petugas tidak cocok dengan tanggal hari ini');
                         }
-                        // console.log('Data petugas Jumat diperbarui');
                     }
                 },
                 error: function(xhr, status, error, retryCount = 0) {
@@ -3673,6 +3832,7 @@
             updateIqomahImages();
             updateAdzanImages();
             updateFridayOfficials();
+            updateDailyPrayerTimes();
         }, 1200000); // 1200000 milidetik = 30 menit
 
         updateJumbotronData();

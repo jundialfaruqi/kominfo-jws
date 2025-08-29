@@ -17,6 +17,7 @@ use App\Models\Theme;
 use App\Models\User;
 use App\Models\Audios; // Tambahkan model Audios
 use App\Models\AdzanAudio;
+use Carbon\Carbon;
 
 class Firdaus extends Component
 {
@@ -72,7 +73,24 @@ class Firdaus extends Component
 
         $this->adzan    = Adzan::where('user_id', $user_id)->first();
         $this->marquee  = Marquee::where('user_id', $user_id)->first();
-        $this->petugas  = Petugas::where('user_id', $user_id)->first();
+        
+        // Ambil data petugas dengan pengecekan tanggal dan bulan
+        $petugas = Petugas::where('user_id', $user_id)->first();
+        if ($petugas) {
+            // Cek apakah tanggal dan bulan pada field hari sesuai dengan hari ini
+            $currentDate = now()->setTimezone('Asia/Jakarta');
+            $petugasDate = Carbon::parse($petugas->hari);
+            
+            // Bandingkan tanggal dan bulan
+            if ($currentDate->day === $petugasDate->day && $currentDate->month === $petugasDate->month) {
+                $this->petugas = $petugas;
+            } else {
+                $this->petugas = null; // Kosongkan jika tanggal dan bulan tidak cocok
+            }
+        } else {
+            $this->petugas = null;
+        }
+        
         $this->slides   = Slides::where('user_id', $user_id)->first();
 
         try {
@@ -522,5 +540,60 @@ class Firdaus extends Component
             'theme' => $this->theme,
             'adzanaudio' => $this->adzanaudio,
         ]);
+    }
+
+    public function refreshPrayerTimes()
+    {
+        try {
+            $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+            if ($response->successful()) {
+                $this->serverTime = $response['serverTime'];
+                $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
+                $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+                $this->serverTimestamp = $serverDateTime->getTimestamp();
+                $this->currentMonth = (int) $serverDateTime->format('n');
+                $this->currentYear = (int) $serverDateTime->format('Y');
+                $this->currentDayOfWeek = (int) $serverDateTime->format('w');
+
+                // Fetch prayer times for current day
+                $monthFormatted = str_pad($this->currentMonth, 2, '0', STR_PAD_LEFT);
+                $url = $this->baseUrl . $this->currentYear . '/' . $monthFormatted . '.json';
+                
+                $jadwalResponse = Http::timeout(10)->get($url);
+                if ($jadwalResponse->successful()) {
+                    $this->jadwalSholat = $jadwalResponse->json();
+                    $this->apiSource = 'primary';
+                    
+                    $today = $serverDateTime->format('Y-m-d');
+                    $jadwalHariIni = collect($this->jadwalSholat)->firstWhere('tanggal', $today);
+                    
+                    if ($jadwalHariIni) {
+                        $dzuhurLabel = ($this->currentDayOfWeek === 5) ? "Jum'at" : 'Dzuhur';
+                        
+                        $this->prayerTimes = [
+                            ['name' => 'Subuh', 'time' => $jadwalHariIni['shubuh'], 'icon' => 'sunrise'],
+                            ['name' => 'Shuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sun'],
+                            ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
+                            ['name' => 'Ashar', 'time' => $jadwalHariIni['ashr'], 'icon' => 'sunwind'],
+                            ['name' => 'Maghrib', 'time' => $jadwalHariIni['magrib'], 'icon' => 'hazemoon'],
+                            ['name' => 'Isya', 'time' => $jadwalHariIni['isya'], 'icon' => 'moon'],
+                        ];
+                        
+                        $currentTime = date('H:i', strtotime($this->serverTime));
+                        $prayerIndices = $this->determineActivePrayerTime($currentTime);
+                        $this->activeIndex = $prayerIndices['active'];
+                        $this->nextPrayerIndex = $prayerIndices['next'];
+                        $this->activePrayerStatus = $this->calculateActivePrayerTimeStatus($currentTime);
+                        
+                        return ['success' => true, 'message' => 'Prayer times updated successfully'];
+                    }
+                }
+            }
+            
+            return ['success' => false, 'message' => 'Failed to update prayer times'];
+            
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => 'Error updating prayer times: ' . $e->getMessage()];
+        }
     }
 }

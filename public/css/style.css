@@ -257,7 +257,7 @@ body {
 .date-item {
   display: flex;
   align-items: center;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   justify-content: flex-end;
 }
 
@@ -287,14 +287,14 @@ body {
 }
 
 .countdown-text {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 #countdown-value {
   font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: 1000;
   min-width: 8ch;
   display: inline-block;
@@ -624,7 +624,7 @@ body {
 
   .date-item {
     align-items: center;
-    font-size: 4rem;
+    font-size: 3.8rem;
   }
 
   .day-name {
@@ -653,14 +653,14 @@ body {
   }
 
   .countdown-text {
-    font-size: 4rem;
+    font-size: 3.8rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
     font-family: monospace;
-    font-size: 4.6rem;
+    font-size: 4.4rem;
     font-weight: 1500;
     min-width: 8ch;
     display: inline-block;
@@ -977,7 +977,7 @@ body {
 
   .date-item {
     align-items: center;
-    font-size: 2.8rem;
+    font-size: 2.6rem;
   }
 
   .day-name {
@@ -1006,14 +1006,14 @@ body {
   }
 
   .countdown-text {
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
     font-family: monospace;
-    font-size: 3.2rem;
+    font-size: 3rem;
     font-weight: 1000;
     min-width: 8ch;
     display: inline-block;
@@ -1268,18 +1268,6 @@ body {
     z-index: 10;
   }
 
-  /* .brand-text {
-    position: absolute;
-    bottom: 60%;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    font-size: 1.5rem;
-    color: white;
-    font-weight: 500;
-    z-index: 4;
-  } */
-
   .right-content {
     grid-area: right-content;
     display: flex;
@@ -1346,7 +1334,7 @@ body {
 
   .date-item {
     align-items: center;
-    font-size: 2.1rem;
+    font-size: 1.9rem;
   }
 
   .day-name {
@@ -1375,14 +1363,14 @@ body {
   }
 
   .countdown-text {
-    font-size: 2.1rem;
+    font-size: 1.9rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
     font-family: monospace;
-    font-size: 2.4rem;
+    font-size: 2.2rem;
     font-weight: 1000;
     min-width: 8ch;
     display: inline-block;
@@ -1700,7 +1688,7 @@ body {
 
   .date-item {
     align-items: center;
-    font-size: 1.9rem;
+    font-size: 1.7rem;
   }
 
   .day-name {
@@ -1729,14 +1717,14 @@ body {
   }
 
   .countdown-text {
-    font-size: 1.9rem;
+    font-size: 1.7rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
     font-family: monospace;
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 1000;
     min-width: 8ch;
     display: inline-block;
@@ -2053,7 +2041,7 @@ body {
 
   .date-item {
     align-items: center;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 
   .day-name {
@@ -2082,14 +2070,14 @@ body {
   }
 
   .countdown-text {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
     font-family: monospace;
-    font-size: 2.1rem;
+    font-size: 1.9rem;
     font-weight: 1000;
     min-width: 8ch;
     display: inline-block;
@@ -2408,7 +2396,7 @@ body {
 
   .date-item {
     align-items: center;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 
   .day-name {
@@ -2437,14 +2425,14 @@ body {
   }
 
   .countdown-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
     font-family: monospace;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 1000;
     min-width: 8ch;
     display: inline-block;

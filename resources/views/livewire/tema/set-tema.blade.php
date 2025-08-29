@@ -66,7 +66,7 @@
                                         @endforeach
                                     </div>
                                 </div>
-                                <div class="card-footer rounded-bottom border-0 sticky-bottom"
+                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
                                     style="background-color: rgba(255, 255, 255, 0.9);">
                                     <div class="d-flex justify-content-end gap-2">
                                         <button type="button" wire:click="cancel"
@@ -116,85 +116,89 @@
                                 </div>
                             </form>
                         @endif
-                        <div class="card-body border-bottom py-3">
-                            <div class="d-flex">
-                                <div class="text-secondary">
-                                    Lihat
-                                    <div class="mx-2 d-inline-block">
-                                        <select wire:model.live="paginate"
-                                            class="form-select form-select py-1 rounded-3">
-                                            <option value="5">5</option>
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
+                        @if ($showTable)
+                            <div class="card-body border-bottom py-3">
+                                <div class="d-flex">
+                                    <div class="text-secondary">
+                                        Lihat
+                                        <div class="mx-2 d-inline-block">
+                                            <select wire:model.live="paginate"
+                                                class="form-select form-select py-1 rounded-3">
+                                                <option value="5">5</option>
+                                                <option value="10">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="ms-auto text-secondary">
-                                    <span>Cari</span>
-                                    <div class="ms-2 d-inline-block">
-                                        <input wire:model.live="search" type="text"
-                                            class="form-control form-control py-1 rounded-3"
-                                            placeholder="Ketik disini">
+                                    <div class="ms-auto text-secondary">
+                                        <span>Cari</span>
+                                        <div class="ms-2 d-inline-block">
+                                            <input wire:model.live="search" type="text"
+                                                class="form-control form-control py-1 rounded-3"
+                                                placeholder="Ketik disini">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table card-table table-vcenter table-hover text-nowrap datatable">
-                                <thead>
-                                    <tr>
-                                        <th class="w-1">No.</th>
-                                        <th>Nama Masjid</th>
-                                        <th>Tema Terpilih</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($profilList as $profil)
+                            <div class="table-responsive">
+                                <table class="table card-table table-vcenter table-hover text-nowrap datatable">
+                                    <thead>
                                         <tr>
-                                            <td class="text-center text-muted">
-                                                {{ $loop->iteration + ($profilList->currentPage() - 1) * $profilList->perPage() }}
-                                            </td>
-                                            <td class="text-wrap">{{ $profil->masjid_name }}</td>
-                                            <td>
-                                                {{ $profil->theme_name }}
-                                            </td>
-                                            <td class="text-end">
-                                                <button wire:click="edit('{{ $profil->user_id }}')"
-                                                    class="btn py-2 px-2 rounded-3 shadow-sm">
-                                                    <span wire:loading.remove
-                                                        wire:target="edit('{{ $profil->user_id }}')">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                            height="24" viewBox="0 0 24 24" fill="none"
-                                                            stroke="currentColor" stroke-width="2"
-                                                            stroke-linecap="round" stroke-linejoin="round"
-                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
-                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                            <path
-                                                                d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
-                                                            <path
-                                                                d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
-                                                            <path d="M16 5l3 3" />
-                                                        </svg>
-                                                        Ubah
-                                                    </span>
-                                                    <span wire:loading wire:target="edit('{{ $profil->user_id }}')">
-                                                        <span class="spinner-border spinner-border-sm" role="status"
-                                                            aria-hidden="true"></span>
-                                                        <span class="small">Loading...</span>
-                                                    </span>
-                                                </button>
-                                            </td>
+                                            <th class="w-1">No.</th>
+                                            <th>Nama Masjid</th>
+                                            <th>Tema Terpilih</th>
+                                            <th></th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                            {{ $profilList->links() }}
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($profilList as $profil)
+                                            <tr>
+                                                <td class="text-center text-muted">
+                                                    {{ $loop->iteration + ($profilList->currentPage() - 1) * $profilList->perPage() }}
+                                                </td>
+                                                <td class="text-wrap">{{ $profil->masjid_name }}</td>
+                                                <td>
+                                                    {{ $profil->theme_name }}
+                                                </td>
+                                                <td class="text-end">
+                                                    <button wire:click="edit('{{ $profil->user_id }}')"
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm">
+                                                        <span wire:loading.remove
+                                                            wire:target="edit('{{ $profil->user_id }}')">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="currentColor" stroke-width="2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                                                <path
+                                                                    d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                                                <path d="M16 5l3 3" />
+                                                            </svg>
+                                                            Ubah
+                                                        </span>
+                                                        <span wire:loading
+                                                            wire:target="edit('{{ $profil->user_id }}')">
+                                                            <span class="spinner-border spinner-border-sm"
+                                                                role="status" aria-hidden="true"></span>
+                                                            <span class="small">Loading...</span>
+                                                        </span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
+                                {{ $profilList->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
