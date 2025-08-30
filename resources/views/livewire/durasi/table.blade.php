@@ -4,12 +4,13 @@
             <tr>
                 <th class="w-1">No</th>
                 <th>Nama Admin Masjid</th>
-                <th>Shubuh (A/I/F)</th>
-                <th>Dzuhur (A/I/F)</th>
-                <th>Jum'at (Slide)</th>
-                <th>Ashar (A/I/F)</th>
-                <th>Maghrib (A/I/F)</th>
-                <th>Isya (A/I/F)</th>
+                <th class="text-center">Shuruq</th>
+                <th class="text-center">Shubuh (A/I/F)</th>
+                <th class="text-center">Dzuhur (A/I/F)</th>
+                <th class="text-center">Jum'at (Slide)</th>
+                <th class="text-center">Ashar (A/I/F)</th>
+                <th class="text-center">Maghrib (A/I/F)</th>
+                <th class="text-center">Isya (A/I/F)</th>
                 <th></th>
             </tr>
         </thead>
@@ -20,23 +21,30 @@
                         {{ $loop->iteration + ($durasiList->currentPage() - 1) * $durasiList->perPage() }}
                     </td>
                     <td class="text-wrap">{{ $durasi->user->name }}</td>
-                    <td>{{ $durasi->adzan_shubuh }}/{{ $durasi->iqomah_shubuh }}/{{ $durasi->final_shubuh }}
+                    <td class="text-center">{{ $durasi->adzan_shuruq }}
                     </td>
-                    <td>{{ $durasi->adzan_dzuhur }}/{{ $durasi->iqomah_dzuhur }}/{{ $durasi->final_dzuhur }}
+                    <td class="text-center">
+                        {{ $durasi->adzan_shubuh }}/{{ $durasi->iqomah_shubuh }}/{{ $durasi->final_shubuh }}
                     </td>
-                    <td>{{ $durasi->jumat_slide }}</td>
-                    <td>{{ $durasi->adzan_ashar }}/{{ $durasi->iqomah_ashar }}/{{ $durasi->final_ashar }}
+                    <td class="text-center">
+                        {{ $durasi->adzan_dzuhur }}/{{ $durasi->iqomah_dzuhur }}/{{ $durasi->final_dzuhur }}
                     </td>
-                    <td>{{ $durasi->adzan_maghrib }}/{{ $durasi->iqomah_maghrib }}/{{ $durasi->final_maghrib }}
+                    <td class="text-center">{{ $durasi->jumat_slide }}</td>
+                    <td class="text-center">
+                        {{ $durasi->adzan_ashar }}/{{ $durasi->iqomah_ashar }}/{{ $durasi->final_ashar }}
                     </td>
-                    <td>{{ $durasi->adzan_isya }}/{{ $durasi->iqomah_isya }}/{{ $durasi->final_isya }}
+                    <td class="text-center">
+                        {{ $durasi->adzan_maghrib }}/{{ $durasi->iqomah_maghrib }}/{{ $durasi->final_maghrib }}
+                    </td>
+                    <td class="text-center">
+                        {{ $durasi->adzan_isya }}/{{ $durasi->iqomah_isya }}/{{ $durasi->final_isya }}
                     </td>
                     <td class="text-end">
                         <button wire:click="edit({{ $durasi->id }})" class="btn py-2 px-2 rounded-3 shadow-sm">
                             <span wire:loading.remove wire:target="edit({{ $durasi->id }})">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round"
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
                                     class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                     <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
