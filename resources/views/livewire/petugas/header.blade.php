@@ -6,7 +6,7 @@
             {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Petugas' : 'Ubah Pengaturan Petugas' }}
         @endif
     </h3>
-    @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
+    @if (Auth::check() && !$showForm)
         <div class="card-actions">
             <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                 <span wire:loading.remove wire:target="showAddForm">

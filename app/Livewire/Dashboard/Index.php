@@ -20,17 +20,23 @@ class Index extends Component
     public $today;
     public $prayerTimes = [];
     public $currentPrayer = null;
+    public $serverTime;
+    public $apiSource;
 
     public function mount()
     {
-        // Inisialisasi kalender
-        $this->currentMonth = Carbon::now()->month;
-        $this->currentYear = Carbon::now()->year;
-        $this->today = Carbon::now()->day;
+        // Ambil waktu dari API server
+        $this->getServerTime();
+        
+        // Inisialisasi kalender menggunakan waktu server
+        $serverDate = Carbon::parse($this->serverTime, 'Asia/Jakarta');
+        $this->currentMonth = $serverDate->month;
+        $this->currentYear = $serverDate->year;
+        $this->today = $serverDate->day;
         $this->updateCalendar();
 
         // Kunci cache berdasarkan tanggal dan kota
-        $cacheKey = 'prayer_times_pekanbaru_' . now()->format('d-m-Y');
+        $cacheKey = 'prayer_times_pekanbaru_' . Carbon::parse($this->serverTime, 'Asia/Jakarta')->format('d-m-Y');
 
         // Coba ambil dari cache terlebih dahulu
         $cachedPrayerTimes = Cache::get($cacheKey);
@@ -41,56 +47,63 @@ class Index extends Component
             return;
         }
 
-        // Mengambil data jadwal sholat dari Aladhan API untuk Pekanbaru
+        // Mengambil data jadwal sholat dari MyQuran API untuk Pekanbaru
         try {
-            $response = Http::get('http://api.aladhan.com/v1/timingsByCity', [
-                'city' => 'Pekanbaru',
-                'country' => 'Indonesia',
-                'method' => 8,
-                'date' => now()->format('d-m-Y'),
-            ]);
+            $currentDate = Carbon::parse($this->serverTime, 'Asia/Jakarta')->format('Y-m-d');
+            $response = Http::get("https://api.myquran.com/v2/sholat/jadwal/0412/{$currentDate}");
 
             if ($response->successful()) {
-                $data = $response->json()['data']['timings'];
-                $currentTime = Carbon::now('Asia/Jakarta')->format('H:i');
-                $this->prayerTimes = [
-                    [
-                        'name' => 'Subuh',
-                        'time' => $this->formatTime($data['Fajr']),
-                        'icon' => 'sunrise',
-                        'is_active' => $this->isCurrentPrayer($currentTime, $data['Fajr'], $data['Sunrise']),
-                    ],
-                    [
-                        'name' => 'Dzuhur',
-                        'time' => $this->formatTime($data['Dhuhr']),
-                        'icon' => 'sun',
-                        'is_active' => $this->isCurrentPrayer($currentTime, $data['Dhuhr'], $data['Asr']),
-                    ],
-                    [
-                        'name' => 'Maghrib',
-                        'time' => $this->formatTime($data['Maghrib']),
-                        'icon' => 'hazemoon',
-                        'is_active' => $this->isCurrentPrayer($currentTime, $data['Maghrib'], $data['Isha']),
-                    ],
-                    [
-                        'name' => 'Shuruq',
-                        'time' => $this->formatTime($data['Sunrise']),
-                        'icon' => 'sunset',
-                        'is_active' => $this->isCurrentPrayer($currentTime, $data['Sunrise'], $data['Dhuhr']),
-                    ],
-                    [
-                        'name' => 'Ashar',
-                        'time' => $this->formatTime($data['Asr']),
-                        'icon' => 'sunwind',
-                        'is_active' => $this->isCurrentPrayer($currentTime, $data['Asr'], $data['Maghrib']),
-                    ],
-                    [
-                        'name' => 'Isya',
-                        'time' => $this->formatTime($data['Isha']),
-                        'icon' => 'moon',
-                        'is_active' => $this->isCurrentPrayer($currentTime, $data['Isha'], '23:59'),
-                    ],
-                ];
+                $responseData = $response->json();
+                $todaySchedule = $responseData['data']['jadwal'];
+                
+                // Pastikan data jadwal tersedia
+                if (!$todaySchedule || !isset($todaySchedule['date'])) {
+                    $todaySchedule = null;
+                }
+                
+                if ($todaySchedule) {
+                    $currentTime = Carbon::parse($this->serverTime, 'Asia/Jakarta')->format('H:i');
+                    $this->prayerTimes = [
+                        [
+                            'name' => 'Subuh',
+                            'time' => $todaySchedule['subuh'],
+                            'icon' => 'sunrise',
+                            'is_active' => $this->isCurrentPrayer($currentTime, $todaySchedule['subuh'], $todaySchedule['terbit']),
+                        ],
+                        [
+                            'name' => 'Dzuhur',
+                            'time' => $todaySchedule['dzuhur'],
+                            'icon' => 'sun',
+                            'is_active' => $this->isCurrentPrayer($currentTime, $todaySchedule['dzuhur'], $todaySchedule['ashar']),
+                        ],
+                        [
+                            'name' => 'Maghrib',
+                            'time' => $todaySchedule['maghrib'],
+                            'icon' => 'hazemoon',
+                            'is_active' => $this->isCurrentPrayer($currentTime, $todaySchedule['maghrib'], $todaySchedule['isya']),
+                        ],
+                        [
+                            'name' => 'Shuruq',
+                            'time' => $todaySchedule['terbit'],
+                            'icon' => 'sunset',
+                            'is_active' => $this->isCurrentPrayer($currentTime, $todaySchedule['terbit'], $todaySchedule['dzuhur']),
+                        ],
+                        [
+                            'name' => 'Ashar',
+                            'time' => $todaySchedule['ashar'],
+                            'icon' => 'sunwind',
+                            'is_active' => $this->isCurrentPrayer($currentTime, $todaySchedule['ashar'], $todaySchedule['maghrib']),
+                        ],
+                        [
+                            'name' => 'Isya',
+                            'time' => $todaySchedule['isya'],
+                            'icon' => 'moon',
+                            'is_active' => $this->isCurrentPrayer($currentTime, $todaySchedule['isya'], '23:59'),
+                        ],
+                    ];
+                } else {
+                    $this->setFallbackPrayerTimes();
+                }
 
                 // Simpan ke cache selama 24 jam
                 Cache::put($cacheKey, $this->prayerTimes, now()->addDay());
@@ -102,6 +115,52 @@ class Index extends Component
             }
         } catch (\Exception $e) {
             $this->setFallbackPrayerTimes();
+        }
+    }
+
+    private function getServerTime()
+    {
+        try {
+            // Coba API utama
+            $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+
+            if ($response->successful()) {
+                $this->serverTime = $response['serverTime'];
+                $this->serverTime = Carbon::parse($this->serverTime, 'UTC')
+                    ->setTimezone('Asia/Jakarta')
+                    ->toDateTimeString();
+                $this->apiSource = 'pekanbaru';
+            } else {
+                throw new \Exception('API utama gagal');
+            }
+        } catch (\Exception $e) {
+            try {
+                // Fallback ke timeapi.io
+                $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+
+                if ($fallbackResponse->successful()) {
+                    $this->serverTime = $fallbackResponse['dateTime'];
+                    $this->apiSource = 'timeapi';
+                } else {
+                    throw new \Exception('API timeapi.io gagal');
+                }
+            } catch (\Exception $e) {
+                try {
+                    // Fallback ke API Google Script
+                    $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
+
+                    if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
+                        $this->serverTime = $newApiResponse['fulldate'];
+                        $this->apiSource = 'google-script';
+                    } else {
+                        throw new \Exception('API Google Script gagal');
+                    }
+                } catch (\Exception $e) {
+                    // Fallback ke waktu server lokal
+                    $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
+                    $this->apiSource = 'local';
+                }
+            }
         }
     }
 
