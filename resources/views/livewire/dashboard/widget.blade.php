@@ -299,11 +299,7 @@
                                 <tr>
                                     @foreach ($week as $day)
                                         <td
-                                            @if (
-                                                $day &&
-                                                    $day == $today &&
-                                                    \Carbon\Carbon::now()->month == $currentMonth &&
-                                                    \Carbon\Carbon::now()->year == $currentYear) class="bg-primary text-white rounded-3" @endif>
+                                            @if ($day && $day == $today) class="bg-primary text-white rounded-3" @endif>
                                             {{ $day ?? '' }}
                                         </td>
                                     @endforeach
@@ -322,7 +318,7 @@
         <div class="card card-sm rounded-4">
             <div class="card-body px-4">
                 <small class="d-block text-center">Jadwal Sholat Pekanbaru</small>
-                <small class="d-block text-center mb-3">{{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</small>
+                <small class="d-block text-center mb-3">{{ \Carbon\Carbon::parse($serverTime, 'Asia/Jakarta')->translatedFormat('d F Y') }}</small>
                 <div class="row">
                     @if ($prayerTimes[0]['time'] === 'N/A')
                         <div class="col-12 text-center text-danger">

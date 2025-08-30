@@ -33,7 +33,7 @@ class Firdaus extends Component
     public $currentMonth;
     public $currentYear;
     public $currentDayOfWeek;
-    public $baseUrl = 'https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/pekanbaru/';
+    public $baseUrl = 'https://api.myquran.com/v2/sholat/jadwal/0412';
     public $activePrayerStatus = null;
     public $profil;
     public $adzan;
@@ -144,25 +144,26 @@ class Firdaus extends Component
             $this->currentYear      = date('Y', strtotime($this->serverTime));
             $this->currentDayOfWeek = date('N', strtotime($this->serverTime));
 
-            $jadwalUrl = $this->baseUrl . $this->currentYear . '/' . $this->currentMonth . '.json';
+            $jadwalUrl = $this->baseUrl . '/' . $this->currentYear . '/' . $this->currentMonth;
             $jadwalResponse = Http::get($jadwalUrl);
 
             if (!$jadwalResponse->successful()) {
                 $bulanSebelumnya = $this->getPreviousMonth($this->currentMonth, $this->currentYear);
                 $tahunSebelumnya = $bulanSebelumnya['year'];
                 $bulanSebelumnya = $bulanSebelumnya['month'];
-                $fallbackUrl = $this->baseUrl . $tahunSebelumnya . '/' . $bulanSebelumnya . '.json';
+                $fallbackUrl = $this->baseUrl . '/' . $tahunSebelumnya . '/' . $bulanSebelumnya;
                 $jadwalResponse = Http::get($fallbackUrl);
                 logger("Menggunakan data jadwal fallback: " . $fallbackUrl);
             }
 
             if ($jadwalResponse->successful()) {
-                $jadwalSholat = $jadwalResponse->json();
+                $responseData = $jadwalResponse->json();
+                $jadwalSholat = $responseData['data']['jadwal'] ?? [];
                 $this->jadwalSholat = $jadwalSholat;
 
                 $jadwalHariIni = null;
                 foreach ($jadwalSholat as $item) {
-                    if ($item['tanggal'] === $tanggalHariIni) {
+                    if ($item['date'] === $tanggalHariIni) {
                         $jadwalHariIni = $item;
                         break;
                     }
@@ -171,11 +172,11 @@ class Firdaus extends Component
                 if ($jadwalHariIni) {
                     $dzuhurLabel = $this->currentDayOfWeek == 5 ? "Jum'at" : "Dzuhur";
                     $this->prayerTimes = [
-                        ['name' => 'Shubuh', 'time' => $jadwalHariIni['shubuh'], 'icon' => 'sunset'],
+                        ['name' => 'Shubuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunset'],
                         ['name' => 'Shuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
                         ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
-                        ['name' => 'Ashar', 'time' => $jadwalHariIni['ashr'], 'icon' => 'sunwind'],
-                        ['name' => 'Maghrib', 'time' => $jadwalHariIni['magrib'], 'icon' => 'hazemoon'],
+                        ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
+                        ['name' => 'Maghrib', 'time' => $jadwalHariIni['maghrib'], 'icon' => 'hazemoon'],
                         ['name' => 'Isya', 'time' => $jadwalHariIni['isya'], 'icon' => 'moon'],
                     ];
 
@@ -557,25 +558,26 @@ class Firdaus extends Component
 
                 // Fetch prayer times for current day
                 $monthFormatted = str_pad($this->currentMonth, 2, '0', STR_PAD_LEFT);
-                $url = $this->baseUrl . $this->currentYear . '/' . $monthFormatted . '.json';
+                $url = $this->baseUrl . '/' . $this->currentYear . '/' . $monthFormatted;
                 
                 $jadwalResponse = Http::timeout(10)->get($url);
                 if ($jadwalResponse->successful()) {
-                    $this->jadwalSholat = $jadwalResponse->json();
+                    $responseData = $jadwalResponse->json();
+                    $this->jadwalSholat = $responseData['data']['jadwal'] ?? [];
                     $this->apiSource = 'primary';
                     
                     $today = $serverDateTime->format('Y-m-d');
-                    $jadwalHariIni = collect($this->jadwalSholat)->firstWhere('tanggal', $today);
+                    $jadwalHariIni = collect($this->jadwalSholat)->firstWhere('date', $today);
                     
                     if ($jadwalHariIni) {
                         $dzuhurLabel = ($this->currentDayOfWeek === 5) ? "Jum'at" : 'Dzuhur';
                         
                         $this->prayerTimes = [
-                            ['name' => 'Subuh', 'time' => $jadwalHariIni['shubuh'], 'icon' => 'sunrise'],
+                            ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunrise'],
                             ['name' => 'Shuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sun'],
                             ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
-                            ['name' => 'Ashar', 'time' => $jadwalHariIni['ashr'], 'icon' => 'sunwind'],
-                            ['name' => 'Maghrib', 'time' => $jadwalHariIni['magrib'], 'icon' => 'hazemoon'],
+                            ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
+                            ['name' => 'Maghrib', 'time' => $jadwalHariIni['maghrib'], 'icon' => 'hazemoon'],
                             ['name' => 'Isya', 'time' => $jadwalHariIni['isya'], 'icon' => 'moon'],
                         ];
                         

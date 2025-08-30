@@ -1,4 +1,4 @@
-@if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && $showTable)
+@if (Auth::check() && $showTable)
     {{-- Pagination and search control --}}
     <div class="card-body border-bottom py-3">
         <div class="d-flex">
@@ -29,7 +29,9 @@
             <thead>
                 <tr>
                     <th class="w-1">No</th>
-                    <th>Nama Admin Masjid</th>
+                    @can('view nama admin masjid')
+                        <th>Nama Admin Masjid</th>
+                    @endcan
                     <th>Hari</th>
                     <th>Khatib</th>
                     <th>Imam</th>
@@ -43,8 +45,11 @@
                         <td class="text-center text-muted">
                             {{ $loop->iteration + ($petugasList->currentPage() - 1) * $petugasList->perPage() }}
                         </td>
-                        <td class="text-wrap">{{ $petugas->user->name }}</td>
-                        <td>{{ $petugas->hari }}</td>
+                        @can('view nama admin masjid')
+                            <td class="text-wrap">{{ $petugas->user->name }}</td>
+                        @endcan
+                        <td>{{ \Carbon\Carbon::parse($petugas->hari)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
+                        </td>
                         <td>{{ $petugas->khatib }}</td>
                         <td>{{ $petugas->imam }}</td>
                         <td>{{ $petugas->muadzin }}</td>

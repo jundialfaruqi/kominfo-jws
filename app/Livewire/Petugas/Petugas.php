@@ -34,7 +34,7 @@ class Petugas extends Component
 
     protected $rules = [
         'userId'  => 'required|exists:users,id',
-        'hari'    => 'required',
+        'hari'    => 'required|unique:petugas,hari',
         'khatib'  => 'required',
         'imam'    => 'required',
         'muadzin' => 'required',
@@ -44,6 +44,7 @@ class Petugas extends Component
         'userId.required'  => 'Admin Masjid wajib diisi',
         'userId.exists'    => 'Admin Masjid tidak ditemukan',
         'hari.required'    => 'Hari wajib diisi',
+        'hari.unique'      => 'Data Petugas untuk Tanggal ini sudah ada, silahkan pilih tanggal lain',
         'khatib.required'  => 'Khatib wajib diisi',
         'imam.required'    => 'Imam wajib diisi',
         'muadzin.required' => 'Muadzin wajib diisi',
@@ -54,27 +55,10 @@ class Petugas extends Component
         $this->paginate = 10;
         $this->search = '';
 
-        // jika user bukan admin
+        // For non-admin users, show table by default instead of form
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            $petugas = ModelsPetugas::where('user_id', Auth::user()->id)->first();
-
-            // Always show form for non-admin users
-            $this->showForm = true;
-            // Set user ID for new petugas
-            $this->userId = Auth::id();
-
-            if ($petugas) {
-                // If petugas exists, load the data
-                $this->petugasId = $petugas->id;
-                $this->hari = $petugas->hari;
-                $this->khatib = $petugas->khatib;
-                $this->imam = $petugas->imam;
-                $this->muadzin = $petugas->muadzin;
-                $this->isEdit = true;
-            } else {
-                // For new slides, set isEdit to false
-                $this->isEdit = false;
-            }
+            $this->showForm = false;
+            $this->showTable = true;
         }
     }
 
@@ -153,12 +137,6 @@ class Petugas extends Component
 
     public function showAddForm()
     {
-        // Only admin can add new petugas
-        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-            $this->dispatch('error', 'Anda tidak memiliki akses untuk menambah petugas!');
-            return;
-        }
-
         $this->resetValidation();
         $this->reset(
             [
@@ -170,6 +148,12 @@ class Petugas extends Component
                 'muadzin',
             ]
         );
+
+        // For non-admin users, automatically set their user ID
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
+            $this->userId = Auth::id();
+        }
+
         $this->isEdit = false;
         $this->showForm = true;
         $this->showTable = false;
@@ -225,22 +209,24 @@ class Petugas extends Component
             $this->userId = $currentUser->id;
         }
 
-        // Additional validation for one profile per user
-        if (!$this->isEdit) {
-            // Check if the selected user already has a profile
-            $existingPetugas = ModelsPetugas::where('user_id', $this->userId)->first();
-            if ($existingPetugas) {
-                $this->dispatch('error', 'User ini sudah memiliki petugas!');
-                return;
-            }
-        } else {
-            // When editing, make sure we're not changing to a user who already has a profile
-            $existingPetugas = ModelsPetugas::where('user_id', $this->userId)
-                ->where('id', '!=', $this->petugasId)
-                ->first();
-            if ($existingPetugas) {
-                $this->dispatch('error', 'User ini sudah memiliki petugas!');
-                return;
+        // For admin users, still validate one profile per user
+        if (in_array($currentUser->role, ['Super Admin', 'Admin'])) {
+            if (!$this->isEdit) {
+                // Check if the selected user already has a profile
+                $existingPetugas = ModelsPetugas::where('user_id', $this->userId)->first();
+                if ($existingPetugas) {
+                    $this->dispatch('error', 'User ini sudah memiliki petugas!');
+                    return;
+                }
+            } else {
+                // When editing, make sure we're not changing to a user who already has a profile
+                $existingPetugas = ModelsPetugas::where('user_id', $this->userId)
+                    ->where('id', '!=', $this->petugasId)
+                    ->first();
+                if ($existingPetugas) {
+                    $this->dispatch('error', 'User ini sudah memiliki petugas!');
+                    return;
+                }
             }
         }
 
@@ -271,34 +257,20 @@ class Petugas extends Component
             $petugas->save();
 
             $this->dispatch('success', $this->isEdit ? 'Petugas berhasil diubah!' : 'Petugas berhasil ditambahkan!');
-            $this->showTable = true;
 
-            // only hide form and reset field if user is not admin
-            if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
-                $this->showForm = false;
-                $this->reset(
-                    [
-                        'petugasId',
-                        'userId',
-                        'hari',
-                        'khatib',
-                        'imam',
-                        'muadzin'
-                    ]
-                );
-            } else {
-                // for regular users, keep the form visible and reload their data
-                $this->showForm = true;
-                $petugas = ModelsPetugas::where('user_id', Auth::id())->first();
-                if ($petugas) {
-                    $this->petugasId = $petugas->id;
-                    $this->hari      = $petugas->hari;
-                    $this->khatib    = $petugas->khatib;
-                    $this->imam      = $petugas->imam;
-                    $this->muadzin   = $petugas->muadzin;
-                    $this->isEdit    = true;
-                }
-            }
+            // Hide form and show table for all users after successful save
+            $this->showForm = false;
+            $this->showTable = true;
+            $this->reset(
+                [
+                    'petugasId',
+                    'userId',
+                    'hari',
+                    'khatib',
+                    'imam',
+                    'muadzin'
+                ]
+            );
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menyimpan petugas: ' . $e->getMessage());
         }

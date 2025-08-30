@@ -1024,7 +1024,7 @@
                 }
 
                 // Cari jadwal untuk hari ini
-                const jadwalHariIni = jadwalSholat.find(item => item.tanggal === today);
+                const jadwalHariIni = jadwalSholat.find(item => item.date === today);
 
                 if (!jadwalHariIni) {
                     console.log(`Jadwal sholat tidak ditemukan untuk tanggal: ${today}`);
@@ -1037,7 +1037,7 @@
 
                 const prayerTimes = [{
                         name: 'Shubuh',
-                        time: jadwalHariIni.shubuh
+                        time: jadwalHariIni.subuh
                     },
                     {
                         name: 'Shuruq',
@@ -1049,11 +1049,11 @@
                     },
                     {
                         name: 'Ashar',
-                        time: jadwalHariIni.ashr
+                        time: jadwalHariIni.ashar
                     },
                     {
                         name: 'Maghrib',
-                        time: jadwalHariIni.magrib
+                        time: jadwalHariIni.maghrib
                     },
                     {
                         name: 'Isya',
