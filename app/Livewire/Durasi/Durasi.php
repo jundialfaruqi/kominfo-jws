@@ -21,6 +21,7 @@ class Durasi extends Component
 
     public $durasiId;
     public $userId;
+    public $adzan_shuruq;
     public $adzan_shubuh;
     public $iqomah_shubuh;
     public $final_shubuh;
@@ -46,6 +47,7 @@ class Durasi extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
+        'adzan_shuruq' => 'required|numeric|min:1',
         'adzan_shubuh' => 'required|numeric|min:1',
         'iqomah_shubuh' => 'required|numeric|min:1',
         'final_shubuh' => 'required|numeric|min:1',
@@ -67,6 +69,9 @@ class Durasi extends Component
     protected $messages = [
         'userId.required' => 'Admin Masjid wajib diisi',
         'userId.exists' => 'Admin Masjid tidak ditemukan',
+        'adzan_shuruq.required' => 'Durasi adzan Shuruq wajib diisi',
+        'adzan_shuruq.numeric' => 'Durasi adzan Shuruq harus berupa angka',
+        'adzan_shuruq.min' => 'Durasi adzan Shuruq minimal 1 menit',
         'adzan_shubuh.required' => 'Durasi adzan Shubuh wajib diisi',
         'adzan_shubuh.numeric' => 'Durasi adzan Shubuh harus berupa angka',
         'adzan_shubuh.min' => 'Durasi adzan Shubuh minimal 1 menit',
@@ -134,6 +139,7 @@ class Durasi extends Component
             if ($durasi) {
                 // Jika durasi sudah ada, muat data
                 $this->durasiId = $durasi->id;
+                $this->adzan_shuruq = $durasi->adzan_shuruq;
                 $this->adzan_shubuh = $durasi->adzan_shubuh;
                 $this->iqomah_shubuh = $durasi->iqomah_shubuh;
                 $this->final_shubuh = $durasi->final_shubuh;
@@ -166,6 +172,7 @@ class Durasi extends Component
         $this->reset([
             'durasiId',
             'userId',
+            'adzan_shuruq',
             'adzan_shubuh',
             'iqomah_shubuh',
             'final_shubuh',
@@ -197,6 +204,7 @@ class Durasi extends Component
             ->select(
                 'id',
                 'user_id',
+                'adzan_shuruq',
                 'adzan_shubuh',
                 'iqomah_shubuh',
                 'final_shubuh',
@@ -302,6 +310,7 @@ class Durasi extends Component
 
         $this->durasiId = $durasi->id;
         $this->userId = $durasi->user_id;
+        $this->adzan_shuruq = $durasi->adzan_shuruq;
         $this->adzan_shubuh = $durasi->adzan_shubuh;
         $this->iqomah_shubuh = $durasi->iqomah_shubuh;
         $this->final_shubuh = $durasi->final_shubuh;
@@ -399,6 +408,7 @@ class Durasi extends Component
             }
 
             $durasi->user_id = $this->userId;
+            $durasi->adzan_shuruq = $this->adzan_shuruq;
             $durasi->adzan_shubuh = $this->adzan_shubuh;
             $durasi->iqomah_shubuh = $this->iqomah_shubuh;
             $durasi->final_shubuh = $this->final_shubuh;
@@ -426,6 +436,7 @@ class Durasi extends Component
                 $this->reset([
                     'durasiId',
                     'userId',
+                    'adzan_shuruq',
                     'adzan_shubuh',
                     'iqomah_shubuh',
                     'final_shubuh',
@@ -449,6 +460,7 @@ class Durasi extends Component
                 $durasi = ModelsDurasi::where('user_id', Auth::id())->first();
                 if ($durasi) {
                     $this->durasiId = $durasi->id;
+                    $this->adzan_shuruq = $durasi->adzan_shuruq;
                     $this->adzan_shubuh = $durasi->adzan_shubuh;
                     $this->iqomah_shubuh = $durasi->iqomah_shubuh;
                     $this->final_shubuh = $durasi->final_shubuh;

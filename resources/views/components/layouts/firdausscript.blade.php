@@ -2070,6 +2070,20 @@
             return window.cachedJumatSlideDuration;
         }
 
+        // Fungsi untuk mendapatkan durasi shuruq (dalam detik)
+        function getShuruqDuration() {
+            const durasiData = getDurasiData();
+
+            // Default durasi jika data tidak tersedia (dalam detik)
+            const defaultDuration = 3 * 60; // 3 menit
+
+            if (!durasiData || !durasiData.adzan_shuruq) {
+                return defaultDuration;
+            }
+
+            return durasiData.adzan_shuruq * 60; // Konversi menit ke detik
+        }
+
         function showAdzanPopup(prayerName, prayerTimeStr, isRestored = false) {
             // Pastikan audio dijeda saat adzan dimulai
             pauseAudio();
@@ -2104,7 +2118,10 @@
             const $title = $('#adzanTitle');
             const $progress = $('#adzanProgress');
             const $countdown = $('#adzanCountdown');
+            const $label = $('#adzanLabel');
 
+            // Set label untuk adzan biasa
+            $label.text('Waktunya Azan');
             $title.text(` ${prayerName}`);
             $popup.css('display', 'flex');
 
@@ -2255,7 +2272,7 @@
                     const seconds = Math.floor(timeLeft % 60);
 
                     $countdown.text(
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
                     );
 
                     lastCountdownUpdate = currentTime;
@@ -2270,6 +2287,108 @@
 
             // Return function untuk cleanup jika diperlukan
             return function stopAdzan() {
+                isAdzanPlaying = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            };
+        }
+
+        function showShuruqPopup(prayerName, prayerTimeStr, isRestored = false) {
+            // Pastikan audio dijeda saat shuruq dimulai
+            pauseAudio();
+
+            const $popup = $('#adzanPopup');
+            const $title = $('#adzanTitle');
+            const $progress = $('#adzanProgress');
+            const $countdown = $('#adzanCountdown');
+            const $label = $('#adzanLabel');
+
+            // Set label khusus untuk shuruq
+            $label.text('waktu');
+            // Set title dengan content 'waktu' untuk shuruq
+            $title.text(`${prayerName}`);
+            $popup.css('display', 'flex');
+
+            // Putar beep sound untuk shuruq
+            if (!isRestored) {
+                playBeepSound(1);
+                $progress.css('width', '0%');
+            }
+
+            if (!adzanStartTime) {
+                if (isRestored && activePrayerStatus && activePrayerStatus.phase === 'adzan') {
+                    const now = getCurrentTimeFromServer().getTime();
+                    adzanStartTime = now - (activePrayerStatus.elapsedSeconds * 1000);
+                } else {
+                    adzanStartTime = calculateSyncStartTime(prayerTimeStr);
+                }
+                localStorage.setItem('adzanStartTime', adzanStartTime);
+                localStorage.setItem('currentPrayerName', prayerName);
+                localStorage.setItem('currentPrayerTime', prayerTimeStr);
+                currentPrayerName = prayerName;
+                currentPrayerTime = prayerTimeStr;
+            }
+
+            // Gunakan durasi dinamis untuk shuruq
+            const duration = getShuruqDuration(); // dalam detik
+            let lastCountdownUpdate = 0;
+            isAdzanPlaying = true;
+            let animationId;
+
+            // Fungsi animasi dengan requestAnimationFrame
+            function updateShuruqAnimation(timestamp) {
+                if (!isAdzanPlaying) {
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    return;
+                }
+
+                const currentTime = getCurrentTimeFromServer().getTime();
+                const elapsedSeconds = (currentTime - adzanStartTime) / 1000;
+                const timeLeft = duration - elapsedSeconds;
+
+                // Cek apakah shuruq sudah selesai
+                if (timeLeft <= 0) {
+                    $popup.css('display', 'none');
+                    isAdzanPlaying = false;
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+
+                    // Clear shuruq state setelah selesai
+                    clearShuruqAlarmState();
+                    return;
+                }
+
+                // Update progress bar
+                $progress.css({
+                    'animation': `progressAnimation ${duration}s linear forwards`
+                });
+
+                // Update countdown hanya setiap detik untuk efisiensi
+                if (currentTime - lastCountdownUpdate >= 1000) {
+                    const hours = Math.floor(timeLeft / 3600);
+                    const minutes = Math.floor((timeLeft % 3600) / 60);
+                    const seconds = Math.floor(timeLeft % 60);
+
+                    $countdown.text(
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                    );
+
+                    lastCountdownUpdate = currentTime;
+                }
+
+                // Lanjutkan animasi
+                animationId = requestAnimationFrame(updateShuruqAnimation);
+            }
+
+            // Mulai animasi
+            animationId = requestAnimationFrame(updateShuruqAnimation);
+
+            // Return function untuk cleanup jika diperlukan
+            return function stopShuruq() {
                 isAdzanPlaying = false;
                 if (animationId) {
                     cancelAnimationFrame(animationId);
@@ -2515,7 +2634,7 @@
                     const seconds = Math.floor(timeLeft % 60);
 
                     $countdown.text(
-                        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
                     );
 
                     lastCountdownUpdate = currentTime;
@@ -3179,12 +3298,8 @@
                         if (!isShuruqAlarmPlaying) {
                             isShuruqAlarmPlaying = true;
                             localStorage.setItem('shuruqAlarmTime', currentTimeFormatted);
-                            // Jeda audio saat alarm Shuruq/Syuruq/Terbit dimulai
-                            pauseAudio();
-                            playBeepSound(1);
-                            shuruqAlarmTimeout = setTimeout(() => {
-                                clearShuruqAlarmState();
-                            }, 60000);
+                            // Tampilkan popup adzan shuruq dengan content 'waktu'
+                            showShuruqPopup(prayer.name, prayer.time);
                         }
                     } else if (prayer.name === "Jum'at" && fridayInfoStartTime && now.getTime() <
                         fridayInfoEndTime) {
@@ -3654,9 +3769,16 @@
                 `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
             if (savedShuruqTime === currentTimeFormatted) {
                 isShuruqAlarmPlaying = true;
-                shuruqAlarmTimeout = setTimeout(() => {
-                    clearShuruqAlarmState();
-                }, 60000);
+                // Cari prayer time shuruq untuk restore popup
+                const prayerTimes = getPrayerTimes();
+                const shuruqPrayer = prayerTimes.find(prayer =>
+                    prayer.name.toLowerCase().includes('shuruq') ||
+                    prayer.name.toLowerCase().includes('syuruq') ||
+                    prayer.name.toLowerCase().includes('terbit')
+                );
+                if (shuruqPrayer) {
+                    showShuruqPopup(shuruqPrayer.name, shuruqPrayer.time, true);
+                }
             } else {
                 clearShuruqAlarmState();
             }
