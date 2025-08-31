@@ -968,7 +968,7 @@
                 const year = now.getFullYear();
                 const monthFormatted = month.toString().padStart(2, '0');
                 const url =
-                    `https://raw.githubusercontent.com/lakuapik/jadwalsholatorg/master/adzan/pekanbaru/${year}/${monthFormatted}.json`;
+                    `https://api.myquran.com/v2/sholat/jadwal/0412/${year}/${monthFormatted}`;
 
                 // Ambil nilai bulan dan tahun saat ini dari input hidden
                 const currentMonthValue = $('#current-month').val() || new Date().getMonth() + 1;
@@ -981,14 +981,18 @@
                             url,
                             method: 'GET'
                         });
-                        console.log("Data bulan baru berhasil diambil, memperbarui input hidden...");
+                        console.log(
+                            `Data bulan baru berhasil diambil untuk bulan ${monthFormatted}/${year}, memperbarui input hidden...`
+                            );
 
                         // Update input hidden dengan bulan dan tahun baru
                         $('#current-month').val(month);
                         $('#current-year').val(year);
 
                         console.log(`Input hidden diperbarui: bulan=${month}, tahun=${year}`);
-                        return response;
+
+                        // Return the jadwal data from the API response structure
+                        return response.data && response.data.jadwal ? response.data.jadwal : response;
                     } catch (fetchError) {
                         console.error("Error saat mengambil data jadwal sholat:", fetchError);
                         return null;
@@ -2333,6 +2337,7 @@
             // Gunakan durasi dinamis untuk shuruq
             const duration = getShuruqDuration(); // dalam detik
             let lastCountdownUpdate = 0;
+            let hasPlayedFinalBeep = false;
             isAdzanPlaying = true;
             let animationId;
 
@@ -2348,6 +2353,12 @@
                 const currentTime = getCurrentTimeFromServer().getTime();
                 const elapsedSeconds = (currentTime - adzanStartTime) / 1000;
                 const timeLeft = duration - elapsedSeconds;
+
+                // Mainkan beep sound saat 5 detik terakhir
+                if (timeLeft <= 5 && !hasPlayedFinalBeep) {
+                    playBeepSound(1);
+                    hasPlayedFinalBeep = true;
+                }
 
                 // Cek apakah shuruq sudah selesai
                 if (timeLeft <= 0) {

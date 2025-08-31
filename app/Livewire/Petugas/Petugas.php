@@ -34,7 +34,7 @@ class Petugas extends Component
 
     protected $rules = [
         'userId'  => 'required|exists:users,id',
-        'hari'    => 'required|unique:petugas,hari',
+        'hari'    => 'required',
         'khatib'  => 'required',
         'imam'    => 'required',
         'muadzin' => 'required',
@@ -44,11 +44,28 @@ class Petugas extends Component
         'userId.required'  => 'Admin Masjid wajib diisi',
         'userId.exists'    => 'Admin Masjid tidak ditemukan',
         'hari.required'    => 'Hari wajib diisi',
-        'hari.unique'      => 'Data Petugas untuk Tanggal ini sudah ada, silahkan pilih tanggal lain',
         'khatib.required'  => 'Khatib wajib diisi',
         'imam.required'    => 'Imam wajib diisi',
         'muadzin.required' => 'Muadzin wajib diisi',
     ];
+
+    public $hariError = '';
+
+    public function updatedHari()
+    {
+        $this->hariError = '';
+        $this->validateFridayDate();
+    }
+
+    private function validateFridayDate()
+    {
+        if ($this->hari) {
+            $dayOfWeek = date('N', strtotime($this->hari));
+            if ($dayOfWeek != 5) { // 5 = Friday
+                $this->hariError = 'Tanggal yang dipilih bukan Hari Jum\'at, harap pilih tanggal di Hari Jum\'at';
+            }
+        }
+    }
 
     public function mount()
     {
@@ -75,6 +92,7 @@ class Petugas extends Component
                 'khatib',
                 'imam',
                 'muadzin',
+                'hariError',
             ]
         );
     }
@@ -146,6 +164,7 @@ class Petugas extends Component
                 'khatib',
                 'imam',
                 'muadzin',
+                'hariError',
             ]
         );
 
@@ -195,7 +214,8 @@ class Petugas extends Component
                 'hari',
                 'khatib',
                 'imam',
-                'muadzin'
+                'muadzin',
+                'hariError'
             ]
         );
     }
@@ -230,6 +250,29 @@ class Petugas extends Component
             }
         }
 
+        // Validate that the selected date is a Friday
+        if ($this->hari) {
+            $dayOfWeek = date('N', strtotime($this->hari));
+            if ($dayOfWeek != 5) { // 5 = Friday
+                $this->hariError = 'Tanggal yang dipilih bukan Hari Jum\'at, harap pilih tanggal di Hari Jum\'at';
+                return;
+            }
+        }
+
+        // Check for duplicate hari for the same user
+        $existingHari = ModelsPetugas::where('user_id', $this->userId)
+            ->where('hari', $this->hari);
+
+        if ($this->isEdit) {
+            $existingHari->where('id', '!=', $this->petugasId);
+        }
+
+        if ($existingHari->exists()) {
+            $this->hariError = 'Tanggal ini tidak bisa digunakan karena sudah digunakan sebelumnya! Silahkan pilih hari Jumat di tanggal lain.';
+            return;
+        }
+
+        $this->hariError = '';
         $this->validate();
 
         try {
@@ -268,7 +311,8 @@ class Petugas extends Component
                     'hari',
                     'khatib',
                     'imam',
-                    'muadzin'
+                    'muadzin',
+                    'hariError'
                 ]
             );
         } catch (\Exception $e) {
