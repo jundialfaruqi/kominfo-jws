@@ -53,11 +53,14 @@
                         </label>
                     </div>
                     <div class="col-md-10">
-                        <input type="date" class="form-control rounded-3 @error('hari') is-invalid @enderror"
+                        <input type="date" class="form-control rounded-3 @error('hari') is-invalid @enderror {{ $hariError ? 'is-invalid' : '' }}"
                             wire:model="hari">
                         @error('hari')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        @if($hariError)
+                            <div class="invalid-feedback d-block">{{ $hariError }}</div>
+                        @endif
                     </div>
                 </div>
 

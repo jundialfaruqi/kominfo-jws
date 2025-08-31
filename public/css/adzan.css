@@ -320,25 +320,25 @@
     }
 
     .adzan {
-        font-size: 8rem;
-        letter-spacing: 3px;
+        font-size: 9rem;
+        letter-spacing: 4px;
     }
 
     .adzan-title,
     .iqomah-title {
-        font-size: 20rem;
+        font-size: 24rem;
         margin-bottom: 3rem;
     }
 
     .progress-container,
     .iqomah-progress-container {
-        height: 120px;
-        max-width: 1350px;
+        height: 140px;
+        max-width: 1550px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 18rem;
+        font-size: 32rem;
     }
 
     .friday-date,
@@ -447,28 +447,28 @@
     }
 
     .adzan {
-        font-size: 4rem;
-        letter-spacing: 2.5px;
+        font-size: 5.5rem;
+        letter-spacing: 6px;
     }
 
     .adzan-title {
-        font-size: 10rem;
+        font-size: 15rem;
         margin-bottom: 2.5rem;
     }
 
     .progress-container,
     .iqomah-progress-container {
-        height: 50px;
-        max-width: 700px;
+        height: 110px;
+        max-width: 1100px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 9rem;
+        font-size: 20rem;
     }
 
     .iqomah-title {
-        font-size: 9rem;
+        font-size: 15rem;
         margin-bottom: 2.5rem;
     }
 
@@ -580,25 +580,25 @@
     }
 
     .adzan {
-        font-size: 3.5rem;
-        letter-spacing: 2px;
+        font-size: 5rem;
+        letter-spacing: 3px;
     }
 
     .adzan-title,
     .iqomah-title {
-        font-size: 8rem;
+        font-size: 12rem;
         margin-bottom: 2rem;
     }
 
     .progress-container,
     .iqomah-progress-container {
-        height: 45px;
-        max-width: 650px;
+        height: 80px;
+        max-width: 850px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 8rem;
+        font-size: 16rem;
     }
 
     .friday-date,
@@ -607,7 +607,7 @@
     }
 
     .day-name-popup {
-        font-size: 4rem;
+        font-size: 6rem;
     }
 
     .responsive-table td {
@@ -705,25 +705,25 @@
     }
 
     .adzan {
-        font-size: 3rem;
-        letter-spacing: 1.8px;
+        font-size: 3.5rem;
+        letter-spacing: 4px;
     }
 
     .adzan-title,
     .iqomah-title {
-        font-size: 7rem;
+        font-size: 10rem;
         margin-bottom: 1.8rem;
     }
 
     .progress-container,
     .iqomah-progress-container {
-        height: 40px;
-        max-width: 600px;
+        height: 70px;
+        max-width: 800px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 7rem;
+        font-size: 13rem;
     }
 
     .friday-date,
@@ -814,25 +814,25 @@
     }
 
     .adzan {
-        font-size: 2.5rem;
-        letter-spacing: 1.5px;
+        font-size: 3.2rem;
+        letter-spacing: 3px;
     }
 
     .adzan-title,
     .iqomah-title {
-        font-size: 6rem;
+        font-size: 8rem;
         margin-bottom: 1.5rem;
     }
 
     .progress-container,
     .iqomah-progress-container {
-        height: 35px;
+        height: 50px;
         max-width: 500px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 6rem;
+        font-size: 10rem;
     }
 
     .friday-date,
@@ -935,13 +935,13 @@
 
     .progress-container,
     .iqomah-progress-container {
-        height: 30px;
+        height: 50px;
         max-width: 400px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 5rem;
+        font-size: 14rem;
     }
 
     .friday-date,
