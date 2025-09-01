@@ -107,15 +107,13 @@
     color: #d4af37;
     text-transform: uppercase;
     font-weight: bold;
-    margin-bottom: 2rem;
+    margin-bottom: 0;
 }
 
+.iqomah-title,
 .adzan-title {
     font-size: 9rem;
-}
-
-.iqomah-title {
-    font-size: 7rem;
+    font-family: "Arial", sans-serif;
 }
 
 .friday-date,
@@ -141,7 +139,7 @@
     height: 40px;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 100px;
-    margin: 0 auto 1rem;
+    margin: 0 auto 0.5rem;
     overflow: hidden;
 }
 
@@ -165,13 +163,13 @@
 
 .countdown,
 .iqomah-countdown {
-    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-family: 'JetBrains Mono', 'Roboto Mono', 'Roboto Mono', 'Courier New', monospace;
     font-weight: 700;
     font-size: clamp(6rem, 8vw, 8rem);
     color: #ffffff;
     text-shadow: 0 4px 8px rgb(76, 76, 76);
     letter-spacing: 0.05em;
-    padding: 0.5rem 1rem;
+    padding: 0;
     border-radius: 8px;
     display: inline-block;
 }
@@ -203,8 +201,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.5rem;
-    margin-top: 1rem;
 }
 
 .logo-popup img {
@@ -224,7 +220,7 @@
 
 .jumbotron-countdown,
 .jumbotron-digital-clock {
-    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
     position: absolute;
     bottom: 20px;
     background: rgba(0, 0, 0, 0.6);
@@ -327,7 +323,7 @@
     .adzan-title,
     .iqomah-title {
         font-size: 24rem;
-        margin-bottom: 3rem;
+        margin-bottom: 1rem;
     }
 
     .progress-container,
@@ -373,7 +369,7 @@
     }
 
     .logo-popup {
-        margin-top: 2rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -453,7 +449,7 @@
 
     .adzan-title {
         font-size: 15rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
 
     .progress-container,
@@ -469,7 +465,7 @@
 
     .iqomah-title {
         font-size: 15rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
     }
 
     .friday-date,
@@ -504,7 +500,7 @@
     }
 
     .logo-popup {
-        margin-top: 1.5rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -586,19 +582,24 @@
 
     .adzan-title,
     .iqomah-title {
-        font-size: 14rem;
-        margin-bottom: 2rem;
+        font-size: 12rem;
+        margin-bottom: 0;
+        margin-top: 0;
+        padding: 0;
     }
 
     .progress-container,
     .iqomah-progress-container {
         height: 80px;
         max-width: 850px;
+        margin-top: 0;
+        margin-bottom: 0;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 18rem;
+        font-size: 16rem;
+        padding: 0;
     }
 
     .friday-date,
@@ -633,7 +634,7 @@
     }
 
     .logo-popup {
-        margin-top: 1.2rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -707,12 +708,13 @@
     .adzan {
         font-size: 3.5rem;
         letter-spacing: 4px;
+        margin: 0;
+        padding: 0;
     }
 
     .adzan-title,
     .iqomah-title {
         font-size: 12rem;
-        margin-bottom: 1.8rem;
     }
 
     .progress-container,
@@ -746,7 +748,7 @@
     }
 
     .logo-popup {
-        margin-top: 1.1rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -821,7 +823,7 @@
     .adzan-title,
     .iqomah-title {
         font-size: 10rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .progress-container,
@@ -855,7 +857,7 @@
     }
 
     .logo-popup {
-        margin-top: 1rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -930,7 +932,7 @@
     .adzan-title,
     .iqomah-title {
         font-size: 5rem;
-        margin-bottom: 1.2rem;
+        margin-bottom: 1rem;
     }
 
     .progress-container,
@@ -981,7 +983,7 @@
     }
 
     .logo-popup {
-        margin-top: 0.8rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -1138,7 +1140,7 @@
     }
 
     .logo-popup {
-        margin-top: 0.7rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -1257,7 +1259,7 @@
     }
 
     .logo-popup {
-        margin-top: 0.6rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -1377,7 +1379,7 @@
     }
 
     .logo-popup {
-        margin-top: 0.5rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
@@ -1472,7 +1474,7 @@
     }
 
     .logo-popup {
-        margin-top: 0.4rem;
+        margin-top: 0;
     }
 
     .logo-popup img {
