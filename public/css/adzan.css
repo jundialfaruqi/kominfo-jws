@@ -165,7 +165,7 @@
 
 .countdown,
 .iqomah-countdown {
-    font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
     font-weight: 700;
     font-size: clamp(6rem, 8vw, 8rem);
     color: #ffffff;
@@ -224,7 +224,7 @@
 
 .jumbotron-countdown,
 .jumbotron-digital-clock {
-    font-family: 'JetBrains Mono', 'Roboto Mono', 'Courier New', monospace;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
     position: absolute;
     bottom: 20px;
     background: rgba(0, 0, 0, 0.6);
