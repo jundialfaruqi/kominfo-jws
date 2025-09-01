@@ -272,7 +272,7 @@
     {{-- Adzan Popup --}}
     <div id="adzanPopup" class="adzan-popup" style="display: none;">
         <div class="adzan-popup-content">
-            <div id="adzanLabel" class="adzan">Waktunya Azan</div>
+            <div id="adzanLabel" class="adzan">Waktunya Adzan</div>
             <h2 id="adzanTitle" class="adzan-title"></h2>
             <div class="progress-container">
                 <div id="adzanProgress" class="progress-bar"></div>

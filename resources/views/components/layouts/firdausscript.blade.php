@@ -2125,7 +2125,7 @@
             const $label = $('#adzanLabel');
 
             // Set label untuk adzan biasa
-            $label.text('Waktunya Azan');
+            $label.text('Waktunya Adzan');
             $title.text(` ${prayerName}`);
             $popup.css('display', 'flex');
 
