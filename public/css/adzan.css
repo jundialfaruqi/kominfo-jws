@@ -586,7 +586,7 @@
 
     .adzan-title,
     .iqomah-title {
-        font-size: 12rem;
+        font-size: 14rem;
         margin-bottom: 2rem;
     }
 
@@ -598,7 +598,7 @@
 
     .countdown,
     .iqomah-countdown {
-        font-size: 16rem;
+        font-size: 18rem;
     }
 
     .friday-date,
@@ -711,7 +711,7 @@
 
     .adzan-title,
     .iqomah-title {
-        font-size: 10rem;
+        font-size: 12rem;
         margin-bottom: 1.8rem;
     }
 
@@ -723,7 +723,7 @@
 
     .countdown,
     .iqomah-countdown {
-        font-size: 13rem;
+        font-size: 15rem;
     }
 
     .friday-date,
@@ -820,19 +820,19 @@
 
     .adzan-title,
     .iqomah-title {
-        font-size: 8rem;
+        font-size: 10rem;
         margin-bottom: 1.5rem;
     }
 
     .progress-container,
     .iqomah-progress-container {
         height: 50px;
-        max-width: 500px;
+        max-width: 600px;
     }
 
     .countdown,
     .iqomah-countdown {
-        font-size: 10rem;
+        font-size: 13rem;
     }
 
     .friday-date,

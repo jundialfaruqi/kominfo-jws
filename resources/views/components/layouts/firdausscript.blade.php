@@ -983,7 +983,7 @@
                         });
                         console.log(
                             `Data bulan baru berhasil diambil untuk bulan ${monthFormatted}/${year}, memperbarui input hidden...`
-                            );
+                        );
 
                         // Update input hidden dengan bulan dan tahun baru
                         $('#current-month').val(month);
