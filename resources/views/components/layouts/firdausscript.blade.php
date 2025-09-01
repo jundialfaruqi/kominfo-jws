@@ -946,10 +946,10 @@
             });
         }, 3000); // 3000 milidetik = 3 detik
 
-        // setInterval(() => {
-        //     syncServerTime();
-        //     // console.log('Waktu server diupdate setiap 30 detik');
-        // }, 30000);
+        setInterval(() => {
+            syncServerTime();
+            // console.log('Waktu server diupdate setiap 30 detik');
+        }, 30000);
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
