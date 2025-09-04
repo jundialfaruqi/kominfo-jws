@@ -1825,31 +1825,27 @@
                 // Update tanggal dan waktu
                 updateDate();
 
-                // Update jadwal sholat untuk hari baru dari 
-                if (typeof Livewire !== 'undefined' && Livewire.find) {
-                    try {
-                        const component = Livewire.find(document.querySelector('[wire\\:id]').getAttribute(
-                            'wire:id'));
-                        if (component) {
-                            component.call('refreshPrayerTimes').then(() => {
-                                console.log(' prayer times refreshed successfully');
-                                // Update frontend display setelah diperbarui
-                                updateDailyPrayerTimes();
-                            }).catch(error => {
-                                console.error('Error refreshing prayer times:', error);
-                                // Fallback ke update frontend saja
-                                updateDailyPrayerTimes();
-                            });
+                // Update jadwal sholat untuk hari baru dengan AJAX
+                $.ajax({
+                    url: '/api/refresh-prayer-times',
+                    method: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            console.log('Prayer times refreshed successfully');
+                            // Update frontend display setelah diperbarui
+                            updateDailyPrayerTimes();
                         } else {
+                            console.error('Error refreshing prayer times:', response.message);
                             updateDailyPrayerTimes();
                         }
-                    } catch (error) {
-                        console.error('Error calling Livewire refreshPrayerTimes:', error);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error refreshing prayer times:', error);
+                        // Fallback ke update frontend saja
                         updateDailyPrayerTimes();
                     }
-                } else {
-                    updateDailyPrayerTimes();
-                }
+                });
 
                 // Juga cek apakah perlu mengambil data bulan baru
                 fetchPrayerTimes();
@@ -1897,29 +1893,25 @@
         checkDayChange();
         scheduleMidnightCheck();
 
-        // Update jadwal sholat untuk hari ini saat halaman dimuat
-        // Pertama refresh dari , lalu update frontend display
-        if (typeof Livewire !== 'undefined' && Livewire.find) {
-            try {
-                const component = Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
-                if (component) {
-                    component.call('refreshPrayerTimes').then(() => {
-                        console.log('Initial prayer times refreshed successfully');
-                        updateDailyPrayerTimes();
-                    }).catch(error => {
-                        console.error('Error refreshing initial prayer times:', error);
-                        updateDailyPrayerTimes();
-                    });
+        // Update jadwal sholat untuk hari ini saat halaman dimuat dengan AJAX
+        $.ajax({
+            url: '/api/refresh-prayer-times',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    console.log('Initial prayer times refreshed successfully');
+                    updateDailyPrayerTimes();
                 } else {
+                    console.error('Error refreshing initial prayer times:', response.message);
                     updateDailyPrayerTimes();
                 }
-            } catch (error) {
-                console.error('Error calling initial Livewire refreshPrayerTimes:', error);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error refreshing initial prayer times:', error);
                 updateDailyPrayerTimes();
             }
-        } else {
-            updateDailyPrayerTimes();
-        }
+        });
 
         function clearShuruqAlarmState() {
             isShuruqAlarmPlaying = false;
@@ -3965,7 +3957,6 @@
             updateIqomahImages();
             updateAdzanImages();
             updateFridayOfficials();
-            updateDailyPrayerTimes();
         }, 1200000); // 1200000 milidetik = 30 menit
 
         updateJumbotronData();
@@ -3976,6 +3967,7 @@
             updateMarqueeText();
             checkThemeUpdate();
             updateSlides();
+            updateDailyPrayerTimes();
         }, 120000); // 120000 milidetik = 2 menit
 
         // Fungsi untuk toggle full screen
