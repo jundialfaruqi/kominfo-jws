@@ -475,4 +475,45 @@ Route::get('/api/adzan-audio', function () {
     return response()->json(['success' => false, 'message' => 'Data tidak ditemukan, Resource not found'], 200);
 })->name('api.adzan-audio.legacy');
 
+// API endpoint for refreshing prayer times
+Route::get('/api/refresh-prayer-times', function () {
+    try {
+        $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+        if ($response->successful()) {
+            $serverTime = $response['serverTime'];
+            $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
+            $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+            $currentMonth = (int) $serverDateTime->format('n');
+            $currentYear = (int) $serverDateTime->format('Y');
+            
+            // Fetch prayer times for current month
+            $monthFormatted = str_pad($currentMonth, 2, '0', STR_PAD_LEFT);
+            $baseUrl = 'https://api.myquran.com/v2/sholat/jadwal/0412';
+            $url = $baseUrl . '/' . $currentYear . '/' . $monthFormatted;
+            
+            $jadwalResponse = Http::timeout(10)->get($url);
+            if ($jadwalResponse->successful()) {
+                $responseData = $jadwalResponse->json();
+                $jadwalSholat = $responseData['data']['jadwal'] ?? [];
+                
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'jadwal' => $jadwalSholat,
+                        'server_time' => $serverTime,
+                        'current_month' => $currentMonth,
+                        'current_year' => $currentYear
+                    ]
+                ]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Failed to fetch prayer times data']);
+            }
+        } else {
+            return response()->json(['success' => false, 'message' => 'Failed to fetch server time']);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+})->name('api.refresh-prayer-times');
+
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
