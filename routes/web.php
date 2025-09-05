@@ -258,6 +258,7 @@ Route::get('/api/server-time', function () {
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
             // $serverDateTime->modify('+23 hour 28 minutes'); // Tambah 1 jam 20 menit
             // $serverDateTime->modify('+6 hour 56 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('+0 hour 37 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
@@ -485,17 +486,17 @@ Route::get('/api/refresh-prayer-times', function () {
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
             $currentMonth = (int) $serverDateTime->format('n');
             $currentYear = (int) $serverDateTime->format('Y');
-            
+
             // Fetch prayer times for current month
             $monthFormatted = str_pad($currentMonth, 2, '0', STR_PAD_LEFT);
             $baseUrl = 'https://api.myquran.com/v2/sholat/jadwal/0412';
             $url = $baseUrl . '/' . $currentYear . '/' . $monthFormatted;
-            
+
             $jadwalResponse = Http::timeout(10)->get($url);
             if ($jadwalResponse->successful()) {
                 $responseData = $jadwalResponse->json();
                 $jadwalSholat = $responseData['data']['jadwal'] ?? [];
-                
+
                 return response()->json([
                     'success' => true,
                     'data' => [

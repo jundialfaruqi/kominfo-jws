@@ -1921,6 +1921,11 @@
                 shuruqAlarmTimeout = null;
             }
 
+            // Reset adzanStartTime agar tidak mengganggu penanganan waktu sholat berikutnya
+            adzanStartTime = null;
+            localStorage.removeItem('adzanStartTime');
+            isAdzanPlaying = false;
+
             // Lanjutkan pemutaran audio setelah alarm Shuruq/Syuruq/Terbit selesai
             resumeAudio();
         }
