@@ -29,12 +29,12 @@
                                         @foreach ($availableThemes as $theme)
                                             <div class="col-md-4" wire:key="theme-{{ $theme->id }}">
                                                 <div
-                                                    class="card mb-3 rounded-4 pt-3 shadow-sm {{ $selectedThemeId == $theme->id ? 'border-primary bg-light shadow-sm' : 'shadow-sm' }}">
+                                                    class="card mb-3 rounded-4 pt-2 px-2 shadow-sm {{ $selectedThemeId == $theme->id ? 'border-primary bg-light shadow-sm' : 'shadow-sm' }}">
                                                     <div class="position-relative">
                                                         <img src="{{ $theme->preview_image ? asset($theme->preview_image) : asset('images/other/default-theme.jpg') }}"
-                                                            class="card-img-top rounded-4 {{ $selectedThemeId == $theme->id ? 'opacity-50' : 'opacity-100' }}"
+                                                            class="card-img-top rounded-3 {{ $selectedThemeId == $theme->id ? 'opacity-50' : 'opacity-100' }}"
                                                             alt="{{ $theme->name }}"
-                                                            style="height: 200px; object-fit: cover;">
+                                                            style="height: 200px; object-fit: stright;">
                                                         @if ($selectedThemeId == $theme->id)
                                                             <div
                                                                 class="position-absolute top-0 end-0 me-4 mt-2 text-success avatar rounded-circle shadow-sm">

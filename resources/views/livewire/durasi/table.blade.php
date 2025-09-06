@@ -4,7 +4,7 @@
             <tr>
                 <th class="w-1">No</th>
                 <th>Nama Admin Masjid</th>
-                <th class="text-center">Shuruq</th>
+                <th class="text-center">Syuruq</th>
                 <th class="text-center">Shubuh (A/I/F)</th>
                 <th class="text-center">Dzuhur (A/I/F)</th>
                 <th class="text-center">Jum'at (Slide)</th>
