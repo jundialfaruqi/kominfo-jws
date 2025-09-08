@@ -273,10 +273,6 @@ class Firdaus extends Component
         $prayerName = $activePrayer['name'];
         $prayerTime = $activePrayer['time'];
 
-        if (strtolower($prayerName) === 'syuruq') {
-            return null;
-        }
-
         $serverDate = new \DateTime($this->serverTime);
         $today = $serverDate->format('Y-m-d');
         $currentDateTime = new \DateTime("{$today} {$currentTime}");
@@ -391,6 +387,9 @@ class Firdaus extends Component
             return ($this->durasi->adzan_maghrib * 60) + ($this->durasi->iqomah_maghrib * 60) + $this->durasi->final_maghrib;
         } elseif ($prayerLower === "isya") {
             return ($this->durasi->adzan_isya * 60) + ($this->durasi->iqomah_isya * 60) + $this->durasi->final_isya;
+        } elseif ($prayerLower === "syuruq") {
+            // Syuruq hanya memiliki fase adzan (tanpa iqomah dan final)
+            return ($this->durasi->adzan_shuruq ?? 3) * 60;
         }
 
         return 0;
@@ -448,6 +447,11 @@ class Firdaus extends Component
                     'iqomah' => $this->durasi->iqomah_isya * 60,
                     'final' => $this->durasi->final_isya * 60,
                 ];
+            } elseif ($prayerLower === 'syuruq') {
+                $durasi = [
+                    'adzan' => ($this->durasi->adzan_shuruq ?? 3) * 60,
+                    // Syuruq tidak memiliki iqomah dan final, hanya adzan
+                ];
             }
         }
 
@@ -466,6 +470,14 @@ class Firdaus extends Component
                 $status['progressPercentage'] = ($jumatElapsed / $durasi['jumat_slide']) * 100;
             }
             $status['isFriday'] = true;
+        } elseif ($prayerLower === 'syuruq') {
+            // Syuruq hanya memiliki fase adzan
+            if ($elapsedSeconds <= $durasi['adzan']) {
+                $status['phase'] = 'adzan';
+                $status['remainingSeconds'] = $durasi['adzan'] - $elapsedSeconds;
+                $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
+            }
+            $status['isSyuruq'] = true;
         } else {
             // Adzan phase
             if ($elapsedSeconds <= $durasi['adzan']) {
