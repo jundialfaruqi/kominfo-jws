@@ -519,9 +519,3 @@ Route::get('/api/refresh-prayer-times', function () {
 })->name('api.refresh-prayer-times');
 
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
-
-// Route::get('/onoff', function () {
-//     $path = base_path('onoff.html'); // ambil dari root utama project
-//     return response(File::get($path))
-//         ->header('Content-Type', 'text/html');
-// });
