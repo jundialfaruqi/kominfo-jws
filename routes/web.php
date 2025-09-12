@@ -258,8 +258,8 @@ Route::get('/api/server-time', function () {
             $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
             $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
             // $serverDateTime->modify('+23 hour 28 minutes'); // Tambah 1 jam 20 menit
-            // $serverDateTime->modify('+13 hour 29 minutes'); // Tambah 1 jam 20 menit
-            // $serverDateTime->modify('+5 hour 50 minutes'); // Tambah 1 jam 20 menit
+            $serverDateTime->modify('+2 hour 22 minutes'); // Tambah 1 jam 20 menit
+            // $serverDateTime->modify('-10 hour 11 minutes'); // Tambah 1 jam 20 menit
 
             // untuk testing hari jumat
             // $currentDay = (int)$serverDateTime->format('w');
