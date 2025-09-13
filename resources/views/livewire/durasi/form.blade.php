@@ -49,7 +49,7 @@
                 {{-- Durasi Shuruq --}}
                 <div class="row g-2 mb-3">
                     <div class="col-md-2">
-                        <label class="form-label required">Shuruq</label>
+                        <label class="form-label required">Syuruq</label>
                     </div>
                     <div class="col-md-10">
                         <div class="row g-2">
@@ -58,7 +58,7 @@
                                 <select class="form-select rounded-3 @error('adzan_shuruq') is-invalid @enderror"
                                     wire:model="adzan_shuruq">
                                     <option value="">Pilih durasi shuruq</option>
-                                    @for ($i = 1; $i <= 20; $i++)
+                                    @for ($i = 2; $i <= 20; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
@@ -352,8 +352,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
-            style="background-color: rgba(255, 255, 255, 0.9);">
+        <div class="card-footer rounded-bottom-4 border-0">
             <div class="d-flex justify-content-end gap-2">
                 @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                     <button type="button" wire:click="cancelForm" class="btn py-2 px-2 rounded-3 shadow-sm">

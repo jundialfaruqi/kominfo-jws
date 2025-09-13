@@ -172,7 +172,7 @@ class Firdaus extends Component
                 if ($jadwalHariIni) {
                     $dzuhurLabel = $this->currentDayOfWeek == 5 ? "Jum'at" : "Dzuhur";
                     $this->prayerTimes = [
-                        ['name' => 'Shubuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunset'],
+                        ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunset'],
                         ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
                         ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
                         ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
@@ -338,7 +338,7 @@ class Firdaus extends Component
         $yesterdayDate = (clone $serverDate)->modify('-1 day');
         $yesterday = $yesterdayDate->format('Y-m-d');
 
-        if ($prayerName === 'Shubuh') {
+        if ($prayerName === 'Subuh') {
             if ($isEarlyMorning) {
                 $currentDateTime = new \DateTime("{$today} {$currentTime}");
                 $prayerDateTime = new \DateTime("{$today} {$prayerTime}");
@@ -377,7 +377,7 @@ class Firdaus extends Component
         $prayerLower = strtolower($prayerName);
         if ($prayerLower === "juma'at" && $this->currentDayOfWeek == 5) {
             return $this->durasi->adzan_dzuhur * 60 + $this->durasi->jumat_slide * 60;
-        } elseif ($prayerLower === "shubuh") {
+        } elseif ($prayerLower === "subuh") {
             return ($this->durasi->adzan_shubuh * 60) + ($this->durasi->iqomah_shubuh * 60) + $this->durasi->final_shubuh;
         } elseif ($prayerLower === "dzuhur") {
             return ($this->durasi->adzan_dzuhur * 60) + ($this->durasi->iqomah_dzuhur * 60) + $this->durasi->final_dzuhur;
@@ -416,7 +416,7 @@ class Firdaus extends Component
                 'jumat_slide' => 10 * 60 // 20 menit
             ];
         } else {
-            if ($prayerLower === 'shubuh') {
+            if ($prayerLower === 'subuh') {
                 $durasi = [
                     'adzan' => $this->durasi->adzan_shubuh * 60,
                     'iqomah' => $this->durasi->iqomah_shubuh * 60,

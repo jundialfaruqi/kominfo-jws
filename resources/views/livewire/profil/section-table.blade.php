@@ -26,7 +26,7 @@
         </div>
         {{-- Table of mosque profiles --}}
         <div class="table-responsive">
-            <table class="table card-table table-vcenter table-hover text-nowrap datatable">
+            <table class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
                 <thead>
                     <tr>
                         <th class="w-1">No.</th>

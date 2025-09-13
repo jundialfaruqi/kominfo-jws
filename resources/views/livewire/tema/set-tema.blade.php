@@ -66,8 +66,7 @@
                                         @endforeach
                                     </div>
                                 </div>
-                                <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
-                                    style="background-color: rgba(255, 255, 255, 0.9);">
+                                <div class="card-footer rounded-bottom-4 border-0">
                                     <div class="d-flex justify-content-end gap-2">
                                         <button type="button" wire:click="cancel"
                                             class="btn py-2 px-2 rounded-3 shadow-sm">
@@ -143,7 +142,8 @@
                                 </div>
                             </div>
                             <div class="table-responsive">
-                                <table class="table card-table table-vcenter table-hover text-nowrap datatable">
+                                <table
+                                    class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
                                     <thead>
                                         <tr>
                                             <th class="w-1">No.</th>
