@@ -121,7 +121,16 @@ class Index extends Component
     private function getServerTime()
     {
         try {
-            // Coba API utama
+            // Gunakan waktu server langsung dengan Carbon
+            $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
+            $this->apiSource = 'server';
+            return;
+        } catch (\Exception $e) {
+            // Jika gagal menggunakan Carbon langsung, coba API eksternal
+        }
+        
+        try {
+            // Coba API utama (Pekanbaru)
             $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
 
             if ($response->successful()) {
@@ -130,38 +139,47 @@ class Index extends Component
                     ->setTimezone('Asia/Jakarta')
                     ->toDateTimeString();
                 $this->apiSource = 'pekanbaru';
+                return;
             } else {
                 throw new \Exception('API utama gagal');
             }
         } catch (\Exception $e) {
-            try {
-                // Fallback ke timeapi.io
-                $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
-
-                if ($fallbackResponse->successful()) {
-                    $this->serverTime = $fallbackResponse['dateTime'];
-                    $this->apiSource = 'timeapi';
-                } else {
-                    throw new \Exception('API timeapi.io gagal');
-                }
-            } catch (\Exception $e) {
-                try {
-                    // Fallback ke API Google Script
-                    $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
-
-                    if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
-                        $this->serverTime = $newApiResponse['fulldate'];
-                        $this->apiSource = 'google-script';
-                    } else {
-                        throw new \Exception('API Google Script gagal');
-                    }
-                } catch (\Exception $e) {
-                    // Fallback ke waktu server lokal
-                    $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
-                    $this->apiSource = 'local';
-                }
-            }
+            // Jika API utama gagal, coba API fallback
         }
+        
+        try {
+            // Fallback ke timeapi.io
+            $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+
+            if ($fallbackResponse->successful()) {
+                $this->serverTime = $fallbackResponse['dateTime'];
+                $this->apiSource = 'timeapi';
+                return;
+            } else {
+                throw new \Exception('API timeapi.io gagal');
+            }
+        } catch (\Exception $e) {
+            // Jika timeapi.io gagal, coba Google Script
+        }
+        
+        try {
+            // Fallback ke API Google Script
+            $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
+
+            if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
+                $this->serverTime = $newApiResponse['fulldate'];
+                $this->apiSource = 'google-script';
+                return;
+            } else {
+                throw new \Exception('API Google Script gagal');
+            }
+        } catch (\Exception $e) {
+            // Jika semua API gagal, gunakan waktu server lokal sebagai fallback terakhir
+        }
+        
+        // Fallback terakhir ke waktu server lokal
+        $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
+        $this->apiSource = 'local';
     }
 
     private function setCurrentPrayer()
