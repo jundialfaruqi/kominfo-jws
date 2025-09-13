@@ -3,7 +3,9 @@
         <div class="flex flex-col items-start">
             <p x-text="formattedTime + ' WIB'" class="text-3xl font-medium text-gray-800 tracking-wide mb-0"></p>
             <i class="text-sm text-muted text-gray-400">
-                <?php if ($apiSource === 'pekanbaru'): ?>
+                <?php if ($apiSource === 'server'): ?>
+                Sumber: <span class="font-medium text-gray-200">Server Lokal</span>
+                <?php elseif ($apiSource === 'pekanbaru'): ?>
                 Sumber: <span class="font-medium text-gray-200">Api Pekanbaru Super App</span>
                 <?php elseif ($apiSource === 'timeapi'): ?>
                 Sumber: <span class="font-medium text-gray-200">TimeAPI.io</span>

@@ -15,6 +15,16 @@ class ServerTime extends Component
     public function mount()
     {
         try {
+            // Gunakan waktu server langsung dengan Carbon
+            $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
+            $this->serverTimestamp = Carbon::now('Asia/Jakarta')->timestamp * 1000; // in milliseconds
+            $this->apiSource = 'server';
+            return;
+        } catch (\Exception $e) {
+            // Jika gagal menggunakan Carbon langsung, coba API eksternal
+        }
+        
+        try {
             // Coba API utama
             $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
 
