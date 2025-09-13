@@ -360,18 +360,29 @@ Route::get('/api/prayer-status/{slug}', function ($slug) {
         $firdaus = new \App\Livewire\Firdaus\Firdaus();
         $firdaus->mount($slug);
 
-        // Get current server time
-        $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
-        if (!$response->successful()) {
-            return response()->json(['success' => false, 'message' => 'Server time unavailable']);
+        try {
+            // Gunakan waktu server langsung dengan Carbon sebagai sumber utama
+            $jakartaDateTime = Carbon::now('Asia/Jakarta');
+            $currentTime = $jakartaDateTime->format('H:i');
+        } catch (\Exception $e) {
+            // Jika gagal menggunakan Carbon, coba API eksternal sebagai fallback
+            try {
+                // Get current server time from external API as fallback
+                $response = Http::get('https://superapp.pekanbaru.go.id/api/server-time');
+                if (!$response->successful()) {
+                    return response()->json(['success' => false, 'message' => 'Server time unavailable']);
+                }
+
+                $serverTime = $response['serverTime'];
+
+                // Convert UTC time to Asia/Jakarta timezone
+                $utcDateTime = new DateTime($serverTime, new DateTimeZone('UTC'));
+                $jakartaDateTime = $utcDateTime->setTimezone(new DateTimeZone('Asia/Jakarta'));
+                $currentTime = $jakartaDateTime->format('H:i');
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Failed to get server time: ' . $e->getMessage()]);
+            }
         }
-
-        $serverTime = $response['serverTime'];
-
-        // Convert UTC time to Asia/Jakarta timezone
-        $utcDateTime = new DateTime($serverTime, new DateTimeZone('UTC'));
-        $jakartaDateTime = $utcDateTime->setTimezone(new DateTimeZone('Asia/Jakarta'));
-        $currentTime = $jakartaDateTime->format('H:i');
 
         // Get prayer status using reflection to call private method
         $reflection = new ReflectionClass($firdaus);
@@ -495,38 +506,52 @@ Route::get('/api/adzan-audio', function () {
 // API endpoint for refreshing prayer times
 Route::get('/api/refresh-prayer-times', function () {
     try {
-        $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
-        if ($response->successful()) {
-            $serverTime = $response['serverTime'];
-            $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
-            $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-            $currentMonth = (int) $serverDateTime->format('n');
-            $currentYear = (int) $serverDateTime->format('Y');
-
-            // Fetch prayer times for current month
-            $monthFormatted = str_pad($currentMonth, 2, '0', STR_PAD_LEFT);
-            $baseUrl = 'https://api.myquran.com/v2/sholat/jadwal/0412';
-            $url = $baseUrl . '/' . $currentYear . '/' . $monthFormatted;
-
-            $jadwalResponse = Http::timeout(10)->get($url);
-            if ($jadwalResponse->successful()) {
-                $responseData = $jadwalResponse->json();
-                $jadwalSholat = $responseData['data']['jadwal'] ?? [];
-
-                return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'jadwal' => $jadwalSholat,
-                        'server_time' => $serverTime,
-                        'current_month' => $currentMonth,
-                        'current_year' => $currentYear
-                    ]
-                ]);
+        // Gunakan waktu server langsung dengan Carbon sebagai sumber utama
+        $serverDateTime = Carbon::now('Asia/Jakarta');
+        $serverTime = $serverDateTime->toDateTimeString();
+        $currentMonth = (int) $serverDateTime->format('n');
+        $currentYear = (int) $serverDateTime->format('Y');
+    } catch (\Exception $e) {
+        // Jika gagal menggunakan Carbon, coba API eksternal sebagai fallback
+        try {
+            $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+            if ($response->successful()) {
+                $serverTime = $response['serverTime'];
+                $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
+                $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+                $serverTime = $serverDateTime->format('Y-m-d H:i:s');
+                $currentMonth = (int) $serverDateTime->format('n');
+                $currentYear = (int) $serverDateTime->format('Y');
             } else {
-                return response()->json(['success' => false, 'message' => 'Failed to fetch prayer times data']);
+                return response()->json(['success' => false, 'message' => 'API utama gagal']);
             }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to fetch server time: ' . $e->getMessage()]);
+        }
+    }
+
+    // Fetch prayer times for current month
+    try {
+        $monthFormatted = str_pad($currentMonth, 2, '0', STR_PAD_LEFT);
+        $baseUrl = 'https://api.myquran.com/v2/sholat/jadwal/0412';
+        $url = $baseUrl . '/' . $currentYear . '/' . $monthFormatted;
+
+        $jadwalResponse = Http::timeout(10)->get($url);
+        if ($jadwalResponse->successful()) {
+            $responseData = $jadwalResponse->json();
+            $jadwalSholat = $responseData['data']['jadwal'] ?? [];
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'jadwal' => $jadwalSholat,
+                    'server_time' => $serverTime,
+                    'current_month' => $currentMonth,
+                    'current_year' => $currentYear
+                ]
+            ]);
         } else {
-            return response()->json(['success' => false, 'message' => 'Failed to fetch server time']);
+            return response()->json(['success' => false, 'message' => 'Failed to fetch prayer times data']);
         }
     } catch (\Exception $e) {
         return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);

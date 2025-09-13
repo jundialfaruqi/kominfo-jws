@@ -94,46 +94,53 @@ class Firdaus extends Component
         $this->slides   = Slides::where('user_id', $user_id)->first();
 
         try {
-            $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
-            if ($response->successful()) {
-                $this->serverTime = $response['serverTime'];
-                $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
-                $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-                $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
-                $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
-                $this->apiSource = 'pekanbaru';
-            } else {
-                throw new \Exception('API utama gagal');
-            }
+            // Gunakan waktu server langsung dengan Carbon
+            $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
+            $this->serverTimestamp = Carbon::now('Asia/Jakarta')->timestamp * 1000; // in milliseconds
+            $this->apiSource = 'server';
         } catch (\Exception $e) {
             try {
-                $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
-                if ($fallbackResponse->successful()) {
-                    $this->serverTime = $fallbackResponse['dateTime'];
-                    $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
+                $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+                if ($response->successful()) {
+                    $this->serverTime = $response['serverTime'];
+                    $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
+                    $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
                     $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
                     $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
-                    $this->apiSource = 'timeapi';
+                    $this->apiSource = 'pekanbaru';
                 } else {
-                    throw new \Exception('API timeapi.io gagal');
+                    throw new \Exception('API utama gagal');
                 }
             } catch (\Exception $e) {
                 try {
-                    $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
-                    if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
-                        $this->serverTime = $newApiResponse['fulldate'];
+                    $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+                    if ($fallbackResponse->successful()) {
+                        $this->serverTime = $fallbackResponse['dateTime'];
                         $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
                         $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
                         $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
-                        $this->apiSource = 'google-script';
+                        $this->apiSource = 'timeapi';
                     } else {
-                        throw new \Exception('API Google Script gagal');
+                        throw new \Exception('API timeapi.io gagal');
                     }
                 } catch (\Exception $e) {
-                    $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
-                    $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
-                    $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
-                    $this->apiSource = 'local';
+                    try {
+                        $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
+                        if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
+                            $this->serverTime = $newApiResponse['fulldate'];
+                            $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('Asia/Jakarta'));
+                            $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
+                            $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
+                            $this->apiSource = 'google-script';
+                        } else {
+                            throw new \Exception('API Google Script gagal');
+                        }
+                    } catch (\Exception $e) {
+                        $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
+                        $this->serverTime = $serverDateTime->format('Y-m-d H:i:s');
+                        $this->serverTimestamp = $serverDateTime->getTimestamp() * 1000;
+                        $this->apiSource = 'local';
+                    }
                 }
             }
         }
@@ -558,15 +565,31 @@ class Firdaus extends Component
     public function refreshPrayerTimes()
     {
         try {
-            $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
-            if ($response->successful()) {
-                $this->serverTime = $response['serverTime'];
-                $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
-                $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-                $this->serverTimestamp = $serverDateTime->getTimestamp();
-                $this->currentMonth = (int) $serverDateTime->format('n');
-                $this->currentYear = (int) $serverDateTime->format('Y');
-                $this->currentDayOfWeek = (int) $serverDateTime->format('w');
+            // Gunakan waktu server langsung dengan Carbon sebagai sumber utama
+            $serverDateTime = Carbon::now('Asia/Jakarta');
+            $this->serverTime = $serverDateTime->toDateTimeString();
+            $this->serverTimestamp = $serverDateTime->timestamp;
+            $this->currentMonth = (int) $serverDateTime->format('n');
+            $this->currentYear = (int) $serverDateTime->format('Y');
+            $this->currentDayOfWeek = (int) $serverDateTime->format('w');
+            $this->apiSource = 'server';
+        } catch (\Exception $e) {
+            // Jika gagal menggunakan Carbon, coba API eksternal sebagai fallback
+            try {
+                $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
+                if ($response->successful()) {
+                    $this->serverTime = $response['serverTime'];
+                    $serverDateTime = new \DateTime($this->serverTime, new \DateTimeZone('UTC'));
+                    $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
+                    $this->serverTimestamp = $serverDateTime->getTimestamp();
+                    $this->currentMonth = (int) $serverDateTime->format('n');
+                    $this->currentYear = (int) $serverDateTime->format('Y');
+                    $this->currentDayOfWeek = (int) $serverDateTime->format('w');
+                    $this->apiSource = 'pekanbaru';
+                } else {
+                    throw new \Exception('API utama gagal');
+                }
+            } catch (\Exception $e) {
 
                 // Fetch prayer times for current day
                 $monthFormatted = str_pad($this->currentMonth, 2, '0', STR_PAD_LEFT);

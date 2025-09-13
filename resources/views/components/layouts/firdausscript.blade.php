@@ -14,13 +14,13 @@
 <script>
     $(document).ready(function() {
         // Tambahkan di awal script
-        let userHasInteracted = false;
+        // let userHasInteracted = false;
 
         // Event listener untuk mendeteksi interaksi user
-        $(document).one('click touchstart keydown', function() {
-            userHasInteracted = true;
-            console.log('User interaction detected - audio autoplay enabled');
-        });
+        // $(document).one('click touchstart keydown', function() {
+        //     userHasInteracted = true;
+        //     console.log('User interaction detected - audio autoplay enabled');
+        // });
 
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
@@ -4007,12 +4007,12 @@
         });
 
         // Event handler untuk menghentikan audio adzan saat halaman di-refresh atau ditutup
-        $(window).on('beforeunload', function() {
-            // Hentikan audio adzan jika sedang diputar
-            if (window.adzanAudioPlayer) {
-                window.adzanAudioPlayer.pause();
-                window.adzanAudioPlayer.currentTime = 0;
-            }
-        });
+        // $(window).on('beforeunload', function() {
+        //     // Hentikan audio adzan jika sedang diputar
+        //     if (window.adzanAudioPlayer) {
+        //         window.adzanAudioPlayer.pause();
+        //         window.adzanAudioPlayer.currentTime = 0;
+        //     }
+        // });
     });
 </script>
