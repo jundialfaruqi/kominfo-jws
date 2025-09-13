@@ -130,8 +130,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
-            style="background-color: rgba(255, 255, 255, 0.9);">
+        <div class="card-footer rounded-bottom-4 border-0">
             <div class="d-flex justify-content-end gap-2">
                 @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                     <button type="button" wire:click="cancelForm" class="btn py-2 px-2 rounded-3 shadow-sm">

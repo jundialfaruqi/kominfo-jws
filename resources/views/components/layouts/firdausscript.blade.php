@@ -946,10 +946,10 @@
             });
         }, 3000); // 3000 milidetik = 3 detik
 
-        // setInterval(() => {
-        //     syncServerTime();
-        //     // console.log('Waktu server diupdate setiap 30 detik');
-        // }, 30000);
+        setInterval(() => {
+            syncServerTime();
+            // console.log('Waktu server diupdate setiap 30 detik');
+        }, 30000);
 
         let activePrayerStatus = null;
         if ($('#active-prayer-status').val()) {
@@ -1040,7 +1040,7 @@
                 const dzuhurLabel = isFriday ? "Jum'at" : "Dzuhur";
 
                 const prayerTimes = [{
-                        name: 'Shubuh',
+                        name: 'Subuh',
                         time: jadwalHariIni.subuh
                     },
                     {
@@ -1994,7 +1994,7 @@
 
             if (!durasiData) return defaultDuration;
 
-            if (prayerLower === 'shubuh' && durasiData.adzan_shubuh) {
+            if (prayerLower === 'subuh' && durasiData.adzan_shubuh) {
                 return durasiData.adzan_shubuh * 60;
             } else if ((prayerLower === 'dzuhur' || prayerLower === "jum'at") && durasiData.adzan_dzuhur) {
                 return durasiData.adzan_dzuhur * 60;
@@ -2019,7 +2019,7 @@
 
             if (!durasiData) return defaultDuration;
 
-            if (prayerLower === 'shubuh' && durasiData.iqomah_shubuh) {
+            if (prayerLower === 'subuh' && durasiData.iqomah_shubuh) {
                 return durasiData.iqomah_shubuh * 60;
             } else if (prayerLower === 'dzuhur' && durasiData.iqomah_dzuhur) {
                 return durasiData.iqomah_dzuhur * 60;
@@ -2044,7 +2044,7 @@
 
             if (!durasiData) return defaultDuration;
 
-            if (prayerLower === 'shubuh' && durasiData.final_shubuh) {
+            if (prayerLower === 'subuh' && durasiData.final_shubuh) {
                 return durasiData.final_shubuh * 1000;
             } else if (prayerLower === 'dzuhur' && durasiData.final_dzuhur) {
                 return durasiData.final_dzuhur * 1000;
@@ -2166,13 +2166,13 @@
                     // Tunggu beep sound selesai baru putar audio adzan (5 detik)
                     setTimeout(() => {
                         // Pilih audio adzan berdasarkan waktu sholat
-                        if (prayerLower === 'shubuh') {
+                        if (prayerLower === 'subuh') {
                             // Gunakan adzan_shubuh untuk waktu shubuh
                             const adzanShubuhUrl = $('#adzan_shubuh').val();
                             if (adzanShubuhUrl && adzanShubuhUrl.trim() !== '') {
                                 window.adzanAudioPlayer.src = adzanShubuhUrl;
                                 window.adzanAudioPlayer.play();
-                                console.log('Memutar audio adzan shubuh');
+                                console.log('Memutar audio adzan subuh');
                             }
                         } else if (prayerLower !== 'syuruq' && prayerLower !== 'shuruq' &&
                             prayerLower !== 'terbit') {
