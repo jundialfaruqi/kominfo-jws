@@ -248,6 +248,105 @@ Route::get('/api/adzan/{slug}', function ($slug) {
     return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
 })->name('api.adzan');
 
+// API route untuk mendapatkan data slider iqomah
+Route::get('/api/iqomah/{slug}', function ($slug) {
+    $profil = \App\Models\Profil::where('slug', $slug)->first();
+    if ($profil) {
+        $adzan = \App\Models\Adzan::where('user_id', $profil->user_id)->first();
+        $durasi = \App\Models\Durasi::where('user_id', $profil->user_id)->first();
+        $defaultDurasi = [
+            'syuruq' => 2*60,
+            'shubuh' => [
+                'adzan' => 1 * 60,
+                'iqomah' => 1 * 60,
+                'final' => 1 * 30,
+            ],
+            'dzuhur' => [
+                'adzan' => 1 * 60,
+                'iqomah' => 1 * 60,
+                'final' => 1 * 30,
+            ],
+            'jumat' => 1*60,
+            'ashar' => [
+                'adzan' => 1 * 60,
+                'iqomah' => 1 * 60,
+                'final' => 1 * 30,
+            ],
+            'maghrib' => [
+                'adzan' => 1 * 60,
+                'iqomah' => 1 * 60,
+                'final' => 1 * 30,
+            ],
+            'isya' => [
+                'adzan' => 1 * 60,
+                'iqomah' => 1 * 60,
+                'final' => 1 * 30,
+            ],
+        ];
+        if ($adzan) {
+            $data = [];
+            // 5 Waktu
+            if ($adzan->adzan1) $data['5waktu'][] = $adzan->adzan1;
+            if ($adzan->adzan2) $data['5waktu'][] = $adzan->adzan2;
+            if ($adzan->adzan3) $data['5waktu'][] = $adzan->adzan3;
+            if ($adzan->adzan4) $data['5waktu'][] = $adzan->adzan4;
+            if ($adzan->adzan5) $data['5waktu'][] = $adzan->adzan5;
+            if ($adzan->adzan6) $data['5waktu'][] = $adzan->adzan6;
+            // Jumat
+            if ($adzan->adzan7) $data['jumat'][] = $adzan->adzan7;
+            if ($adzan->adzan8) $data['jumat'][] = $adzan->adzan8;
+            if ($adzan->adzan9) $data['jumat'][] = $adzan->adzan9;
+            if ($adzan->adzan10) $data['jumat'][] = $adzan->adzan10;
+            if ($adzan->adzan11) $data['jumat'][] = $adzan->adzan11;
+            if ($adzan->adzan12) $data['jumat'][] = $adzan->adzan12;
+            // Final
+            if ($adzan->adzan15) $data['final'] = $adzan->adzan15;
+
+            if ($durasi) {
+                $dataDurasi = [
+                    'syuruq' => $durasi->adzan_shuruq ? $durasi->adzan_shuruq * 60 : $defaultDurasi['syuruq'],
+                    'shubuh' => [
+                        'adzan' => $durasi->adzan_shubuh ? $durasi->adzan_shubuh * 60 : $defaultDurasi['shubuh']['adzan'],
+                        'iqomah' => $durasi->iqomah_shubuh ? $durasi->iqomah_shubuh * 60 : $defaultDurasi['shubuh']['iqomah'],
+                        'final' => $durasi->final_shubuh ?? $defaultDurasi['shubuh']['final'],
+                    ],
+                    'dzuhur' => [
+                        'adzan' => $durasi->adzan_dzuhur ? $durasi->adzan_dzuhur * 60 : $defaultDurasi['dzuhur']['adzan'],
+                        'iqomah' => $durasi->iqomah_dzuhur ? $durasi->iqomah_dzuhur * 60 : $defaultDurasi['dzuhur']['iqomah'],
+                        'final' => $durasi->final_dzuhur ?? $defaultDurasi['dzuhur']['final'],
+                    ],
+                    'jumat' => $durasi->jumat_slide ? $durasi->jumat_slide * 60 : $defaultDurasi['jumat'],
+                    'ashar' => [
+                        'adzan' => $durasi->adzan_ashar ? $durasi->adzan_ashar * 60 : $defaultDurasi['ashar']['adzan'],
+                        'iqomah' => $durasi->iqomah_ashar ? $durasi->iqomah_ashar * 60 : $defaultDurasi['ashar']['iqomah'],
+                        'final' => $durasi->final_ashar ?? $defaultDurasi['ashar']['final'],
+                    ],
+                    'maghrib' => [
+                        'adzan' => $durasi->adzan_maghrib ? $durasi->adzan_maghrib * 60 : $defaultDurasi['maghrib']['adzan'],
+                        'iqomah' => $durasi->iqomah_maghrib ? $durasi->iqomah_maghrib * 60 : $defaultDurasi['maghrib']['iqomah'],
+                        'final' => $durasi->final_maghrib ?? $defaultDurasi['maghrib']['final'],
+                    ],
+                    'isya' => [
+                        'adzan' => $durasi->adzan_isya ? $durasi->adzan_isya * 60 : $defaultDurasi['isya']['adzan'],
+                        'iqomah' => $durasi->iqomah_isya ? $durasi->iqomah_isya * 60 : $defaultDurasi['isya']['iqomah'],
+                        'final' => $durasi->final_isya ?? $defaultDurasi['isya']['final'],
+                    ],
+                ];
+            }
+            else {
+                $dataDurasi = $defaultDurasi;
+            }
+            $data['durasi'] = $dataDurasi;
+
+            return response()->json([
+                'success' => true,
+                'data' => $data
+            ]);
+        }
+    }
+    return response()->json(['success' => false, 'message' => 'Resource not found'], 200);
+})->name('api.adzan');
+
 Route::get('/api/server-time', function () {
     try {
         // Gunakan waktu server langsung dengan Carbon
