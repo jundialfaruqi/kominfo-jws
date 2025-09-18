@@ -32,12 +32,12 @@ class MasterController extends Controller {
         try {
             $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
             $data = [];
-            if ($jumbotron->jumbotron1) $data[] = $jumbotron->jumbotron1;
-            if ($jumbotron->jumbotron2) $data[] = $jumbotron->jumbotron2;
-            if ($jumbotron->jumbotron3) $data[] = $jumbotron->jumbotron3;
-            if ($jumbotron->jumbotron4) $data[] = $jumbotron->jumbotron4;
-            if ($jumbotron->jumbotron5) $data[] = $jumbotron->jumbotron5;
-            if ($jumbotron->jumbotron6) $data[] = $jumbotron->jumbotron6;
+            if ($jumbotron->jumbo1) $data[] = asset($jumbotron->jumbo1);
+            if ($jumbotron->jumbo2) $data[] = asset($jumbotron->jumbo2);
+            if ($jumbotron->jumbo3) $data[] = asset($jumbotron->jumbo3);
+            if ($jumbotron->jumbo4) $data[] = asset($jumbotron->jumbo4);
+            if ($jumbotron->jumbo5) $data[] = asset($jumbotron->jumbo5);
+            if ($jumbotron->jumbo6) $data[] = asset($jumbotron->jumbo6);
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data jumbotron !',
