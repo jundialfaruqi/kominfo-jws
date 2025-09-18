@@ -31,15 +31,13 @@ class MasterController extends Controller {
     public function get_jumbotron() {
         try {
             $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
-            $data = [
-                'jumbo1' => $jumbotron->jumbo1 ?? '',
-                'jumbo2' => $jumbotron->jumbo2 ?? '',
-                'jumbo3' => $jumbotron->jumbo3 ?? '',
-                'jumbo4' => $jumbotron->jumbo4 ?? '',
-                'jumbo5' => $jumbotron->jumbo5 ?? '',
-                'jumbo6' => $jumbotron->jumbo6 ?? '',
-                'is_active' => $jumbotron->is_active,
-            ];
+            $data = [];
+            if ($jumbotron->jumbotron1) $data[] = $jumbotron->jumbotron1;
+            if ($jumbotron->jumbotron2) $data[] = $jumbotron->jumbotron2;
+            if ($jumbotron->jumbotron3) $data[] = $jumbotron->jumbotron3;
+            if ($jumbotron->jumbotron4) $data[] = $jumbotron->jumbotron4;
+            if ($jumbotron->jumbotron5) $data[] = $jumbotron->jumbotron5;
+            if ($jumbotron->jumbotron6) $data[] = $jumbotron->jumbotron6;
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data jumbotron !',
