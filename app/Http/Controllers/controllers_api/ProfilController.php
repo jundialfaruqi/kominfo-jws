@@ -21,6 +21,7 @@ use App\Models\Slides;
 use App\Models\Adzan;
 use App\Models\AdzanAudio;
 use App\Models\Audios;
+use App\Events\ContentUpdatedEvent;
 
 class ProfilController extends Controller {
     
@@ -30,6 +31,7 @@ class ProfilController extends Controller {
     // GET PROFIL
     public function get_profil($slug) {
         try {
+            // trigger
             $profil = Profil::where('slug', $slug)->firstOrFail();
             $profil->makeVisible(['logo_masjid_url', 'logo_pemerintah_url']);
             $data = [
@@ -38,6 +40,9 @@ class ProfilController extends Controller {
                 'logo_masjid_url' => $profil->logo_masjid_url,
                 'logo_pemerintah_url' => $profil->logo_pemerintah_url
             ];
+            
+            event(new ContentUpdatedEvent($profil->id, 'slider'));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data profil masjid !',
