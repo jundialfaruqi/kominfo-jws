@@ -15,18 +15,22 @@ Route::get('profil/{slug}', [API\ProfilController::class, 'get_profil'])->name('
 Route::get('theme-check/{slug}', [API\ProfilController::class, 'get_theme'])->name('api.theme');
 
 // API route untuk mendapatkan data marquee
+Route::get('marquee1/{slug}', [API\ProfilController::class, 'get_marquee1'])->name('api.marquee1'); // API LAMA
 Route::get('marquee/{slug}', [API\ProfilController::class, 'get_marquee'])->name('api.marquee');
 
 // API route untuk mendapatkan data slide
+Route::get('slides1/{slug}', [API\ProfilController::class, 'get_slides1'])->name('api.slides1');
 Route::get('slides/{slug}', [API\ProfilController::class, 'get_slides'])->name('api.slides');
 
 // API route untuk mendapatkan data petugas jumat
 Route::get('petugas/{slug}', [API\ProfilController::class, 'get_petugas'])->name('api.petugas');
 
 // API route untuk mendapatkan data slider adzan / slider iqomah / durasi
+Route::get('adzan1/{slug}', [API\ProfilController::class, 'get_adzan1'])->name('api.adzan1'); // API LAMA
 Route::get('adzan/{slug}', [API\ProfilController::class, 'get_adzan'])->name('api.adzan');
 
 // API route untuk mendapatkan data audio background masjid
+Route::get('audio1/{slug}', [API\ProfilController::class, 'get_audio1'])->name('api.audio1'); // API LAMA
 Route::get('audio/{slug}', [API\ProfilController::class, 'get_audio'])->name('api.audio');
 
 // API route untuk mendapatkan data audio adzan masjid
