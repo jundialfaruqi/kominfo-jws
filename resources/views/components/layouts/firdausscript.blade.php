@@ -3589,7 +3589,7 @@
 
         function updateJumbotronData() {
             $.ajax({
-                url: '/api/jumbotron',
+                url: '/api/jumbotron1',
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {

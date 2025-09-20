@@ -19,7 +19,7 @@ Route::get('marquee1/{slug}', [API\ProfilController::class, 'get_marquee1'])->na
 Route::get('marquee/{slug}', [API\ProfilController::class, 'get_marquee'])->name('api.marquee');
 
 // API route untuk mendapatkan data slide
-Route::get('slides1/{slug}', [API\ProfilController::class, 'get_slides1'])->name('api.slides1');
+Route::get('slides1/{slug}', [API\ProfilController::class, 'get_slides1'])->name('api.slides1'); // API LAMA
 Route::get('slides/{slug}', [API\ProfilController::class, 'get_slides'])->name('api.slides');
 
 // API route untuk mendapatkan data petugas jumat
@@ -41,6 +41,7 @@ Route::get('prayer-status/{slug}', [API\ProfilController::class, 'get_prayer_sta
 
 // [ROUTE MASTER]
 // API route untuk mendapatkan data jumbotron
+Route::get('jumbotron1', [API\MasterController::class, 'get_jumbotron1'])->name('api.jumbotron1'); // API LAMA
 Route::get('jumbotron', [API\MasterController::class, 'get_jumbotron'])->name('api.jumbotron');
 
 // API route untuk mendapatkan server time

@@ -148,6 +148,30 @@ class ProfilController extends Controller
         }
     }
 
+    // GET SLIDES (API LAMA)
+    public function get_slides1($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $slides = Slides::where('user_id', $profil->user_id)->firstOrFail();
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'slide1' => $slides->slide1,
+                    'slide2' => $slides->slide2,
+                    'slide3' => $slides->slide3,
+                    'slide4' => $slides->slide4,
+                    'slide5' => $slides->slide5,
+                    'slide6' => $slides->slide6
+                ]
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil / Slides tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
     // GET SLIDES
     public function get_slides($slug)
     {

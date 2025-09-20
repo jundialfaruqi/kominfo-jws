@@ -10,21 +10,36 @@ use Carbon\Carbon;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-use App\Models\User;
-use App\Models\Theme;
-use App\Models\Durasi;
 use App\Models\Jumbotron;
-use App\Models\Marquee;
-use App\Models\Petugas;
-use App\Models\Profil;
-use App\Models\Slides;
-use App\Models\Adzan;
-use App\Models\AdzanAudio;
-use App\Models\Audios;
 
 class MasterController extends Controller {
     
     public function __construct() {
+    }
+
+    // GET JUMBOTRON (API LAMA)
+    public function get_jumbotron1() {
+        try {
+            $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
+            $data = [];
+            if ($jumbotron->jumbo1) $data[] = asset($jumbotron->jumbo1);
+            if ($jumbotron->jumbo2) $data[] = asset($jumbotron->jumbo2);
+            if ($jumbotron->jumbo3) $data[] = asset($jumbotron->jumbo3);
+            if ($jumbotron->jumbo4) $data[] = asset($jumbotron->jumbo4);
+            if ($jumbotron->jumbo5) $data[] = asset($jumbotron->jumbo5);
+            if ($jumbotron->jumbo6) $data[] = asset($jumbotron->jumbo6);
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data jumbotron !',
+                'data' => $data
+            ]);
+        }
+        catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Jumbotron tidak ditemukan !'], 404);
+        } 
+        catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
     }
 
     // GET JUMBOTRON
