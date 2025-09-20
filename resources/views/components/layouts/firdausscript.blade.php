@@ -267,7 +267,7 @@
             const requestTimestamp = Date.now();
 
             $.ajax({
-                url: `/api/audio/${slug}?_=${requestTimestamp}`,
+                url: `/api/audio1/${slug}?_=${requestTimestamp}`,
                 method: 'GET',
                 dataType: 'json',
                 cache: false, // Pastikan browser tidak meng-cache respons
@@ -1486,7 +1486,7 @@
             // console.log('Memperbarui teks marquee untuk slug:', slug);
 
             $.ajax({
-                url: `/api/marquee/${slug}`,
+                url: `/api/marquee1/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
@@ -2452,7 +2452,7 @@
             }
 
             $.ajax({
-                url: `/api/adzan/${slug}`,
+                url: `/api/adzan1/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: async function(response) {
@@ -2740,7 +2740,7 @@
                 return;
             }
             $.ajax({
-                url: `/api/adzan/${slug}`,
+                url: `/api/adzan1/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
@@ -2931,7 +2931,7 @@
             }
 
             $.ajax({
-                url: `/api/adzan/${slug}`,
+                url: `/api/adzan1/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: async function(response) {
@@ -3378,7 +3378,7 @@
             console.log('Memeriksa update slide untuk slug:', slug);
 
             $.ajax({
-                url: `/api/slides/${slug}`,
+                url: `/api/slides1/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: async function(response) {

@@ -23,13 +23,14 @@ use App\Models\AdzanAudio;
 use App\Models\Audios;
 use App\Events\ContentUpdatedEvent;
 
-class ProfilController extends Controller {
-    
-    public function __construct() {
-    }
+class ProfilController extends Controller
+{
+
+    public function __construct() {}
 
     // GET PROFIL
-    public function get_profil($slug) {
+    public function get_profil($slug)
+    {
         try {
             // trigger
             $profil = Profil::where('slug', $slug)->firstOrFail();
@@ -37,10 +38,12 @@ class ProfilController extends Controller {
             $data = [
                 'name' => $profil->name,
                 'address' => $profil->address,
+                'logo_masjid' => $profil->logo_masjid,
+                'logo_pemerintah' => $profil->logo_pemerintah,
                 'logo_masjid_url' => $profil->logo_masjid_url,
                 'logo_pemerintah_url' => $profil->logo_pemerintah_url
             ];
-            
+
             event(new ContentUpdatedEvent($profil->id, 'slider'));
 
             return response()->json([
@@ -48,17 +51,16 @@ class ProfilController extends Controller {
                 'message' => 'Berhasil get data profil masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET THEME
-    public function get_theme($slug) {
+    public function get_theme($slug)
+    {
         try {
             // Cari profil berdasarkan slug
             $profil = Profil::where('slug', $slug)->firstOrFail();
@@ -88,17 +90,41 @@ class ProfilController extends Controller {
                 'message' => 'Berhasil get data theme masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // GET MARQUEE (API LAMA)
+    public function get_marquee1($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $marquee = Marquee::where('user_id', $profil->user_id)->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'marquee1' => $marquee->marquee1,
+                    'marquee2' => $marquee->marquee2,
+                    'marquee3' => $marquee->marquee3,
+                    'marquee4' => $marquee->marquee4,
+                    'marquee5' => $marquee->marquee5,
+                    'marquee6' => $marquee->marquee6
+                ]
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil / Marquee tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET MARQUEE
-    public function get_marquee($slug) {
+    public function get_marquee($slug)
+    {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
             $marquee = Marquee::where('user_id', $profil->user_id)->firstOrFail();
@@ -109,23 +135,22 @@ class ProfilController extends Controller {
             if ($marquee->marquee4) $data[] = $marquee->marquee4;
             if ($marquee->marquee5) $data[] = $marquee->marquee5;
             if ($marquee->marquee6) $data[] = $marquee->marquee6;
-           
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data marquee masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Marquee tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET SLIDES
-    public function get_slides($slug) {
+    public function get_slides($slug)
+    {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
             $slides = Slides::where('user_id', $profil->user_id)->firstOrFail();
@@ -136,23 +161,22 @@ class ProfilController extends Controller {
             if ($slides->slide4) $data[] = asset($slides->slide4);
             if ($slides->slide5) $data[] = asset($slides->slide5);
             if ($slides->slide6) $data[] = asset($slides->slide6);
-           
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data slide masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Slides tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET PETUGAS
-    public function get_petugas($slug) {
+    public function get_petugas($slug)
+    {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
             $petugas = Petugas::where('user_id', $profil->user_id)->firstOrFail();
@@ -168,24 +192,55 @@ class ProfilController extends Controller {
                 'message' => 'Berhasil get data petugas jumat masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Petugas tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // GET ADZAN (API LAMA)
+    public function get_adzan1($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $adzan = Adzan::where('user_id', $profil->user_id)->first();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'adzan1' => $adzan->adzan1,
+                    'adzan2' => $adzan->adzan2,
+                    'adzan3' => $adzan->adzan3,
+                    'adzan4' => $adzan->adzan4,
+                    'adzan5' => $adzan->adzan5,
+                    'adzan6' => $adzan->adzan6,
+                    'adzan15' => $adzan->adzan15,
+                    'adzan7' => $adzan->adzan7,
+                    'adzan8' => $adzan->adzan8,
+                    'adzan9' => $adzan->adzan9,
+                    'adzan10' => $adzan->adzan10,
+                    'adzan11' => $adzan->adzan11,
+                    'adzan12' => $adzan->adzan12,
+                ]
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil / Adzan tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET ADZAN
-    public function get_adzan($slug) {
+    public function get_adzan($slug)
+    {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
             $adzan = Adzan::where('user_id', $profil->user_id)->first();
             $durasi = Durasi::where('user_id', $profil->user_id)->first();
 
             $defaultDurasi = [
-                'syuruq' => 2*60,
+                'syuruq' => 2 * 60,
                 'shubuh' => [
                     'adzan' => 1 * 60,
                     'iqomah' => 1 * 60,
@@ -196,7 +251,7 @@ class ProfilController extends Controller {
                     'iqomah' => 1 * 60,
                     'final' => 1 * 30,
                 ],
-                'jumat' => 1*60,
+                'jumat' => 1 * 60,
                 'ashar' => [
                     'adzan' => 1 * 60,
                     'iqomah' => 1 * 60,
@@ -213,7 +268,7 @@ class ProfilController extends Controller {
                     'final' => 1 * 30,
                 ],
             ];
-            
+
             $data = [];
             if ($adzan) {
                 // 5 Waktu
@@ -263,8 +318,7 @@ class ProfilController extends Controller {
                             'final' => $durasi->final_isya ?? $defaultDurasi['isya']['final'],
                         ],
                     ];
-                }
-                else {
+                } else {
                     $dataDurasi = $defaultDurasi;
                 }
                 $data['durasi'] = $dataDurasi;
@@ -275,17 +329,44 @@ class ProfilController extends Controller {
                 'message' => 'Berhasil get data slide adzan, slide iqomah dan durasi masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Adzan tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // GET AUDIO BACKGROUND (API LAMA)
+    public function get_audio1($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $audio = Audios::where('user_id', $profil->user_id)->firstOrFail();
+            if (!$audio->status) {
+                return response()->json(['success' => false, 'message' => 'Audio background tidak diaktifkan pada masjid ini !'], 404);
+            }
+
+            // Buat instance komponen Audio untuk menggunakan generateLocalUrl
+            $audioComponent = new \App\Livewire\Audios\Audio();
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'audio1' => $audio->audio1 ? $audioComponent->generateLocalUrl($audio->audio1) : null,
+                    'audio2' => $audio->audio2 ? $audioComponent->generateLocalUrl($audio->audio2) : null,
+                    'audio3' => $audio->audio3 ? $audioComponent->generateLocalUrl($audio->audio3) : null,
+                    'status' => $audio->status
+                ]
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil / Audio Background tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET AUDIO BACKGROUND
-    public function get_audio($slug) {
+    public function get_audio($slug)
+    {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
             $audio = Audios::where('user_id', $profil->user_id)->firstOrFail();
@@ -311,17 +392,16 @@ class ProfilController extends Controller {
                 'message' => 'Berhasil get data audio background masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Audio Background tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET AUDIO ADZAN
-    public function get_adzan_audio($slug) {
+    public function get_adzan_audio($slug)
+    {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
 
@@ -343,11 +423,9 @@ class ProfilController extends Controller {
                 'message' => 'Berhasil get data audio adzan masjid !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Audio Adzan tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
@@ -356,7 +434,8 @@ class ProfilController extends Controller {
 
 
     // GET PRAYER STATUS
-    public function get_prayer_status($slug) {
+    public function get_prayer_status($slug)
+    {
         try {
             // Get the Firdaus component instance
             $firdaus = new \App\Livewire\Firdaus\Firdaus();
@@ -366,8 +445,7 @@ class ProfilController extends Controller {
                 // Gunakan waktu server langsung dengan Carbon sebagai sumber utama
                 $jakartaDateTime = Carbon::now('Asia/Jakarta');
                 $currentTime = $jakartaDateTime->format('H:i');
-            } 
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 // Jika gagal menggunakan Carbon, coba API eksternal sebagai fallback
                 try {
                     // Get current server time from external API as fallback
@@ -382,8 +460,7 @@ class ProfilController extends Controller {
                     $utcDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
                     $jakartaDateTime = $utcDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
                     $currentTime = $jakartaDateTime->format('H:i');
-                } 
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     return response()->json(['success' => false, 'message' => 'Failed to get server time: ' . $e->getMessage()]);
                 }
             }
@@ -400,13 +477,11 @@ class ProfilController extends Controller {
                 'current_time_jakarta' => $jakartaDateTime->format('Y-m-d H:i:s'), // Optional: untuk debugging
                 'timezone' => 'Asia/Jakarta'
             ]);
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error calculating prayer status: ' . $e->getMessage()
             ]);
         }
     }
-
 }
