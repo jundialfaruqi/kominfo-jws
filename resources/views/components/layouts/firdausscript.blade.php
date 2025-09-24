@@ -75,7 +75,7 @@
                 const cacheSlug = localStorage.getItem(AUDIO_CACHE_SLUG_KEY);
 
                 if (!cacheData || !cacheTimestamp || !cacheSlug) {
-                    console.log('Tidak ada cache audio di localStorage');
+                    // console.log('Tidak ada cache audio di localStorage');
                     return null;
                 }
 
@@ -117,7 +117,7 @@
                 localStorage.removeItem(AUDIO_CACHE_KEY);
                 localStorage.removeItem(AUDIO_CACHE_TIMESTAMP_KEY);
                 localStorage.removeItem(AUDIO_CACHE_SLUG_KEY);
-                console.log('Cache audio dihapus dari localStorage');
+                // console.log('Cache audio dihapus dari localStorage');
             } catch (error) {
                 console.warn('Gagal menghapus cache audio dari localStorage:', error);
             }
@@ -366,7 +366,7 @@
                     if (xhr.status === 404 || xhr.status === 500) {
                         const slug = window.location.pathname.replace(/^\//, '');
                         clearAudioCacheFromLocalStorage(slug);
-                        console.log('Cache localStorage dibersihkan');
+                        // console.log('Cache localStorage dibersihkan');
                     }
 
                     // Jika masih ada audio di cache, gunakan itu meskipun request gagal
@@ -386,7 +386,7 @@
                         }
                     } else {
                         // Coba lagi setelah beberapa waktu jika tidak ada cache
-                        console.log('Mencoba mengambil audio lagi dalam 5 menit...');
+                        // console.log('Mencoba mengambil audio lagi dalam 5 menit...');
                         setTimeout(updateAndPlayAudio, 5 * 60 * 1000);
                     }
                 },
@@ -1924,7 +1924,7 @@
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    console.log('Initial prayer times refreshed successfully');
+                    // console.log('Initial prayer times refreshed successfully');
                     updateDailyPrayerTimes();
                 } else {
                     console.error('Error refreshing initial prayer times:', response.message);
@@ -3375,7 +3375,7 @@
                 return;
             }
 
-            console.log('Memeriksa update slide untuk slug:', slug);
+            // console.log('Memeriksa update slide untuk slug:', slug);
 
             $.ajax({
                 url: `/api/slides1/${slug}`,
@@ -3406,7 +3406,7 @@
                             newSlides[index]);
 
                         if (hasChanges) {
-                            console.log('Perubahan terdeteksi, memperbarui slide...');
+                            // console.log('Perubahan terdeteksi, memperbarui slide...');
 
                             $('#slide1').val(newSlides[0]);
                             $('#slide2').val(newSlides[1]);
@@ -3425,13 +3425,12 @@
                             const urlsToPreload = newUrls.filter(url => !window.imageCache[url] || !
                                 window.imageCache[url].complete);
                             if (urlsToPreload.length > 0) {
-                                console.log(
-                                    `Preload gambar baru dari updateSlides: ${urlsToPreload}`);
+                                // console.log(`Preload gambar baru dari updateSlides: ${urlsToPreload}`);
                                 await preloadImages(urlsToPreload);
                             }
 
                             window.slideUrls = newUrls;
-                            console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
+                            // console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
                             $(document).trigger('slidesUpdated', [newSlides]);
                         } else {
                             console.log('Tidak ada perubahan pada slide, update diabaikan');
@@ -3468,7 +3467,7 @@
             Object.keys(window.imageCache).forEach(url => {
                 if (!activeUrls.includes(url)) {
                     delete window.imageCache[url];
-                    console.log(`Gambar dihapus dari cache: ${url}`);
+                    // console.log(`Gambar dihapus dari cache: ${url}`);
                 }
             });
 
@@ -3496,7 +3495,7 @@
                     img.src = url;
 
                     img.onload = () => {
-                        console.log(`Gambar berhasil dimuat: ${url}`);
+                        // console.log(`Gambar berhasil dimuat: ${url}`);
                         window.imageCache[url] = img;
                         resolve(img);
                     };
@@ -3652,7 +3651,7 @@
                 try {
                     const allUrls = [...window.slideUrls, ...window.jumbotronUrls];
                     await preloadImages(allUrls);
-                    console.log('Semua gambar telah dimuat, memulai slider', allUrls);
+                    // console.log('Semua gambar telah dimuat, memulai slider', allUrls);
 
                     const slideDuration = 20000; // 20 detik per gambar
 
@@ -3721,7 +3720,7 @@
                             });
                             // Hentikan animasi progress bar saat jumbotron tidak ditampilkan
                             $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
-                            console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
+                            // console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
                         clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
@@ -3732,7 +3731,7 @@
                     setInterval(updateSlide, 1000);
 
                     $(document).on('slidesUpdated', async function(event, newSlides) {
-                        console.log('Event slidesUpdated diterima, memperbarui slider');
+                        // console.log('Event slidesUpdated diterima, memperbarui slider');
                         const newUrls = newSlides.filter(url => url.trim() !== '');
                         if (newUrls.length === 0) {
                             console.warn(
@@ -3750,7 +3749,7 @@
                             await preloadImages(urlsToPreload);
                         }
 
-                        console.log('slideUrls diperbarui:', window.slideUrls);
+                        // console.log('slideUrls diperbarui:', window.slideUrls);
                         clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
                     });
 
