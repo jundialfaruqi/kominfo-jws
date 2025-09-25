@@ -10,32 +10,37 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ContentUpdatedEvent implements ShouldBroadcast
+class TestingEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private $slug;
-    private $type;
+    /**
+     * Create a new event instance.
+     */
 
-    public function __construct($slug, $type)
+    private $message;
+
+    public function __construct($message)
     {
-        $this->slug = $slug;
-        $this->type = $type;
+        $this->message = $message;
     }
 
-    // public function broadcastOn()
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
     public function broadcastOn(): array
     {
-        // return new Channel("masjid-{$this->slug}");
         return [
-            new Channel("masjid-{$this->slug}"),
+            new Channel('testChannel'),
         ];
     }
 
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->type,
+            'message' => $this->message,
         ];
     }
 }

@@ -120,3 +120,13 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
 });
 
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
+
+
+
+// TESTING WEB SOCKER
+Route::get('test/testing-channel/view', function () {
+    return view('testingWebSocket');
+});
+Route::get('test/testing-channel/event', function () {
+    event(new \App\Events\ContentUpdatedEvent('1', 'hello 1'));
+});
