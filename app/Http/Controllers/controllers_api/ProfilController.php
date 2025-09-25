@@ -44,7 +44,7 @@ class ProfilController extends Controller
                 'logo_pemerintah_url' => $profil->logo_pemerintah_url
             ];
 
-            event(new ContentUpdatedEvent($profil->id, 'slider'));
+            event(new ContentUpdatedEvent($profil->slug, 'slider'));
 
             return response()->json([
                 'success' => true,
