@@ -3833,85 +3833,164 @@
         }, 60000);
 
         function updateFridayOfficials() {
+            console.log('=== updateFridayOfficials function called ===');
             const slug = window.location.pathname.replace(/^\//, '');
+            console.log('Current slug:', slug);
+
             if (!slug) {
+                console.log('No slug found, exiting function');
                 return;
             }
 
-            $.ajax({
-                url: `/api/petugas/${slug}`,
-                method: 'GET',
-                dataType: 'json',
-                retries: 3, // Maksimum jumlah percobaan
-                retryDelay: 5000, // Jeda 5 detik antara percobaan
-                success: function(response) {
-                    // console.log('Respons API petugas:', response);
-                    if (response.success) {
-                        // Cek apakah tanggal dan bulan pada field hari sesuai dengan waktu server
-                        const currentServerTime = getCurrentTimeFromServer();
-                        const petugasDate = new Date(response.data.hari);
+            function makeRequest(retryCount = 0) {
+                console.log(`Making AJAX request to: /api/petugas/${slug} (attempt ${retryCount + 1})`);
+                $.ajax({
+                    url: `/api/petugas/${slug}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    timeout: 10000, // 10 detik timeout
+                    success: function(response) {
+                        console.log('Respons API petugas:', response);
+                        if (response.success && response.data) {
+                            // Log data petugas yang diterima
+                            console.log('Data petugas diterima:', {
+                                hari: response.data.hari,
+                                khatib: response.data.khatib,
+                                imam: response.data.imam,
+                                muadzin: response.data.muadzin
+                            });
 
-                        // Bandingkan tanggal dan bulan
-                        const currentDay = currentServerTime.getDate();
-                        const currentMonth = currentServerTime.getMonth();
-                        const petugasDay = petugasDate.getDate();
-                        const petugasMonth = petugasDate.getMonth();
-
-                        // Hanya update data petugas jika tanggal dan bulan cocok
-                        if (currentDay === petugasDay && currentMonth === petugasMonth) {
-                            // Simpan nilai sebelumnya untuk perbandingan
-                            const previousKhatib = $('#khatib').val();
-                            const previousImam = $('#imam').val();
-                            const previousMuadzin = $('#muadzin').val();
-
-                            // Perbarui nilai input hidden untuk petugas
-                            $('#khatib').val(response.data.khatib);
-                            $('#imam').val(response.data.imam);
-                            $('#muadzin').val(response.data.muadzin);
-
-                            // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
-                            if ($('#fridayInfoPopup').is(':visible')) {
-                                updateFridayInfoContent();
+                            // Validasi data yang diperlukan
+                            if (!response.data.hari) {
+                                console.warn('Data hari tidak tersedia dalam response API');
+                                clearPetugasData();
+                                return;
                             }
-                            // console.log('Data petugas Jumat diperbarui');
+
+                            // Cek apakah tanggal dan bulan pada field hari sesuai dengan waktu server
+                            const currentServerTime = getCurrentTimeFromServer();
+                            const petugasDate = new Date(response.data.hari);
+
+                            // Log perbandingan tanggal
+                            console.log('Perbandingan tanggal:', {
+                                currentServerTime: currentServerTime,
+                                petugasDate: petugasDate,
+                                currentDay: currentServerTime.getDate(),
+                                currentMonth: currentServerTime.getMonth(),
+                                petugasDay: petugasDate.getDate(),
+                                petugasMonth: petugasDate.getMonth()
+                            });
+
+                            // Validasi tanggal yang valid
+                            if (isNaN(petugasDate.getTime())) {
+                                console.warn('Format tanggal hari tidak valid:', response.data
+                                    .hari);
+                                clearPetugasData();
+                                return;
+                            }
+
+                            // Bandingkan tanggal dan bulan
+                            const currentDay = currentServerTime.getDate();
+                            const currentMonth = currentServerTime.getMonth();
+                            const petugasDay = petugasDate.getDate();
+                            const petugasMonth = petugasDate.getMonth();
+
+                            // Hanya update data petugas jika tanggal dan bulan cocok
+                            if (currentDay === petugasDay && currentMonth === petugasMonth) {
+                                // Perbarui nilai input hidden untuk petugas dengan validasi
+                                $('#khatib').val(response.data.khatib || '');
+                                $('#imam').val(response.data.imam || '');
+                                $('#muadzin').val(response.data.muadzin || '');
+
+                                // Log data yang berhasil diupdate
+                                console.log('Data petugas Jumat berhasil diperbarui:', {
+                                    khatib: response.data.khatib || '',
+                                    imam: response.data.imam || '',
+                                    muadzin: response.data.muadzin || ''
+                                });
+
+                                // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
+                                if ($('#fridayInfoPopup').is(':visible')) {
+                                    updateFridayInfoContent();
+                                }
+                            } else {
+                                // Kosongkan data petugas jika tanggal dan bulan tidak cocok
+                                clearPetugasData();
+                                console.log(
+                                    'Data petugas tidak cocok dengan tanggal hari ini - data dikosongkan'
+                                );
+                            }
                         } else {
-                            // Kosongkan data petugas jika tanggal dan bulan tidak cocok
-                            $('#khatib').val('');
-                            $('#imam').val('');
-                            $('#muadzin').val('');
+                            // Handle response yang tidak success
+                            console.warn('Response API tidak success atau data tidak tersedia:',
+                                response.message || 'Unknown error');
+                            console.log('Full response:', response);
+                            clearPetugasData();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX Error occurred:', {
+                            xhr,
+                            status,
+                            error
+                        });
+                        let errorMessage = 'Unknown error';
+                        let shouldRetry = true;
 
-                            // Jika popup sedang ditampilkan, perbarui kontennya
-                            if ($('#fridayInfoPopup').is(':visible')) {
-                                updateFridayInfoContent();
+                        // Parse error response
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+
+                            // Jangan retry untuk error 404 (data tidak ditemukan)
+                            if (xhr.status === 404) {
+                                shouldRetry = false;
+                                clearPetugasData();
+                                console.warn('Data petugas tidak ditemukan untuk slug:', slug);
+                                return;
                             }
-                            // console.log('Data petugas tidak cocok dengan tanggal hari ini');
+                        } catch (e) {
+                            errorMessage = xhr.responseText || error || status;
+                        }
+
+                        console.error(
+                            `Error saat mengambil data petugas (Percobaan ${retryCount + 1}):`,
+                            errorMessage
+                        );
+
+                        // Retry logic untuk error selain 404
+                        if (shouldRetry && retryCount < 3) {
+                            setTimeout(() => {
+                                console.log(
+                                    `Mencoba ulang pengambilan data petugas (Percobaan ${retryCount + 2})...`
+                                );
+                                makeRequest(retryCount + 1);
+                            }, 5000); // 5 detik delay
+                        } else {
+                            console.error(
+                                'Maksimum percobaan pengambilan data petugas tercapai atau error tidak dapat di-retry.'
+                            );
+                            clearPetugasData();
                         }
                     }
-                },
-                error: function(xhr, status, error, retryCount = 0) {
-                    console.error(
-                        `Error saat mengambil data petugas (Percobaan ${retryCount + 1}):`,
-                        error, xhr.responseText);
-                    if (retryCount < this.retries) {
-                        setTimeout(() => {
-                            console.log(
-                                `Mencoba ulang pengambilan data petugas (Percobaan ${retryCount + 2})...`
-                            );
-                            $.ajax({
-                                ...this,
-                                error: (xhr, status, error) => {
-                                    this.error(xhr, status, error, retryCount +
-                                        1);
-                                }
-                            });
-                        }, this.retryDelay);
-                    } else {
-                        console.error(
-                            'Maksimum percobaan pengambilan data petugas tercapai. Tidak ada percobaan ulang lebih lanjut.'
-                        );
-                    }
+                });
+            }
+
+            // Helper function untuk membersihkan data petugas
+            function clearPetugasData() {
+                $('#khatib').val('');
+                $('#imam').val('');
+                $('#muadzin').val('');
+
+                // Jika popup sedang ditampilkan, perbarui kontennya
+                if ($('#fridayInfoPopup').is(':visible')) {
+                    updateFridayInfoContent();
                 }
-            });
+            }
+
+            // Mulai request
+            console.log('Starting makeRequest call...');
+            makeRequest();
         }
 
         // Tambahkan fungsi updateFridayInfoContent
@@ -3973,7 +4052,7 @@
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateFridayOfficials();
+            // updateFridayOfficials();
         }, 1200000); // 1200000 milidetik = 30 menit
 
         updateJumbotronData();
@@ -3986,6 +4065,10 @@
             updateSlides();
             updateDailyPrayerTimes();
         }, 120000); // 120000 milidetik = 2 menit
+
+        setInterval(function() {
+            updateFridayOfficials();
+        }, 300000); // 300000 milidetik = 5 menit
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
