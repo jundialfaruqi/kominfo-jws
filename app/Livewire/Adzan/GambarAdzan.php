@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Adzan;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Adzan;
+use App\Models\Profil;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -1320,6 +1322,10 @@ class GambarAdzan extends Component
 
             $adzan->save();
 
+            // Trigger event 
+            $profil = Profil::where('user_id', $this->userId)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'adzan'));
+
             $this->dispatch('success', $this->isEdit ? 'Adzan berhasil diubah!' : 'Adzan berhasil ditambahkan!');
             $this->showTable = true;
 
@@ -1389,6 +1395,7 @@ class GambarAdzan extends Component
     {
         try {
             $adzan = Adzan::findOrFail($this->deleteAdzanId);
+            $profil = $adzan->user->profil;
             if ($adzan->adzan1 && file_exists(public_path($adzan->adzan1))) {
                 File::delete(public_path($adzan->adzan1));
             }
@@ -1435,6 +1442,8 @@ class GambarAdzan extends Component
                 File::delete(public_path($adzan->adzan15));
             }
             $adzan->delete();
+
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'adzan'));
 
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Adzan berhasil dihapus!');

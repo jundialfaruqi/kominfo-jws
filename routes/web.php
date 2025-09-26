@@ -124,9 +124,17 @@ Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
 
 
 // TESTING WEB SOCKER
-Route::get('test/testing-channel/view', function () {
-    return view('testingWebSocket');
+Route::get('test/testing-channel/view/{slug}', function ($slug) {
+    $profil = Profil::where('slug', $slug)->first();
+    if (!$profil) {
+        return redirect()->route('dashboard.index')->with('error', 'Profil masjid tidak ditemukan !');
+    }
+    return view('testingWebSocket', ['slug' => $slug]);
 });
-Route::get('test/testing-channel/event', function () {
-    event(new \App\Events\ContentUpdatedEvent('1', 'hello 1'));
+Route::get('test/testing-channel/event/{slug}', function ($slug) {
+    $profil = Profil::where('slug', $slug)->first();
+    if (!$profil) {
+        return redirect()->route('dashboard.index')->with('error', 'Profil masjid tidak ditemukan !');
+    }
+    event(new \App\Events\ContentUpdatedEvent($slug, 'hello ' . $profil->name));
 });

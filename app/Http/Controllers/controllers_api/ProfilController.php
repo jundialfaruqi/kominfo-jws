@@ -21,7 +21,6 @@ use App\Models\Slides;
 use App\Models\Adzan;
 use App\Models\AdzanAudio;
 use App\Models\Audios;
-use App\Events\ContentUpdatedEvent;
 
 class ProfilController extends Controller
 {
@@ -43,8 +42,6 @@ class ProfilController extends Controller
                 'logo_masjid_url' => $profil->logo_masjid_url,
                 'logo_pemerintah_url' => $profil->logo_pemerintah_url
             ];
-
-            event(new ContentUpdatedEvent($profil->slug, 'slider'));
 
             return response()->json([
                 'success' => true,

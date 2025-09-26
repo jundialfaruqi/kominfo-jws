@@ -35,7 +35,7 @@ class ContentUpdatedEvent implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'message' => $this->type,
+            'type' => $this->type,
         ];
     }
 }

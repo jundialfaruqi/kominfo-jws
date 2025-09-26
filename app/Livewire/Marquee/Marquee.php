@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Marquee;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Marquee as ModelsMarquee;
 use App\Models\User;
+use App\Models\Profil;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -292,6 +294,10 @@ class Marquee extends Component
             $marquee->marquee6 = $this->marquee6;
             $marquee->save();
 
+            // Trigger event 
+            $profil = Profil::where('user_id', $this->userId)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'marquee'));
+
             $this->dispatch('success', $this->isEdit ? 'Marquee berhasil diubah!' : 'Marquee berhasil ditambahkan!');
             $this->showTable = true;
 
@@ -341,7 +347,12 @@ class Marquee extends Component
     {
         try {
             $marquee = ModelsMarquee::findOrFail($this->deleteMarqueeId);
+            $profil = $marquee->user->profil;
             $marquee->delete();
+
+            // Trigger event 
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'marquee'));
+
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Marquee berhasil dihapus!');
         } catch (\Exception $e) {

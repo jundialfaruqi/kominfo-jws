@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Slides;
 
+use App\Events\ContentUpdatedEvent;
+use App\Models\Profil;
 use App\Models\Slides;
 use App\Models\User;
 use Livewire\Attributes\Title;
@@ -683,6 +685,10 @@ class Slide extends Component
 
             $slide->save();
 
+            // Trigger event 
+            $profil = Profil::where('user_id', $this->userId)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'slide'));
+
             $this->dispatch('success', $this->isEdit ? 'Gambar Slide berhasil diubah!' : 'Gambar Slide berhasil ditambahkan!');
             $this->showTable = true;
 
@@ -734,6 +740,7 @@ class Slide extends Component
     {
         try {
             $slide = Slides::findOrFail($this->deleteSlideId);
+            $profil = $slide->user->profil;
 
             if ($slide->slide1 && file_exists(public_path($slide->slide1))) {
                 File::delete(public_path($slide->slide1));
@@ -760,6 +767,9 @@ class Slide extends Component
             }
 
             $slide->delete();
+
+            // Trigger event 
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'slide'));
 
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Slide berhasil dihapus!');

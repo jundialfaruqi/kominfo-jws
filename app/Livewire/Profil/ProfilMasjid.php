@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Profil;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Profil;
 use App\Models\User;
 use Livewire\Attributes\Title;
@@ -566,6 +567,11 @@ class ProfilMasjid extends Component
             }
 
             $profil->save();
+
+            // Trigger event 
+            if ($this->isEdit) {
+                event(new ContentUpdatedEvent($profil->slug, 'profil'));
+            }
 
             $this->dispatch('success', $this->isEdit ? 'Profil masjid berhasil diperbarui!' : 'Profil masjid berhasil ditambahkan!');
             $this->showTable = true;

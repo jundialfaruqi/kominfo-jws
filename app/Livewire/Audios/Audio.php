@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Audios;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Audios;
+use App\Models\Profil;
 use App\Models\User;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -594,6 +596,9 @@ class Audio extends Component
             }
 
             $audio->save();
+            // Trigger event 
+            $profil = Profil::where('user_id', $this->userId)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'audio-background'));
 
             $this->dispatch('success', $this->isEdit ? 'Audio berhasil diubah!' : 'Audio berhasil ditambahkan!');
             $this->showTable = true;
@@ -723,6 +728,7 @@ class Audio extends Component
     {
         try {
             $audio = Audios::findOrFail($this->deleteAudioId);
+            $profil = $audio->user->profil;
             $audioFields = ['audio1', 'audio2', 'audio3'];
             $allDeleted = true;
 
@@ -753,6 +759,7 @@ class Audio extends Component
 
             if ($allDeleted) {
                 $audio->delete();
+                if ($profil) event(new ContentUpdatedEvent($profil->slug, 'audio-background'));
                 $this->dispatch('closeDeleteModal');
                 $this->dispatch('success', 'Audio dan data berhasil dihapus.');
             } else {

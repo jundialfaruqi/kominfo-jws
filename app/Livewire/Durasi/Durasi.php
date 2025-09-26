@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Durasi;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Durasi as ModelsDurasi;
+use App\Models\Profil;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
@@ -427,6 +429,10 @@ class Durasi extends Component
             $durasi->final_isya = $this->final_isya;
             $durasi->save();
 
+            // Trigger event 
+            $profil = Profil::where('user_id', $this->userId)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'adzan'));
+
             $this->dispatch('success', $this->isEdit ? 'Durasi berhasil diubah!' : 'Durasi berhasil ditambahkan!');
             $this->showTable = true;
 
@@ -498,7 +504,9 @@ class Durasi extends Component
     {
         try {
             $durasi = ModelsDurasi::findOrFail($this->deleteDurasiId);
+            $profil = $durasi->user->profil;
             $durasi->delete();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'adzan'));
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Durasi berhasil dihapus!');
         } catch (\Exception $e) {

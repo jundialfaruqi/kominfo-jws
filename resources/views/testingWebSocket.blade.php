@@ -12,7 +12,7 @@
 </body>
 <script>
     setTimeout(() => {
-        window.Echo.channel('masjid-1')
+        window.Echo.channel('masjid-{{ $slug }}')
             .listen('ContentUpdatedEvent', (e) => {
                 console.log(e)
             })

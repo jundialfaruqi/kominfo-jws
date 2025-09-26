@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Petugas;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Petugas as ModelsPetugas;
+use App\Models\Profil;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
@@ -299,6 +301,10 @@ class Petugas extends Component
             $petugas->muadzin = $this->muadzin;
             $petugas->save();
 
+            // Trigger event 
+            $profil = Profil::where('user_id', $this->userId)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'petugas'));
+
             $this->dispatch('success', $this->isEdit ? 'Petugas berhasil diubah!' : 'Petugas berhasil ditambahkan!');
 
             // Hide form and show table for all users after successful save
@@ -333,7 +339,12 @@ class Petugas extends Component
     {
         try {
             $petugas = ModelsPetugas::findOrFail($this->deletePetugasId);
+            $profil = $petugas->user->profil;
             $petugas->delete();
+
+            // Trigger event 
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'petugas'));
+
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Petugas berhasil dihapus!');
         } catch (\Exception $e) {

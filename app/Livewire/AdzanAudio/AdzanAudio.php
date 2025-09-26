@@ -2,7 +2,9 @@
 
 namespace App\Livewire\AdzanAudio;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\AdzanAudio as AdzanAudioModel;
+use App\Models\Profil;
 use App\Models\User;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -556,6 +558,9 @@ class AdzanAudio extends Component
                 $adzanAudio = AdzanAudioModel::find($this->adzanAudioId);
                 if ($adzanAudio) {
                     $adzanAudio->update($data);
+                    // Trigger event 
+                    $profil = Profil::where('user_id', $this->userId)->first();
+                    if ($profil) event(new ContentUpdatedEvent($profil->slug, 'audio-adzan'));
                     $this->dispatch('success', 'Audio Adzan berhasil diperbarui!');
                 } else {
                     $this->dispatch('error', 'Audio Adzan tidak ditemukan!');
@@ -563,6 +568,8 @@ class AdzanAudio extends Component
                 }
             } else {
                 AdzanAudioModel::create($data);
+                $profil = Profil::where('user_id', $this->userId)->first();
+                if ($profil) event(new ContentUpdatedEvent($profil->slug, 'audio-adzan'));
                 $this->dispatch('success', 'Audio Adzan berhasil ditambahkan!');
             }
 
@@ -669,6 +676,7 @@ class AdzanAudio extends Component
             $this->checkLocalStorageConfig();
 
             $adzanAudio = AdzanAudioModel::findOrFail($this->deleteAdzanAudioId);
+            $profil = Profil::where('user_id', $adzanAudio->user_id)->first();
 
             // Verifikasi bahwa user hanya dapat menghapus audio adzan miliknya sendiri
             if (Auth::id() != $adzanAudio->user_id && Auth::user()->role !== 'Super Admin') {
@@ -719,6 +727,7 @@ class AdzanAudio extends Component
 
             if ($allDeleted) {
                 $adzanAudio->delete();
+                if ($profil) event(new ContentUpdatedEvent($profil->slug, 'audio-adzan'));
                 $this->dispatch('closeDeleteModal');
                 $this->dispatch('success', 'Audio Adzan berhasil dihapus!');
                 $this->reset(['deleteAdzanAudioId', 'deleteAdzanAudioName']);
