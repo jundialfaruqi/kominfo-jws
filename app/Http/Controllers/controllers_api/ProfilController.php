@@ -205,13 +205,14 @@ class ProfilController extends Controller
     {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
-            $petugas = Petugas::where('user_id', $profil->user_id)->firstOrFail();
-            $data = [
-                'hari' => $petugas->hari,
-                'khatib' => $petugas->khatib,
-                'imam' => $petugas->imam,
-                'muadzin' => $petugas->muadzin
-            ];
+            // $petugas = Petugas::where('user_id', $profil->user_id)->firstOrFail();
+            // $data = [
+            //     'hari' => $petugas->hari,
+            //     'khatib' => $petugas->khatib,
+            //     'imam' => $petugas->imam,
+            //     'muadzin' => $petugas->muadzin
+            // ];
+            $data = Petugas::where('user_id', $profil->user_id)->orderBy('hari', 'DESC')->get(['hari', 'khatib', 'imam', 'muadzin']);
 
             return response()->json([
                 'success' => true,
