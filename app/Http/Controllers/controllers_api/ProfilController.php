@@ -295,6 +295,20 @@ class ProfilController extends Controller
                 ],
             ];
 
+            // Default arrays
+            $default['5waktu'] = [
+                asset('/images/other/doa-setelah-adzan-default.webp'),
+                asset('/images/other/doa-masuk-masjid-default.webp'),
+                asset('/images/other/non-silent-hp-default.webp'),
+            ];
+            $default['jumat'] = [
+                asset('/images/other/doa-setelah-adzan-default.webp'),
+                asset('/images/other/doa-masuk-masjid-default.webp'),
+                asset('/images/other/dilarang-bicara-saat-sholat-jumat-default.webp'),
+                asset('/images/other/non-silent-hp-default.webp'),
+            ];
+            $default['final'] = asset('images/other/lurus-rapat-shaf-default.webp');
+
             if ($adzan) {
                 // 5 Waktu
                 $data['5waktu'] = array_filter([
@@ -305,6 +319,9 @@ class ProfilController extends Controller
                     $adzan->adzan5 ? asset($adzan->adzan5) : null,
                     $adzan->adzan6 ? asset($adzan->adzan6) : null,
                 ]);
+                if (empty($data['5waktu']))
+                    $data['5waktu'] = $default['5waktu'];
+
                 // Jumat
                 $data['jumat'] = array_filter([
                     $adzan->adzan7 ? asset($adzan->adzan7) : null,
@@ -314,23 +331,16 @@ class ProfilController extends Controller
                     $adzan->adzan11 ? asset($adzan->adzan11) : null,
                     $adzan->adzan12 ? asset($adzan->adzan12) : null,
                 ]);
+                if (empty($data['jumat'])) 
+                    $data['jumat'] = $default['jumat'];
+
                 // Final
-                $data['final'] = $adzan->adzan15 ? asset($adzan->adzan15) : null;
-            }
-            // Default
+                $data['final'] = $adzan->adzan15 ? asset($adzan->adzan15) : $default['final'];
+            } 
             else {
-                $data['5waktu'] = [
-                    asset('/images/other/doa-setelah-adzan-default.webp'),
-                    asset('/images/other/doa-masuk-masjid-default.webp'),
-                    asset('/images/other/non-silent-hp-default.webp'),
-                ];
-                $data['jumat'] = [
-                    asset('/images/other/doa-setelah-adzan-default.webp'),
-                    asset('/images/other/doa-masuk-masjid-default.webp'),
-                    asset('/images/other/dilarang-bicara-saat-sholat-jumat-default.webp'),
-                    asset('/images/other/non-silent-hp-default.webp'),
-                ];
-                $data['final'] = asset('images/other/lurus-rapat-shaf-default.webp');
+                $data['5waktu'] = $default['5waktu'];
+                $data['jumat'] = $default['jumat'];
+                $data['final'] = $default['final'];
             }
 
             if ($durasi) {
