@@ -3594,13 +3594,26 @@
                 success: function(response) {
                     console.log('Respons API jumbotron:', response);
                     if (response.success && response.data) {
-                        $('#jumbo1').val(response.data.jumbo1 || '');
-                        $('#jumbo2').val(response.data.jumbo2 || '');
-                        $('#jumbo3').val(response.data.jumbo3 || '');
-                        $('#jumbo4').val(response.data.jumbo4 || '');
-                        $('#jumbo5').val(response.data.jumbo5 || '');
-                        $('#jumbo6').val(response.data.jumbo6 || '');
-                        $('#jumbo_is_active').val(response.data.is_active ? 'true' : 'false');
+                        const data = response.data;
+                        if (Array.isArray(data)) {
+                            // API lama mengembalikan array URL
+                            $('#jumbo1').val(data[0] || '');
+                            $('#jumbo2').val(data[1] || '');
+                            $('#jumbo3').val(data[2] || '');
+                            $('#jumbo4').val(data[3] || '');
+                            $('#jumbo5').val(data[4] || '');
+                            $('#jumbo6').val(data[5] || '');
+                            $('#jumbo_is_active').val(data.length > 0 ? 'true' : 'false');
+                        } else {
+                            // API baru/object dengan key jumbo1..jumbo6 dan is_active
+                            $('#jumbo1').val(data.jumbo1 || '');
+                            $('#jumbo2').val(data.jumbo2 || '');
+                            $('#jumbo3').val(data.jumbo3 || '');
+                            $('#jumbo4').val(data.jumbo4 || '');
+                            $('#jumbo5').val(data.jumbo5 || '');
+                            $('#jumbo6').val(data.jumbo6 || '');
+                            $('#jumbo_is_active').val(data.is_active ? 'true' : 'false');
+                        }
                         $(document).trigger('jumbotronUpdated');
                     } else {
                         $('#jumbo_is_active').val('false');
@@ -3705,8 +3718,8 @@
                             $progressBar.css('width', '0%');
                             $progressBar.css('animation',
                                 `progressAnimation ${slideDuration}ms linear forwards`);
-                            console.log(
-                                `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
+                            // console.log(
+                            // `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
                         } else {
                             const slideIndex = imageIndex % window.slideUrls.length;
                             currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
