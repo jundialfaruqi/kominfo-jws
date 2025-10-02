@@ -13,7 +13,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\User;
 use App\Models\Theme;
 use App\Models\Durasi;
-use App\Models\Jumbotron;
 use App\Models\Marquee;
 use App\Models\Petugas;
 use App\Models\Profil;
@@ -174,14 +173,20 @@ class ProfilController extends Controller
     {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
-            $slides = Slides::where('user_id', $profil->user_id)->firstOrFail();
+            $slides = Slides::where('user_id', $profil->user_id)->first();
             $data = [];
-            if ($slides->slide1) $data[] = asset($slides->slide1);
-            if ($slides->slide2) $data[] = asset($slides->slide2);
-            if ($slides->slide3) $data[] = asset($slides->slide3);
-            if ($slides->slide4) $data[] = asset($slides->slide4);
-            if ($slides->slide5) $data[] = asset($slides->slide5);
-            if ($slides->slide6) $data[] = asset($slides->slide6);
+            if ($slides) {
+                if ($slides->slide1) $data[] = asset($slides->slide1);
+                if ($slides->slide2) $data[] = asset($slides->slide2);
+                if ($slides->slide3) $data[] = asset($slides->slide3);
+                if ($slides->slide4) $data[] = asset($slides->slide4);
+                if ($slides->slide5) $data[] = asset($slides->slide5);
+                if ($slides->slide6) $data[] = asset($slides->slide6);
+            }
+            // Default
+            else {
+                $data[] = asset('images/other/slide-jws-default.jpg');
+            }
 
             return response()->json([
                 'success' => true,
@@ -189,7 +194,7 @@ class ProfilController extends Controller
                 'data' => $data
             ]);
         } catch (ModelNotFoundException $ex) {
-            return response()->json(['success' => false, 'message' => 'Profil / Slides tidak ditemukan !'], 404);
+            return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
         } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
@@ -290,59 +295,78 @@ class ProfilController extends Controller
                 ],
             ];
 
-            $data = [];
             if ($adzan) {
                 // 5 Waktu
-                if ($adzan->adzan1) $data['5waktu'][] = asset($adzan->adzan1);
-                if ($adzan->adzan2) $data['5waktu'][] = asset($adzan->adzan2);
-                if ($adzan->adzan3) $data['5waktu'][] = asset($adzan->adzan3);
-                if ($adzan->adzan4) $data['5waktu'][] = asset($adzan->adzan4);
-                if ($adzan->adzan5) $data['5waktu'][] = asset($adzan->adzan5);
-                if ($adzan->adzan6) $data['5waktu'][] = asset($adzan->adzan6);
+                $data['5waktu'] = array_filter([
+                    $adzan->adzan1 ? asset($adzan->adzan1) : null,
+                    $adzan->adzan2 ? asset($adzan->adzan2) : null,
+                    $adzan->adzan3 ? asset($adzan->adzan3) : null,
+                    $adzan->adzan4 ? asset($adzan->adzan4) : null,
+                    $adzan->adzan5 ? asset($adzan->adzan5) : null,
+                    $adzan->adzan6 ? asset($adzan->adzan6) : null,
+                ]);
                 // Jumat
-                if ($adzan->adzan7) $data['jumat'][] = asset($adzan->adzan7);
-                if ($adzan->adzan8) $data['jumat'][] = asset($adzan->adzan8);
-                if ($adzan->adzan9) $data['jumat'][] = asset($adzan->adzan9);
-                if ($adzan->adzan10) $data['jumat'][] = asset($adzan->adzan10);
-                if ($adzan->adzan11) $data['jumat'][] = asset($adzan->adzan11);
-                if ($adzan->adzan12) $data['jumat'][] = asset($adzan->adzan12);
+                $data['jumat'] = array_filter([
+                    $adzan->adzan7 ? asset($adzan->adzan7) : null,
+                    $adzan->adzan8 ? asset($adzan->adzan8) : null,
+                    $adzan->adzan9 ? asset($adzan->adzan9) : null,
+                    $adzan->adzan10 ? asset($adzan->adzan10) : null,
+                    $adzan->adzan11 ? asset($adzan->adzan11) : null,
+                    $adzan->adzan12 ? asset($adzan->adzan12) : null,
+                ]);
                 // Final
-                if ($adzan->adzan15) $data['final'] = asset($adzan->adzan15);
+                $data['final'] = $adzan->adzan15 ? asset($adzan->adzan15) : null;
+            }
+            // Default
+            else {
+                $data['5waktu'] = [
+                    asset('/images/other/doa-setelah-adzan-default.webp'),
+                    asset('/images/other/doa-masuk-masjid-default.webp'),
+                    asset('/images/other/non-silent-hp-default.webp'),
+                ];
+                $data['jumat'] = [
+                    asset('/images/other/doa-setelah-adzan-default.webp'),
+                    asset('/images/other/doa-masuk-masjid-default.webp'),
+                    asset('/images/other/dilarang-bicara-saat-sholat-jumat-default.webp'),
+                    asset('/images/other/non-silent-hp-default.webp'),
+                ];
+                $data['final'] = asset('images/other/lurus-rapat-shaf-default.webp');
+            }
 
-                if ($durasi) {
-                    $dataDurasi = [
-                        'syuruq' => $durasi->adzan_shuruq ? $durasi->adzan_shuruq * 60 : $defaultDurasi['syuruq'],
-                        'shubuh' => [
-                            'adzan' => $durasi->adzan_shubuh ? $durasi->adzan_shubuh * 60 : $defaultDurasi['shubuh']['adzan'],
-                            'iqomah' => $durasi->iqomah_shubuh ? $durasi->iqomah_shubuh * 60 : $defaultDurasi['shubuh']['iqomah'],
-                            'final' => $durasi->final_shubuh ?? $defaultDurasi['shubuh']['final'],
-                        ],
-                        'dzuhur' => [
-                            'adzan' => $durasi->adzan_dzuhur ? $durasi->adzan_dzuhur * 60 : $defaultDurasi['dzuhur']['adzan'],
-                            'iqomah' => $durasi->iqomah_dzuhur ? $durasi->iqomah_dzuhur * 60 : $defaultDurasi['dzuhur']['iqomah'],
-                            'final' => $durasi->final_dzuhur ?? $defaultDurasi['dzuhur']['final'],
-                        ],
-                        'jumat' => $durasi->jumat_slide ? $durasi->jumat_slide * 60 : $defaultDurasi['jumat'],
-                        'ashar' => [
-                            'adzan' => $durasi->adzan_ashar ? $durasi->adzan_ashar * 60 : $defaultDurasi['ashar']['adzan'],
-                            'iqomah' => $durasi->iqomah_ashar ? $durasi->iqomah_ashar * 60 : $defaultDurasi['ashar']['iqomah'],
-                            'final' => $durasi->final_ashar ?? $defaultDurasi['ashar']['final'],
-                        ],
-                        'maghrib' => [
-                            'adzan' => $durasi->adzan_maghrib ? $durasi->adzan_maghrib * 60 : $defaultDurasi['maghrib']['adzan'],
-                            'iqomah' => $durasi->iqomah_maghrib ? $durasi->iqomah_maghrib * 60 : $defaultDurasi['maghrib']['iqomah'],
-                            'final' => $durasi->final_maghrib ?? $defaultDurasi['maghrib']['final'],
-                        ],
-                        'isya' => [
-                            'adzan' => $durasi->adzan_isya ? $durasi->adzan_isya * 60 : $defaultDurasi['isya']['adzan'],
-                            'iqomah' => $durasi->iqomah_isya ? $durasi->iqomah_isya * 60 : $defaultDurasi['isya']['iqomah'],
-                            'final' => $durasi->final_isya ?? $defaultDurasi['isya']['final'],
-                        ],
-                    ];
-                } else {
-                    $dataDurasi = $defaultDurasi;
-                }
+            if ($durasi) {
+                $dataDurasi = [
+                    'syuruq' => $durasi->adzan_shuruq ? $durasi->adzan_shuruq * 60 : $defaultDurasi['syuruq'],
+                    'shubuh' => [
+                        'adzan' => $durasi->adzan_shubuh ? $durasi->adzan_shubuh * 60 : $defaultDurasi['shubuh']['adzan'],
+                        'iqomah' => $durasi->iqomah_shubuh ? $durasi->iqomah_shubuh * 60 : $defaultDurasi['shubuh']['iqomah'],
+                        'final' => $durasi->final_shubuh ?? $defaultDurasi['shubuh']['final'],
+                    ],
+                    'dzuhur' => [
+                        'adzan' => $durasi->adzan_dzuhur ? $durasi->adzan_dzuhur * 60 : $defaultDurasi['dzuhur']['adzan'],
+                        'iqomah' => $durasi->iqomah_dzuhur ? $durasi->iqomah_dzuhur * 60 : $defaultDurasi['dzuhur']['iqomah'],
+                        'final' => $durasi->final_dzuhur ?? $defaultDurasi['dzuhur']['final'],
+                    ],
+                    'jumat' => $durasi->jumat_slide ? $durasi->jumat_slide * 60 : $defaultDurasi['jumat'],
+                    'ashar' => [
+                        'adzan' => $durasi->adzan_ashar ? $durasi->adzan_ashar * 60 : $defaultDurasi['ashar']['adzan'],
+                        'iqomah' => $durasi->iqomah_ashar ? $durasi->iqomah_ashar * 60 : $defaultDurasi['ashar']['iqomah'],
+                        'final' => $durasi->final_ashar ?? $defaultDurasi['ashar']['final'],
+                    ],
+                    'maghrib' => [
+                        'adzan' => $durasi->adzan_maghrib ? $durasi->adzan_maghrib * 60 : $defaultDurasi['maghrib']['adzan'],
+                        'iqomah' => $durasi->iqomah_maghrib ? $durasi->iqomah_maghrib * 60 : $defaultDurasi['maghrib']['iqomah'],
+                        'final' => $durasi->final_maghrib ?? $defaultDurasi['maghrib']['final'],
+                    ],
+                    'isya' => [
+                        'adzan' => $durasi->adzan_isya ? $durasi->adzan_isya * 60 : $defaultDurasi['isya']['adzan'],
+                        'iqomah' => $durasi->iqomah_isya ? $durasi->iqomah_isya * 60 : $defaultDurasi['isya']['iqomah'],
+                        'final' => $durasi->final_isya ?? $defaultDurasi['isya']['final'],
+                    ],
+                ];
                 $data['durasi'] = $dataDurasi;
+            } 
+            else {
+                $data['durasi'] = $defaultDurasi;
             }
 
             return response()->json([
