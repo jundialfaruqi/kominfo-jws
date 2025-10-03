@@ -1644,7 +1644,7 @@
             } else if (iqomahStartTime) {
                 const iqomahElapsedSeconds = (nowTime - iqomahStartTime) / 1000;
                 const iqomahDuration = getIqomahDuration(currentPrayerName || 'Dzuhur');
-                const finalPhaseDuration = getFinalDuration(currentPrayerName || 'Dzuhur') / 1000;
+                const finalPhaseDuration = getFinalDuration(currentPrayerName || 'Dzuhur');
 
                 if (iqomahElapsedSeconds < iqomahDuration) {
                     showIqomahPopup(currentPrayerTime, true);
@@ -1680,7 +1680,7 @@
                     const timeDiffSeconds = (currentTimeInMinutes - prayerToRestore.timeInMinutes) * 60;
                     const adzanDuration = getAdzanDuration(prayerToRestore.name);
                     const iqomahDuration = getIqomahDuration(prayerToRestore.name);
-                    const finalPhaseDuration = getFinalDuration(prayerToRestore.name) / 1000;
+                    const finalPhaseDuration = getFinalDuration(prayerToRestore.name);
 
                     if (timeDiffSeconds < adzanDuration) {
                         adzanStartTime = nowTime - (timeDiffSeconds * 1000);
@@ -2034,26 +2034,26 @@
             return defaultDuration;
         }
 
-        // Fungsi untuk mendapatkan durasi final berdasarkan nama sholat (dalam milidetik)
+        // Fungsi untuk mendapatkan durasi final berdasarkan nama sholat (dalam detik)
         function getFinalDuration(prayerName) {
             const durasiData = getDurasiData();
             const prayerLower = prayerName.toLowerCase();
 
-            // Default durasi jika data tidak tersedia (dalam milidetik)
-            const defaultDuration = 60 * 1000; // 60 detik
+            // Default durasi jika data tidak tersedia (dalam detik)
+            const defaultDuration = 1 * 60; // 60 detik
 
             if (!durasiData) return defaultDuration;
 
             if (prayerLower === 'subuh' && durasiData.final_shubuh) {
-                return durasiData.final_shubuh * 1000;
+                return durasiData.final_shubuh * 60;
             } else if (prayerLower === 'dzuhur' && durasiData.final_dzuhur) {
-                return durasiData.final_dzuhur * 1000;
+                return durasiData.final_dzuhur * 60;
             } else if (prayerLower === 'ashar' && durasiData.final_ashar) {
-                return durasiData.final_ashar * 1000;
+                return durasiData.final_ashar * 60;
             } else if (prayerLower === 'maghrib' && durasiData.final_maghrib) {
-                return durasiData.final_maghrib * 1000;
+                return durasiData.final_maghrib * 60;
             } else if (prayerLower === 'isya' && durasiData.final_isya) {
-                return durasiData.final_isya * 1000;
+                return durasiData.final_isya * 60;
             }
 
             return defaultDuration;
@@ -2839,19 +2839,19 @@
                 imageUrl = '/images/other/lurus-rapat-shaf-default.webp';
             }
 
-            const duration = getFinalDuration(currentPrayerName || 'Dzuhur');
+            const durationMs = getFinalDuration(currentPrayerName || 'Dzuhur') * 1000; // convert seconds -> ms
 
-            displayAdzanImage(imageUrl, false, duration);
+            displayAdzanImage(imageUrl, false, durationMs);
 
             adzanImageTimeout = setTimeout(() => {
                 const $imageDisplay = $('#adzanImageDisplay');
                 $imageDisplay.css('display', 'none');
                 clearAdzanImageState();
-                // console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
+                // console.log('Final adzan image ditutup setelah', durationMs / 1000, 'detik');
 
                 // Lanjutkan pemutaran audio setelah fase adzanImageDisplay berakhir
                 resumeAudio();
-            }, duration);
+            }, durationMs);
         }
 
         // Fungsi helper untuk menutup gambar adzan
@@ -3873,14 +3873,16 @@
                             const data = response.data;
 
                             if (Array.isArray(data)) {
-                                console.log(`Menerima array petugas dengan panjang: ${data.length}`);
+                                console.log(
+                                    `Menerima array petugas dengan panjang: ${data.length}`);
                                 for (let i = 0; i < data.length; i++) {
                                     const item = data[i];
                                     const d = new Date(item.hari);
                                     if (isNaN(d.getTime())) {
                                         continue; // lewati tanggal invalid
                                     }
-                                    if (d.getDate() === currentDay && d.getMonth() === currentMonth) {
+                                    if (d.getDate() === currentDay && d.getMonth() ===
+                                        currentMonth) {
                                         selected = item;
                                         break; // ambil pertama yang cocok (diasumsikan DESC)
                                     }
@@ -3890,7 +3892,9 @@
                             }
 
                             if (!selected) {
-                                console.warn('Tidak ada entri petugas yang cocok untuk tanggal hari ini.');
+                                console.warn(
+                                    'Tidak ada entri petugas yang cocok untuk tanggal hari ini.'
+                                );
                                 clearPetugasData();
                                 return;
                             }
@@ -3898,7 +3902,8 @@
                             // Validasi tanggal terpilih
                             const petugasDate = new Date(selected.hari);
                             if (isNaN(petugasDate.getTime())) {
-                                console.warn('Format tanggal hari tidak valid pada entri terpilih:', selected.hari);
+                                console.warn('Format tanggal hari tidak valid pada entri terpilih:',
+                                    selected.hari);
                                 clearPetugasData();
                                 return;
                             }
@@ -3922,7 +3927,9 @@
                                 }
                             } else {
                                 clearPetugasData();
-                                console.log('Entri petugas terpilih tidak cocok dengan tanggal hari ini - data dikosongkan');
+                                console.log(
+                                    'Entri petugas terpilih tidak cocok dengan tanggal hari ini - data dikosongkan'
+                                );
                             }
                         } else {
                             // Handle response yang tidak success

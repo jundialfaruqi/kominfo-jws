@@ -107,12 +107,14 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Final (detik)</label>
+                                <label class="form-label">Final (menit)</label>
                                 <select class="form-select rounded-3 @error('final_shubuh') is-invalid @enderror"
                                     wire:model="final_shubuh">
                                     <option value="">Pilih durasi final</option>
-                                    <option value="30">30 detik</option>
-                                    <option value="60">60 detik</option>
+                                    @for ($i = 1; $i <= 10; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
                                 </select>
                                 @error('final_shubuh')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -158,12 +160,14 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Final (detik)</label>
+                                <label class="form-label">Final (menit)</label>
                                 <select class="form-select rounded-3 @error('final_dzuhur') is-invalid @enderror"
                                     wire:model="final_dzuhur">
                                     <option value="">Pilih durasi final</option>
-                                    <option value="30">30 detik</option>
-                                    <option value="60">60 detik</option>
+                                    @for ($i = 1; $i <= 10; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
                                 </select>
                                 @error('final_dzuhur')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -234,12 +238,14 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Final (detik)</label>
+                                <label class="form-label">Final (menit)</label>
                                 <select class="form-select rounded-3 @error('final_ashar') is-invalid @enderror"
                                     wire:model="final_ashar">
                                     <option value="">Pilih durasi final</option>
-                                    <option value="30">30 detik</option>
-                                    <option value="60">60 detik</option>
+                                    @for ($i = 1; $i <= 10; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
                                 </select>
                                 @error('final_ashar')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -285,12 +291,14 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Final (detik)</label>
+                                <label class="form-label">Final (menit)</label>
                                 <select class="form-select rounded-3 @error('final_maghrib') is-invalid @enderror"
                                     wire:model="final_maghrib">
                                     <option value="">Pilih durasi final</option>
-                                    <option value="30">30 detik</option>
-                                    <option value="60">60 detik</option>
+                                    @for ($i = 1; $i <= 10; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
                                 </select>
                                 @error('final_maghrib')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -336,12 +344,14 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Final (detik)</label>
+                                <label class="form-label">Final (menit)</label>
                                 <select class="form-select rounded-3 @error('final_isya') is-invalid @enderror"
                                     wire:model="final_isya">
                                     <option value="">Pilih durasi final</option>
-                                    <option value="30">30 detik</option>
-                                    <option value="60">60 detik</option>
+                                    @for ($i = 1; $i <= 10; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
                                 </select>
                                 @error('final_isya')
                                     <div class="invalid-feedback">{{ $message }}</div>
