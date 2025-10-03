@@ -74,22 +74,27 @@ class Firdaus extends Component
         $this->adzan    = Adzan::where('user_id', $user_id)->first();
         $this->marquee  = Marquee::where('user_id', $user_id)->first();
 
-        // Ambil data petugas dengan pengecekan tanggal dan bulan
-        $petugas = Petugas::where('user_id', $user_id)->first();
-        if ($petugas) {
-            // Cek apakah tanggal dan bulan pada field hari sesuai dengan hari ini
-            $currentDate = now()->setTimezone('Asia/Jakarta');
-            $petugasDate = Carbon::parse($petugas->hari);
+        // Ambil data petugas: pilih entri terbaru yang tanggal & bulan cocok
+        $petugasList = Petugas::where('user_id', $user_id)
+            ->orderBy('hari', 'desc')
+            ->get();
 
-            // Bandingkan tanggal dan bulan
-            if ($currentDate->day === $petugasDate->day && $currentDate->month === $petugasDate->month) {
-                $this->petugas = $petugas;
-            } else {
-                $this->petugas = null; // Kosongkan jika tanggal dan bulan tidak cocok
+        $currentDate = Carbon::now('Asia/Jakarta');
+        $matchedPetugas = null;
+
+        foreach ($petugasList as $p) {
+            try {
+                $pd = Carbon::parse($p->hari);
+                if ($currentDate->day === $pd->day && $currentDate->month === $pd->month) {
+                    $matchedPetugas = $p;
+                    break; // ambil pertama yang cocok (list sudah DESC)
+                }
+            } catch (\Exception $e) {
+                // abaikan format tanggal yang tidak valid
             }
-        } else {
-            $this->petugas = null;
         }
+
+        $this->petugas = $matchedPetugas ?: null;
 
         $this->slides   = Slides::where('user_id', $user_id)->first();
 

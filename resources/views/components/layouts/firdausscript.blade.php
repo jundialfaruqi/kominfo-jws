@@ -3865,73 +3865,64 @@
                     success: function(response) {
                         console.log('Respons API petugas:', response);
                         if (response.success && response.data) {
-                            // Log data petugas yang diterima
-                            console.log('Data petugas diterima:', {
-                                hari: response.data.hari,
-                                khatib: response.data.khatib,
-                                imam: response.data.imam,
-                                muadzin: response.data.muadzin
-                            });
+                            const now = getCurrentTimeFromServer();
+                            const currentDay = now.getDate();
+                            const currentMonth = now.getMonth();
 
-                            // Validasi data yang diperlukan
-                            if (!response.data.hari) {
-                                console.warn('Data hari tidak tersedia dalam response API');
+                            let selected = null;
+                            const data = response.data;
+
+                            if (Array.isArray(data)) {
+                                console.log(`Menerima array petugas dengan panjang: ${data.length}`);
+                                for (let i = 0; i < data.length; i++) {
+                                    const item = data[i];
+                                    const d = new Date(item.hari);
+                                    if (isNaN(d.getTime())) {
+                                        continue; // lewati tanggal invalid
+                                    }
+                                    if (d.getDate() === currentDay && d.getMonth() === currentMonth) {
+                                        selected = item;
+                                        break; // ambil pertama yang cocok (diasumsikan DESC)
+                                    }
+                                }
+                            } else if (typeof data === 'object') {
+                                selected = data;
+                            }
+
+                            if (!selected) {
+                                console.warn('Tidak ada entri petugas yang cocok untuk tanggal hari ini.');
                                 clearPetugasData();
                                 return;
                             }
 
-                            // Cek apakah tanggal dan bulan pada field hari sesuai dengan waktu server
-                            const currentServerTime = getCurrentTimeFromServer();
-                            const petugasDate = new Date(response.data.hari);
-
-                            // Log perbandingan tanggal
-                            console.log('Perbandingan tanggal:', {
-                                currentServerTime: currentServerTime,
-                                petugasDate: petugasDate,
-                                currentDay: currentServerTime.getDate(),
-                                currentMonth: currentServerTime.getMonth(),
-                                petugasDay: petugasDate.getDate(),
-                                petugasMonth: petugasDate.getMonth()
-                            });
-
-                            // Validasi tanggal yang valid
+                            // Validasi tanggal terpilih
+                            const petugasDate = new Date(selected.hari);
                             if (isNaN(petugasDate.getTime())) {
-                                console.warn('Format tanggal hari tidak valid:', response.data
-                                    .hari);
+                                console.warn('Format tanggal hari tidak valid pada entri terpilih:', selected.hari);
                                 clearPetugasData();
                                 return;
                             }
 
                             // Bandingkan tanggal dan bulan
-                            const currentDay = currentServerTime.getDate();
-                            const currentMonth = currentServerTime.getMonth();
                             const petugasDay = petugasDate.getDate();
                             const petugasMonth = petugasDate.getMonth();
-
-                            // Hanya update data petugas jika tanggal dan bulan cocok
                             if (currentDay === petugasDay && currentMonth === petugasMonth) {
-                                // Perbarui nilai input hidden untuk petugas dengan validasi
-                                $('#khatib').val(response.data.khatib || '');
-                                $('#imam').val(response.data.imam || '');
-                                $('#muadzin').val(response.data.muadzin || '');
+                                $('#khatib').val(selected.khatib || '');
+                                $('#imam').val(selected.imam || '');
+                                $('#muadzin').val(selected.muadzin || '');
 
-                                // Log data yang berhasil diupdate
-                                console.log('Data petugas Jumat berhasil diperbarui:', {
-                                    khatib: response.data.khatib || '',
-                                    imam: response.data.imam || '',
-                                    muadzin: response.data.muadzin || ''
+                                console.log('Data petugas Jumat diperbarui dari entri terpilih:', {
+                                    khatib: selected.khatib || '',
+                                    imam: selected.imam || '',
+                                    muadzin: selected.muadzin || ''
                                 });
 
-                                // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
                                 if ($('#fridayInfoPopup').is(':visible')) {
                                     updateFridayInfoContent();
                                 }
                             } else {
-                                // Kosongkan data petugas jika tanggal dan bulan tidak cocok
                                 clearPetugasData();
-                                console.log(
-                                    'Data petugas tidak cocok dengan tanggal hari ini - data dikosongkan'
-                                );
+                                console.log('Entri petugas terpilih tidak cocok dengan tanggal hari ini - data dikosongkan');
                             }
                         } else {
                             // Handle response yang tidak success

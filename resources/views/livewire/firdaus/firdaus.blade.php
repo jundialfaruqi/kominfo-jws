@@ -127,31 +127,31 @@
             <div class="mosque-image">
                 {{-- Mosque images with object-fit stretch --}}
                 @if ($slides)
-                    <img id="slide1" src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
-                    <img id="slide2" src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
-                    <img id="slide3" src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
-                    <img id="slide4" src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
-                    <img id="slide5" src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
-                    <img id="slide6" src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
+                    <img id="slide1" src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
+                    <img id="slide2" src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
+                    <img id="slide3" src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
+                    <img id="slide4" src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
+                    <img id="slide5" src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
+                    <img id="slide6" src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @else
-                    <img id="slide1" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
-                    <img id="slide2" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
-                    <img id="slide3" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
-                    <img id="slide4" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
-                    <img id="slide5" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
-                    <img id="slide6" src="{{ asset('images/other/slide-jws-default.jpg') }}" 
-                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
+                    <img id="slide1" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
+                    <img id="slide2" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
+                    <img id="slide3" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
+                    <img id="slide4" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
+                    <img id="slide5" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
+                    <img id="slide6" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @endif
             </div>
         </div>
@@ -302,9 +302,8 @@
     </div>
 
     {{-- Friday Info Popup --}}
-    {{-- DEBUG: Popup ini hanya muncul pada hari Jumat saat waktu Zuhur --}}
-    {{-- DEBUG: Untuk testing, uncomment baris di bawah untuk memaksa tampil --}}
-    {{-- <div id="fridayInfoPopup" class="friday-info-popup" style="display: flex;"> --}}
+    {{-- DEBUG: Paksa Friday Info Popup tampil untuk testing UI --}}
+    {{-- CARA: Ubah style ke display:flex agar terlihat. Kembalikan ke display:none setelah selesai debug. --}}
     <div id="fridayInfoPopup" class="friday-info-popup" style="display: none;">
         <div class="friday-info-content">
             <div id="fridayDate" class="friday-date"></div>
@@ -313,11 +312,9 @@
                 <span style="text-align: top">JAM</span>
                 <span class="clock-time">00:00:00</span>
             </div>
-            @if ($petugas)
-                <input type="hidden" id="khatib" value="{{ $petugas->khatib }}">
-                <input type="hidden" id="imam" value="{{ $petugas->imam }}">
-                <input type="hidden" id="muadzin" value="{{ $petugas->muadzin }}">
-            @endif
+            <input type="hidden" id="khatib" value="{{ $petugas->khatib ?? '' }}">
+            <input type="hidden" id="imam" value="{{ $petugas->imam ?? '' }}">
+            <input type="hidden" id="muadzin" value="{{ $petugas->muadzin ?? '' }}">
             <div class="logo-popup">
                 <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
             </div>
@@ -326,11 +323,6 @@
             <div id="currentFridayImage" class="currentFridayImage"></div>
         </div>
     </div>
-
-    {{-- DEBUG: Button untuk testing Friday Info Popup (hapus setelah selesai debug) --}}
-    {{-- <button onclick="testFridayPopup()"
-        style="position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 10px; border: none; cursor: pointer;">Test
-        Friday Popup</button> --}}
 
     {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
