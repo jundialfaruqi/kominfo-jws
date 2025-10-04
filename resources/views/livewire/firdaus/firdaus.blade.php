@@ -326,6 +326,7 @@
 
     {{-- Adzan Image Display --}}
     <div id="adzanImageDisplay" class="adzan-image-display" style="display: none;">
-        <img id="currentAdzanImage" src="" alt="Adzan Image">
+        <img id="currentAdzanImage" src="{{ asset('images/other/lurus-rapat-shaf-default.webp') }}"
+            alt="Adzan Image">
     </div>
 </div>
