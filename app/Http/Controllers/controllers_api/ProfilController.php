@@ -332,13 +332,12 @@ class ProfilController extends Controller
                     $adzan->adzan11 ? asset($adzan->adzan11) : null,
                     $adzan->adzan12 ? asset($adzan->adzan12) : null,
                 ]);
-                if (empty($data['jumat'])) 
+                if (empty($data['jumat']))
                     $data['jumat'] = $default['jumat'];
 
                 // Final
                 $data['final'] = $adzan->adzan15 ? asset($adzan->adzan15) : $default['final'];
-            } 
-            else {
+            } else {
                 $data['5waktu'] = $default['5waktu'];
                 $data['jumat'] = $default['jumat'];
                 $data['final'] = $default['final'];
@@ -350,33 +349,32 @@ class ProfilController extends Controller
                     'shubuh' => [
                         'adzan' => $durasi->adzan_shubuh ? $durasi->adzan_shubuh * 60 : $defaultDurasi['shubuh']['adzan'],
                         'iqomah' => $durasi->iqomah_shubuh ? $durasi->iqomah_shubuh * 60 : $defaultDurasi['shubuh']['iqomah'],
-                        'final' => $durasi->final_shubuh ?? $defaultDurasi['shubuh']['final'],
+                        'final' => $durasi->final_shubuh ? $durasi->final_shubuh * 60 : $defaultDurasi['shubuh']['final'],
                     ],
                     'dzuhur' => [
                         'adzan' => $durasi->adzan_dzuhur ? $durasi->adzan_dzuhur * 60 : $defaultDurasi['dzuhur']['adzan'],
                         'iqomah' => $durasi->iqomah_dzuhur ? $durasi->iqomah_dzuhur * 60 : $defaultDurasi['dzuhur']['iqomah'],
-                        'final' => $durasi->final_dzuhur ?? $defaultDurasi['dzuhur']['final'],
+                        'final' => $durasi->final_dzuhur ? $durasi->final_dzuhur * 60 : $defaultDurasi['dzuhur']['final'],
                     ],
                     'jumat' => $durasi->jumat_slide ? $durasi->jumat_slide * 60 : $defaultDurasi['jumat'],
                     'ashar' => [
                         'adzan' => $durasi->adzan_ashar ? $durasi->adzan_ashar * 60 : $defaultDurasi['ashar']['adzan'],
                         'iqomah' => $durasi->iqomah_ashar ? $durasi->iqomah_ashar * 60 : $defaultDurasi['ashar']['iqomah'],
-                        'final' => $durasi->final_ashar ?? $defaultDurasi['ashar']['final'],
+                        'final' => $durasi->final_ashar ? $durasi->final_ashar * 60 : $defaultDurasi['ashar']['final'],
                     ],
                     'maghrib' => [
                         'adzan' => $durasi->adzan_maghrib ? $durasi->adzan_maghrib * 60 : $defaultDurasi['maghrib']['adzan'],
                         'iqomah' => $durasi->iqomah_maghrib ? $durasi->iqomah_maghrib * 60 : $defaultDurasi['maghrib']['iqomah'],
-                        'final' => $durasi->final_maghrib ?? $defaultDurasi['maghrib']['final'],
+                        'final' => $durasi->final_maghrib ? $durasi->final_maghrib * 60 : $defaultDurasi['maghrib']['final'],
                     ],
                     'isya' => [
                         'adzan' => $durasi->adzan_isya ? $durasi->adzan_isya * 60 : $defaultDurasi['isya']['adzan'],
                         'iqomah' => $durasi->iqomah_isya ? $durasi->iqomah_isya * 60 : $defaultDurasi['isya']['iqomah'],
-                        'final' => $durasi->final_isya ?? $defaultDurasi['isya']['final'],
+                        'final' => $durasi->final_isya ? $durasi->final_isya * 60 : $defaultDurasi['isya']['final'],
                     ],
                 ];
                 $data['durasi'] = $dataDurasi;
-            } 
-            else {
+            } else {
                 $data['durasi'] = $defaultDurasi;
             }
 
