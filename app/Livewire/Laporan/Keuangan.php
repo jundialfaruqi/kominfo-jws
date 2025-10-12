@@ -435,6 +435,7 @@ class Keuangan extends Component
                     $pageName = 'page_' . $masjidId . '_' . $catId;
                     $perPage = $this->paginatePerCategory[$masjidId][$catId] ?? $this->paginate;
                     $paginator = $catQuery->paginate($perPage, ['*'], $pageName);
+                    $startNo = ((int) $paginator->currentPage() - 1) * (int) $paginator->perPage();
 
                     $runningBalance = 0;
                     $totalMasuk = 0;
@@ -459,7 +460,7 @@ class Keuangan extends Component
 
                         $rows[] = [
                             'id' => $laporan->id,
-                            'no' => $i + 1,
+                            'no' => (int) $startNo + (int) $i + 1,
                             'tanggal' => Carbon::parse($laporan->tanggal)->format('d/m/Y'),
                             'uraian' => $laporan->is_opening ? ($laporan->uraian ?: 'Sisa bulan yang lalu') : $laporan->uraian,
                             'is_opening' => (bool) $laporan->is_opening,
@@ -524,6 +525,7 @@ class Keuangan extends Component
                     $pageName = 'page_cat_' . $catId;
                     $perPageNonAdmin = $this->paginatePerCategoryNonAdmin[$catId] ?? $this->paginate;
                     $paginator = $catQuery->paginate($perPageNonAdmin, ['*'], $pageName);
+                    $startNo = ((int) $paginator->currentPage() - 1) * (int) $paginator->perPage();
 
                     $runningBalance = 0;
                     $totalMasuk = 0;
@@ -548,7 +550,7 @@ class Keuangan extends Component
 
                         $rows[] = [
                             'id' => $laporan->id,
-                            'no' => $i + 1,
+                            'no' => (int) $startNo + (int) $i + 1,
                             'tanggal' => Carbon::parse($laporan->tanggal)->format('d/m/Y'),
                             'uraian' => $laporan->is_opening ? ($laporan->uraian ?: 'Sisa bulan yang lalu') : $laporan->uraian,
                             'is_opening' => (bool) $laporan->is_opening,
