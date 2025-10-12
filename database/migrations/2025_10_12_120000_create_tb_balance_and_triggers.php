@@ -15,7 +15,7 @@ return new class extends Migration
         // Add running_balance column to laporans
         Schema::table('laporans', function (Blueprint $table) {
             if (!Schema::hasColumn('laporans', 'running_balance')) {
-                $table->decimal('running_balance', 15, 2)->default(0)->after('is_opening');
+                $table->bigInteger('running_balance')->default(0)->after('is_opening');
             }
         });
 
@@ -24,9 +24,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_masjid');
             $table->unsignedBigInteger('id_group_category');
-            $table->decimal('total_masuk', 15, 2)->default(0);
-            $table->decimal('total_keluar', 15, 2)->default(0);
-            $table->decimal('ending_balance', 15, 2)->default(0);
+            $table->bigInteger('total_masuk')->default(0);
+            $table->bigInteger('total_keluar')->default(0);
+            $table->bigInteger('ending_balance')->default(0);
             $table->timestamps();
 
             $table->unique(['id_masjid', 'id_group_category'], 'uniq_tb_balance_masjid_cat');
@@ -56,7 +56,7 @@ return new class extends Migration
                         OVER (PARTITION BY id_masjid, id_group_category ORDER BY tanggal, id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS rb
                 FROM laporans
             ) AS s ON s.id = t.id
-            SET t.running_balance = s.rb
+            SET t.running_balance = CAST(s.rb AS SIGNED)
         SQL);
 
         // Trigger: AFTER INSERT on laporans
@@ -65,8 +65,8 @@ return new class extends Migration
             AFTER INSERT ON laporans
             FOR EACH ROW
             BEGIN
-                DECLARE delta DECIMAL(15,2);
-                DECLARE prevSum DECIMAL(15,2);
+                DECLARE delta BIGINT;
+                DECLARE prevSum BIGINT;
 
                 SET delta = CASE WHEN NEW.is_opening = 1 OR NEW.jenis = 'masuk' THEN NEW.saldo ELSE -NEW.saldo END;
 
@@ -107,9 +107,9 @@ return new class extends Migration
             AFTER UPDATE ON laporans
             FOR EACH ROW
             BEGIN
-                DECLARE oldDelta DECIMAL(15,2);
-                DECLARE newDelta DECIMAL(15,2);
-                DECLARE prevSum DECIMAL(15,2);
+                DECLARE oldDelta BIGINT;
+                DECLARE newDelta BIGINT;
+                DECLARE prevSum BIGINT;
 
                 SET oldDelta = CASE WHEN OLD.is_opening = 1 OR OLD.jenis = 'masuk' THEN OLD.saldo ELSE -OLD.saldo END;
                 SET newDelta = CASE WHEN NEW.is_opening = 1 OR NEW.jenis = 'masuk' THEN NEW.saldo ELSE -NEW.saldo END;
@@ -202,7 +202,7 @@ return new class extends Migration
             AFTER DELETE ON laporans
             FOR EACH ROW
             BEGIN
-                DECLARE oldDelta DECIMAL(15,2);
+                DECLARE oldDelta BIGINT;
                 SET oldDelta = CASE WHEN OLD.is_opening = 1 OR OLD.jenis = 'masuk' THEN OLD.saldo ELSE -OLD.saldo END;
 
                 UPDATE tb_balance SET
