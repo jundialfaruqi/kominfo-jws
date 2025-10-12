@@ -23,6 +23,7 @@ class Laporan extends Model
 
     protected $casts = [
         'is_opening' => 'boolean',
+        'saldo' => 'integer',
     ];
 
     /**

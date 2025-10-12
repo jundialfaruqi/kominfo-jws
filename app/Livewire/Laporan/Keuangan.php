@@ -59,7 +59,7 @@ class Keuangan extends Component
         'tanggal'  => 'required|date',
         'uraian'   => 'required|string',
         'jenis'    => 'required|in:masuk,keluar',
-        'saldo'    => 'required|numeric|min:0',
+        'saldo'    => 'required|integer|min:0',
     ];
 
     protected $messages = [
@@ -73,7 +73,7 @@ class Keuangan extends Component
         'jenis.required'    => 'Jenis transaksi harus dipilih',
         'jenis.in'          => 'Jenis transaksi harus salah satu dari: masuk atau keluar',
         'saldo.required'    => 'Saldo tidak boleh kosong',
-        'saldo.numeric'     => 'Saldo harus berupa angka',
+        'saldo.integer'     => 'Saldo harus berupa bilangan bulat',
         'saldo.min'         => 'Saldo tidak boleh kurang dari 0',
     ];
 
@@ -466,7 +466,7 @@ class Keuangan extends Component
                             'groupCategoryName' => optional($laporan->groupCategory)->name ?? '-',
                             'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
                             'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',
-                            'runningBalanceDisplay' => number_format((float) $laporan->running_balance_sql, 0, ',', '.'),
+                            'runningBalanceDisplay' => number_format((int) $laporan->running_balance_sql, 0, ',', '.'),
                         ];
                     }
 
@@ -555,7 +555,7 @@ class Keuangan extends Component
                             'groupCategoryName' => optional($laporan->groupCategory)->name ?? '-',
                             'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
                             'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',
-                            'runningBalanceDisplay' => number_format((float) $laporan->running_balance_sql, 0, ',', '.'),
+                            'runningBalanceDisplay' => number_format((int) $laporan->running_balance_sql, 0, ',', '.'),
                         ];
                     }
 
