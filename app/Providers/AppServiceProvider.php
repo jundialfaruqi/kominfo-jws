@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
+use App\Models\Laporan;
+use App\Policies\LaporanPolicy;
+use App\Models\GroupCategory;
+use App\Policies\GroupCategoryPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,5 +38,10 @@ class AppServiceProvider extends ServiceProvider
         Livewire::addPersistentMiddleware([
             \App\Http\Middleware\AdminMiddleware::class,
         ]);
+
+        // Register policy untuk Laporan
+        Gate::policy(Laporan::class, LaporanPolicy::class);
+        // Register policy untuk GroupCategory
+        Gate::policy(GroupCategory::class, GroupCategoryPolicy::class);
     }
 }

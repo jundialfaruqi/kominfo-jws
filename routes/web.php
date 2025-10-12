@@ -21,6 +21,7 @@ use App\Models\User;
 use App\Models\Theme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use App\Livewire\GroupCategory\Group as GroupCategoryGroup;
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -77,6 +78,23 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Marquee Routes
     Route::get('/marquee', \App\Livewire\Marquee\Marquee::class)->name('marquee.index');
 
+    // Laporan Keuangan Routes
+    Route::get('/laporan-keuangan', \App\Livewire\Laporan\Keuangan::class)
+        ->name('laporan-keuangan.index')
+        ->middleware('can:view-laporan-keuangan');
+
+    // Group Category Routes
+    Route::get('/group-category', GroupCategoryGroup::class)
+        ->name('group-category.index')
+        ->middleware('can:view-group-category');
+
+    Route::get('/group-category/create', \App\Livewire\GroupCategory\Create::class)
+        ->name('group-category.create')
+        ->middleware('can:create-group-category');
+
+    Route::get('/group-category/{id}/edit', \App\Livewire\GroupCategory\Edit::class)
+        ->name('group-category.edit')
+        ->middleware('can:edit-group-category');
     // adzan routes
     Route::get('/adzan', \App\Livewire\Adzan\GambarAdzan::class)->name('adzan.index');
 

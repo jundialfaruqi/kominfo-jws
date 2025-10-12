@@ -26,7 +26,7 @@ class Profil extends Model
     
     protected $appends = [
         'logo_masjid_url',
-        'llogo_pemerintah_url',
+        'logo_pemerintah_url',
     ];
 
     // Additional Method
@@ -40,5 +40,21 @@ class Profil extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    /**
+     * Relasi: Satu profil memiliki banyak laporan.
+     */
+    public function laporans()
+    {
+        return $this->hasMany(Laporan::class, 'id_masjid');
+    }
+
+    /**
+     * Relasi: Satu profil memiliki banyak group categories.
+     */
+    public function groupCategories()
+    {
+        return $this->hasMany(GroupCategory::class, 'id_masjid');
     }
 }

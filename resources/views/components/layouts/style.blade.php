@@ -4,7 +4,7 @@
 <link href="{{ asset('theme/dist/css/tabler-vendors.min.css') }}" rel="stylesheet" />
 <link href="{{ asset('theme/dist/css/demo.min.css') }}" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/izitoast/dist/css/iziToast.min.css" rel="stylesheet" />
-<script src="{{ asset('theme/dist/js/demo-theme.min.js') }}"></script>
+<script src="{{ asset('theme/dist/js/demo-theme.min.js') }}" defer></script>
 <script src="{{ asset('js/theme-handler.js') }}"></script>
 <style>
     @import url('https://rsms.me/inter/inter.css');

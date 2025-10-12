@@ -52,7 +52,7 @@
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-settings">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path
-                                    d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+                                    d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065z" />
                                 <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                             </svg>
                             Pengaturan
@@ -90,20 +90,6 @@
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                         @can('view-users')
-                            <div class="hr-text mb-3 mt-5">
-                                <b>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-user-edit">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
-                                        <path d="M6 21v-2a4 4 0 0 1 4 -4h3.5" />
-                                        <path d="M18.42 15.61a2.1 2.1 0 0 1 2.97 2.97l-3.39 3.42h-3v-3l3.42 -3.39z" />
-                                    </svg>
-                                    Manajemen User
-                                </b>
-                            </div>
                             <li
                                 class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
@@ -205,20 +191,6 @@
                             </li>
                         @endcan
                     @endif
-                    <div class="hr-text mb-3 mt-5">
-                        <b>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-file-minus">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                <path d="M9 14l6 0" />
-                            </svg>
-                            Manajemen Konten
-                        </b>
-                    </div>
                     <li
                         class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
@@ -245,6 +217,35 @@
                                 Profil Masjid
                             </span>
                         </a>
+                    </li>
+                    <li class="nav-item mx-3 dropdown {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
+                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}" data-bs-toggle="dropdown" aria-expanded="{{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'true' : 'false' }}">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cash">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3" />
+                                    <path d="M7 9m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" />
+                                    <path d="M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                </svg>
+                            </span>
+                            <span class="nav-link-title">Keuangan</span>
+                        </a>
+                        <ul class="dropdown-menu rounded-3 {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
+                            <li>
+                                <a wire:navigate
+                                    class="dropdown-item {{ request()->routeIs('group-category.*') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
+                                    href="{{ route('group-category.index') }}">
+                                    Group Category
+                                </a>
+                            </li>
+                            <li>
+                                <a wire:navigate
+                                    class="dropdown-item {{ request()->routeIs('laporan-keuangan.index') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
+                                    href="{{ route('laporan-keuangan.index') }}">
+                                    Laporan Keuangan
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li
                         class="nav-item mx-3 {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
