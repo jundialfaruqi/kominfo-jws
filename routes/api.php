@@ -49,3 +49,8 @@ Route::get('server-time', [API\MasterController::class, 'get_server_time'])->nam
 
 // API route untuk mendapatkan refresh prayer time
 Route::get('refresh-prayer-times', [API\MasterController::class, 'get_refresh_prayer_times'])->name('api.refresh-prayer-times');
+
+// API route untuk rekap total keseluruhan kategori per profil (ALL, tanpa filter tanggal)
+Route::get('balance-summary/{slug}', [API\ProfilController::class, 'get_balance_summary'])->name('api.balance-summary');
+// Endpoint yang sama mengembalikan rekap dan rincian items per kategori
+Route::get('balance-details/{slug}', [API\ProfilController::class, 'get_balance_summary'])->name('api.balance-details');

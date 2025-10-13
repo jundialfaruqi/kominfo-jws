@@ -144,6 +144,154 @@ class ProfilController extends Controller
         }
     }
 
+    // GET REKAPAN total keseluruhan kategori per profile (id_masjid),
+    public function get_balance_summary(Request $request, $slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+
+            // Query params: details (none|summary|full), page, per_page
+            $details = strtolower($request->query('details', 'summary'));
+            if (!in_array($details, ['none', 'summary', 'full'])) {
+                $details = 'summary';
+            }
+            $page = max(1, (int) $request->query('page', 1));
+            $perPage = (int) $request->query('per_page', 50);
+            if ($perPage < 1) { $perPage = 50; }
+            if ($perPage > 500) { $perPage = 500; } // batas atas untuk mencegah respons terlalu besar
+
+            $rows = DB::table('tb_balance')
+                ->leftJoin('group_categories', 'group_categories.id', '=', 'tb_balance.id_group_category')
+                ->where('tb_balance.id_masjid', $profil->id)
+                ->selectRaw('tb_balance.id_group_category as category_id, COALESCE(group_categories.name, "-") as category_name, tb_balance.total_masuk as sumMasuk, tb_balance.total_keluar as sumKeluar, tb_balance.ending_balance as ending')
+                ->orderBy('group_categories.name')
+                ->get();
+
+            $categories = [];
+            $categoriesWithItems = [];
+            $grandTotals = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+
+            foreach ($rows as $row) {
+                $sumMasuk = (int) ($row->sumMasuk ?? 0);
+                $sumKeluar = (int) ($row->sumKeluar ?? 0);
+                $ending = (int) ($row->ending ?? 0);
+                $categories[] = [
+                    'categoryId' => (int) $row->category_id,
+                    'categoryName' => $row->category_name,
+                    'sumMasuk' => $sumMasuk,
+                    'sumKeluar' => $sumKeluar,
+                    'ending' => $ending,
+                    // tambahan: tampilan terformat ribuan
+                    'sumMasukDisplay' => number_format($sumMasuk, 0, ',', '.'),
+                    'sumKeluarDisplay' => number_format($sumKeluar, 0, ',', '.'),
+                    'endingDisplay' => number_format($ending, 0, ',', '.'),
+                ];
+
+                if ($details === 'full') {
+                    // Pagination per kategori
+                    $totalItems = DB::table('laporans')
+                        ->where('laporans.id_masjid', $profil->id)
+                        ->where('laporans.id_group_category', $row->category_id)
+                        ->count();
+
+                    $itemRows = DB::table('laporans')
+                        ->where('laporans.id_masjid', $profil->id)
+                        ->where('laporans.id_group_category', $row->category_id)
+                        ->selectRaw('laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening, laporans.running_balance')
+                        ->orderBy('tanggal', 'asc')
+                        ->orderBy('id', 'asc')
+                        ->offset(($page - 1) * $perPage)
+                        ->limit($perPage)
+                        ->get();
+
+                    $items = [];
+                    $startNo = ($page - 1) * $perPage;
+                    foreach ($itemRows as $i => $lap) {
+                        $masuk = 0;
+                        $keluar = 0;
+                        if ($lap->is_opening) {
+                            $masuk = (int) $lap->saldo;
+                        } else {
+                            if ($lap->jenis === 'masuk') {
+                                $masuk = (int) $lap->saldo;
+                            } elseif ($lap->jenis === 'keluar') {
+                                $keluar = (int) $lap->saldo;
+                            }
+                        }
+
+                        $items[] = [
+                            'id' => (int) $lap->id,
+                            'no' => (int) $startNo + (int) $i + 1,
+                            'tanggal' => Carbon::parse($lap->tanggal)->format('d/m/Y'),
+                            'uraian' => $lap->is_opening ? ($lap->uraian ?: 'Sisa bulan yang lalu') : $lap->uraian,
+                            'is_opening' => (bool) $lap->is_opening,
+                            'groupCategoryName' => $row->category_name,
+                            'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
+                            'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',
+                            'runningBalanceDisplay' => number_format((int) $lap->running_balance, 0, ',', '.'),
+                        ];
+                    }
+
+                    $categoriesWithItems[] = [
+                        'categoryId' => (int) $row->category_id,
+                        'categoryName' => $row->category_name,
+                        'items' => $items,
+                        'totals' => [
+                            'totalMasukDisplay' => number_format($sumMasuk, 0, ',', '.'),
+                            'totalKeluarDisplay' => number_format($sumKeluar, 0, ',', '.'),
+                            'endingBalanceDisplay' => number_format($ending, 0, ',', '.'),
+                        ],
+                        'pagination' => [
+                            'page' => $page,
+                            'perPage' => $perPage,
+                            'total' => (int) $totalItems,
+                            'lastPage' => (int) ceil($totalItems / $perPage),
+                        ],
+                    ];
+                }
+
+                $grandTotals['sumMasuk'] += $sumMasuk;
+                $grandTotals['sumKeluar'] += $sumKeluar;
+                $grandTotals['ending'] += $ending;
+            }
+
+            // tambahan: grandTotals tampilan terformat ribuan
+            $grandTotals['sumMasukDisplay'] = number_format($grandTotals['sumMasuk'], 0, ',', '.');
+            $grandTotals['sumKeluarDisplay'] = number_format($grandTotals['sumKeluar'], 0, ',', '.');
+            $grandTotals['endingDisplay'] = number_format($grandTotals['ending'], 0, ',', '.');
+
+            $data = [
+                'profil' => [
+                    'id' => $profil->id,
+                    'name' => $profil->name,
+                ],
+                'categories' => $categories,
+                // hanya sertakan detail ketika diminta
+                // 'categoriesWithItems' akan ditambahkan di bawah bila $details === 'full'
+                'grandTotals' => $grandTotals,
+            ];
+
+            if ($details === 'full') {
+                $data['categoriesWithItems'] = $categoriesWithItems;
+                $data['details'] = 'full';
+                $data['page'] = $page;
+                $data['per_page'] = $perPage;
+            } else {
+                $data['details'] = $details; // none atau summary
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data rekap balance masjid !',
+                'data' => $data
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
     // GET SLIDES (API LAMA)
     public function get_slides1($slug)
     {

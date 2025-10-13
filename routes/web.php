@@ -107,6 +107,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // faq routes
     Route::get('/faq', \App\Livewire\Faq\Index::class)->name('faq.index');
 
+    // Balance API Docs
+    Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)->name('api-docs.balance');
+
     // about routes
     Route::get('/about', \App\Livewire\About\Index::class)->name('about.index');
 
