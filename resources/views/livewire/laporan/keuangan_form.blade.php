@@ -84,10 +84,14 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label">Nominal</label>
-                    <input type="number" step="1" wire:model="saldo" min="0"
-                        class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal">
-                    @error('saldo')
-                    @enderror
+                    <div class="input-group">
+                        <span class="input-group-text" id="visible-addon">Rp</span>
+                        <input type="number" step="1" wire:model="saldo" min="0"
+                            class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal">
+                        @error('saldo')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
             </div>
         </div>

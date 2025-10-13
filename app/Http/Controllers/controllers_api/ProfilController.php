@@ -157,8 +157,25 @@ class ProfilController extends Controller
             }
             $page = max(1, (int) $request->query('page', 1));
             $perPage = (int) $request->query('per_page', 50);
-            if ($perPage < 1) { $perPage = 50; }
-            if ($perPage > 500) { $perPage = 500; } // batas atas untuk mencegah respons terlalu besar
+            if ($perPage < 1) {
+                $perPage = 50;
+            }
+            if ($perPage > 500) {
+                $perPage = 500;
+            } // batas atas untuk mencegah respons terlalu besar
+            // parameter tambahan: full_month => bila true, detail full dibatasi bulan berjalan tanpa paginasi
+            $fullMonth = filter_var($request->query('full_month', 'false'), FILTER_VALIDATE_BOOLEAN);
+            $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
+            $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+            $fullMonth = filter_var($request->query('full_month', 'false'), FILTER_VALIDATE_BOOLEAN);
+            // keep ISO format for DB query, but expose dd-mm-yyyy in response
+            $startOfMonthIso = Carbon::now()->startOfMonth()->toDateString();
+            $endOfMonthIso = Carbon::now()->endOfMonth()->toDateString();
+            $startOfMonthDisplay = Carbon::parse($startOfMonthIso)->format('d-m-Y');
+            $endOfMonthDisplay = Carbon::parse($endOfMonthIso)->format('d-m-Y');
+            // Tambahan: nama bulan (Indonesia) dan tahun untuk period saat full_month=true
+            $monthNameId = Carbon::now()->locale('id')->translatedFormat('F');
+            $yearNumber = Carbon::now()->year;
 
             $rows = DB::table('tb_balance')
                 ->leftJoin('group_categories', 'group_categories.id', '=', 'tb_balance.id_group_category')
@@ -189,23 +206,43 @@ class ProfilController extends Controller
 
                 if ($details === 'full') {
                     // Pagination per kategori
-                    $totalItems = DB::table('laporans')
-                        ->where('laporans.id_masjid', $profil->id)
-                        ->where('laporans.id_group_category', $row->category_id)
-                        ->count();
+                    if ($fullMonth) {
+                        $totalItems = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->whereBetween('laporans.tanggal', [$startOfMonth, $endOfMonth])
+                            ->count();
 
-                    $itemRows = DB::table('laporans')
-                        ->where('laporans.id_masjid', $profil->id)
-                        ->where('laporans.id_group_category', $row->category_id)
-                        ->selectRaw('laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening, laporans.running_balance')
-                        ->orderBy('tanggal', 'asc')
-                        ->orderBy('id', 'asc')
-                        ->offset(($page - 1) * $perPage)
-                        ->limit($perPage)
-                        ->get();
+                        $itemRows = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->whereBetween('laporans.tanggal', [$startOfMonth, $endOfMonth])
+                            ->selectRaw('laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening, laporans.running_balance')
+                            ->orderBy('tanggal', 'asc')
+                            ->orderBy('id', 'asc')
+                            ->get();
 
-                    $items = [];
-                    $startNo = ($page - 1) * $perPage;
+                        $items = [];
+                        $startNo = 0; // tanpa paginasi untuk bulan berjalan
+                    } else {
+                        $totalItems = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->count();
+
+                        $itemRows = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->selectRaw('laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening, laporans.running_balance')
+                            ->orderBy('tanggal', 'asc')
+                            ->orderBy('id', 'asc')
+                            ->offset(($page - 1) * $perPage)
+                            ->limit($perPage)
+                            ->get();
+
+                        $items = [];
+                        $startNo = ($page - 1) * $perPage; // dengan paginasi
+                    }
                     foreach ($itemRows as $i => $lap) {
                         $masuk = 0;
                         $keluar = 0;
@@ -232,7 +269,7 @@ class ProfilController extends Controller
                         ];
                     }
 
-                    $categoriesWithItems[] = [
+                    $categoryBlock = [
                         'categoryId' => (int) $row->category_id,
                         'categoryName' => $row->category_name,
                         'items' => $items,
@@ -241,13 +278,18 @@ class ProfilController extends Controller
                             'totalKeluarDisplay' => number_format($sumKeluar, 0, ',', '.'),
                             'endingBalanceDisplay' => number_format($ending, 0, ',', '.'),
                         ],
-                        'pagination' => [
+                    ];
+
+                    if (!$fullMonth) {
+                        $categoryBlock['pagination'] = [
                             'page' => $page,
                             'perPage' => $perPage,
                             'total' => (int) $totalItems,
                             'lastPage' => (int) ceil($totalItems / $perPage),
-                        ],
-                    ];
+                        ];
+                    }
+
+                    $categoriesWithItems[] = $categoryBlock;
                 }
 
                 $grandTotals['sumMasuk'] += $sumMasuk;
@@ -274,8 +316,19 @@ class ProfilController extends Controller
             if ($details === 'full') {
                 $data['categoriesWithItems'] = $categoriesWithItems;
                 $data['details'] = 'full';
-                $data['page'] = $page;
-                $data['per_page'] = $perPage;
+                $data['full_month'] = $fullMonth;
+                if (!$fullMonth) {
+                    $data['page'] = $page;
+                    $data['per_page'] = $perPage;
+                } else {
+                    $data['period'] = [
+                        'type' => 'current_month',
+                        'month' => $monthNameId,
+                        'year' => (int) $yearNumber,
+                        'start' => $startOfMonthDisplay,
+                        'end' => $endOfMonthDisplay,
+                    ];
+                }
             } else {
                 $data['details'] = $details; // none atau summary
             }

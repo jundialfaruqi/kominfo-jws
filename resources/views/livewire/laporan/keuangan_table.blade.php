@@ -101,8 +101,40 @@
                     {{-- per kategori dan total keseluruhan per profil (id_masjid) --}}
                     <div class="card mb-3 rounded-3 shadow-sm">
                         <div class="card-body">
+                            @php
+                                $filterLabel = 'Semua';
+                                try {
+                                    if ($filterDateMode === 'hari' && !empty($filterDay)) {
+                                        $filterLabel = \Carbon\Carbon::createFromFormat(
+                                            'Y-m-d',
+                                            $filterDay,
+                                        )->translatedFormat('d F Y');
+                                    } elseif ($filterDateMode === 'bulan' && !empty($filterMonth)) {
+                                        $filterLabel = \Carbon\Carbon::createFromFormat(
+                                            'Y-m',
+                                            $filterMonth,
+                                        )->translatedFormat('F Y');
+                                    } elseif ($filterDateMode === 'tahun' && !empty($filterYear)) {
+                                        $filterLabel = $filterYear;
+                                    } elseif ($filterDateMode === 'semua') {
+                                        $filterLabel = 'Semua';
+                                    }
+                                } catch (\Exception $e) {
+                                    // fallback ke raw value jika format gagal
+                                    if ($filterDateMode === 'hari') {
+                                        $filterLabel = $filterDay ?? 'Semua';
+                                    } elseif ($filterDateMode === 'bulan') {
+                                        $filterLabel = $filterMonth ?? 'Semua';
+                                    } elseif ($filterDateMode === 'tahun') {
+                                        $filterLabel = $filterYear ?? 'Semua';
+                                    }
+                                }
+                            @endphp
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
-                                <div class="fw-semibold">Ringkasan per Kategori (mengikuti filter tanggal)</div>
+                                <div class="fw-semibold">
+                                    Ringkasan per Kategori
+                                    <span class="badge badge-small bg-primary text-white">{{ $filterLabel }}</span>
+                                </div>
                                 <div class="text-muted small">Profil: {{ $group['masjidName'] ?? '-' }}</div>
                             </div>
                             <div class="table-responsive">
@@ -116,12 +148,35 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        @if (
+                                            $filterDateMode === 'bulan' ||
+                                                (($previousTotalsAdmin['sumMasuk'] ?? 0) !== 0 ||
+                                                    ($previousTotalsAdmin['sumKeluar'] ?? 0) !== 0 ||
+                                                    ($previousTotalsAdmin['ending'] ?? 0) !== 0))
+                                            <tr class="table-secondary">
+                                                <td><b>Saldo Sebelumnya</b> <span class="text-muted small">(s.d. akhir
+                                                        bulan sebelumnya)</span></td>
+                                                <td class="text-end">
+                                                    <b>Rp
+                                                        {{ number_format($previousTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}</b>
+                                                </td>
+                                                <td class="text-end">
+                                                    <b>Rp
+                                                        {{ number_format($previousTotalsAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}</b>
+                                                </td>
+                                                <td class="text-end">
+                                                    <b>Rp
+                                                        {{ number_format($previousTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}</b>
+                                                </td>
+                                            </tr>
+                                        @endif
                                         @foreach ($summaryCategoriesAdmin ?? [] as $sum)
                                             <tr>
                                                 <td>{{ $sum['categoryName'] }}</td>
                                                 <td class="text-end">{{ number_format($sum['sumMasuk'], 0, ',', '.') }}
                                                 </td>
-                                                <td class="text-end">{{ number_format($sum['sumKeluar'], 0, ',', '.') }}
+                                                <td class="text-end">
+                                                    {{ number_format($sum['sumKeluar'], 0, ',', '.') }}
                                                 </td>
                                                 <td class="text-end">{{ number_format($sum['ending'], 0, ',', '.') }}
                                                 </td>
@@ -129,8 +184,8 @@
                                         @endforeach
                                     </tbody>
                                     <tfoot>
-                                        <tr>
-                                            <th class="text-end">Total Semua</th>
+                                        <tr class="bg-primary-lt">
+                                            <th class="text-end">Total :</th>
                                             <th class="text-end">
                                                 Rp {{ number_format($grandTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
                                             </th>
@@ -139,9 +194,30 @@
                                                 {{ number_format($grandTotalsAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
                                             </th>
                                             <th class="text-end">
-                                                Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                                @if ($filterDateMode === 'bulan')
+                                                    Rp {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                                                @else
+                                                    Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                                @endif
                                             </th>
                                         </tr>
+                                        @if ($filterDateMode === 'bulan')
+                                            <tr class="bg-secondary text-white">
+                                                <th class="text-end">Total Termasuk Saldo Sebelumnya :</th>
+                                                <th class="text-end">
+                                                    Rp
+                                                    {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) + ($previousTotalsAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
+                                                </th>
+                                                <th class="text-end">
+                                                    Rp
+                                                    {{ number_format(($grandTotalsAdmin['sumKeluar'] ?? 0) + ($previousTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                                                </th>
+                                                <th class="text-end">
+                                                    Rp
+                                                    {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                                </th>
+                                            </tr>
+                                        @endif
                                     </tfoot>
                                 </table>
                             </div>
@@ -305,7 +381,37 @@
             {{-- Ringkasan per kategori (Non-admin) --}}
             <div class="card mb-3 rounded-3 shadow-sm">
                 <div class="card-body">
-                    <div class="fw-semibold mb-2">Ringkasan per Kategori (mengikuti filter tanggal)</div>
+                    @php
+                        $filterLabel = 'Semua';
+                        try {
+                            if ($filterDateMode === 'hari' && !empty($filterDay)) {
+                                $filterLabel = \Carbon\Carbon::createFromFormat('Y-m-d', $filterDay)->translatedFormat(
+                                    'd F Y',
+                                );
+                            } elseif ($filterDateMode === 'bulan' && !empty($filterMonth)) {
+                                $filterLabel = \Carbon\Carbon::createFromFormat('Y-m', $filterMonth)->translatedFormat(
+                                    'F Y',
+                                );
+                            } elseif ($filterDateMode === 'tahun' && !empty($filterYear)) {
+                                $filterLabel = $filterYear;
+                            } elseif ($filterDateMode === 'semua') {
+                                $filterLabel = 'Semua';
+                            }
+                        } catch (\Exception $e) {
+                            // fallback ke raw value jika format gagal
+                            if ($filterDateMode === 'hari') {
+                                $filterLabel = $filterDay ?? 'Semua';
+                            } elseif ($filterDateMode === 'bulan') {
+                                $filterLabel = $filterMonth ?? 'Semua';
+                            } elseif ($filterDateMode === 'tahun') {
+                                $filterLabel = $filterYear ?? 'Semua';
+                            }
+                        }
+                    @endphp
+                    <div class="fw-semibold mb-2">
+                        Ringkasan per Kategori
+                        <span class="badge badge-small bg-primary text-white">{{ $filterLabel }}</span>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-sm table-striped">
                             <thead>
@@ -317,6 +423,34 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @if (
+                                    $filterDateMode === 'bulan' ||
+                                        (($previousTotalsNonAdmin['sumMasuk'] ?? 0) !== 0 ||
+                                            ($previousTotalsNonAdmin['sumKeluar'] ?? 0) !== 0 ||
+                                            ($previousTotalsNonAdmin['ending'] ?? 0) !== 0))
+                                    <tr class="table-secondary">
+                                        <td><b>Saldo Sebelumnya</b> <span class="text-muted small">(s.d. akhir bulan
+                                                sebelumnya)</span></td>
+                                        <td class="text-end">
+                                            <b>
+                                                Rp
+                                                {{ number_format($previousTotalsNonAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
+                                            </b>
+                                        </td>
+                                        <td class="text-end">
+                                            <b>
+                                                Rp
+                                                {{ number_format($previousTotalsNonAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                            </b>
+                                        </td>
+                                        <td class="text-end">
+                                            <b>
+                                                Rp
+                                                {{ number_format($previousTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                            </b>
+                                        </td>
+                                    </tr>
+                                @endif
                                 @foreach ($summaryCategoriesNonAdmin ?? [] as $sum)
                                     <tr>
                                         <td>{{ $sum['categoryName'] }}</td>
@@ -327,16 +461,34 @@
                                 @endforeach
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <th class="text-end">Total Semua</th>
+                                <tr class="bg-primary-lt text-white">
+                                    <th class="text-end">Total :</th>
                                     <th class="text-end">
-                                        Rp {{ number_format($grandTotalsNonAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}</th>
+                                        Rp {{ number_format($grandTotalsNonAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
+                                    </th>
                                     <th class="text-end">
                                         Rp {{ number_format($grandTotalsNonAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
                                     </th>
                                     <th class="text-end">
-                                        Rp {{ number_format($grandTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}</th>
+                                        Rp {{ number_format($grandTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                    </th>
                                 </tr>
+                                @if ($filterDateMode === 'bulan')
+                                    <tr class="bg-secondary text-white">
+                                        <th class="text-end">Total Termasuk Saldo Sebelumnya :</th>
+                                        <th class="text-end">
+                                            Rp
+                                            {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) + ($previousTotalsNonAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
+                                        </th>
+                                        <th class="text-end">
+                                            Rp
+                                            {{ number_format(($grandTotalsNonAdmin['sumKeluar'] ?? 0) + ($previousTotalsNonAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                                        </th>
+                                        <th class="text-end">
+                                            Rp {{ number_format($grandTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                        </th>
+                                    </tr>
+                                @endif
                             </tfoot>
                         </table>
                     </div>

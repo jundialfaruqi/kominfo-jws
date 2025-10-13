@@ -313,9 +313,24 @@ class Keuangan extends Component
             }
         }
 
+        // Penentuan awal periode untuk carry-forward saldo awal
+        $periodStartDate = null;
+        if ($this->filterDateMode === 'hari' && !empty($this->filterDay)) {
+            $periodStartDate = Carbon::parse($this->filterDay)->format('Y-m-d');
+        } elseif ($this->filterDateMode === 'bulan' && !empty($this->filterMonth)) {
+            $year = substr($this->filterMonth, 0, 4);
+            $month = substr($this->filterMonth, 5, 2);
+            if (is_numeric($year) && is_numeric($month)) {
+                $periodStartDate = Carbon::createFromDate((int) $year, (int) $month, 1)->format('Y-m-d');
+            }
+        } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
+            $periodStartDate = Carbon::createFromDate((int) $this->filterYear, 1, 1)->format('Y-m-d');
+        }
+
         // Ringkasan per kategori dan total keseluruhan (mengikuti filter tanggal)
         $summaryCategoriesAdmin = [];
         $grandTotalsAdmin = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+        $previousTotalsAdmin = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
         if ($isAdmin && $this->idMasjid) {
             $categoriesForSummary = GroupCategory::where('id_masjid', $this->idMasjid)->orderBy('name')->get();
             foreach ($categoriesForSummary as $cat) {
@@ -339,7 +354,19 @@ class Keuangan extends Component
                 )->first();
                 $sumMasuk = (int) ($agg->sum_masuk ?? 0);
                 $sumKeluar = (int) ($agg->sum_keluar ?? 0);
-                $ending = $sumMasuk - $sumKeluar;
+
+                $opening = 0;
+                if (!empty($periodStartDate)) {
+                    $openAgg = DB::table('laporans')
+                        ->where('id_masjid', $this->idMasjid)
+                        ->where('id_group_category', $cat->id)
+                        ->where('tanggal', '<', $periodStartDate)
+                        ->selectRaw('COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE -saldo END), 0) AS opening')
+                        ->first();
+                    $opening = (int) ($openAgg->opening ?? 0);
+                }
+
+                $ending = $opening + $sumMasuk - $sumKeluar;
                 $summaryCategoriesAdmin[] = [
                     'categoryId' => $cat->id,
                     'categoryName' => $cat->name,
@@ -351,10 +378,39 @@ class Keuangan extends Component
                 $grandTotalsAdmin['sumKeluar'] += $sumKeluar;
                 $grandTotalsAdmin['ending'] += $ending;
             }
+
+            // Hitung totals saldo sebelumnya (akumulasi hingga akhir bulan sebelumnya)
+            if ($this->filterDateMode === 'bulan' && !empty($this->filterMonth)) {
+                $year = substr($this->filterMonth, 0, 4);
+                $month = substr($this->filterMonth, 5, 2);
+                if (is_numeric($year) && is_numeric($month)) {
+                    $currentMonth = Carbon::createFromDate((int) $year, (int) $month, 1);
+                    $prevEnd = $currentMonth->copy()->subMonth()->endOfMonth()->format('Y-m-d');
+
+                    $aggPrev = DB::table('laporans')
+                        ->where('id_masjid', $this->idMasjid)
+                        ->where('tanggal', '<=', $prevEnd)
+                        ->selectRaw(
+                            "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
+                            "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                        )
+                        ->first();
+
+                    $prevMasuk = (int) ($aggPrev->sum_masuk ?? 0);
+                    $prevKeluar = (int) ($aggPrev->sum_keluar ?? 0);
+                    $prevEnding = $prevMasuk - $prevKeluar;
+                    $previousTotalsAdmin = [
+                        'sumMasuk' => $prevMasuk,
+                        'sumKeluar' => $prevKeluar,
+                        'ending' => $prevEnding,
+                    ];
+                }
+            }
         }
 
         $summaryCategoriesNonAdmin = [];
         $grandTotalsNonAdmin = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+        $previousTotalsNonAdmin = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
         if (!$isAdmin) {
             $profil = $currentUser->profil;
             if ($profil) {
@@ -380,7 +436,19 @@ class Keuangan extends Component
                     )->first();
                     $sumMasuk = (int) ($agg->sum_masuk ?? 0);
                     $sumKeluar = (int) ($agg->sum_keluar ?? 0);
-                    $ending = $sumMasuk - $sumKeluar;
+
+                    $opening = 0;
+                    if (!empty($periodStartDate)) {
+                        $openAgg = DB::table('laporans')
+                            ->where('id_masjid', $profil->id)
+                            ->where('id_group_category', $cat->id)
+                            ->where('tanggal', '<', $periodStartDate)
+                            ->selectRaw('COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE -saldo END), 0) AS opening')
+                            ->first();
+                        $opening = (int) ($openAgg->opening ?? 0);
+                    }
+
+                    $ending = $opening + $sumMasuk - $sumKeluar;
                     $summaryCategoriesNonAdmin[] = [
                         'categoryId' => $cat->id,
                         'categoryName' => $cat->name,
@@ -391,6 +459,34 @@ class Keuangan extends Component
                     $grandTotalsNonAdmin['sumMasuk'] += $sumMasuk;
                     $grandTotalsNonAdmin['sumKeluar'] += $sumKeluar;
                     $grandTotalsNonAdmin['ending'] += $ending;
+                }
+
+                // Hitung totals saldo sebelumnya (akumulasi hingga akhir bulan sebelumnya)
+                if ($this->filterDateMode === 'bulan' && !empty($this->filterMonth)) {
+                    $year = substr($this->filterMonth, 0, 4);
+                    $month = substr($this->filterMonth, 5, 2);
+                    if (is_numeric($year) && is_numeric($month)) {
+                        $currentMonth = Carbon::createFromDate((int) $year, (int) $month, 1);
+                        $prevEnd = $currentMonth->copy()->subMonth()->endOfMonth()->format('Y-m-d');
+
+                        $aggPrev = DB::table('laporans')
+                            ->where('id_masjid', $profil->id)
+                            ->where('tanggal', '<=', $prevEnd)
+                            ->selectRaw(
+                                "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
+                                "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                            )
+                            ->first();
+
+                        $prevMasuk = (int) ($aggPrev->sum_masuk ?? 0);
+                        $prevKeluar = (int) ($aggPrev->sum_keluar ?? 0);
+                        $prevEnding = $prevMasuk - $prevKeluar;
+                        $previousTotalsNonAdmin = [
+                            'sumMasuk' => $prevMasuk,
+                            'sumKeluar' => $prevKeluar,
+                            'ending' => $prevEnding,
+                        ];
+                    }
                 }
             }
         }
@@ -593,8 +689,10 @@ class Keuangan extends Component
             'computedCategoryGroupsNonAdmin' => $computedCategoryGroupsNonAdmin,
             'summaryCategoriesAdmin' => $summaryCategoriesAdmin,
             'grandTotalsAdmin' => $grandTotalsAdmin,
+            'previousTotalsAdmin' => $previousTotalsAdmin,
             'summaryCategoriesNonAdmin' => $summaryCategoriesNonAdmin,
             'grandTotalsNonAdmin' => $grandTotalsNonAdmin,
+            'previousTotalsNonAdmin' => $previousTotalsNonAdmin,
         ]);
     }
 
