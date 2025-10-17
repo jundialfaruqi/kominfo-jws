@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 * {
   margin: 0;
@@ -653,13 +654,13 @@ body {
   }
 
   .countdown-text {
-    font-size: 3.8rem;
+    font-size: 4.3rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
-    font-family: monospace;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
     font-size: 4.4rem;
     font-weight: 1500;
     min-width: 8ch;
@@ -677,12 +678,13 @@ body {
     will-change: background-image;
   }
 
-    .mosque-image img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: fill !important;
-      display: block;
-      background-repeat: no-repeat !important; }
+  .mosque-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block;
+    background-repeat: no-repeat !important;
+  }
 
   .footer-message {
     grid-area: footer;
@@ -726,6 +728,127 @@ body {
     margin: 0 24px;
     color: white;
   }
+
+  /* Finance */
+    .finance-overlay {
+        top: 61vh !important;
+        right: 30px !important;
+        border-radius: 50px !important;
+        padding: 50px 50px !important;
+        width: 23vw !important; /* diperkecil lagi */
+        /* max-height: 500vh !important; */
+    }
+
+    .finance-title {
+        font-size: 3.8rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    .finance-scroll-container {
+        border-radius: 60px !important; /* sudut scroll membulat agar tidak terlihat flat */
+        /* height: 800vh !important; */
+    }
+
+    .finance-scroll-content {
+        gap: 30px !important;
+    }
+
+    .finance-row {
+        font-size: 3.4rem !important;
+        border-radius: 60px !important;
+        /* margin-bottom: 50px !important; */
+    }
+
+    /* Chip background untuk baris per kategori */
+    .finance-chip {
+        padding: 20px 20px !important;
+        border-radius: 60px !important;
+    }
+
+    .finance-chip-title {
+        margin-bottom: 10px !important;
+        margin-left: 20px !important;
+        margin-bottom: 20px !important;
+    }
+
+    /* ---- Finance Pill Styles (Masuk/Keluar/Saldo dalam kategori) ---- */
+    .finance-pill-container {
+        gap: 25px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .finance-pill {
+        border-radius: 30px !important;
+        padding: 25px 25px !important;
+    }
+
+    /* Icon kecil sebelum label */
+    .finance-pill.masuk .label::before {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 45px !important;
+    }
+
+    .finance-pill.keluar .label::before {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 45px !important;
+    }
+
+    .finance-pill.saldo .label::before {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 30px !important;
+    }
+
+    /* ---- Activity Pills (Aktivitas per kategori; berbeda dari kategori pill) ---- */
+
+    .activity-pill-container {
+        gap: 25px !important;
+    }
+
+    .activity-pill {
+        border-radius: 50px !important;
+        padding: 25px 25px !important;
+        border: 6px dashed #ffffffe0 !important;
+        gap: 20px !important;
+    }
+
+    /* Accent berbeda via border-left warna */
+    .activity-pill.masuk { border-left: 10px solid #388e3c !important; }
+    .activity-pill.keluar { border-left: 10px solid #d32f2f !important; }
+    .activity-pill.netral { border-left: 10px solid #808080 !important; }
+
+    /* Badge-style background for nominal lines */
+    .activity-line.nominal {
+        gap: 25px !important;
+    }
+
+    .activity-line.nominal.masuk::before,
+    .activity-line.nominal.keluar::before,
+    .activity-line.nominal.netral::before {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 40px !important;
+    }
+
+    /* ===== New: Total Pills (Totals section) ===== */
+    .total-pill {
+        border-radius: 60px !important;
+        padding: 30px 50px !important;
+    }
+
+    .total-pill-container {
+        gap: 30px !important;
+    }
+
+    .total-pill .label {
+        font-size: 2.9rem !important;
+    }
+
+    .total-pill .value {
+        font-size: 5.5rem !important;
+    }
 }
 
 /* 2K QHD (2560x1440) sudah fix di layar (2560 x 1440) */
@@ -1006,13 +1129,13 @@ body {
   }
 
   .countdown-text {
-    font-size: 2.6rem;
+    font-size: 2.9rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
-    font-family: monospace;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
     font-size: 3rem;
     font-weight: 1000;
     min-width: 8ch;
@@ -1031,12 +1154,12 @@ body {
     will-change: background-image;
   }
 
-   .mosque-image img {
-     width: 100% !important;
-     height: 100% !important;
-     object-fit: fill !important;
-     display: block;
-     background-repeat: no-repeat !important;
+  .mosque-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block;
+    background-repeat: no-repeat !important;
   }
 
   .countdown-timer {
@@ -1098,6 +1221,123 @@ body {
     margin: 0 18px;
     color: white;
   }
+
+  /* Finance */
+    .finance-overlay {
+        top: 61vh !important;
+        right: 20px !important;
+        border-radius: 30px !important;
+        padding: 20px 20px !important;
+        width: 26.6vw !important; /* diperkecil lagi */
+    }
+
+    .finance-title {
+        font-size: 2.8rem !important;
+        margin-bottom: 10px !important;
+    }
+
+    .finance-scroll-container {
+        border-radius: 20px !important; /* sudut scroll membulat agar tidak terlihat flat */
+    }
+
+    .finance-scroll-content {
+        gap: 10px !important;
+    }
+
+    .finance-row {
+        font-size: 2.8rem !important;
+        border-radius: 30px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* Chip background untuk baris per kategori */
+    .finance-chip {
+        padding: 20px 20px !important;
+        border-radius: 20px !important;
+    }
+
+    .finance-chip-title {
+        margin-bottom: 10px !important;
+        margin-left: 10px !important;
+    }
+
+    /* ---- Finance Pill Styles (Masuk/Keluar/Saldo dalam kategori) ---- */
+    .finance-pill-container {
+        gap: 15px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .finance-pill {
+        border-radius: 20px !important;
+        padding: 15px 15px !important;
+    }
+
+    /* Icon kecil sebelum label */
+    .finance-pill.masuk .label::before {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 30px !important;
+    }
+
+    .finance-pill.keluar .label::before {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 30px !important;
+    }
+
+    .finance-pill.saldo .label::before {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 20px !important;
+    }
+
+    /* ---- Activity Pills (Aktivitas per kategori; berbeda dari kategori pill) ---- */
+
+    .activity-pill-container {
+        gap: 15px !important;
+    }
+
+    .activity-pill {
+        border-radius: 20px !important;
+        padding: 20px 20px !important;
+        border: 3px dashed #ffffffe0 !important;
+        gap: 20px !important;
+    }
+
+    /* Accent berbeda via border-left warna */
+    .activity-pill.masuk { border-left: 5px solid #388e3c !important; }
+    .activity-pill.keluar { border-left: 5px solid #d32f2f !important; }
+    .activity-pill.netral { border-left: 5px solid #808080 !important; }
+
+    /* Badge-style background for nominal lines */
+    .activity-line.nominal {
+        gap: 25px !important;
+    }
+
+    .activity-line.nominal.masuk::before,
+    .activity-line.nominal.keluar::before,
+    .activity-line.nominal.netral::before {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 40px !important;
+    }
+
+    /* ===== New: Total Pills (Totals section) ===== */
+    .total-pill {
+        border-radius: 20px !important;
+    }
+
+    .total-pill-container {
+        gap: 15px !important;
+    }
+
+    .total-pill .label {
+        font-size: 2.2rem !important;
+    }
+
+    .total-pill .value {
+        font-size: 4.5rem !important;
+    }
 }
 
 /* Full HD (1920x1080) (sudah fix di layar 1920 x 1200) */
@@ -1363,13 +1603,13 @@ body {
   }
 
   .countdown-text {
-    font-size: 1.9rem;
+    font-size: 2.1rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
-    font-family: monospace;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
     font-size: 2.2rem;
     font-weight: 1000;
     min-width: 8ch;
@@ -1387,26 +1627,27 @@ body {
     will-change: background-image;
   }
 
-    .mosque-image img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: fill !important;
-      display: block;
-      background-repeat: no-repeat !important; }
+  .mosque-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block;
+    background-repeat: no-repeat !important;
+  }
 
-    .footer-message {
-      grid-area: footer;
-      background-color: rgba(0, 0, 0, 0.7);
-      /* padding: 5px 5px; */
-      padding-top: 5px;
-      padding-bottom: 15px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 3.8rem;
-      overflow: hidden;
-      z-index: 5;
-      position: relative;
-    }
+  .footer-message {
+    grid-area: footer;
+    background-color: rgba(0, 0, 0, 0.7);
+    /* padding: 5px 5px; */
+    padding-top: 5px;
+    padding-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 3.8rem;
+    overflow: hidden;
+    z-index: 5;
+    position: relative;
+  }
 
   .scrolling-text {
     display: inline-block;
@@ -1438,6 +1679,127 @@ body {
     margin: 0 15px;
     color: white;
   }
+
+  /* Finance */
+    .finance-overlay {
+        top: 60vh !important;
+        right: 15px !important;
+        border-radius: 30px !important;
+        padding: 20px 20px !important;
+        width: 26vw !important; /* diperkecil lagi */
+        /* max-height: 500vh !important; */
+    }
+
+    .finance-title {
+        font-size: 2rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .finance-scroll-container {
+        border-radius: 20px !important; /* sudut scroll membulat agar tidak terlihat flat */
+        /* height: 800vh !important; */
+    }
+
+    .finance-scroll-content {
+        gap: 11px !important;
+    }
+
+    .finance-row {
+        font-size: 1.9rem !important;
+        border-radius: 20px !important;
+        margin-bottom: 40px !important;
+    }
+
+    /* Chip background untuk baris per kategori */
+    .finance-chip {
+        padding: 15px 15px !important;
+        border-radius: 20px !important;
+    }
+
+    .finance-chip-title {
+        margin-bottom: 10px !important;
+        margin-left: 10px !important;
+        margin-bottom: 15px !important;
+    }
+
+    /* ---- Finance Pill Styles (Masuk/Keluar/Saldo dalam kategori) ---- */
+    .finance-pill-container {
+        gap: 10px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .finance-pill {
+        border-radius: 15px !important;
+        padding: 10px 15px !important;
+    }
+
+    /* Icon kecil sebelum label */
+    .finance-pill.masuk .label::before {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 24px !important;
+    }
+
+    .finance-pill.keluar .label::before {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 24px !important;
+    }
+
+    .finance-pill.saldo .label::before {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 15px !important;
+    }
+
+    /* ---- Activity Pills (Aktivitas per kategori; berbeda dari kategori pill) ---- */
+
+    .activity-pill-container {
+        gap: 15px !important;
+    }
+
+    .activity-pill {
+        border-radius: 20px !important;
+        padding: 15px 15px !important;
+        border: 3px dashed #ffffffe0 !important;
+        gap: 8px !important;
+    }
+
+    /* Accent berbeda via border-left warna */
+    .activity-pill.masuk { border-left: 6px solid #388e3c !important; }
+    .activity-pill.keluar { border-left: 6px solid #d32f2f !important; }
+    .activity-pill.netral { border-left: 6px solid #808080 !important; }
+
+    /* Badge-style background for nominal lines */
+    .activity-line.nominal {
+        gap: 20px !important;
+    }
+
+    .activity-line.nominal.masuk::before,
+    .activity-line.nominal.keluar::before,
+    .activity-line.nominal.netral::before {
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 25px !important;
+    }
+
+    /* ===== New: Total Pills (Totals section) ===== */
+    .total-pill {
+        border-radius: 20px !important;
+        padding: 10px 25px !important;
+    }
+
+    .total-pill-container {
+        gap: 10px !important;
+    }
+
+    .total-pill .label {
+        font-size: 1.7rem !important;
+    }
+
+    .total-pill .value {
+        font-size: 3.3rem !important;
+    }
 }
 
 /* HD (1600x900) sudah fix (1600 x 900) */
@@ -1717,13 +2079,13 @@ body {
   }
 
   .countdown-text {
-    font-size: 1.7rem;
+    font-size: 1.9rem;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   #countdown-value {
-    font-family: monospace;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
     font-size: 2rem;
     font-weight: 1000;
     min-width: 8ch;
@@ -1742,12 +2104,13 @@ body {
     will-change: background-image;
   }
 
-    .mosque-image img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: fill !important;
-      display: block;
-      background-repeat: no-repeat !important; }
+  .mosque-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block;
+    background-repeat: no-repeat !important;
+  }
 
   .footer-message {
     grid-area: footer;
@@ -1791,6 +2154,127 @@ body {
     margin: 0 13px;
     color: white;
   }
+
+  /* Finance */
+    .finance-overlay {
+        top: 59vh !important;
+        right: 15px !important;
+        border-radius: 30px !important;
+        padding: 20px 20px !important;
+        width: 22vw !important; /* diperkecil lagi */
+        /* max-height: 500vh !important; */
+    }
+
+    .finance-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .finance-scroll-container {
+        border-radius: 20px !important; /* sudut scroll membulat agar tidak terlihat flat */
+        /* height: 800vh !important; */
+    }
+
+    .finance-scroll-content {
+        gap: 10px !important;
+    }
+
+    .finance-row {
+        font-size: 1.3rem !important;
+        border-radius: 20px !important;
+        /* margin-bottom: 50px !important; */
+    }
+
+    /* Chip background untuk baris per kategori */
+    .finance-chip {
+        padding: 10px 10px !important;
+        border-radius: 20px !important;
+    }
+
+    .finance-chip-title {
+        margin-bottom: 10px !important;
+        margin-left: 10px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* ---- Finance Pill Styles (Masuk/Keluar/Saldo dalam kategori) ---- */
+    .finance-pill-container {
+        gap: 10px !important;
+        margin-bottom: 11px !important;
+    }
+
+    .finance-pill {
+        border-radius: 15px !important;
+        padding: 10px 10px !important;
+    }
+
+    /* Icon kecil sebelum label */
+    .finance-pill.masuk .label::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 16px !important;
+    }
+
+    .finance-pill.keluar .label::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 16px !important;
+    }
+
+    .finance-pill.saldo .label::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* ---- Activity Pills (Aktivitas per kategori; berbeda dari kategori pill) ---- */
+
+    .activity-pill-container {
+        gap: 10px !important;
+    }
+
+    .activity-pill {
+        border-radius: 20px !important;
+        padding: 10px 10px !important;
+        border: 2px dashed #ffffffe0 !important;
+        gap: 10px !important;
+    }
+
+    /* Accent berbeda via border-left warna */
+    .activity-pill.masuk { border-left: 4px solid #388e3c !important; }
+    .activity-pill.keluar { border-left: 4px solid #d32f2f !important; }
+    .activity-pill.netral { border-left: 4px solid #808080 !important; }
+
+    /* Badge-style background for nominal lines */
+    .activity-line.nominal {
+        gap: 20px !important;
+    }
+
+    .activity-line.nominal.masuk::before,
+    .activity-line.nominal.keluar::before,
+    .activity-line.nominal.netral::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 20px !important;
+    }
+
+    /* ===== New: Total Pills (Totals section) ===== */
+    .total-pill {
+        border-radius: 20px !important;
+        padding: 10px 20px !important;
+    }
+
+    .total-pill-container {
+        gap: 10px !important;
+    }
+
+    .total-pill .label {
+        font-size: 1.3rem !important;
+    }
+
+    .total-pill .value {
+        font-size: 2.2rem !important;
+    }
 }
 
 /* Laptop (1366x768) - Referensi yang sudah baik (Sudah FIX di 1536 x 960) */
@@ -2076,8 +2560,8 @@ body {
   }
 
   #countdown-value {
-    font-family: monospace;
-    font-size: 1.9rem;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
+    font-size: 1.7rem;
     font-weight: 1000;
     min-width: 8ch;
     display: inline-block;
@@ -2095,12 +2579,13 @@ body {
     will-change: background-image;
   }
 
-    .mosque-image img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: fill !important;
-      display: block;
-      background-repeat: no-repeat !important; }
+  .mosque-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block;
+    background-repeat: no-repeat !important;
+  }
 
   .footer-message {
     grid-area: footer;
@@ -2145,6 +2630,127 @@ body {
     margin: 0 12px;
     color: white;
   }
+
+  /* Finance */
+    .finance-overlay {
+        top: 55vh !important;
+        right: 15px !important;
+        border-radius: 20px !important;
+        padding: 20px 20px !important;
+        width: 22vw !important; /* diperkecil lagi */
+        /* max-height: 500vh !important; */
+    }
+
+    .finance-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 5px !important;
+    }
+
+    .finance-scroll-container {
+        border-radius: 10px !important; /* sudut scroll membulat agar tidak terlihat flat */
+        /* height: 800vh !important; */
+    }
+
+    .finance-scroll-content {
+        gap: 10px !important;
+    }
+
+    .finance-row {
+        font-size: 1.2rem !important;
+        border-radius: 10px !important;
+        /* margin-bottom: 50px !important; */
+    }
+
+    /* Chip background untuk baris per kategori */
+    .finance-chip {
+        padding: 10px 10px !important;
+        border-radius: 10px !important;
+    }
+
+    .finance-chip-title {
+        margin-bottom: 10px !important;
+        margin-left: 10px !important;
+        margin-bottom: 10px !important;
+    }
+
+    /* ---- Finance Pill Styles (Masuk/Keluar/Saldo dalam kategori) ---- */
+    .finance-pill-container {
+        gap: 10px !important;
+        margin-bottom: 11px !important;
+    }
+
+    .finance-pill {
+        border-radius: 10px !important;
+        padding: 10px 10px !important;
+    }
+
+    /* Icon kecil sebelum label */
+    .finance-pill.masuk .label::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 16px !important;
+    }
+
+    .finance-pill.keluar .label::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 16px !important;
+    }
+
+    .finance-pill.saldo .label::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 14px !important;
+    }
+
+    /* ---- Activity Pills (Aktivitas per kategori; berbeda dari kategori pill) ---- */
+
+    .activity-pill-container {
+        gap: 10px !important;
+    }
+
+    .activity-pill {
+        border-radius: 10px !important;
+        padding: 10px 10px !important;
+        border: 1px dashed #ffffffe0 !important;
+        gap: 5px !important;
+    }
+
+    /* Accent berbeda via border-left warna */
+    .activity-pill.masuk { border-left: 3px solid #388e3c !important; }
+    .activity-pill.keluar { border-left: 3px solid #d32f2f !important; }
+    .activity-pill.netral { border-left: 3px solid #808080 !important; }
+
+    /* Badge-style background for nominal lines */
+    .activity-line.nominal {
+        gap: 20px !important;
+    }
+
+    .activity-line.nominal.masuk::before,
+    .activity-line.nominal.keluar::before,
+    .activity-line.nominal.netral::before {
+        width: 20px !important;
+        height: 20px !important;
+        font-size: 20px !important;
+    }
+
+    /* ===== New: Total Pills (Totals section) ===== */
+    .total-pill {
+        border-radius: 10px !important;
+        padding: 10px 20px !important;
+    }
+
+    .total-pill-container {
+        gap: 10px !important;
+    }
+
+    .total-pill .label {
+        font-size: 1rem !important;
+    }
+
+    .total-pill .value {
+        font-size: 1.6rem !important;
+    }
 }
 
 /* Tablet Landscape (1024 x 768) (sudah fix 1024 x 768) */
@@ -2431,7 +3037,7 @@ body {
   }
 
   #countdown-value {
-    font-family: monospace;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
     font-size: 1.2rem;
     font-weight: 1000;
     min-width: 8ch;
@@ -2450,12 +3056,13 @@ body {
     will-change: background-image;
   }
 
-    .mosque-image img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: fill !important;
-      display: block;
-      background-repeat: no-repeat !important; }
+  .mosque-image img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important;
+    display: block;
+    background-repeat: no-repeat !important;
+  }
 
   .footer-message {
     grid-area: footer;
@@ -2499,6 +3106,11 @@ body {
     margin: 0 9px;
     color: white;
   }
+
+    .finance-overlay {
+        display: none !important;
+    }
+
 }
 
 /* tablet 900 - 1023 */
@@ -2594,6 +3206,11 @@ body {
   .footer-message {
     display: none;
   }
+
+    .finance-overlay {
+        display: none !important;
+    }
+
 }
 
 /* Mobile (768) */
@@ -2689,6 +3306,10 @@ body {
   .footer-message {
     display: none;
   }
+
+    .finance-overlay {
+        display: none !important;
+    }
 }
 
 /* Mobile (480) */
@@ -2782,14 +3403,10 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
-    /* Disesuaikan untuk tampilan responsif */
     margin-left: 0;
-    /* Dihapus karena margin-left: 290px tidak cocok untuk layar kecil */
     color: #ffeb3b;
     order: 3;
-    /* Diposisikan di bawah date-info */
     justify-content: center;
-    /* Pusatkan konten */
     padding: 10px;
     padding-top: 0;
   }
@@ -2814,7 +3431,7 @@ body {
   }
 
   #countdown-value {
-    font-family: monospace;
+    font-family: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
     font-size: 1.1rem;
     /* Disesuaikan untuk layar kecil */
     font-weight: 1000;
@@ -2831,4 +3448,318 @@ body {
   .footer-message {
     display: none;
   }
+
+    .finance-overlay {
+        display: none !important;
+    }
+}
+
+/* ===== Finance Overlay (ringkas, konsisten dengan next prayer) ===== */
+.finance-overlay {
+  position: fixed;
+  top: 430px;
+  right: 15px;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.554);
+  border-radius: 20px;
+  padding: 16px 16px;
+  width: 22vw; /* diperkecil lagi */
+  max-height: 32vh;
+  overflow: hidden;
+}
+
+.finance-title {
+  font-size: 1.4rem;
+  text-align: center;
+  font-weight: 700;
+  color: #ffeb3b;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.finance-totals {
+  display: flex;
+  flex-direction: column; /* vertikal */
+  align-items: stretch; /* isi penuh lebar container */
+  gap: 6px;
+}
+
+.finance-scroll-container {
+  overflow: hidden;
+  height: 18vh; /* area scroll vertikal */
+  border-radius: 12px; /* sudut scroll membulat agar tidak terlihat flat */
+  background-clip: padding-box; /* pastikan clipping mengikuti radius */
+}
+
+.finance-scroll-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  will-change: transform;
+}
+
+.finance-row {
+  display: flex;
+  flex-direction: column; /* vertikal */
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 1.15rem;
+  color: #fff;
+  background-color: #004080;
+  border-radius: 12px;
+}
+
+/* Chip background untuk baris per kategori */
+.finance-chip {
+  display: block;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+/* Satu background untuk nama kategori + isi konten kategori */
+.finance-chip.kategori {
+    background-color: rgba(33, 150, 243, 0.35);
+    color: #fff;
+    /* border: 1px solid rgba(33, 150, 243, 0.5); */
+}
+
+.finance-chip-title { font-weight: 700; color: #ffeb3b; margin-bottom: 6px; }
+
+/* ---- Finance Pill Styles (Masuk/Keluar/Saldo dalam kategori) ---- */
+.finance-pill-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.finance-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-weight: 700;
+}
+
+.finance-pill .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.finance-pill .value {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+
+/* Varian warna */
+.finance-pill.masuk {
+  background: #388e3c;
+  color: #d9fadd;
+}
+
+.finance-pill.keluar {
+  background: #d32f2f;
+  color: #ffd9d9;
+}
+
+.finance-pill.saldo {
+  background: #2195f3;
+  color: #d9ebff;
+}
+
+/* Icon kecil sebelum label */
+.finance-pill.masuk .label::before {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #eaffea;
+  color: #388e3c;
+  font-size: 12px;
+}
+
+.finance-pill.keluar .label::before {
+  content: "-";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffecec;
+  color: #d32f2f;
+  font-size: 12px;
+}
+
+.finance-pill.saldo .label::before {
+  content: "∑";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #eef6ff;
+  color: #2195f3;
+  font-size: 12px;
+}
+
+/* ---- Activity Pills (Aktivitas per kategori; berbeda dari kategori pill) ---- */
+.activity-pill-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.activity-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 10px;
+  padding: 8px 8px;
+  font-weight: 600;
+  background: #ffffff0f;
+  border: 1px dashed #ffffffe0;
+}
+
+/* Accent berbeda via border-left warna */
+.activity-pill.masuk { border-left: 3px solid #388e3c; }
+.activity-pill.keluar { border-left: 3px solid #d32f2f; }
+.activity-pill.netral { border-left: 3px solid #808080; }
+
+/* ---- Override & per-baris layout untuk activity pills ---- */
+.activity-pill {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  justify-content: flex-start;
+}
+
+/* Baris-baris dalam activity pill */
+.activity-line { display: block; }
+.activity-line.tanggal { color: rgba(255, 255, 255, 0.95); font-weight: 700; }
+.activity-line.uraian { color: rgba(255, 255, 255, 0.85); font-weight: 600; }
+.activity-line.nominal { font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.2px; }
+
+/* Badge-style background for nominal lines */
+.activity-line.nominal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.activity-line.nominal.masuk {
+  background-color: #0a8f3d; /* solid */
+  color: #ffffff;
+  border: 1px solid #0a8f3d;
+}
+
+.activity-line.nominal.keluar {
+  background-color: #c0392b; /* solid */
+  color: #ffffff;
+  border: 1px solid #c0392b;
+}
+
+.activity-line.nominal.netral {
+  background-color: #6b7280; /* solid gray */
+  color: #ffffff;
+  border: 1px solid #6b7280;
+}
+
+.activity-line.nominal.masuk::before,
+.activity-line.nominal.keluar::before,
+.activity-line.nominal.netral::before {
+  content: "";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.activity-line.nominal.masuk::before { content: "+"; }
+.activity-line.nominal.keluar::before { content: "-"; }
+.activity-line.nominal.netral::before { content: "∑"; }
+
+/* ===== New: Total Pills (Totals section) ===== */
+.total-pill-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.total-pill {
+  display: flex;
+  flex-direction: column; /* label di atas, nominal di bawah */
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 6px; /* beri jarak vertikal antara label dan nominal */
+  border-radius: 14px;
+  padding: 10px 16px 10px 40px; /* tambah ruang kiri agar tidak nempel dengan aksen */
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.total-pill .label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-size: 0.95rem;
+}
+
+.total-pill .value {
+  display: block;
+  font-weight: 800;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Total Pills: Varian Warna */
+.total-pill.masuk {
+  background-color: #0a8f3d; /* solid, no transparency */
+  /* border: 1px solid #0a6d31; */
+}
+
+.total-pill.masuk .label { color: #ffffff; }
+.total-pill.masuk .value {
+    color: #ffffff;
+    font-size: 1.8rem;
+}
+
+.total-pill.keluar {
+  background-color: #c0392b; /* solid, no transparency */
+  /* border: 1px solid #962d22; */
+}
+
+.total-pill.keluar .label { color: #ffffff; }
+.total-pill.keluar .value {
+    color: #ffffff;
+    font-size: 1.8rem;
+}
+
+.total-pill.saldo {
+  background-color: #1e6bb8; /* solid, no transparency */
+  /* border: 1px solid #184f88; */
+}
+
+.total-pill.saldo .label { color: #ffffff; }
+.total-pill.saldo .value {
+    color: #ffffff;
+    font-size: 1.8rem;
 }
