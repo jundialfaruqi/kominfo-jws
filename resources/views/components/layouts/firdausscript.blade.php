@@ -1111,9 +1111,9 @@
             ctx.beginPath();
             ctx.arc(clockCenter.x, clockCenter.y, clockRadius, 0, Math.PI * 2);
             ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 15;
-            ctx.shadowOffsetX = 5;
-            ctx.shadowOffsetY = 5;
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
             ctx.fillStyle = '#003366';
             ctx.fill();
             ctx.shadowColor = 'transparent';
@@ -1158,8 +1158,8 @@
 
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
                 ctx.shadowBlur = 5;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
 
                 ctx.fillStyle = i === 0 ? '#ff0000' : '#ffffff';
                 ctx.font = 'bold 30px Poppins';
@@ -2882,6 +2882,259 @@
         let fridayInfoData = localStorage.getItem('fridayInfoData') ? JSON.parse(localStorage.getItem(
             'fridayInfoData')) : null;
         let fridayImageSliderInterval = null;
+
+        // ===================== Finance Overlay (summary + auto-scroll) =====================
+        let financeScrollRaf = null;
+        let financeScrollStartTs = null;
+        let financeActiveSection = 'top'; // 'top' or 'latest'
+
+        function initFinanceOverlay() {
+            fetchFinanceData();
+            // Refresh data setiap 1 menit
+            setInterval(fetchFinanceData, 60000);
+            // Tidak lagi alternating; kita pakai satu scroll untuk seluruh konten
+        }
+
+        function fetchFinanceData() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) {
+                console.error('Tidak dapat menentukan slug dari URL');
+                showFinanceError('Data tidak tersedia');
+                return;
+            }
+            $.ajax({
+                url: `/api/balance-summary/${encodeURIComponent(slug)}?details=full&full_month=true&recent_limit=3`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp && resp.success && resp.data) {
+                        renderFinanceOverlay(resp.data);
+                    } else {
+                        showFinanceError('Data tidak tersedia');
+                    }
+                },
+                error: function() {
+                    showFinanceError('Gagal memuat data keuangan');
+                }
+            });
+        }
+
+        function showFinanceError(message) {
+            const $overlay = $('#financeOverlay');
+            $('#financePeriodTitle').text(message);
+            $('#financeTotalMasukValue').text('-');
+            $('#financeTotalKeluarValue').text('-');
+            $('#financeEndingBalanceValue').text('-');
+            $('#financeTopCategoriesList').empty();
+            $('#financeLatestItemsList').empty();
+            $overlay.show();
+        }
+
+        function truncateText(text, maxLen) {
+            if (!text) return '';
+            return text.length > maxLen ? (text.substring(0, maxLen - 1) + '…') : text;
+        }
+
+        function renderFinanceOverlay(data) {
+            try {
+                // Judul menampilkan bulan dan tahun saja (tanpa rentang tanggal)
+                if (data.period && data.period.month && data.period.year) {
+                    const title = `Keuangan Masjid ${data.period.month} ${data.period.year}`;
+                    $('#financePeriodTitle').text(title);
+                } else {
+                    $('#financePeriodTitle').text('Keuangan');
+                }
+
+                // Totals
+                if (data.grandTotals) {
+                    $('#financeTotalMasukValue').text(data.grandTotals.sumMasukDisplay || '-');
+                    $('#financeTotalKeluarValue').text(data.grandTotals.sumKeluarDisplay || '-');
+                    $('#financeEndingBalanceValue').text(data.grandTotals.endingDisplay || '-');
+                }
+
+                // Top kategori (ambil 3 terbesar berdasarkan ending)
+                const categories = Array.isArray(data.categories) ? data.categories.slice() : [];
+                categories.sort((a, b) => (b.ending || 0) - (a.ending || 0));
+                const top3 = categories.slice(0, 3);
+                const $topList = $('#financeTopCategoriesList');
+                $topList.empty();
+                top3.forEach(cat => {
+                    // Ambil aktivitas dari backend (dibatasi recent_limit=3)
+                    let itemsHtml = '';
+                    if (Array.isArray(data.categoriesWithItems)) {
+                        const block = data.categoriesWithItems.find(b => (b.categoryName || '') === (cat
+                            .categoryName || ''));
+                        const itemsForCat = Array.isArray(block && block.items) ? block.items.slice() :
+                            [];
+                        itemsForCat.sort((a, b) => (b.id || 0) - (a.id || 0));
+                        const recent = itemsForCat; // backend sudah batasi ke 3 item terbaru
+                        itemsHtml = recent.map(it => {
+                            const nilaiMasuk = it.masukDisplay && it.masukDisplay !== '-';
+                            const nilaiKeluar = it.keluarDisplay && it.keluarDisplay !== '-';
+                            const nilaiClass = nilaiMasuk ? 'masuk' : (nilaiKeluar ? 'keluar' :
+                                'netral');
+                            const nilai = nilaiMasuk ? it.masukDisplay : (nilaiKeluar ? it
+                                .keluarDisplay : '-');
+                            const tanggal = it.tanggal || '-';
+                            const uraian = truncateText(it.uraian || '-', 28);
+                            return `<div class="activity-pill ${nilaiClass}">
+                                <span class="activity-line tanggal">${tanggal}</span>
+                                <span class="activity-line uraian">${uraian}</span>
+                                <span class="activity-line nominal ${nilaiClass}">${nilai}</span>
+                            </div>`;
+                        }).join('');
+                    }
+                    const row = `<div class="finance-row">
+                        <div class="finance-chip kategori">
+                            <div class="finance-chip-title">${cat.categoryName || '-'}</div>
+                            <div class="finance-pill-container">
+                                <div class="finance-pill masuk">
+                                    <span class="label">Masuk</span>
+                                    <span class="value">${cat.sumMasukDisplay || '-'}</span>
+                                </div>
+                                <div class="finance-pill keluar">
+                                    <span class="label">Keluar</span>
+                                    <span class="value">${cat.sumKeluarDisplay || '-'}</span>
+                                </div>
+                                <div class="finance-pill saldo">
+                                    <span class="label">Saldo</span>
+                                    <span class="value">${cat.endingDisplay || '-'}</span>
+                                </div>
+                            </div>
+                            ${itemsHtml ? `<div class="activity-pill-container">${itemsHtml}</div>` : ''}
+                        </div>
+                    </div>`;
+                    $topList.append(row);
+                });
+
+                // Tampilkan overlay
+                $('#financeOverlay').show();
+                // Mulai scroll pada konten gabungan (totals + kategori + aktivitas)
+                const $containerAll = $('#financeScrollContainerAll');
+                const $contentAll = $('#financeScrollContentAll');
+                startVerticalScroll($containerAll, $contentAll);
+
+            } catch (e) {
+                showFinanceError('Kesalahan memproses data keuangan');
+            }
+        }
+
+        // Auto-scroll util: scroll vertikal bolak-balik dengan jeda 2 detik di atas & bawah
+        function startVerticalScroll($container, $content) {
+            stopVerticalScroll();
+            if (!$container || !$content || $content.children().length === 0) return;
+
+            const container = $container[0];
+            const content = $content[0];
+            let offset = container.scrollTop || 0;
+            const speedPxPerSec = 10; // kecepatan scroll
+            let lastTs = null;
+            let direction = 1; // 1: turun, -1: naik
+            let pauseUntil = null; // timestamp (ms) sampai kapan jeda berlangsung
+
+            function loop(ts) {
+                if (lastTs === null) lastTs = ts;
+                const dt = Math.min(0.033, (ts - lastTs) / 1000); // batasi dt ke ~33ms
+                lastTs = ts;
+
+                const maxScroll = Math.max(0, content.scrollHeight - container.clientHeight);
+                if (maxScroll <= 0) {
+                    // tidak ada yang bisa di-scroll
+                    stopVerticalScroll();
+                    return;
+                }
+
+                // Kelola jeda: tahan posisi, dan setelah jeda bawah selesai loncat ke atas
+                if (pauseUntil) {
+                    if (ts < pauseUntil) {
+                        // masih dalam jeda, tahan posisi sekarang
+                        container.scrollTop = offset;
+                        financeScrollRaf = requestAnimationFrame(loop);
+                        return;
+                    } else {
+                        // jeda selesai
+                        pauseUntil = null;
+                        if (offset >= maxScroll) {
+                            // selesai jeda di bawah: sembunyikan overlay selama 10 detik, lalu tampil dari atas
+                            const $overlay = $('#financeOverlay');
+                            $overlay.hide();
+                            stopVerticalScroll();
+                            setTimeout(() => {
+                                $overlay.show();
+                                container.scrollTop = 0; // mulai dari atas
+                                // jeda 2 detik di atas sebelum mulai turun lagi
+                                setTimeout(() => {
+                                    startVerticalScroll($container, $content);
+                                }, 2000);
+                            }, 20000);
+                            return;
+                        }
+                        if (offset <= 0) {
+                            // selesai jeda di atas: lanjut turun
+                            direction = 1;
+                        }
+                    }
+                }
+
+                // Bergerak sesuai arah saat ini
+                offset += direction * speedPxPerSec * dt;
+
+                // Jika melewati batas bawah
+                if (offset >= maxScroll) {
+                    offset = maxScroll; // clamp ke bawah
+                    pauseUntil = ts + 2000; // jeda 2 detik
+                    direction = 0; // jangan naik; tunggu loncat ke atas setelah jeda
+                }
+
+                // Jika melewati batas atas
+                if (offset <= 0) {
+                    offset = 0; // clamp ke atas
+                    pauseUntil = ts + 2000; // jeda 2 detik
+                    direction = 1; // balik arah: turun
+                }
+
+                container.scrollTop = offset;
+                financeScrollRaf = requestAnimationFrame(loop);
+            }
+            financeScrollRaf = requestAnimationFrame(loop);
+        }
+
+        function stopVerticalScroll() {
+            if (financeScrollRaf) {
+                cancelAnimationFrame(financeScrollRaf);
+                financeScrollRaf = null;
+                financeScrollStartTs = null;
+            }
+        }
+
+        function startFinanceAlternating() {
+            // mulai dengan Top Kategori
+            activateFinanceSection('top');
+            setInterval(() => {
+                financeActiveSection = (financeActiveSection === 'top') ? 'latest' : 'top';
+                activateFinanceSection(financeActiveSection);
+            }, 20000); // perpanjang agar lebih santai
+        }
+
+        function activateFinanceSection(section) {
+            if (section === 'latest') {
+                $('#financeTopCategoriesSection').hide();
+                $('#financeLatestItemsSection').show();
+                startVerticalScroll($('#financeLatestItemsSection .finance-scroll-container'), $(
+                    '#financeLatestItemsList'));
+            } else {
+                $('#financeLatestItemsSection').hide();
+                $('#financeTopCategoriesSection').show();
+                startVerticalScroll($('#financeTopCategoriesSection .finance-scroll-container'), $(
+                    '#financeTopCategoriesList'));
+            }
+        }
+
+        // Inisialisasi saat dokumen siap
+        $(function() {
+            initFinanceOverlay();
+        });
+
         let fridaySliderStartTime = localStorage.getItem('fridaySliderStartTime') ? parseInt(localStorage
             .getItem('fridaySliderStartTime')) : null;
 

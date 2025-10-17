@@ -124,6 +124,32 @@
                 <span class="date-item"></span>
             </div>
 
+            <!-- Finance Overlay (floating, judul tetap, konten scroll) -->
+            <div id="financeOverlay" class="finance-overlay" style="display: none;">
+                <div class="finance-title" id="financePeriodTitle">Memuat data keuangan…</div>
+                <div class="finance-scroll-container" id="financeScrollContainerAll">
+                    <div class="finance-scroll-content" id="financeScrollContentAll">
+                        <div class="finance-totals">
+                            <div class="total-pill-container">
+                                <div class="total-pill masuk">
+                                    <span class="label">Total Uang Masuk</span>
+                                    <span class="value" id="financeTotalMasukValue">-</span>
+                                </div>
+                                <div class="total-pill keluar">
+                                    <span class="label">Total Uang Keluar</span>
+                                    <span class="value" id="financeTotalKeluarValue">-</span>
+                                </div>
+                                <div class="total-pill saldo">
+                                    <span class="label">Total Saldo</span>
+                                    <span class="value" id="financeEndingBalanceValue">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="finance-scroll-content" id="financeTopCategoriesList"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mosque-image">
                 {{-- Mosque images with object-fit stretch --}}
                 @if ($slides)

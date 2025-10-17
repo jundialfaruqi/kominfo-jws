@@ -163,6 +163,18 @@ class ProfilController extends Controller
             if ($perPage > 500) {
                 $perPage = 500;
             } // batas atas untuk mencegah respons terlalu besar
+            // Limit item per kategori pada mode full_month hanya jika recent_limit diberikan (clamp 1..50; default tidak ada limit)
+            $hasRecentLimit = $request->has('recent_limit');
+            $recentLimit = null;
+            if ($hasRecentLimit) {
+                $recentLimit = (int) $request->query('recent_limit');
+                if ($recentLimit < 1) {
+                    $recentLimit = 3;
+                }
+                if ($recentLimit > 50) {
+                    $recentLimit = 50;
+                }
+            }
             // parameter tambahan: full_month => bila true, detail full dibatasi bulan berjalan tanpa paginasi
             $fullMonth = filter_var($request->query('full_month', 'false'), FILTER_VALIDATE_BOOLEAN);
             $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
@@ -176,6 +188,10 @@ class ProfilController extends Controller
             // Tambahan: nama bulan (Indonesia) dan tahun untuk period saat full_month=true
             $monthNameId = Carbon::now()->locale('id')->translatedFormat('F');
             $yearNumber = Carbon::now()->year;
+            // Pada mode full_month, jangan sertakan running_balance untuk mengurangi payload
+            $skipRunningBalance = $fullMonth;
+            // Tambahan: dukung paginasi saat full_month=true bila page/per_page diberikan dan tanpa recent_limit
+            $monthPaginationRequested = $fullMonth && !$hasRecentLimit && ($request->has('page') || $request->has('per_page'));
 
             $rows = DB::table('tb_balance')
                 ->leftJoin('group_categories', 'group_categories.id', '=', 'tb_balance.id_group_category')
@@ -199,9 +215,9 @@ class ProfilController extends Controller
                     'sumKeluar' => $sumKeluar,
                     'ending' => $ending,
                     // tambahan: tampilan terformat ribuan
-                    'sumMasukDisplay' => number_format($sumMasuk, 0, ',', '.'),
-                    'sumKeluarDisplay' => number_format($sumKeluar, 0, ',', '.'),
-                    'endingDisplay' => number_format($ending, 0, ',', '.'),
+                    'sumMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                    'sumKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                    'endingDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
                 ];
 
                 if ($details === 'full') {
@@ -213,17 +229,27 @@ class ProfilController extends Controller
                             ->whereBetween('laporans.tanggal', [$startOfMonth, $endOfMonth])
                             ->count();
 
-                        $itemRows = DB::table('laporans')
+                        // Hanya kirim N item terbaru (urut terbaru) untuk mengurangi payload
+                        $selectCols = 'laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening' . ($skipRunningBalance ? '' : ', laporans.running_balance');
+                        $queryItems = DB::table('laporans')
                             ->where('laporans.id_masjid', $profil->id)
                             ->where('laporans.id_group_category', $row->category_id)
                             ->whereBetween('laporans.tanggal', [$startOfMonth, $endOfMonth])
-                            ->selectRaw('laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening, laporans.running_balance')
-                            ->orderBy('tanggal', 'asc')
-                            ->orderBy('id', 'asc')
-                            ->get();
+                            ->selectRaw($selectCols)
+                            ->orderBy('tanggal', 'desc')
+                            ->orderBy('id', 'desc');
+
+                        if ($hasRecentLimit && $recentLimit !== null) {
+                            $queryItems->limit($recentLimit);
+                        }
+                        if ($monthPaginationRequested && !$hasRecentLimit) {
+                            $queryItems->offset(($page - 1) * $perPage)->limit($perPage);
+                        }
+
+                        $itemRows = $queryItems->get();
 
                         $items = [];
-                        $startNo = 0; // tanpa paginasi untuk bulan berjalan
+                        $startNo = ($monthPaginationRequested && !$hasRecentLimit) ? (($page - 1) * $perPage) : 0; // nomor awal saat paginasi
                     } else {
                         $totalItems = DB::table('laporans')
                             ->where('laporans.id_masjid', $profil->id)
@@ -255,18 +281,20 @@ class ProfilController extends Controller
                                 $keluar = (int) $lap->saldo;
                             }
                         }
-
-                        $items[] = [
+                        $item = [
                             'id' => (int) $lap->id,
                             'no' => (int) $startNo + (int) $i + 1,
                             'tanggal' => Carbon::parse($lap->tanggal)->format('d/m/Y'),
                             'uraian' => $lap->is_opening ? ($lap->uraian ?: 'Sisa bulan yang lalu') : $lap->uraian,
                             'is_opening' => (bool) $lap->is_opening,
                             'groupCategoryName' => $row->category_name,
-                            'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
-                            'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',
-                            'runningBalanceDisplay' => number_format((int) $lap->running_balance, 0, ',', '.'),
+                            'masukDisplay' => $masuk > 0 ? ('Rp ' . number_format($masuk, 0, ',', '.')) : '-',
+                            'keluarDisplay' => $keluar > 0 ? ('Rp ' . number_format($keluar, 0, ',', '.')) : '-',
                         ];
+                        if (!$skipRunningBalance) {
+                            $item['runningBalanceDisplay'] = 'Rp ' . number_format((int) ($lap->running_balance ?? 0), 0, ',', '.');
+                        }
+                        $items[] = $item;
                     }
 
                     $categoryBlock = [
@@ -274,13 +302,20 @@ class ProfilController extends Controller
                         'categoryName' => $row->category_name,
                         'items' => $items,
                         'totals' => [
-                            'totalMasukDisplay' => number_format($sumMasuk, 0, ',', '.'),
-                            'totalKeluarDisplay' => number_format($sumKeluar, 0, ',', '.'),
-                            'endingBalanceDisplay' => number_format($ending, 0, ',', '.'),
+                            'totalMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                            'totalKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                            'endingBalanceDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
                         ],
                     ];
 
                     if (!$fullMonth) {
+                        $categoryBlock['pagination'] = [
+                            'page' => $page,
+                            'perPage' => $perPage,
+                            'total' => (int) $totalItems,
+                            'lastPage' => (int) ceil($totalItems / $perPage),
+                        ];
+                    } elseif ($monthPaginationRequested) {
                         $categoryBlock['pagination'] = [
                             'page' => $page,
                             'perPage' => $perPage,
@@ -298,9 +333,9 @@ class ProfilController extends Controller
             }
 
             // tambahan: grandTotals tampilan terformat ribuan
-            $grandTotals['sumMasukDisplay'] = number_format($grandTotals['sumMasuk'], 0, ',', '.');
-            $grandTotals['sumKeluarDisplay'] = number_format($grandTotals['sumKeluar'], 0, ',', '.');
-            $grandTotals['endingDisplay'] = number_format($grandTotals['ending'], 0, ',', '.');
+            $grandTotals['sumMasukDisplay'] = 'Rp ' . number_format($grandTotals['sumMasuk'], 0, ',', '.');
+            $grandTotals['sumKeluarDisplay'] = 'Rp ' . number_format($grandTotals['sumKeluar'], 0, ',', '.');
+            $grandTotals['endingDisplay'] = 'Rp ' . number_format($grandTotals['ending'], 0, ',', '.');
 
             $data = [
                 'profil' => [
@@ -328,6 +363,10 @@ class ProfilController extends Controller
                         'start' => $startOfMonthDisplay,
                         'end' => $endOfMonthDisplay,
                     ];
+                    if ($monthPaginationRequested) {
+                        $data['page'] = $page;
+                        $data['per_page'] = $perPage;
+                    }
                 }
             } else {
                 $data['details'] = $details; // none atau summary
