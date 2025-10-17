@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Spatie\Csp\AddCspHeaders;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'ensure-user-is-active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'jumbotron.permission' => \App\Http\Middleware\JumbotronPermission::class,
         ]);
+
+        // Append CSP middleware to the global middleware stack
+        $middleware->append(AddCspHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

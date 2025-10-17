@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-12 mb-4">
                 <div class="mb-2 d-flex align-items-center">
-                    <input id="isOpening" type="checkbox" class="form-check-input me-2" wire:model="isOpening">
+                    <input id="isOpening" type="checkbox" class="form-check-input me-2" wire:model.live="isOpening">
                     <label for="isOpening" class="form-check-label">Saldo awal</label>
                 </div>
                 <div class="text-danger small">*Centang Saldo Awal jika ingin menginput saldo awal</div>
