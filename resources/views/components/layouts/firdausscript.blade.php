@@ -44,9 +44,6 @@
         const MAX_RETRY_ATTEMPTS =
             3; // Maksimum percobaan pemutaran ulang
 
-        // Inisialisasi cache gambar global
-        window.imageCache = window.imageCache || {};
-
         // Konstanta untuk localStorage audio cache
         const AUDIO_CACHE_KEY = 'audioCache';
         const AUDIO_CACHE_TIMESTAMP_KEY = 'audioCacheTimestamp';
@@ -4396,132 +4393,7 @@
             }, 1000);
         }
 
-        function getSlideElementValue(index) {
-            const $mosqueImage = $('.mosque-image');
-            if (!$mosqueImage.length) {
-                return '';
-            }
-
-            const $element = $mosqueImage.find(`#slide${index}`);
-            if (!$element.length) {
-                return '';
-            }
-
-            if ($element.is('input, textarea, select')) {
-                return ($element.val() || '').toString().trim();
-            }
-
-            const dataSrc = $element.attr('data-src');
-            if (typeof dataSrc === 'string' && dataSrc.trim() !== '') {
-                return dataSrc.trim();
-            }
-
-            const src = $element.attr('src');
-            return typeof src === 'string' ? src.trim() : '';
-        }
-
-        function setSlideElementValue(index, value) {
-            const $mosqueImage = $('.mosque-image');
-            if (!$mosqueImage.length) {
-                return;
-            }
-
-            let $element = $mosqueImage.find(`#slide${index}`);
-            if (!$element.length) {
-                $element = $('<img>', {
-                    id: `slide${index}`,
-                    alt: `Slide ${index}`,
-                    css: {
-                        objectFit: 'stretch',
-                        width: '100%',
-                        height: '100%',
-                        display: 'none',
-                    }
-                });
-                $mosqueImage.append($element);
-            }
-
-            if ($element.is('input, textarea, select')) {
-                $element.val(value || '');
-                return;
-            }
-
-            if (typeof value === 'string' && value.trim() !== '') {
-                $element.attr('src', value);
-                $element.attr('data-src', value);
-            } else {
-                $element.attr('src', '');
-                $element.removeAttr('data-src');
-            }
-        }
-
-        function collectSlideValues() {
-            const $mosqueImage = $('.mosque-image');
-            if (!$mosqueImage.length) {
-                return [];
-            }
-
-            const collectedEntries = [];
-            $mosqueImage.find('[id^="slide"]').each(function() {
-                const idMatch = this.id && this.id.match(/^slide(\d+)$/);
-                if (!idMatch) {
-                    return;
-                }
-
-                const index = parseInt(idMatch[1], 10);
-                if (Number.isNaN(index)) {
-                    return;
-                }
-
-                const value = getSlideElementValue(index);
-                if (typeof value === 'string' && value.trim() !== '') {
-                    collectedEntries.push({
-                        index,
-                        value: value.trim()
-                    });
-                }
-            });
-            return collectedEntries
-                .sort((a, b) => a.index - b.index)
-                .map(entry => entry.value);
-        }
-
-        function syncSlideElementsWithUrls(urls) {
-            if (!Array.isArray(urls)) {
-                return;
-            }
-
-            urls.forEach((url, idx) => {
-                setSlideElementValue(idx + 1, url);
-            });
-
-            const $mosqueImage = $('.mosque-image');
-            if (!$mosqueImage.length) {
-                return;
-            }
-
-            const maxVisible = urls.length;
-            $mosqueImage.find('[id^="slide"]').each(function() {
-                const idMatch = this.id && this.id.match(/^slide(\d+)$/);
-                if (!idMatch) {
-                    return;
-                }
-
-                const index = parseInt(idMatch[1], 10);
-                if (Number.isNaN(index) || index <= maxVisible) {
-                    return;
-                }
-
-                const $element = $(this);
-                if ($element.is('img')) {
-                    $element.attr('src', '').removeAttr('data-src');
-                } else {
-                    $element.val('');
-                }
-            });
-        }
-
-        // Update slider based on NewSlider API
+        // FIXME: update slider - reffer updateSlides
         function updateSlider() {
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
@@ -4530,63 +4402,12 @@
             }
 
             $.ajax({
-                url: `/api/new_slider/${encodeURIComponent(slug)}`,
+                url: `/api/new_slider/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    if (!response || response.success !== true) {
-                        console.warn('Respons API new_slider tidak valid atau tidak sukses:', response);
-                        return;
-                    }
-
-                    let sliderPaths = [];
-                    if (Array.isArray(response.data)) {
-                        sliderPaths = response.data;
-                    } else if (response.data && typeof response.data === 'object') {
-                        sliderPaths = Object.values(response.data);
-                    }
-
-                    sliderPaths = sliderPaths
-                        .map(item => (typeof item === 'string' ? item.trim() : ''))
-                        .filter(item => item !== '');
-
-                    if (sliderPaths.length === 0) {
-                        sliderPaths = ['/images/other/slide-jws-default.jpg'];
-                    }
-
-                    const previousSlides = Array.isArray(window.slideUrls)
-                        ? window.slideUrls.slice()
-                        : collectSlideValues();
-
-                    const hasChanges = previousSlides.length !== sliderPaths.length ||
-                        previousSlides.some((url, index) => url !== sliderPaths[index]);
-
-                    if (!hasChanges) {
-                        return;
-                    }
-
-                    window.slideUrls = sliderPaths.slice();
-                    syncSlideElementsWithUrls(sliderPaths);
-
-                    const urlsToPreload = sliderPaths.filter(url => {
-                        return !window.imageCache[url] || !window.imageCache[url].complete;
-                    });
-
-                    const handlePreload = urlsToPreload.length > 0
-                        ? preloadImages(urlsToPreload)
-                        : Promise.resolve();
-
-                    handlePreload
-                        .then(() => {
-                            clearUnusedCache(sliderPaths.concat(window.jumbotronUrls || []));
-                            $(document).trigger('slidesUpdated', [sliderPaths]);
-                        })
-                        .catch(error => {
-                            console.error('Gagal memuat gambar slider baru:', error);
-                        });
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error saat mengambil data slider baru:', error, xhr.responseText);
+                    console.log('API new_slider response:',
+                        response);
                 }
             });
         }
@@ -4608,10 +4429,14 @@
                     console.log('Respons API slides:',
                         response);
                     if (response.success) {
-                        const previousSlides = [];
-                        for (let i = 1; i <= 6; i++) {
-                            previousSlides.push(getSlideElementValue(i));
-                        }
+                        const previousSlides = [
+                            $('#slide1').val() || '',
+                            $('#slide2').val() || '',
+                            $('#slide3').val() || '',
+                            $('#slide4').val() || '',
+                            $('#slide5').val() || '',
+                            $('#slide6').val() || ''
+                        ];
 
                         const newSlides = [
                             response.data.slide1 || '',
@@ -4630,9 +4455,12 @@
                         if (hasChanges) {
                             // console.log('Perubahan terdeteksi, memperbarui slide...');
 
-                            for (let i = 1; i <= 6; i++) {
-                                setSlideElementValue(i, newSlides[i - 1]);
-                            }
+                            $('#slide1').val(newSlides[0]);
+                            $('#slide2').val(newSlides[1]);
+                            $('#slide3').val(newSlides[2]);
+                            $('#slide4').val(newSlides[3]);
+                            $('#slide5').val(newSlides[4]);
+                            $('#slide6').val(newSlides[5]);
 
                             const newUrls = newSlides
                                 .filter(url => url
@@ -4681,6 +4509,10 @@
                 }
             });
         }
+
+
+        // Objek global untuk menyimpan cache gambar
+        window.imageCache = window.imageCache || {};
 
         function getAllActiveUrls() {
             const slideUrls = window.slideUrls || [];
@@ -4912,7 +4744,14 @@
             }
 
             // Inisialisasi slideUrls
-            window.slideUrls = collectSlideValues();
+            window.slideUrls = [
+                $('#slide1').val() || '',
+                $('#slide2').val() || '',
+                $('#slide3').val() || '',
+                $('#slide4').val() || '',
+                $('#slide5').val() || '',
+                $('#slide6').val() || ''
+            ].filter(url => url.trim() !== '');
 
             if (window.slideUrls.length === 0) {
                 console.warn(

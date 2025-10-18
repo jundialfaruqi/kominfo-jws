@@ -18,7 +18,7 @@ class NewSlide extends Component
     #[Title('New Slider')]
 
     // jumlah slide
-    public Int $sliderFormCount;
+    public Int $sliderFormCount, $maxAllowedSlides = 15;
     public array $slideImages = [];
     public array $existingSlides = [];
 
@@ -57,7 +57,7 @@ class NewSlide extends Component
         $slides = $user->newSliders()->orderBy('created_at')->get();
 
         $this->existingSlides = $slides->values()
-            ->mapWithKeys(fn ($slide, $index) => [
+            ->mapWithKeys(fn($slide, $index) => [
                 $index + 1 => [
                     'id' => $slide->id,
                     'path' => $slide->path,
@@ -71,7 +71,13 @@ class NewSlide extends Component
 
     public function addSliderForm()
     {
-        $this->sliderFormCount += 1;
+        if ($this->sliderFormCount < $this->maxAllowedSlides) {
+            $this->sliderFormCount += 1;
+        } else {
+            $this->dispatch('error', 'form tidak boleh melebihi ' . $this->maxAllowedSlides);
+            return;
+        }
+
         $this->slideImages[$this->sliderFormCount] = null;
         if (!array_key_exists($this->sliderFormCount, $this->existingSlides)) {
             $this->existingSlides[$this->sliderFormCount] = null;
@@ -84,7 +90,7 @@ class NewSlide extends Component
         $this->validate();
 
         $files = collect($this->slideImages)
-            ->filter(fn ($file) => $file instanceof TemporaryUploadedFile);
+            ->filter(fn($file) => $file instanceof TemporaryUploadedFile);
 
         if ($files->isEmpty()) {
             $this->addError('slideImages', 'Minimal satu gambar perlu diunggah.');

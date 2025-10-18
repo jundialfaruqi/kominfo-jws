@@ -27,24 +27,11 @@
                                         $hasImage = $temporaryFile || $existingPath;
                                     @endphp
                                     <div class="col-12 col-md-6 col-lg-3" wire:key="slider-field-{{ $i }}">
-                                        <div class="mb-3">
+                                        <div class="mb-5">
                                             <div class="d-flex align-items-center justify-content-between mb-2">
                                                 <label class="form-label mb-0" for="slideImage{{ $i }}">
                                                     Slide Image {{ $i }}
                                                 </label>
-                                                @if ($hasImage)
-                                                    <button type="button"
-                                                        class="btn btn-link text-danger p-0 d-inline-flex align-items-center gap-1"
-                                                        wire:click="removeSlideImage({{ $i }})"
-                                                        wire:loading.attr="disabled"
-                                                        wire:target="removeSlideImage({{ $i }})">
-                                                        <span wire:loading.remove wire:target="removeSlideImage({{ $i }})">Hapus</span>
-                                                        <span class="spinner-border spinner-border-sm"
-                                                            wire:loading
-                                                            wire:target="removeSlideImage({{ $i }})"
-                                                            role="status" aria-hidden="true"></span>
-                                                    </button>
-                                                @endif
                                             </div>
 
                                             @if ($temporaryFile)
@@ -61,11 +48,38 @@
                                                 </div>
                                             @endif
 
-                                            <input class="form-control rounded-4"
-                                                id="slideImage{{ $i }}"
-                                                type="file"
-                                                wire:model="slideImages.{{ $i }}"
-                                                accept="image/*">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input class="form-control rounded-4"
+                                                    id="slideImage{{ $i }}"
+                                                    type="file"
+                                                    wire:model="slideImages.{{ $i }}"
+                                                    accept="image/*">
+                                                @if ($hasImage)
+                                                    <button type="button"
+                                                        class="btn btn-danger py-2 px-2 rounded-3 shadow-sm"
+                                                        wire:click="removeSlideImage({{ $i }})"
+                                                        wire:loading.attr="disabled"
+                                                        wire:target="removeSlideImage({{ $i }})">
+                                                        <span wire:loading.remove wire:target="removeSlideImage({{ $i }})">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
+                                                            <path d="M4 7l16 0"></path>
+                                                            <path d="M10 11l0 6"></path>
+                                                            <path d="M14 11l0 6"></path>
+                                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12">
+                                                            </path>
+                                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3">
+                                                            </path>
+                                                        </svg>
+                                                        Hapus</span>
+                                                        <span class="spinner-border spinner-border-sm"
+                                                            wire:loading
+                                                            wire:target="removeSlideImage({{ $i }})"
+                                                            role="status" aria-hidden="true"></span>
+                                                    </button>
+                                                @endif
+                                            </div>
                                             <div class="small text-muted mt-2"
                                                 wire:loading
                                                 wire:target="slideImages.{{ $i }}">
@@ -78,12 +92,13 @@
                                     </div>
                                 @endfor
                             </div>
-                            @error('slideImages')
-                                <span
-                                    class="text-danger">{{ $message }}</span>
-                            @enderror
-                            <button class="btn btn-success" type="submit">Save
-                                Slide</button>
+
+                            <div class="mt-5">
+                                <button class="btn btn-success mb-2" type="submit">Save Slide</button>
+                                @error('slideImages')
+                                    <br><span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </form>
                         {{-- end of form --}}
                     </div>
