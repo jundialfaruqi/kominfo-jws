@@ -125,7 +125,7 @@
             </div>
 
             <!-- Finance Overlay (floating, judul tetap, konten scroll) -->
-            <div id="financeOverlay" class="finance-overlay" style="display: none;">
+            {{-- <div id="financeOverlay" class="finance-overlay" style="display: none;">
                 <div class="finance-title" id="financePeriodTitle">Memuat data keuangan…</div>
                 <div class="finance-scroll-container" id="financeScrollContainerAll">
                     <div class="finance-scroll-content" id="financeScrollContentAll">
@@ -148,7 +148,7 @@
                         <div class="finance-scroll-content" id="financeTopCategoriesList"></div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="mosque-image">
                 {{-- Mosque images with object-fit stretch --}}
