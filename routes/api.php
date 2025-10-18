@@ -19,6 +19,7 @@ Route::get('marquee1/{slug}', [API\ProfilController::class, 'get_marquee1'])->na
 Route::get('marquee/{slug}', [API\ProfilController::class, 'get_marquee'])->name('api.marquee');
 
 // API route untuk mendapatkan data slide
+Route::get('new_slider/{slug}', [API\ProfilController::class, 'get_new_slider'])->name('api.new.slider'); // API Mazlan
 Route::get('slides1/{slug}', [API\ProfilController::class, 'get_slides1'])->name('api.slides1'); // API LAMA
 Route::get('slides/{slug}', [API\ProfilController::class, 'get_slides'])->name('api.slides');
 

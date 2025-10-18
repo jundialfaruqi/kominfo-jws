@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Profil;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,14 +27,33 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory()->create([
-            'name' => 'Example User',
-            'email' => 'example@mail.com',
-            'role' => 'User',
+            'name' => 'Example Super Admin',
+            'email' => 'superadmin@kominfo-jws.test',
+            'role' => 'Super Admin',
             'phone' => '081234567890',
-            'password' => Hash::make('user123'),
+            'password' => Hash::make('terserah'),
             'address' => 'Pekanbaru',
             'status' => 'Active',
         ]);
+
+        User::factory()->create([
+            'name' => 'Example User',
+            'email' => 'user@kominfo-jws.test',
+            'role' => 'User',
+            'phone' => '081234567890',
+            'password' => Hash::make('terserah'),
+            'address' => 'Pekanbaru',
+            'status' => 'Active',
+        ]);
+
+        Profil::factory()->create([
+            'name' => 'Masjid Programmer Pekanbaru',
+            'address' => 'Jl. Jalan Healing Akhir Tahun',
+            'phone' => '081234567890',
+            'slug' => 'programmer-pku',
+            'user_id' => 3,
+        ]);
+
 
         User::factory()->create([
             'name' => 'Super Admin',

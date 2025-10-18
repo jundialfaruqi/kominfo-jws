@@ -23,17 +23,19 @@ class Profil extends Model
         'logo_masjid_url',
         'logo_pemerintah_url',
     ];
-    
+
     protected $appends = [
         'logo_masjid_url',
         'logo_pemerintah_url',
     ];
 
     // Additional Method
-    public function getLogoMasjidUrlAttribute() {
+    public function getLogoMasjidUrlAttribute()
+    {
         return $this->logo_masjid ? asset($this->logo_masjid) : asset('images/other/logo-masjid-default.png');
     }
-    public function getLogoPemerintahUrlAttribute() {
+    public function getLogoPemerintahUrlAttribute()
+    {
         return $this->logo_pemerintah ? asset($this->logo_pemerintah) : asset('images/other/logo-masjid-default.png');
     }
 
@@ -56,5 +58,10 @@ class Profil extends Model
     public function groupCategories()
     {
         return $this->hasMany(GroupCategory::class, 'id_masjid');
+    }
+
+    public function newSliders()
+    {
+        return $this->hasMany(NewSlider::class, 'masjid_id');
     }
 }

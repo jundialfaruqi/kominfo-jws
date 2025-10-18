@@ -71,6 +71,7 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
 
     // Slider Routes
     Route::get('/slider-utama', Slide::class)->name('slide.index');
+    Route::get('/new-slider', \App\Livewire\Slides\NewSlide::class)->name('new.slide.index'); // TODO: make slider count dynamic
 
     // Petugas Routes
     Route::get('/petugas-jumat', Petugas::class)->name('petugas.index');

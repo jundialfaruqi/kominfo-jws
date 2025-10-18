@@ -1,56 +1,74 @@
-<aside class="navbar navbar-vertical navbar-expand-lg sticky-top" data-bs-theme="light">
+<aside class="navbar navbar-vertical navbar-expand-lg sticky-top"
+    data-bs-theme="light">
     <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
-            aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" data-bs-toggle="collapse"
+            data-bs-target="#sidebar-menu" type="button"
+            aria-controls="sidebar-menu" aria-expanded="false"
+            aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand me-lg-3 me-3">
-            <a wire:navigate href="{{ route('dashboard.index') }}">
+            <a href="{{ route('dashboard.index') }}" wire:navigate>
                 <span class="navbar-brand-image">
-                    <a wire:navigate href="{{ route('dashboard.index') }}">
-                        <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
-                            class="navbar-brand-image">
+                    <a href="{{ route('dashboard.index') }}" wire:navigate>
+                        <img class="navbar-brand-image"
+                            src="{{ asset('nav-brand.png') }}"
+                            alt="JWS Diskominfo" width="30">
                     </a>
                 </span>
                 <span class="navbar-brand-text">JWS Diskominfo</span>
             </a>
         </h1>
-        <div class="navbar-nav flex-row d-lg-none">
+        <div class="navbar-nav d-lg-none flex-row">
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown"
+                <a class="nav-link d-flex lh-1 text-reset p-0"
+                    data-bs-toggle="dropdown" href="#"
                     aria-label="Open user menu">
                     @if (Auth::user()->photo)
-                        <img class="avatar avatar-sm rounded-circle" src="{{ asset(Auth::user()->photo) }}"
+                        <img class="avatar avatar-sm rounded-circle"
+                            src="{{ asset(Auth::user()->photo) }}"
                             alt="{{ Auth::user()->name }}">
                     @else
                         <span class="avatar avatar-sm rounded-circle">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-user">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-user"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24"
+                                viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z"
+                                    fill="none" />
+                                <path
+                                    d="M12 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                <path
+                                    d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                             </svg>
                         </span>
                     @endif
                     <div class="d-none d-xl-block ps-2">
                         <div>Admin</div>
-                        <div class="mt-1 small text-secondary">Administrator</div>
+                        <div class="small text-secondary mt-1">Administrator
+                        </div>
                     </div>
                 </a>
 
-                <ul class="dropdown-menu dropdown-menu-end rounded-3" aria-labelledby="adminDropdown">
+                <ul class="dropdown-menu dropdown-menu-end rounded-3"
+                    aria-labelledby="adminDropdown">
                     <li>
                         @livewire('auth.logout')
                     </li>
                     <li>
-                        <a wire:navigate href="{{ route('updateprofile.index') }}"
-                            class="dropdown-item d-flex align-items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-settings">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <a class="dropdown-item d-flex align-items-center gap-2"
+                            href="{{ route('updateprofile.index') }}"
+                            wire:navigate>
+                            <svg class="icon icon-tabler icons-tabler-outline icon-tabler-settings"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24" height="24"
+                                viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z"
+                                    fill="none" />
                                 <path
                                     d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065z" />
                                 <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
@@ -61,18 +79,24 @@
                 </ul>
             </div>
         </div>
-        <div class="collapse navbar-collapse" id="sidebar-menu">
+        <div class="navbar-collapse collapse" id="sidebar-menu">
             <ul class="navbar-nav pt-lg-3">
                 @if (Auth::user()->status === 'Active')
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('dashboard.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('dashboard.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-layout-dashboard">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        class="nav-item {{ request()->routeIs('dashboard.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('dashboard.index') }}" wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-layout-dashboard"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
                                     <path
                                         d="M5 4h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1" />
                                     <path
@@ -91,18 +115,28 @@
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                         @can('view-users')
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                                <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-users">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                            <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                                class="nav-item {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                                <a class="nav-link"
+                                    href="{{ route('admin.user.index') }}"
+                                    wire:navigate>
+                                    <span
+                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-users"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z"
+                                                fill="none" />
+                                            <path
+                                                d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                            <path
+                                                d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                            <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
+                                            <path
+                                                d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
                                         </svg>
                                     </span>
                                     <span class="nav-link-title">
@@ -114,17 +148,25 @@
 
                         @can('view-roles')
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('admin.role.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                                <a wire:navigate class="nav-link" href="{{ route('admin.role.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-shield-cog">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                class="nav-item {{ request()->routeIs('admin.role.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                                <a class="nav-link"
+                                    href="{{ route('admin.role.index') }}"
+                                    wire:navigate>
+                                    <span
+                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-shield-cog"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z"
+                                                fill="none" />
                                             <path
                                                 d="M12 21a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3c.568 1.933 .635 3.957 .223 5.89" />
-                                            <path d="M19.001 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                            <path
+                                                d="M19.001 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
                                             <path d="M19.001 15.5v1.5" />
                                             <path d="M19.001 21v1.5" />
                                             <path d="M22.032 17.25l-1.299 .75" />
@@ -142,17 +184,25 @@
 
                         @can('view-permissions')
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('admin.permission.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                                <a wire:navigate class="nav-link" href="{{ route('admin.permission.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-lock-open-2">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                class="nav-item {{ request()->routeIs('admin.permission.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                                <a class="nav-link"
+                                    href="{{ route('admin.permission.index') }}"
+                                    wire:navigate>
+                                    <span
+                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-lock-open-2"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z"
+                                                fill="none" />
                                             <path
                                                 d="M3 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z" />
-                                            <path d="M9 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" />
+                                            <path
+                                                d="M9 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" />
                                             <path d="M13 11v-4a4 4 0 1 1 8 0v4" />
                                         </svg>
                                     </span>
@@ -165,17 +215,26 @@
 
                         @can('view-user-role-assignment')
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('admin.user-role-assignment.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                                <a wire:navigate class="nav-link" href="{{ route('admin.user-role-assignment.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-user-cog">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
+                                class="nav-item {{ request()->routeIs('admin.user-role-assignment.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                                <a class="nav-link"
+                                    href="{{ route('admin.user-role-assignment.index') }}"
+                                    wire:navigate>
+                                    <span
+                                        class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <svg class="icon icon-tabler icons-tabler-outline icon-tabler-user-cog"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path stroke="none" d="M0 0h24v24H0z"
+                                                fill="none" />
+                                            <path
+                                                d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" />
                                             <path d="M6 21v-2a4 4 0 0 1 4 -4h2.5" />
-                                            <path d="M19.001 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+                                            <path
+                                                d="M19.001 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
                                             <path d="M19.001 15.5v1.5" />
                                             <path d="M19.001 21v1.5" />
                                             <path d="M22.032 17.25l-1.299 .75" />
@@ -192,14 +251,21 @@
                         @endcan
                     @endif
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        class="nav-item {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('profilmasjid.index') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
                                     <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
                                     <path d="M4 21v-10" />
                                     <path d="M20 21v-10" />
@@ -218,44 +284,65 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 dropdown {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
-                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}" data-bs-toggle="dropdown" aria-expanded="{{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'true' : 'false' }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cash">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3" />
-                                    <path d="M7 9m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" />
-                                    <path d="M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                    <li
+                        class="nav-item dropdown {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }} mx-3">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}"
+                            data-bs-toggle="dropdown" href="#"
+                            aria-expanded="{{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'true' : 'false' }}">
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-cash"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3" />
+                                    <path
+                                        d="M7 9m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" />
+                                    <path
+                                        d="M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                                 </svg>
                             </span>
                             <span class="nav-link-title">Keuangan</span>
                         </a>
-                        <ul class="dropdown-menu rounded-3 {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
+                        <ul
+                            class="dropdown-menu rounded-3 {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
                             <li>
-                                <a wire:navigate
-                                    class="dropdown-item {{ request()->routeIs('group-category.*') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
-                                    href="{{ route('group-category.index') }}">
+                                <a class="dropdown-item {{ request()->routeIs('group-category.*') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
+                                    href="{{ route('group-category.index') }}"
+                                    wire:navigate>
                                     Group Category
                                 </a>
                             </li>
                             <li>
-                                <a wire:navigate
-                                    class="dropdown-item {{ request()->routeIs('laporan-keuangan.index') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
-                                    href="{{ route('laporan-keuangan.index') }}">
+                                <a class="dropdown-item {{ request()->routeIs('laporan-keuangan.index') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
+                                    href="{{ route('laporan-keuangan.index') }}"
+                                    wire:navigate>
                                     Laporan Keuangan
                                 </a>
                             </li>
                         </ul>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-template">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        class="nav-item {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link" href="{{ route('tema.index') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-template"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
                                     <path
                                         d="M4 4m0 1a1 1 0 0 1 1 -1h14a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-14a1 1 0 0 1 -1 -1z" />
                                     <path
@@ -272,17 +359,26 @@
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('tema.set-tema') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                            <a wire:navigate class="nav-link" href="{{ route('tema.set-tema') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-brush">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            class="nav-item {{ request()->routeIs('tema.set-tema') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                            <a class="nav-link"
+                                href="{{ route('tema.set-tema') }}"
+                                wire:navigate>
+                                <span
+                                    class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-brush"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z"
+                                            fill="none" />
                                         <path d="M3 21v-4a4 4 0 1 1 4 4h-4" />
-                                        <path d="M21 3a16 16 0 0 0 -12.8 10.2" />
-                                        <path d="M21 3a16 16 0 0 1 -10.2 12.8" />
+                                        <path
+                                            d="M21 3a16 16 0 0 0 -12.8 10.2" />
+                                        <path
+                                            d="M21 3a16 16 0 0 1 -10.2 12.8" />
                                         <path d="M10.6 9a9 9 0 0 1 4.4 4.4" />
                                     </svg>
                                 </span>
@@ -293,16 +389,24 @@
                         </li>
                     @endif
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('audios') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('audios') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-music">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-                                    <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                        class="nav-item {{ request()->routeIs('audios') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link" href="{{ route('audios') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-music"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                                    <path
+                                        d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                     <path d="M9 17v-13h10v13" />
                                     <path d="M9 8h10" />
                                 </svg>
@@ -313,14 +417,21 @@
                         </a>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('adzan-audio.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('adzan-audio.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-volume">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        class="nav-item {{ request()->routeIs('adzan-audio.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('adzan-audio.index') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-volume"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
                                     <path d="M15 8a5 5 0 0 1 0 8" />
                                     <path d="M17.7 5a9 9 0 0 1 0 14" />
                                     <path
@@ -332,23 +443,34 @@
                             </span>
                         </a>
                     </li>
-                    @if (Auth::check() && (in_array(Auth::user()->role, ['Super Admin', 'Admin']) || Auth::user()->can('view-jumbotron')))
+                    @if (Auth::check() &&
+                            (in_array(Auth::user()->role, ['Super Admin', 'Admin']) ||
+                                Auth::user()->can('view-jumbotron')))
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('jumbotron.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                            <a wire:navigate class="nav-link" href="{{ route('jumbotron.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-library-photo">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            class="nav-item {{ request()->routeIs('jumbotron.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                            <a class="nav-link"
+                                href="{{ route('jumbotron.index') }}"
+                                wire:navigate>
+                                <span
+                                    class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-library-photo"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z"
+                                            fill="none" />
                                         <path
                                             d="M7 3m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
                                         <path
                                             d="M4.012 7.26a2.005 2.005 0 0 0 -1.012 1.737v10c0 1.1 .9 2 2 2h10c.75 0 1.158 -.385 1.5 -1" />
                                         <path d="M17 7h.01" />
-                                        <path d="M7 13l3.644 -3.644a1.21 1.21 0 0 1 1.712 0l3.644 3.644" />
-                                        <path d="M15 12l1.644 -1.644a1.21 1.21 0 0 1 1.712 0l2.644 2.644" />
+                                        <path
+                                            d="M7 13l3.644 -3.644a1.21 1.21 0 0 1 1.712 0l3.644 3.644" />
+                                        <path
+                                            d="M15 12l1.644 -1.644a1.21 1.21 0 0 1 1.712 0l2.644 2.644" />
                                     </svg>
                                 </span>
                                 <span class="nav-link-title">
@@ -358,14 +480,20 @@
                         </li>
                     @endif
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('slide.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('slide.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-slideshow">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        class="nav-item {{ request()->routeIs('slide.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link" href="{{ route('slide.index') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-slideshow"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
                                     <path d="M15 6l.01 0" />
                                     <path
                                         d="M3 3m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
@@ -382,19 +510,60 @@
                         </a>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('petugas.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('petugas.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-users-group">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                    <path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
-                                    <path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                        class="nav-item {{ request()->routeIs('new.slide.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('new.slide.index') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-slideshow"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path d="M15 6l.01 0" />
+                                    <path
+                                        d="M3 3m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
+                                    <path d="M3 13l4 -4a3 5 0 0 1 3 0l4 4" />
+                                    <path d="M13 12l2 -2a3 5 0 0 1 3 0l3 3" />
+                                    <path d="M8 21l.01 0" />
+                                    <path d="M12 21l.01 0" />
+                                    <path d="M16 21l.01 0" />
+                                </svg>
+                            </span>
+                            <span class="nav-link-title">
+                                New Slide
+                            </span>
+                        </a>
+                    </li>
+                    <li
+                        class="nav-item {{ request()->routeIs('petugas.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('petugas.index') }}" wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-users-group"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path
+                                        d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
+                                    <path
+                                        d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                                     <path d="M17 10h2a2 2 0 0 1 2 2v1" />
-                                    <path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path
+                                        d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                                     <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
                                 </svg>
                             </span>
@@ -404,15 +573,22 @@
                         </a>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('marquee.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
-                        <a wire:navigate class="nav-link" href="{{ route('marquee.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-text-grammar">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M14 9a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                        class="nav-item {{ request()->routeIs('marquee.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('marquee.index') }}" wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-text-grammar"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M14 9a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
                                     <path d="M4 12v-5a3 3 0 1 1 6 0v5" />
                                     <path d="M4 9h6" />
                                     <path d="M20 6v6" />
@@ -427,18 +603,26 @@
                         </a>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('adzan.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
-                        <a wire:navigate class="nav-link" href="{{ route('adzan.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-photo-video">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M9 15h-3a3 3 0 0 1 -3 -3v-6a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v3" />
+                        class="nav-item {{ request()->routeIs('adzan.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link" href="{{ route('adzan.index') }}"
+                            wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-photo-video"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M9 15h-3a3 3 0 0 1 -3 -3v-6a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v3" />
                                     <path
                                         d="M9 9m0 3a3 3 0 0 1 3 -3h6a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-6a3 3 0 0 1 -3 -3z" />
-                                    <path d="M3 12l2.296 -2.296a2.41 2.41 0 0 1 3.408 0l.296 .296" />
+                                    <path
+                                        d="M3 12l2.296 -2.296a2.41 2.41 0 0 1 3.408 0l.296 .296" />
                                     <path d="M14 13.5v3l2.5 -1.5z" />
                                     <path d="M7 6v.01" />
                                 </svg>
@@ -449,16 +633,24 @@
                         </a>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('durasi.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
-                        <a wire:navigate class="nav-link" href="{{ route('durasi.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-time-duration-30">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M14 10.5v3a1.5 1.5 0 0 0 3 0v-3a1.5 1.5 0 0 0 -3 0z" />
-                                    <path d="M8 9h1.5a1.5 1.5 0 0 1 0 3h-.5h.5a1.5 1.5 0 0 1 0 3h-1.5" />
+                        class="nav-item {{ request()->routeIs('durasi.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} mx-3">
+                        <a class="nav-link"
+                            href="{{ route('durasi.index') }}" wire:navigate>
+                            <span
+                                class="nav-link-icon d-md-none d-lg-inline-block">
+                                <svg class="icon icon-tabler icons-tabler-outline icon-tabler-time-duration-30"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M14 10.5v3a1.5 1.5 0 0 0 3 0v-3a1.5 1.5 0 0 0 -3 0z" />
+                                    <path
+                                        d="M8 9h1.5a1.5 1.5 0 0 1 0 3h-.5h.5a1.5 1.5 0 0 1 0 3h-1.5" />
                                     <path d="M3 12v.01" />
                                     <path d="M7.5 4.2v.01" />
                                     <path d="M7.5 19.8v.01" />
@@ -474,14 +666,22 @@
                     </li>
                     @if (Auth::user()->role === 'User')
                         <li class="nav-item">
-                            <a class="nav-link mx-3" href="{{ route('my.mosque') }}" target="_blank">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-external-link">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+                            <a class="nav-link mx-3"
+                                href="{{ route('my.mosque') }}"
+                                target="_blank">
+                                <span
+                                    class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <svg class="icon icon-tabler icons-tabler-outline icon-tabler-external-link"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z"
+                                            fill="none" />
+                                        <path
+                                            d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
                                         <path d="M11 13l9 -9" />
                                         <path d="M15 4h5v5" />
                                     </svg>
@@ -495,14 +695,22 @@
                 @else
                     <!-- Jika user status bukan 'Active', tampilkan pesan peringatan -->
                     <li class="nav-item d-none d-md-block">
-                        <a wire:navigate class="nav-link text-danger disabled" onclick="return false;"
-                            href="{{ route('inactive.index') }}">
-                            <span class="nav-link-icon d-md-none text-danger d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" class="icon alert-icon">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                        <a class="nav-link text-danger disabled"
+                            href="{{ route('inactive.index') }}" wire:navigate
+                            onclick="return false;">
+                            <span
+                                class="nav-link-icon d-md-none text-danger d-lg-inline-block">
+                                <svg class="icon alert-icon"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z"
+                                        fill="none" />
+                                    <path
+                                        d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
                                     <path d="M12 8v4" />
                                     <path d="M12 16h.01" />
                                 </svg>

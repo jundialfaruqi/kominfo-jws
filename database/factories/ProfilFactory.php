@@ -20,6 +20,7 @@ class ProfilFactory extends Factory
         return [
             'name' => fake()->name(),
             'user_id' => User::factory(),
+            'slug' => fake()->slug(),
             'address' => fake()->unique()->address(),
             'phone' => fake()->phoneNumber(),
         ];

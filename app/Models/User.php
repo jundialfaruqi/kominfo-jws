@@ -55,4 +55,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Profil::class);
     }
+
+    public function newSliders()
+    {
+        return $this->hasMany(NewSlider::class, 'uploaded_by');
+    }
 }

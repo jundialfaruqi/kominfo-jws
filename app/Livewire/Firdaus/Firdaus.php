@@ -17,6 +17,7 @@ use App\Models\Theme;
 use App\Models\User;
 use App\Models\Audios; // Tambahkan model Audios
 use App\Models\AdzanAudio;
+use App\Models\NewSlider;
 use Carbon\Carbon;
 
 class Firdaus extends Component
@@ -40,6 +41,7 @@ class Firdaus extends Component
     public $marquee;
     public $petugas;
     public $slides;
+    public $newSlider;
     public $durasi;
     public $jumbotron; // Tambahkan properti untuk jumbotron
     public $slug;
@@ -97,6 +99,7 @@ class Firdaus extends Component
         $this->petugas = $matchedPetugas ?: null;
 
         $this->slides   = Slides::where('user_id', $user_id)->first();
+        $this->newSlider = NewSlider::where('uploaded_by', $user_id)->get();
 
         try {
             // Gunakan waktu server langsung dengan Carbon
@@ -537,6 +540,7 @@ class Firdaus extends Component
             'marquee' => $this->marquee,
             'petugas' => $this->petugas,
             'slides' => $this->slides,
+            'newSlider' => $this->newSlider,
             'durasi' => $this->durasi,
             'jumbotron' => $this->jumbotron,
             'audio' => $this->audio,

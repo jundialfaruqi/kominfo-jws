@@ -20,6 +20,7 @@ use App\Models\Slides;
 use App\Models\Adzan;
 use App\Models\AdzanAudio;
 use App\Models\Audios;
+use App\Models\NewSlider;
 
 class ProfilController extends Controller
 {
@@ -381,6 +382,34 @@ class ProfilController extends Controller
             return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
         } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // NEW SLIDER by Mazlan
+    public function get_new_slider($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $newSlider = NewSlider::where('uploaded_by', $profil->user_id)->get();
+            $sliderPaths = $newSlider->isNotEmpty()
+                ? $newSlider->map(fn($item) => asset($item->path))
+                : collect([asset('images/other/slide-jws-default.jpg')]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data slide masjid !',
+                'data' => $sliderPaths
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Slider / New Slider tidak ditemukan !'
+            ], 404);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => addslashes($ex->getMessage())
+            ], 500);
         }
     }
 
