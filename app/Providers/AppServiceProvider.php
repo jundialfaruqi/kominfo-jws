@@ -27,6 +27,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        /**
+         * Mendefinisikan 'Super Admin'
+         * selalu diizinkan melakukan semua aksi (permissions)
+         */
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('Super Admin') ? true : null;
+        });
 
         if (request()->getHttpHost() == 'jadwalsholat.pekanbaru.go.id' or App::environment('production'))
             URL::forceScheme('https');
