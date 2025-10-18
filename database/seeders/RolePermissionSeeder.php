@@ -91,6 +91,7 @@ class RolePermissionSeeder extends Seeder
         $userRole = Role::create(['name' => 'User']);
         $userRole->givePermissionTo([
             'view-dashboard',
+            'view-profil-masjid',
         ]);
 
         // Admin Masjid - similar to User but with more content management permissions
