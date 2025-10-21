@@ -116,7 +116,8 @@
         <div class="floating-clock">
             <div class="clock-container">
                 <div class="clock">
-                    <canvas id="analogClock" width="350px" height="350px"></canvas>
+                    <canvas id="analogClock" width="350px"
+                        height="350px"></canvas>
                 </div>
                 <div class="clock-text">Loading...</div>
             </div>
@@ -153,53 +154,68 @@
             </div>
 
             <!-- Finance Overlay (floating, judul tetap, konten scroll) -->
-            {{-- <div id="financeOverlay" class="finance-overlay" style="display: none;">
-                <div class="finance-title" id="financePeriodTitle">Memuat data keuangan…</div>
-                <div class="finance-scroll-container" id="financeScrollContainerAll">
-                    <div class="finance-scroll-content" id="financeScrollContentAll">
+            <div class="finance-overlay" id="financeOverlay"
+                style="display: none;">
+                <div class="finance-title" id="financePeriodTitle">Memuat data
+                    keuangan…</div>
+                <div class="finance-scroll-container"
+                    id="financeScrollContainerAll">
+                    <div class="finance-scroll-content"
+                        id="financeScrollContentAll">
                         <div class="finance-totals">
                             <div class="total-pill-container">
                                 <div class="total-pill masuk">
-                                    <span class="label">Total Uang Masuk</span>
-                                    <span class="value" id="financeTotalMasukValue">-</span>
+                                    <span class="label">Total Uang
+                                        Masuk</span>
+                                    <span class="value"
+                                        id="financeTotalMasukValue">-</span>
                                 </div>
                                 <div class="total-pill keluar">
-                                    <span class="label">Total Uang Keluar</span>
-                                    <span class="value" id="financeTotalKeluarValue">-</span>
+                                    <span class="label">Total Uang
+                                        Keluar</span>
+                                    <span class="value"
+                                        id="financeTotalKeluarValue">-</span>
                                 </div>
                                 <div class="total-pill saldo">
                                     <span class="label">Total Saldo</span>
-                                    <span class="value" id="financeEndingBalanceValue">-</span>
+                                    <span class="value"
+                                        id="financeEndingBalanceValue">-</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="finance-scroll-content" id="financeTopCategoriesList"></div>
+                        <div class="finance-scroll-content"
+                            id="financeTopCategoriesList"></div>
                     </div>
                 </div>
-            </div> --}}
+            </div>
 
             <div class="mosque-image">
                 {{-- Mosque images with object-fit stretch --}}
-                @if ($newSlider && $newSlider->count() > 0)
-                    {{-- <img id="slide1" src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
-                    <img id="slide2" src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
-                    <img id="slide3" src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
-                    <img id="slide4" src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
-                    <img id="slide5" src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
-                    <img id="slide6" src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6"> --}}
-
-                    @foreach ($newSlider as $index => $slide)
-                        <img id="slide{{ $index + 1 }}"
-                            src="{{ $slide->path ? asset($slide->path) : asset('images/other/slide-jws-default.jpg') }}"
-                            alt="Slide {{ $index + 1 }}"
-                            style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    @endforeach
+                @if ($slides)
+                    <img id="slide1"
+                        src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide 1"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+                    <img id="slide2"
+                        src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide 2"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+                    <img id="slide3"
+                        src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide 3"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+                    <img id="slide4"
+                        src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide 4"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+                    <img id="slide5"
+                        src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide 5"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+                    <img id="slide6"
+                        src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide 6"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
                 @else
                     <img id="slide1"
                         src="{{ asset('images/other/slide-jws-default.jpg') }}"

@@ -1355,10 +1355,30 @@
             y: $canvas[0].height / 2
         };
 
+        // Sumber gaya dari CSS variables dengan fallback default JS
+        const hostEl = document.querySelector('.clock-container') ||
+            document.documentElement;
+
+        function getCssVar(el, name) {
+            const v = getComputedStyle(el).getPropertyValue(name);
+            return v ? v.trim() : '';
+        }
+
+        function getCssNum(el, name, fallback) {
+            const v = getCssVar(el, name);
+            const n = parseFloat(v);
+            return Number.isFinite(n) ? n : fallback;
+        }
+
+        function getCssStr(el, name, fallback) {
+            const v = getCssVar(el, name);
+            return v !== '' ? v : fallback;
+        }
+
         // Muat gambar logo
         const logo = new Image();
-        logo.src =
-            '../theme/static/logo-small.png'; // Pastikan path ini benar
+        logo.src = getCssStr(hostEl, '--clock-logo-url',
+            '../theme/static/logo-small.png');
 
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
@@ -1368,15 +1388,179 @@
             const seconds = now.getSeconds();
             const milliseconds = now.getMilliseconds();
 
+            // Ambil semua variabel gaya (CSS > default JS)
+            const faceFill = getCssStr(hostEl, '--clock-face-fill',
+                '#003366');
+            const faceStroke = getCssStr(hostEl, '--clock-face-stroke',
+                '#0055a4');
+            // Face stroke width dengan dukungan scale
+            const faceStrokeWidthScale = getCssNum(hostEl,
+                '--clock-face-stroke-width-scale', null);
+            const faceStrokeWidth = (faceStrokeWidthScale && isFinite(
+                    faceStrokeWidthScale)) ?
+                clockRadius * faceStrokeWidthScale :
+                getCssNum(hostEl, '--clock-face-stroke-width', 15);
+            const faceShadowColor = getCssStr(hostEl,
+                '--clock-face-shadow-color', 'rgba(0, 0, 0, 0.5)');
+            const faceShadowBlur = getCssNum(hostEl,
+                '--clock-face-shadow-blur', 20);
+            const faceShadowOffsetX = getCssNum(hostEl,
+                '--clock-face-shadow-offset-x', 0);
+            const faceShadowOffsetY = getCssNum(hostEl,
+                '--clock-face-shadow-offset-y', 0);
+
+            const majorTickColor = getCssStr(hostEl,
+                '--clock-major-tick-color', '#ffffff');
+            // Major tick width dengan dukungan scale
+            const majorTickWidthScale = getCssNum(hostEl,
+                '--clock-major-tick-width-scale', null);
+            const majorTickWidth = (majorTickWidthScale && isFinite(
+                    majorTickWidthScale)) ?
+                clockRadius * majorTickWidthScale :
+                getCssNum(hostEl, '--clock-major-tick-width', 4);
+            // Major tick start offset dengan dukungan scale
+            const majorTickStartOffsetScale = getCssNum(hostEl,
+                '--clock-major-tick-start-offset-scale', null);
+            const majorTickStartOffset = (majorTickStartOffsetScale &&
+                    isFinite(majorTickStartOffsetScale)) ?
+                clockRadius * majorTickStartOffsetScale :
+                getCssNum(hostEl, '--clock-major-tick-start-offset',
+                20);
+            // Major tick end offset dengan dukungan scale
+            const majorTickEndOffsetScale = getCssNum(hostEl,
+                '--clock-major-tick-end-offset-scale', null);
+            const majorTickEndOffset = (majorTickEndOffsetScale &&
+                    isFinite(majorTickEndOffsetScale)) ?
+                clockRadius * majorTickEndOffsetScale :
+                getCssNum(hostEl, '--clock-major-tick-end-offset', 5);
+
+            const minorTickColor = getCssStr(hostEl,
+                '--clock-minor-tick-color',
+                'rgba(255, 255, 255, 0.6)');
+            // Minor tick width dengan dukungan scale
+            const minorTickWidthScale = getCssNum(hostEl,
+                '--clock-minor-tick-width-scale', null);
+            const minorTickWidth = (minorTickWidthScale && isFinite(
+                    minorTickWidthScale)) ?
+                clockRadius * minorTickWidthScale :
+                getCssNum(hostEl, '--clock-minor-tick-width', 2);
+            // Minor tick start offset dengan dukungan scale
+            const minorTickStartOffsetScale = getCssNum(hostEl,
+                '--clock-minor-tick-start-offset-scale', null);
+            const minorTickStartOffset = (minorTickStartOffsetScale &&
+                    isFinite(minorTickStartOffsetScale)) ?
+                clockRadius * minorTickStartOffsetScale :
+                getCssNum(hostEl, '--clock-minor-tick-start-offset',
+                10);
+            // Minor tick end offset dengan dukungan scale
+            const minorTickEndOffsetScale = getCssNum(hostEl,
+                '--clock-minor-tick-end-offset-scale', null);
+            const minorTickEndOffset = (minorTickEndOffsetScale &&
+                    isFinite(minorTickEndOffsetScale)) ?
+                clockRadius * minorTickEndOffsetScale :
+                getCssNum(hostEl, '--clock-minor-tick-end-offset', 5);
+
+            const numberRadiusOffsetScale = getCssNum(hostEl,
+                '--clock-number-radius-offset-scale', NaN);
+            const numberRadiusOffset = Number.isFinite(
+                    numberRadiusOffsetScale) ?
+                Math.round(clockRadius * numberRadiusOffsetScale) :
+                getCssNum(hostEl, '--clock-number-radius-offset', 45);
+            const numberColor = getCssStr(hostEl,
+                '--clock-number-color', '#ffffff');
+            const number12Color = getCssStr(hostEl,
+                '--clock-number-12-color', '#ff0000');
+            const numberShadowColor = getCssStr(hostEl,
+                '--clock-number-shadow-color', 'rgba(0, 0, 0, 0.7)');
+            const numberShadowBlur = getCssNum(hostEl,
+                '--clock-number-shadow-blur', 5);
+            const numberShadowOffsetX = getCssNum(hostEl,
+                '--clock-number-shadow-offset-x', 3);
+            const numberShadowOffsetY = getCssNum(hostEl,
+                '--clock-number-shadow-offset-y', 3);
+
+            const numberFontFamily = getCssStr(hostEl,
+                '--clock-number-font-family', 'Poppins');
+            const numberFontWeight = getCssStr(hostEl,
+                '--clock-number-font-weight', 'bold');
+            const numberFontSize = getCssNum(hostEl,
+                '--clock-number-font-size', 35);
+            const numberFontScale = getCssNum(hostEl,
+                '--clock-number-font-scale', NaN);
+            const resolvedNumFontSize = Number.isFinite(
+                numberFontScale) ?
+                Math.round(clockRadius * numberFontScale) :
+                numberFontSize;
+            const numberFont =
+                `${numberFontWeight} ${resolvedNumFontSize}px ${numberFontFamily}`;
+
+            const hourHandColor = getCssStr(hostEl,
+                '--clock-hour-hand-color', '#ffffff');
+            const hourHandWidth = getCssNum(hostEl,
+                '--clock-hour-hand-width', 8);
+            const hourHandLengthScale = getCssNum(hostEl,
+                '--clock-hour-hand-length-scale', 0.5);
+
+            const minuteHandColor = getCssStr(hostEl,
+                '--clock-minute-hand-color', '#ffffff');
+            const minuteHandWidth = getCssNum(hostEl,
+                '--clock-minute-hand-width', 5);
+            const minuteHandLengthScale = getCssNum(hostEl,
+                '--clock-minute-hand-length-scale', 0.7);
+
+            const secondHandColor = getCssStr(hostEl,
+                '--clock-second-hand-color', '#ff0000');
+            const secondHandWidth = getCssNum(hostEl,
+                '--clock-second-hand-width', 2);
+            const secondHandLengthScale = getCssNum(hostEl,
+                '--clock-second-hand-length-scale', 0.85);
+
+            const handShadowColor = getCssStr(hostEl,
+                '--clock-hand-shadow-color', 'rgba(0, 0, 0, 0.6)');
+            const handShadowBlur = getCssNum(hostEl,
+                '--clock-hand-shadow-blur', 8);
+            const handShadowOffsetX = getCssNum(hostEl,
+                '--clock-hand-shadow-offset-x', 3);
+            const handShadowOffsetY = getCssNum(hostEl,
+                '--clock-hand-shadow-offset-y', 3);
+
+            const secondShadowColor = getCssStr(hostEl,
+                '--clock-second-shadow-color', 'rgba(0, 0, 0, 0.4)');
+            const secondShadowBlur = getCssNum(hostEl,
+                '--clock-second-shadow-blur', 6);
+            const secondShadowOffsetX = getCssNum(hostEl,
+                '--clock-second-shadow-offset-x', 2);
+            const secondShadowOffsetY = getCssNum(hostEl,
+                '--clock-second-shadow-offset-y', 2);
+
+            const centerDotColor = getCssStr(hostEl,
+                '--clock-center-dot-color', '#ff0000');
+            const centerDotRadius = getCssNum(hostEl,
+                '--clock-center-dot-radius', 8);
+            const centerDotShadowColor = getCssStr(hostEl,
+                '--clock-center-dot-shadow-color',
+                'rgba(0, 0, 0, 0.5)');
+            const centerDotShadowBlur = getCssNum(hostEl,
+                '--clock-center-dot-shadow-blur', 5);
+            const centerDotShadowOffsetX = getCssNum(hostEl,
+                '--clock-center-dot-shadow-offset-x', 1);
+            const centerDotShadowOffsetY = getCssNum(hostEl,
+                '--clock-center-dot-shadow-offset-y', 1);
+
+            const logoScale = getCssNum(hostEl, '--clock-logo-scale',
+                0.23);
+            const logoOffsetYScale = getCssNum(hostEl,
+                '--clock-logo-offset-y-scale', 0.33);
+
             ctx.save();
             ctx.beginPath();
             ctx.arc(clockCenter.x, clockCenter.y, clockRadius, 0, Math
                 .PI * 2);
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 20;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            ctx.fillStyle = '#003366';
+            ctx.shadowColor = faceShadowColor;
+            ctx.shadowBlur = faceShadowBlur;
+            ctx.shadowOffsetX = faceShadowOffsetX;
+            ctx.shadowOffsetY = faceShadowOffsetY;
+            ctx.fillStyle = faceFill;
             ctx.fill();
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
@@ -1386,54 +1570,50 @@
             ctx.beginPath();
             ctx.arc(clockCenter.x, clockCenter.y, clockRadius, 0, Math
                 .PI * 2);
-            ctx.strokeStyle = '#0055a4';
-            ctx.lineWidth = 15;
+            ctx.strokeStyle = faceStroke;
+            ctx.lineWidth = faceStrokeWidth;
             ctx.stroke();
 
             // Gambar logo di tengah
-            if (logo.complete) { // Pastikan logo sudah dimuat
-                const logoHeight = clockRadius *
-                    0.23; // Misalnya, 10% dari radius jam
+            if (logo.complete) {
+                const logoHeight = clockRadius * logoScale;
                 const logoWidth = (logo.naturalWidth / logo
-                        .naturalHeight) *
-                    logoHeight; // Hitung lebar berdasarkan rasio aspek
+                    .naturalHeight) * logoHeight;
                 const logoX = clockCenter.x - logoWidth / 2;
                 const logoY = clockCenter.y - logoHeight / 2 -
-                    clockRadius * 0.33;
+                    clockRadius * logoOffsetYScale;
                 ctx.drawImage(logo, logoX, logoY, logoWidth,
-                    logoHeight);
+                logoHeight);
             }
 
-            // Gambar angka dan tanda jam
+            // Gambar angka dan tanda jam (major ticks + numbers)
             for (let i = 0; i < 12; i++) {
                 const angle = (i * Math.PI / 6) - Math.PI / 2;
-                const tickStart = clockRadius - 20;
-                const tickEnd = clockRadius - 5;
+                const tickStart = clockRadius - majorTickStartOffset;
+                const tickEnd = clockRadius - majorTickEndOffset;
 
                 ctx.beginPath();
                 ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart,
-                    clockCenter.y + Math.sin(angle) *
-                    tickStart);
+                    clockCenter.y + Math.sin(angle) * tickStart);
                 ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd,
-                    clockCenter.y + Math.sin(angle) *
-                    tickEnd);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 4;
+                    clockCenter.y + Math.sin(angle) * tickEnd);
+                ctx.strokeStyle = majorTickColor;
+                ctx.lineWidth = majorTickWidth;
                 ctx.stroke();
 
-                const numRadius = clockRadius - 45;
+                const numRadius = clockRadius - numberRadiusOffset;
                 const numX = clockCenter.x + Math.cos(angle) *
                 numRadius;
                 const numY = clockCenter.y + Math.sin(angle) *
                 numRadius;
 
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-                ctx.shadowBlur = 5;
-                ctx.shadowOffsetX = 3;
-                ctx.shadowOffsetY = 3;
+                ctx.shadowColor = numberShadowColor;
+                ctx.shadowBlur = numberShadowBlur;
+                ctx.shadowOffsetX = numberShadowOffsetX;
+                ctx.shadowOffsetY = numberShadowOffsetY;
 
-                ctx.fillStyle = i === 0 ? '#ff0000' : '#ffffff';
-                ctx.font = 'bold 35px Poppins';
+                ctx.fillStyle = i === 0 ? number12Color : numberColor;
+                ctx.font = numberFont;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText((i === 0 ? 12 : i).toString(), numX, numY);
@@ -1444,11 +1624,13 @@
                 ctx.shadowOffsetY = 0;
             }
 
+            // Minor ticks
             for (let i = 0; i < 60; i++) {
                 if (i % 5 !== 0) {
                     const angle = (i * Math.PI / 30) - Math.PI / 2;
-                    const tickStart = clockRadius - 10;
-                    const tickEnd = clockRadius - 5;
+                    const tickStart = clockRadius -
+                    minorTickStartOffset;
+                    const tickEnd = clockRadius - minorTickEndOffset;
 
                     ctx.beginPath();
                     ctx.moveTo(clockCenter.x + Math.cos(angle) *
@@ -1457,8 +1639,8 @@
                     ctx.lineTo(clockCenter.x + Math.cos(angle) *
                         tickEnd, clockCenter.y + Math.sin(angle) *
                         tickEnd);
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = minorTickColor;
+                    ctx.lineWidth = minorTickWidth;
                     ctx.stroke();
                 }
             }
@@ -1471,26 +1653,30 @@
             const secondAngle = ((seconds + milliseconds / 1000) * Math
                 .PI / 30) - Math.PI / 2;
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 3;
-            ctx.shadowOffsetY = 3;
-            drawHand(hourAngle, clockRadius * 0.5, 8, '#ffffff');
-            drawHand(minuteAngle, clockRadius * 0.7, 5, '#ffffff');
+            ctx.shadowColor = handShadowColor;
+            ctx.shadowBlur = handShadowBlur;
+            ctx.shadowOffsetX = handShadowOffsetX;
+            ctx.shadowOffsetY = handShadowOffsetY;
+            drawHand(hourAngle, clockRadius * hourHandLengthScale,
+                hourHandWidth, hourHandColor);
+            drawHand(minuteAngle, clockRadius * minuteHandLengthScale,
+                minuteHandWidth, minuteHandColor);
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-            ctx.shadowBlur = 6;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-            drawHand(secondAngle, clockRadius * 0.85, 2, '#ff0000');
+            ctx.shadowColor = secondShadowColor;
+            ctx.shadowBlur = secondShadowBlur;
+            ctx.shadowOffsetX = secondShadowOffsetX;
+            ctx.shadowOffsetY = secondShadowOffsetY;
+            drawHand(secondAngle, clockRadius * secondHandLengthScale,
+                secondHandWidth, secondHandColor);
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 5;
-            ctx.shadowOffsetX = 1;
-            ctx.shadowOffsetY = 1;
+            ctx.shadowColor = centerDotShadowColor;
+            ctx.shadowBlur = centerDotShadowBlur;
+            ctx.shadowOffsetX = centerDotShadowOffsetX;
+            ctx.shadowOffsetY = centerDotShadowOffsetY;
             ctx.beginPath();
-            ctx.arc(clockCenter.x, clockCenter.y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff0000';
+            ctx.arc(clockCenter.x, clockCenter.y, centerDotRadius, 0,
+                Math.PI * 2);
+            ctx.fillStyle = centerDotColor;
             ctx.fill();
 
             ctx.restore();
@@ -1708,7 +1894,10 @@
 
             if (typeof moment !== 'undefined') {
                 moment.locale('id');
-                const hari = moment(now).format('dddd');
+                let hari = moment(now).format('dddd');
+                if (hari === 'Minggu') {
+                    hari = 'Ahad';
+                }
                 const tanggalMasehi = moment(now).format('D MMMM YYYY');
                 const masehi =
                     `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
@@ -3712,22 +3901,12 @@
                         // jeda selesai
                         pauseUntil = null;
                         if (offset >= maxScroll) {
-                            // selesai jeda di bawah: sembunyikan overlay selama 10 detik, lalu tampil dari atas
-                            const $overlay = $('#financeOverlay');
-                            $overlay.hide();
-                            stopVerticalScroll();
-                            setTimeout(() => {
-                                $overlay.show();
-                                container.scrollTop =
-                                    0; // mulai dari atas
-                                // jeda 2 detik di atas sebelum mulai turun lagi
-                                setTimeout(() => {
-                                    startVerticalScroll(
-                                        $container,
-                                        $content);
-                                }, 2000);
-                            }, 20000);
-                            return;
+                            // selesai jeda di bawah: reset ke atas tanpa menyembunyikan overlay
+                            container.scrollTop = 0; // mulai dari atas
+                            offset = 0;
+                            direction = 1; // lanjut turun lagi
+                            // jeda 2 detik di atas sebelum mulai turun lagi
+                            pauseUntil = ts + 2000;
                         }
                         if (offset <= 0) {
                             // selesai jeda di atas: lanjut turun
@@ -5360,5 +5539,137 @@
         //         window.adzanAudioPlayer.currentTime = 0;
         //     }
         // });
+
+        // Tambahkan popup izin audio di bagian atas agar pemutaran sesuai kebijakan browser
+        (function setupAudioPermissionPopup() {
+            try {
+
+                // Jika tombol lama ada, hapus agar tidak duplikat
+                const oldBtn = document.getElementById(
+                    'start-audio-btn');
+                if (oldBtn) oldBtn.remove();
+
+                if (document.getElementById(
+                        'audio-permission-overlay')) return;
+
+                const overlay = document.createElement('div');
+                overlay.id = 'audio-permission-overlay';
+                overlay.style.position = 'fixed';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.right = '0';
+                overlay.style.zIndex = '10000';
+                overlay.style.background = '#fff';
+                overlay.style.color = '#003366';
+                overlay.style.padding = '12px 16px';
+                overlay.style.boxShadow =
+                    '0 2px 12px rgba(0,0,0,0.15)';
+                overlay.style.borderBottom = '1px solid #e5e7eb';
+                overlay.style.display = 'flex';
+                overlay.style.alignItems = 'center';
+                overlay.style.justifyContent = 'space-between';
+                overlay.style.gap = '12px';
+
+                const text = document.createElement('div');
+                text.textContent =
+                    'Izinkan pemutaran audio untuk Alarm Waktu Sholat.';
+                text.style.fontWeight = '600';
+                text.style.fontSize = '16px';
+
+                const actions = document.createElement('div');
+                actions.style.display = 'flex';
+                actions.style.gap = '8px';
+
+                const allowBtn = document.createElement('button');
+                allowBtn.type = 'button';
+                allowBtn.textContent = 'Izinkan Audio';
+                allowBtn.style.padding = '8px 12px';
+                allowBtn.style.borderRadius = '6px';
+                allowBtn.style.border = '1px solid #0a3a70';
+                allowBtn.style.fontWeight = '600';
+                allowBtn.style.background = '#003366';
+                allowBtn.style.color = '#fff';
+                allowBtn.style.cursor = 'pointer';
+
+                const laterBtn = document.createElement('button');
+                laterBtn.type = 'button';
+                laterBtn.textContent = 'Nanti';
+                laterBtn.style.padding = '8px 12px';
+                laterBtn.style.borderRadius = '6px';
+                laterBtn.style.border = '1px solid #bbb';
+                actions.appendChild(allowBtn);
+
+                overlay.appendChild(text);
+                overlay.appendChild(actions);
+
+                const hideOverlay = () => {
+                    overlay.style.display = 'none';
+                };
+
+                const unlockAudio = async () => {
+                    // Sembunyikan popup segera dan set flag izin
+                    try {
+                        localStorage.setItem(
+                            'firdausAudioUnlocked',
+                            'true');
+                        hideOverlay();
+                    } catch (e) {}
+
+                    // Lakukan unlock audio secara senyap tanpa bunyi
+                    try {
+                        if (typeof beepSound !==
+                            'undefined' && beepSound) {
+                            const wasMuted = beepSound
+                            .muted;
+                            const oldVol = beepSound.volume;
+                            beepSound.muted = true;
+                            beepSound.volume = 0;
+                            await beepSound.play().catch(
+                            () => {});
+                            // hentikan dan kembalikan state
+                            beepSound.pause();
+                            beepSound.currentTime = 0;
+                            beepSound.muted = wasMuted;
+                            beepSound.volume = oldVol;
+                        } else {
+                            const unlockBeep = new Audio(
+                                '/sounds/alarm/beep.mp3'
+                                );
+                            unlockBeep.muted = true;
+                            unlockBeep.volume = 0;
+                            await unlockBeep.play().catch(
+                            () => {});
+                            unlockBeep.pause();
+                            unlockBeep.currentTime = 0;
+                        }
+                    } catch (e) {}
+
+                    // Siapkan adzanAudioPlayer secara senyap
+                    try {
+                        if (!window.adzanAudioPlayer) {
+                            window.adzanAudioPlayer =
+                                new Audio();
+                        }
+                        window.adzanAudioPlayer.muted =
+                        true;
+                        await window.adzanAudioPlayer.play()
+                            .catch(() => {});
+                        window.adzanAudioPlayer.pause();
+                        window.adzanAudioPlayer
+                            .currentTime = 0;
+                        window.adzanAudioPlayer.muted =
+                            false;
+                    } catch (e) {}
+                };
+
+                const REPROMPT_MS = 60000; // 60 detik
+                allowBtn.addEventListener('click', unlockAudio);
+
+                document.body.appendChild(overlay);
+
+            } catch (e) {
+                console.error('Gagal membuat popup izin audio:', e);
+            }
+        })();
     });
 </script>

@@ -412,7 +412,7 @@
                                 </svg>
                             </span>
                             <span class="nav-link-title">
-                                Audio Musik
+                                Audio Murottal
                             </span>
                         </a>
                     </li>
