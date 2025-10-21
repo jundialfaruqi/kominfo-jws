@@ -115,7 +115,9 @@
         {{-- Floating Clock --}}
         <div class="floating-clock">
             <div class="clock-container">
-                <canvas id="analogClock" width="300" height="300"></canvas>
+                <div class="clock">
+                    <canvas id="analogClock" width="350px" height="350px"></canvas>
+                </div>
                 <div class="clock-text">Loading...</div>
             </div>
         </div>
@@ -143,7 +145,7 @@
                     </div>
                     <div class="countdown-text">
                         <span id="next-prayer-label">Maghrib</span>
-                        <span>&nbsp;-</span>
+                        <span>:&nbsp;&nbsp;&nbsp;-</span>
                         <span id="countdown-value">-01:04:00</span>
                     </div>
                 </div>

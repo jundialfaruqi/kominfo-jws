@@ -1421,11 +1421,11 @@
                 ctx.lineWidth = 4;
                 ctx.stroke();
 
-                const numRadius = clockRadius - 40;
+                const numRadius = clockRadius - 45;
                 const numX = clockCenter.x + Math.cos(angle) *
-                    numRadius;
+                numRadius;
                 const numY = clockCenter.y + Math.sin(angle) *
-                    numRadius;
+                numRadius;
 
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
                 ctx.shadowBlur = 5;
@@ -1433,7 +1433,7 @@
                 ctx.shadowOffsetY = 3;
 
                 ctx.fillStyle = i === 0 ? '#ff0000' : '#ffffff';
-                ctx.font = 'bold 30px Poppins';
+                ctx.font = 'bold 35px Poppins';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText((i === 0 ? 12 : i).toString(), numX, numY);
