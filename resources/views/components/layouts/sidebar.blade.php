@@ -218,19 +218,28 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-3 dropdown {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
-                        <a href="#" class="nav-link dropdown-toggle d-flex align-items-center {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}" data-bs-toggle="dropdown" aria-expanded="{{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'true' : 'false' }}">
+                    <li
+                        class="nav-item mx-3 dropdown {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
+                        <a href="#"
+                            class="nav-link dropdown-toggle d-flex align-items-center {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="{{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'true' : 'false' }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-cash">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-cash">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                     <path d="M7 15h-3a1 1 0 0 1 -1 -1v-8a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v3" />
-                                    <path d="M7 9m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" />
+                                    <path
+                                        d="M7 9m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v8a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" />
                                     <path d="M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                                 </svg>
                             </span>
                             <span class="nav-link-title">Keuangan</span>
                         </a>
-                        <ul class="dropdown-menu rounded-3 {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
+                        <ul
+                            class="dropdown-menu rounded-3 {{ request()->routeIs('group-category.*') || request()->routeIs('laporan-keuangan.index') ? 'show' : '' }}">
                             <li>
                                 <a wire:navigate
                                     class="dropdown-item {{ request()->routeIs('group-category.*') ? 'active bg-primary-subtle rounded-3 shadow-sm' : '' }}"
@@ -308,7 +317,7 @@
                                 </svg>
                             </span>
                             <span class="nav-link-title">
-                                Audio Musik
+                                Audio Murottal
                             </span>
                         </a>
                     </li>
