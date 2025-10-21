@@ -168,6 +168,88 @@ body {
 }
 
 .clock-container {
+  /* Clock style variables (override in themes if needed) */
+  --clock-face-fill: #003366;
+  --clock-face-stroke: #0055a4;
+  /* --clock-face-stroke-width: 15; */
+  /* Optional: use scaling for face stroke width */
+  --clock-face-stroke-width-scale: 0.1;
+  --clock-face-shadow-color: rgba(0, 0, 0, 0.5);
+  --clock-face-shadow-blur: 20;
+  --clock-face-shadow-offset-x: 0;
+  --clock-face-shadow-offset-y: 0;
+
+  --clock-major-tick-color: #ffffff;
+  --clock-major-tick-width: 4;
+  /* Optional: use scaling for major tick width */
+  --clock-major-tick-width-scale: 0.02;
+  --clock-major-tick-start-offset: 20;
+  /* Optional: use scaling for major tick start offset */
+  --clock-major-tick-start-offset-scale: 0.12;
+  --clock-major-tick-end-offset: 5;
+  /* Optional: use scaling for major tick end offset */
+  --clock-major-tick-end-offset-scale: 0.03;
+
+  --clock-minor-tick-color: rgba(255, 255, 255, 0.6);
+  --clock-minor-tick-width: 2;
+  /* Optional: use scaling for minor tick width */
+  --clock-minor-tick-width-scale: 0.01;
+  --clock-minor-tick-start-offset: 10;
+  /* Optional: use scaling for minor tick start offset */
+  --clock-minor-tick-start-offset-scale: 0.06;
+  --clock-minor-tick-end-offset: 5;
+  /* Optional: use scaling for minor tick end offset */
+  --clock-minor-tick-end-offset-scale: 0.03;
+
+  --clock-number-color: #ffffff;
+  --clock-number-12-color: #ff0000;
+  --clock-number-font-family: Poppins;
+  --clock-number-font-weight: bold;
+  /* --clock-number-font-size: 35; px */
+  /* Optional: use scaling instead of fixed size */
+  --clock-number-font-scale: 0.2;
+
+  --clock-number-shadow-color: rgba(0, 0, 0, 0.7);
+  --clock-number-shadow-blur: 5;
+  --clock-number-shadow-offset-x: 3;
+  --clock-number-shadow-offset-y: 3;
+  --clock-number-radius-offset: 35;
+  /* Optional: use scaling for number radius offset */
+  --clock-number-radius-offset-scale: 0.3;
+
+  --clock-hour-hand-color: #ffffff;
+  --clock-hour-hand-width: 8;
+  --clock-hour-hand-length-scale: 0.5;
+
+  --clock-minute-hand-color: #ffffff;
+  --clock-minute-hand-width: 5;
+  --clock-minute-hand-length-scale: 0.7;
+
+  --clock-second-hand-color: #ff0000;
+  --clock-second-hand-width: 2;
+  --clock-second-hand-length-scale: 0.85;
+
+  --clock-hand-shadow-color: rgba(0, 0, 0, 0.6);
+  --clock-hand-shadow-blur: 8;
+  --clock-hand-shadow-offset-x: 3;
+  --clock-hand-shadow-offset-y: 3;
+
+  --clock-second-shadow-color: rgba(0, 0, 0, 0.4);
+  --clock-second-shadow-blur: 6;
+  --clock-second-shadow-offset-x: 2;
+  --clock-second-shadow-offset-y: 2;
+
+  --clock-center-dot-color: #ff0000;
+  --clock-center-dot-radius: 8;
+  --clock-center-dot-shadow-color: rgba(0, 0, 0, 0.5);
+  --clock-center-dot-shadow-blur: 5;
+  --clock-center-dot-shadow-offset-x: 1;
+  --clock-center-dot-shadow-offset-y: 1;
+
+  --clock-logo-url: ../theme/static/logo-small.png;
+  --clock-logo-scale: 0.23;
+  --clock-logo-offset-y-scale: 0.33;
+
   width: 100%;
   display: flex;
   justify-content: center;
