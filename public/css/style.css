@@ -264,7 +264,7 @@ body {
   height: calc(20vw - 5px); */
   border-radius: 50%;
   background-color: #003366;
-  box-shadow: 0.3125rem 0.625rem 1.875rem rgba(0, 0, 0, 1);
+  /* box-shadow: 0.3125rem 0.625rem 1.875rem rgba(0, 0, 0, 1); */
   overflow: hidden;
 }
 
