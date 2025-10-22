@@ -1496,23 +1496,44 @@
                 const tanggalMasehi = moment(now).format('D MMMM YYYY');
                 const masehi = `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
 
+                // Helper: ambil waktu Maghrib hari ini dari DOM
+                function getTodayMaghribDate(baseNow) {
+                    const $maghribEl = $('.prayer-time').filter(function() {
+                        return $(this).find('.prayer-name').text().toLowerCase().includes('maghrib');
+                    }).first();
+                    const maghribStr = $maghribEl.find('.prayer-time-value').text();
+                    if (!maghribStr || !/^\d{2}:\d{2}$/.test(maghribStr)) return null;
+                    const [h, m] = maghribStr.split(':').map(Number);
+                    const maghrib = new Date(baseNow);
+                    maghrib.setHours(h, m, 0, 0);
+                    return maghrib;
+                }
+
+                let hijri = '';
                 if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
+                    const maghribToday = getTodayMaghribDate(now);
+                    let hijriBaseMoment;
+                    if (maghribToday instanceof Date) {
+                        hijriBaseMoment = now < maghribToday ? moment(now).subtract(1, 'day') : moment(now);
+                    } else {
+                        // Fallback perkiraan jika jadwal Maghrib belum tersedia
+                        hijriBaseMoment = moment(now).subtract(6, 'hours');
+                    }
+
+                    const hijriDate = hijriBaseMoment.iDate();
+                    const hijriMonth = hijriBaseMoment.iMonth();
+                    const hijriYear = hijriBaseMoment.iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
                         'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
                     ];
-                    const hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
-                    if ($dateElement.length) {
-                        $dateElement.html(`${masehi} / ${hijri}`);
-                    }
+                    hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
                 } else {
-                    if ($dateElement.length) {
-                        $dateElement.html(masehi);
-                        console.warn("moment-hijri tidak tersedia");
-                    }
+                    console.warn("moment-hijri tidak tersedia");
+                }
+
+                if ($dateElement.length) {
+                    $dateElement.html(hijri ? `${masehi} / ${hijri}` : masehi);
                 }
             } else {
                 console.warn("moment.js tidak tersedia");
@@ -4381,9 +4402,22 @@
 
 
                 if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
+                    // Gunakan batas Maghrib sebagai pergantian tanggal Hijriah
+                    let hijriBaseTime = now;
+                    const maghribDate = getTodayMaghribDate(now);
+                    if (maghribDate instanceof Date) {
+                        if (now < maghribDate) {
+                            // Sebelum Maghrib, tanggal Hijriah masih hari sebelumnya
+                            hijriBaseTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                        }
+                    } else {
+                        // Fallback: kurang 6 jam bila data Maghrib belum tersedia
+                        hijriBaseTime = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+                    }
+
+                    const hijriDate = moment(hijriBaseTime).iDate();
+                    const hijriMonth = moment(hijriBaseTime).iMonth();
+                    const hijriYear = moment(hijriBaseTime).iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
                         'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
