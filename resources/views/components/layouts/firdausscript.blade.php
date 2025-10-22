@@ -3055,14 +3055,9 @@
         }
 
         function showFinanceError(message) {
-            const $overlay = $('#financeOverlay');
-            $('#financePeriodTitle').text(message);
-            $('#financeTotalMasukValue').text('-');
-            $('#financeTotalKeluarValue').text('-');
-            $('#financeEndingBalanceValue').text('-');
-            $('#financeTopCategoriesList').empty();
-            $('#financeLatestItemsList').empty();
-            $overlay.show();
+            // Ringan: jangan ubah UI saat error/patah koneksi.
+            // Tidak mengosongkan nilai, tidak menampilkan pesan status.
+            // Intentionally no-op to preserve last successful snapshot.
         }
 
         function truncateText(text, maxLen) {
