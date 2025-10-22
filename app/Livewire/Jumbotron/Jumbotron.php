@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Jumbotron;
 
+use App\Events\ContentUpdatedEvent;
 use App\Models\Jumbotron as ModelsJumbotron;
 use App\Models\User;
 use Livewire\Attributes\Title;
@@ -548,6 +549,8 @@ class Jumbotron extends Component
             $jumbo->is_active = $this->is_active;
             $jumbo->save();
 
+            event(new ContentUpdatedEvent('global', 'jumbotron'));
+
             $this->dispatch('success', $this->isEdit ? 'Jumbotron berhasil diubah!' : 'Jumbotron berhasil ditambahkan!');
             $this->showForm = false;
             $this->showTable = true;
@@ -592,6 +595,8 @@ class Jumbotron extends Component
             }
 
             $jumbo->delete();
+
+            event(new ContentUpdatedEvent('global', 'jumbotron'));
 
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Jumbotron berhasil dihapus!');

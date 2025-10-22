@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Events\ContentUpdatedEvent;
 
 class Keuangan extends Component
 {
@@ -755,6 +756,12 @@ class Keuangan extends Component
         $laporan->is_opening = $this->isOpening ? 1 : 0;
         $laporan->save();
 
+        // Broadcast pembaruan konten laporan untuk slug masjid terkait
+        $profilModel = Profil::find($laporan->id_masjid);
+        if ($profilModel && !empty($profilModel->slug)) {
+            event(new ContentUpdatedEvent($profilModel->slug, 'laporan'));
+        }
+
         $this->resetFormFields();
         $this->isEdit = false;
         $this->showForm = false;
@@ -787,7 +794,14 @@ class Keuangan extends Component
 
         $laporan = ModelsLaporan::findOrFail($this->deleteLaporanId);
         $this->authorize('delete', $laporan);
+        // Ambil slug sebelum delete
+        $slug = optional($laporan->profil)->slug;
         $laporan->delete();
+
+        // Broadcast pembaruan setelah delete
+        if (!empty($slug)) {
+            event(new ContentUpdatedEvent($slug, 'laporan'));
+        }
 
         // Reset state dan tutup modal
         $this->deleteLaporanId = null;
