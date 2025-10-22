@@ -36,6 +36,7 @@ class Keuangan extends Component
     public $uraian;
     public $jenis;
     public $saldo;
+    public $saldoInput;
     // flag saldo awal
     public $isOpening = false;
 
@@ -152,6 +153,18 @@ class Keuangan extends Component
 
     public function updated($name, $value)
     {
+        if ($name === 'saldoInput') {
+            $digits = preg_replace('/\D/', '', (string) $value);
+            if ($digits === '') {
+                $this->saldo = null;
+                $this->saldoInput = '';
+                $this->resetValidation(['saldo']);
+            } else {
+                $this->saldo = (int) $digits;
+                $this->saldoInput = number_format((int) $digits, 0, ',', '.');
+            }
+            return;
+        }
         if ($name === 'paginate') {
             $this->resetPage();
             return;
@@ -286,7 +299,7 @@ class Keuangan extends Component
             $month = substr($this->filterMonth, 5, 2);
             if (is_numeric($year) && is_numeric($month)) {
                 $baseQuery->whereYear('tanggal', (int) $year)
-                          ->whereMonth('tanggal', (int) $month);
+                    ->whereMonth('tanggal', (int) $month);
             }
         } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
             $baseQuery->whereYear('tanggal', (int) $this->filterYear);
@@ -351,7 +364,7 @@ class Keuangan extends Component
                 }
                 $agg = $aggQuery->selectRaw(
                     'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
-                    'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
+                        'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
                 )->first();
                 $sumMasuk = (int) ($agg->sum_masuk ?? 0);
                 $sumKeluar = (int) ($agg->sum_keluar ?? 0);
@@ -393,7 +406,7 @@ class Keuangan extends Component
                         ->where('tanggal', '<=', $prevEnd)
                         ->selectRaw(
                             "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
-                            "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                                "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
                         )
                         ->first();
 
@@ -433,7 +446,7 @@ class Keuangan extends Component
                     }
                     $agg = $aggQuery->selectRaw(
                         'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
-                        'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
+                            'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
                     )->first();
                     $sumMasuk = (int) ($agg->sum_masuk ?? 0);
                     $sumKeluar = (int) ($agg->sum_keluar ?? 0);
@@ -475,7 +488,7 @@ class Keuangan extends Component
                             ->where('tanggal', '<=', $prevEnd)
                             ->selectRaw(
                                 "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
-                                "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                                    "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
                             )
                             ->first();
 
@@ -820,6 +833,7 @@ class Keuangan extends Component
             'uraian',
             'jenis',
             'saldo',
+            'saldoInput',
             'isOpening',
         ]);
     }
