@@ -191,7 +191,8 @@
 
             <div class="mosque-image">
                 {{-- Mosque images with object-fit stretch --}}
-                @if ($slides)
+                {{-- old --}}
+                {{-- @if ($slides)
                     <img id="slide1"
                         src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}"
                         alt="Slide 1"
@@ -241,7 +242,14 @@
                         src="{{ asset('images/other/slide-jws-default.jpg') }}"
                         alt="Slide 6"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                @endif
+                @endif --}}
+                {{-- loop new slider based on API response length --}}
+                @foreach ($slides as $slide)
+                    <img id="slide{{ $loop->index }}"
+                        src="{{ $slide ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide {{ $loop->index }}"
+                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+                @endforeach
             </div>
         </div>
 

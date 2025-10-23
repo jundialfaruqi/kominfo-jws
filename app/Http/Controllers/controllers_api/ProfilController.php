@@ -398,7 +398,8 @@ class ProfilController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data slide masjid !',
-                'data' => $sliderPaths
+                'data' => $sliderPaths,
+                'count' => $sliderPaths->count()
             ]);
         } catch (ModelNotFoundException $ex) {
             return response()->json([

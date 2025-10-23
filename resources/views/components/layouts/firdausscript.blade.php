@@ -17,6 +17,8 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
     crossorigin="anonymous"></script>
 
+<script src="{{ url('js/slider-updater.js?id=' . uniqid()) }}"></script>
+
 <script>
     $(document).ready(function() {
         // Tambahkan di awal script
@@ -1425,7 +1427,7 @@
                     isFinite(majorTickStartOffsetScale)) ?
                 clockRadius * majorTickStartOffsetScale :
                 getCssNum(hostEl, '--clock-major-tick-start-offset',
-                20);
+                    20);
             // Major tick end offset dengan dukungan scale
             const majorTickEndOffsetScale = getCssNum(hostEl,
                 '--clock-major-tick-end-offset-scale', null);
@@ -1451,7 +1453,7 @@
                     isFinite(minorTickStartOffsetScale)) ?
                 clockRadius * minorTickStartOffsetScale :
                 getCssNum(hostEl, '--clock-minor-tick-start-offset',
-                10);
+                    10);
             // Minor tick end offset dengan dukungan scale
             const minorTickEndOffsetScale = getCssNum(hostEl,
                 '--clock-minor-tick-end-offset-scale', null);
@@ -1488,7 +1490,7 @@
             const numberFontScale = getCssNum(hostEl,
                 '--clock-number-font-scale', NaN);
             const resolvedNumFontSize = Number.isFinite(
-                numberFontScale) ?
+                    numberFontScale) ?
                 Math.round(clockRadius * numberFontScale) :
                 numberFontSize;
             const numberFont =
@@ -1583,7 +1585,7 @@
                 const logoY = clockCenter.y - logoHeight / 2 -
                     clockRadius * logoOffsetYScale;
                 ctx.drawImage(logo, logoX, logoY, logoWidth,
-                logoHeight);
+                    logoHeight);
             }
 
             // Gambar angka dan tanda jam (major ticks + numbers)
@@ -1603,9 +1605,9 @@
 
                 const numRadius = clockRadius - numberRadiusOffset;
                 const numX = clockCenter.x + Math.cos(angle) *
-                numRadius;
+                    numRadius;
                 const numY = clockCenter.y + Math.sin(angle) *
-                numRadius;
+                    numRadius;
 
                 ctx.shadowColor = numberShadowColor;
                 ctx.shadowBlur = numberShadowBlur;
@@ -1629,7 +1631,7 @@
                 if (i % 5 !== 0) {
                     const angle = (i * Math.PI / 30) - Math.PI / 2;
                     const tickStart = clockRadius -
-                    minorTickStartOffset;
+                        minorTickStartOffset;
                     const tickEnd = clockRadius - minorTickEndOffset;
 
                     ctx.beginPath();
@@ -4572,25 +4574,6 @@
             }, 1000);
         }
 
-        // FIXME: update slider - reffer updateSlides
-        function updateSlider() {
-            const slug = window.location.pathname.replace(/^\//, '');
-            if (!slug) {
-                console.error('Tidak dapat menentukan slug dari URL');
-                return;
-            }
-
-            $.ajax({
-                url: `/api/new_slider/${slug}`,
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    console.log('API new_slider response:',
-                        response);
-                }
-            });
-        }
-
         function updateSlides() {
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) {
@@ -5620,12 +5603,12 @@
                         if (typeof beepSound !==
                             'undefined' && beepSound) {
                             const wasMuted = beepSound
-                            .muted;
+                                .muted;
                             const oldVol = beepSound.volume;
                             beepSound.muted = true;
                             beepSound.volume = 0;
                             await beepSound.play().catch(
-                            () => {});
+                                () => {});
                             // hentikan dan kembalikan state
                             beepSound.pause();
                             beepSound.currentTime = 0;
@@ -5634,11 +5617,11 @@
                         } else {
                             const unlockBeep = new Audio(
                                 '/sounds/alarm/beep.mp3'
-                                );
+                            );
                             unlockBeep.muted = true;
                             unlockBeep.volume = 0;
                             await unlockBeep.play().catch(
-                            () => {});
+                                () => {});
                             unlockBeep.pause();
                             unlockBeep.currentTime = 0;
                         }
@@ -5651,7 +5634,7 @@
                                 new Audio();
                         }
                         window.adzanAudioPlayer.muted =
-                        true;
+                            true;
                         await window.adzanAudioPlayer.play()
                             .catch(() => {});
                         window.adzanAudioPlayer.pause();
