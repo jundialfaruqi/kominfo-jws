@@ -4552,7 +4552,15 @@
                 allowBtn.style.color = '#fff';
                 allowBtn.style.cursor = 'pointer';
 
+                const laterBtn = document.createElement('button');
+                laterBtn.type = 'button';
+                laterBtn.textContent = 'Nanti';
+                laterBtn.style.padding = '8px 12px';
+                laterBtn.style.borderRadius = '6px';
+                laterBtn.style.border = '1px solid #bbb';
+
                 actions.appendChild(allowBtn);
+                actions.appendChild(laterBtn);
 
                 overlay.appendChild(text);
                 overlay.appendChild(actions);
@@ -4625,6 +4633,7 @@
 
                 const REPROMPT_MS = 60000; // 60 detik
                 allowBtn.addEventListener('click', unlockAudio);
+                laterBtn.addEventListener('click', hideOverlay);
 
                 document.body.appendChild(overlay);
 
