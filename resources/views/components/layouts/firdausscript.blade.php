@@ -1265,7 +1265,7 @@
                 ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) *
                     tickStart);
                 ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd, clockCenter.y + Math.sin(angle) *
-                tickEnd);
+                    tickEnd);
                 ctx.strokeStyle = majorTickColor;
                 ctx.lineWidth = majorTickWidth;
                 ctx.stroke();
@@ -4561,7 +4561,7 @@
                     overlay.style.display = 'none';
                 };
 
-                // Tambahan: fungsi untuk masuk ke fullscreen
+                // fungsi untuk masuk ke layar fullscreen
                 const enterFullscreen = async () => {
                     try {
                         const el = document.documentElement;
