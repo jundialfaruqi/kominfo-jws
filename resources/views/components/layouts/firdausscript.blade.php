@@ -1097,15 +1097,18 @@
 
         // Sumber gaya dari CSS variables dengan fallback default JS
         const hostEl = document.querySelector('.clock-container') || document.documentElement;
+
         function getCssVar(el, name) {
             const v = getComputedStyle(el).getPropertyValue(name);
             return v ? v.trim() : '';
         }
+
         function getCssNum(el, name, fallback) {
             const v = getCssVar(el, name);
             const n = parseFloat(v);
             return Number.isFinite(n) ? n : fallback;
         }
+
         function getCssStr(el, name, fallback) {
             const v = getCssVar(el, name);
             return v !== '' ? v : fallback;
@@ -1128,9 +1131,9 @@
             const faceStroke = getCssStr(hostEl, '--clock-face-stroke', '#0055a4');
             // Face stroke width dengan dukungan scale
             const faceStrokeWidthScale = getCssNum(hostEl, '--clock-face-stroke-width-scale', null);
-            const faceStrokeWidth = (faceStrokeWidthScale && isFinite(faceStrokeWidthScale)) 
-                ? clockRadius * faceStrokeWidthScale 
-                : getCssNum(hostEl, '--clock-face-stroke-width', 15);
+            const faceStrokeWidth = (faceStrokeWidthScale && isFinite(faceStrokeWidthScale)) ?
+                clockRadius * faceStrokeWidthScale :
+                getCssNum(hostEl, '--clock-face-stroke-width', 15);
             const faceShadowColor = getCssStr(hostEl, '--clock-face-shadow-color', 'rgba(0, 0, 0, 0.5)');
             const faceShadowBlur = getCssNum(hostEl, '--clock-face-shadow-blur', 20);
             const faceShadowOffsetX = getCssNum(hostEl, '--clock-face-shadow-offset-x', 0);
@@ -1139,41 +1142,41 @@
             const majorTickColor = getCssStr(hostEl, '--clock-major-tick-color', '#ffffff');
             // Major tick width dengan dukungan scale
             const majorTickWidthScale = getCssNum(hostEl, '--clock-major-tick-width-scale', null);
-            const majorTickWidth = (majorTickWidthScale && isFinite(majorTickWidthScale)) 
-                ? clockRadius * majorTickWidthScale 
-                : getCssNum(hostEl, '--clock-major-tick-width', 4);
+            const majorTickWidth = (majorTickWidthScale && isFinite(majorTickWidthScale)) ?
+                clockRadius * majorTickWidthScale :
+                getCssNum(hostEl, '--clock-major-tick-width', 4);
             // Major tick start offset dengan dukungan scale
             const majorTickStartOffsetScale = getCssNum(hostEl, '--clock-major-tick-start-offset-scale', null);
-            const majorTickStartOffset = (majorTickStartOffsetScale && isFinite(majorTickStartOffsetScale)) 
-                ? clockRadius * majorTickStartOffsetScale 
-                : getCssNum(hostEl, '--clock-major-tick-start-offset', 20);
+            const majorTickStartOffset = (majorTickStartOffsetScale && isFinite(majorTickStartOffsetScale)) ?
+                clockRadius * majorTickStartOffsetScale :
+                getCssNum(hostEl, '--clock-major-tick-start-offset', 20);
             // Major tick end offset dengan dukungan scale
             const majorTickEndOffsetScale = getCssNum(hostEl, '--clock-major-tick-end-offset-scale', null);
-            const majorTickEndOffset = (majorTickEndOffsetScale && isFinite(majorTickEndOffsetScale)) 
-                ? clockRadius * majorTickEndOffsetScale 
-                : getCssNum(hostEl, '--clock-major-tick-end-offset', 5);
+            const majorTickEndOffset = (majorTickEndOffsetScale && isFinite(majorTickEndOffsetScale)) ?
+                clockRadius * majorTickEndOffsetScale :
+                getCssNum(hostEl, '--clock-major-tick-end-offset', 5);
 
             const minorTickColor = getCssStr(hostEl, '--clock-minor-tick-color', 'rgba(255, 255, 255, 0.6)');
             // Minor tick width dengan dukungan scale
             const minorTickWidthScale = getCssNum(hostEl, '--clock-minor-tick-width-scale', null);
-            const minorTickWidth = (minorTickWidthScale && isFinite(minorTickWidthScale)) 
-                ? clockRadius * minorTickWidthScale 
-                : getCssNum(hostEl, '--clock-minor-tick-width', 2);
+            const minorTickWidth = (minorTickWidthScale && isFinite(minorTickWidthScale)) ?
+                clockRadius * minorTickWidthScale :
+                getCssNum(hostEl, '--clock-minor-tick-width', 2);
             // Minor tick start offset dengan dukungan scale
             const minorTickStartOffsetScale = getCssNum(hostEl, '--clock-minor-tick-start-offset-scale', null);
-            const minorTickStartOffset = (minorTickStartOffsetScale && isFinite(minorTickStartOffsetScale)) 
-                ? clockRadius * minorTickStartOffsetScale 
-                : getCssNum(hostEl, '--clock-minor-tick-start-offset', 10);
+            const minorTickStartOffset = (minorTickStartOffsetScale && isFinite(minorTickStartOffsetScale)) ?
+                clockRadius * minorTickStartOffsetScale :
+                getCssNum(hostEl, '--clock-minor-tick-start-offset', 10);
             // Minor tick end offset dengan dukungan scale
             const minorTickEndOffsetScale = getCssNum(hostEl, '--clock-minor-tick-end-offset-scale', null);
-            const minorTickEndOffset = (minorTickEndOffsetScale && isFinite(minorTickEndOffsetScale)) 
-                ? clockRadius * minorTickEndOffsetScale 
-                : getCssNum(hostEl, '--clock-minor-tick-end-offset', 5);
+            const minorTickEndOffset = (minorTickEndOffsetScale && isFinite(minorTickEndOffsetScale)) ?
+                clockRadius * minorTickEndOffsetScale :
+                getCssNum(hostEl, '--clock-minor-tick-end-offset', 5);
 
             const numberRadiusOffsetScale = getCssNum(hostEl, '--clock-number-radius-offset-scale', NaN);
-            const numberRadiusOffset = Number.isFinite(numberRadiusOffsetScale)
-                ? Math.round(clockRadius * numberRadiusOffsetScale)
-                : getCssNum(hostEl, '--clock-number-radius-offset', 45);
+            const numberRadiusOffset = Number.isFinite(numberRadiusOffsetScale) ?
+                Math.round(clockRadius * numberRadiusOffsetScale) :
+                getCssNum(hostEl, '--clock-number-radius-offset', 45);
             const numberColor = getCssStr(hostEl, '--clock-number-color', '#ffffff');
             const number12Color = getCssStr(hostEl, '--clock-number-12-color', '#ff0000');
             const numberShadowColor = getCssStr(hostEl, '--clock-number-shadow-color', 'rgba(0, 0, 0, 0.7)');
@@ -1185,9 +1188,9 @@
             const numberFontWeight = getCssStr(hostEl, '--clock-number-font-weight', 'bold');
             const numberFontSize = getCssNum(hostEl, '--clock-number-font-size', 35);
             const numberFontScale = getCssNum(hostEl, '--clock-number-font-scale', NaN);
-            const resolvedNumFontSize = Number.isFinite(numberFontScale)
-                ? Math.round(clockRadius * numberFontScale)
-                : numberFontSize;
+            const resolvedNumFontSize = Number.isFinite(numberFontScale) ?
+                Math.round(clockRadius * numberFontScale) :
+                numberFontSize;
             const numberFont = `${numberFontWeight} ${resolvedNumFontSize}px ${numberFontFamily}`;
 
             const hourHandColor = getCssStr(hostEl, '--clock-hour-hand-color', '#ffffff');
@@ -1214,7 +1217,8 @@
 
             const centerDotColor = getCssStr(hostEl, '--clock-center-dot-color', '#ff0000');
             const centerDotRadius = getCssNum(hostEl, '--clock-center-dot-radius', 8);
-            const centerDotShadowColor = getCssStr(hostEl, '--clock-center-dot-shadow-color', 'rgba(0, 0, 0, 0.5)');
+            const centerDotShadowColor = getCssStr(hostEl, '--clock-center-dot-shadow-color',
+                'rgba(0, 0, 0, 0.5)');
             const centerDotShadowBlur = getCssNum(hostEl, '--clock-center-dot-shadow-blur', 5);
             const centerDotShadowOffsetX = getCssNum(hostEl, '--clock-center-dot-shadow-offset-x', 1);
             const centerDotShadowOffsetY = getCssNum(hostEl, '--clock-center-dot-shadow-offset-y', 1);
@@ -1258,8 +1262,10 @@
                 const tickEnd = clockRadius - majorTickEndOffset;
 
                 ctx.beginPath();
-                ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) * tickStart);
-                ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd,   clockCenter.y + Math.sin(angle) * tickEnd);
+                ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) *
+                    tickStart);
+                ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd, clockCenter.y + Math.sin(angle) *
+                tickEnd);
                 ctx.strokeStyle = majorTickColor;
                 ctx.lineWidth = majorTickWidth;
                 ctx.stroke();
@@ -1293,8 +1299,10 @@
                     const tickEnd = clockRadius - minorTickEndOffset;
 
                     ctx.beginPath();
-                    ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) * tickStart);
-                    ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd,   clockCenter.y + Math.sin(angle) * tickEnd);
+                    ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) *
+                        tickStart);
+                    ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd, clockCenter.y + Math.sin(angle) *
+                        tickEnd);
                     ctx.strokeStyle = minorTickColor;
                     ctx.lineWidth = minorTickWidth;
                     ctx.stroke();
@@ -1310,7 +1318,7 @@
             ctx.shadowBlur = handShadowBlur;
             ctx.shadowOffsetX = handShadowOffsetX;
             ctx.shadowOffsetY = handShadowOffsetY;
-            drawHand(hourAngle,   clockRadius * hourHandLengthScale,   hourHandWidth,   hourHandColor);
+            drawHand(hourAngle, clockRadius * hourHandLengthScale, hourHandWidth, hourHandColor);
             drawHand(minuteAngle, clockRadius * minuteHandLengthScale, minuteHandWidth, minuteHandColor);
 
             ctx.shadowColor = secondShadowColor;
@@ -4525,7 +4533,7 @@
                 overlay.style.gap = '12px';
 
                 const text = document.createElement('div');
-                text.textContent = 'Izinkan pemutaran audio untuk Alarm Waktu Sholat.';
+                text.textContent = 'Izinkan pemutaran audio Alarm Waktu Sholat dan Tampilkan Fullscreen.';
                 text.style.fontWeight = '600';
                 text.style.fontSize = '16px';
 
@@ -4535,7 +4543,7 @@
 
                 const allowBtn = document.createElement('button');
                 allowBtn.type = 'button';
-                allowBtn.textContent = 'Izinkan Audio';
+                allowBtn.textContent = 'Izinkan Audio & Fullscreen';
                 allowBtn.style.padding = '8px 12px';
                 allowBtn.style.borderRadius = '6px';
                 allowBtn.style.border = '1px solid #0a3a70';
@@ -4544,12 +4552,6 @@
                 allowBtn.style.color = '#fff';
                 allowBtn.style.cursor = 'pointer';
 
-                const laterBtn = document.createElement('button');
-                laterBtn.type = 'button';
-                laterBtn.textContent = 'Nanti';
-                laterBtn.style.padding = '8px 12px';
-                laterBtn.style.borderRadius = '6px';
-                laterBtn.style.border = '1px solid #bbb';
                 actions.appendChild(allowBtn);
 
                 overlay.appendChild(text);
@@ -4559,12 +4561,31 @@
                     overlay.style.display = 'none';
                 };
 
+                // Tambahan: fungsi untuk masuk ke fullscreen
+                const enterFullscreen = async () => {
+                    try {
+                        const el = document.documentElement;
+                        if (!document.fullscreenElement) {
+                            if (el.requestFullscreen) {
+                                await el.requestFullscreen();
+                            } else if (el.webkitRequestFullscreen) {
+                                await el.webkitRequestFullscreen();
+                            } else if (el.msRequestFullscreen) {
+                                await el.msRequestFullscreen();
+                            }
+                        }
+                    } catch (e) {}
+                };
+
                 const unlockAudio = async () => {
                     // Sembunyikan popup segera dan set flag izin
                     try {
                         localStorage.setItem('firdausAudioUnlocked', 'true');
                         hideOverlay();
                     } catch (e) {}
+
+                    // Masuk fullscreen setelah izin pengguna
+                    await enterFullscreen();
 
                     // Lakukan unlock audio secara senyap tanpa bunyi
                     try {
