@@ -189,66 +189,16 @@
                 </div>
             </div>
 
-            <div class="mosque-image">
-                {{-- Mosque images with object-fit stretch --}}
-                {{-- old --}}
-                {{-- @if ($slides)
-                    <img id="slide1"
-                        src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 1"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide2"
-                        src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 2"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide3"
-                        src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 3"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide4"
-                        src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 4"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide5"
-                        src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 5"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide6"
-                        src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 6"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                @else
-                    <img id="slide1"
-                        src="{{ asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 1"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide2"
-                        src="{{ asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 2"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide3"
-                        src="{{ asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 3"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide4"
-                        src="{{ asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 4"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide5"
-                        src="{{ asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 5"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                    <img id="slide6"
-                        src="{{ asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide 6"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
-                @endif --}}
-                {{-- loop new slider based on API response length --}}
-                @foreach ($slides as $slide)
-                    <img id="slide{{ $loop->index }}"
-                        src="{{ $slide ?? asset('images/other/slide-jws-default.jpg') }}"
-                        alt="Slide {{ $loop->index }}"
-                        style="object-fit: stretch; width: 100%; height: 100%; display: none;">
+            @php
+                $initialSlide = $slidePaths[0] ?? asset('images/other/slide-jws-default.jpg');
+            @endphp
+            <div class="mosque-image"
+                style="background-image: url('{{ $initialSlide }}'); display: block; transition: background-image 0.5s ease-in-out;">
+                @foreach ($slidePaths ?? [] as $index => $slideUrl)
+                    <img id="slide{{ $index + 1 }}"
+                        src="{{ $slideUrl ?? asset('images/other/slide-jws-default.jpg') }}"
+                        alt="Slide {{ $index + 1 }}"
+                        style="object-fit: stretch; width:100%; height:100%; display:none;">
                 @endforeach
             </div>
         </div>

@@ -42,6 +42,7 @@ class Firdaus extends Component
     public $petugas;
     public $slides;
     public $newSlider;
+    public $slidePaths = [];
     public $durasi;
     public $jumbotron; // Tambahkan properti untuk jumbotron
     public $slug;
@@ -100,6 +101,14 @@ class Firdaus extends Component
 
         $this->slides   = Slides::where('user_id', $user_id)->first();
         $this->newSlider = NewSlider::where('uploaded_by', $user_id)->get();
+
+        $this->slidePaths = $this->newSlider->isNotEmpty()
+            ? $this->newSlider
+                ->map(fn ($item) => $item->path ? asset($item->path) : null)
+                ->filter()
+                ->values()
+                ->toArray()
+            : [asset('images/other/slide-jws-default.jpg')];
 
         try {
             // Gunakan waktu server langsung dengan Carbon
@@ -541,6 +550,7 @@ class Firdaus extends Component
             'petugas' => $this->petugas,
             'slides' => $this->slides,
             'newSlider' => $this->newSlider,
+            'slidePaths' => $this->slidePaths,
             'durasi' => $this->durasi,
             'jumbotron' => $this->jumbotron,
             'audio' => $this->audio,

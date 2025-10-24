@@ -4583,91 +4583,187 @@
 
             // console.log('Memeriksa update slide untuk slug:', slug);
 
+            const $mosqueImageContainer = $('.mosque-image');
+            const slideSelectors = [
+                '#slide1', '#slide2', '#slide3',
+                '#slide4', '#slide5', '#slide6'
+            ];
+
+            const applySlideResponse = async (response) => {
+                console.log('Respons API slides:', response);
+                if (!response || !response.success) {
+                    console.warn('Response slide tidak sukses, abaikan update');
+                    return;
+                }
+
+                const previousSlides = slideSelectors
+                    .map(selector => {
+                        const $element = $(selector);
+                        if (!$element.length) {
+                            return '';
+                        }
+                        if ($element.attr('data-empty') ===
+                            'true') {
+                            return '';
+                        }
+                        return $element.attr('src') || '';
+                    });
+
+                let newSlidesRaw;
+                if (Array.isArray(response.data)) {
+                    newSlidesRaw = response.data.map(url =>
+                        (url || '').trim());
+                } else if (response.data && typeof response
+                    .data === 'object') {
+                    newSlidesRaw = [
+                        response.data.slide1 || '',
+                        response.data.slide2 || '',
+                        response.data.slide3 || '',
+                        response.data.slide4 || '',
+                        response.data.slide5 || '',
+                        response.data.slide6 || ''
+                    ].map(url => (url || '').trim());
+                } else {
+                    newSlidesRaw = [];
+                }
+
+                if (newSlidesRaw.length < slideSelectors.length) {
+                    newSlidesRaw = [...newSlidesRaw, ...Array(
+                        slideSelectors.length -
+                        newSlidesRaw.length).fill('')];
+                } else if (newSlidesRaw.length > slideSelectors
+                    .length) {
+                    newSlidesRaw = newSlidesRaw.slice(0,
+                        slideSelectors.length);
+                }
+
+                const newSlides = newSlidesRaw.map(url => (url ||
+                    '').trim());
+
+                const hasChanges = !previousSlides
+                    .every((slide, index) => slide ===
+                        newSlides[index]);
+
+                if (!hasChanges) {
+                    console.log(
+                        'Tidak ada perubahan pada slide, update diabaikan'
+                    );
+                    clearUnusedCache(window.slideUrls || []);
+                    return;
+                }
+
+                slideSelectors.forEach((selector,
+                    index) => {
+                    let $slideElement = $(
+                        selector);
+                    if (!$slideElement.length) {
+                        const elementId = selector.replace(
+                            '#', '');
+                        $slideElement = $('<img>', {
+                            id: elementId,
+                            alt: `Slide ${index + 1}`,
+                            style: 'object-fit: stretch; width:100%; height:100%; display:none;'
+                        });
+                        if ($mosqueImageContainer &&
+                            $mosqueImageContainer.length) {
+                            $mosqueImageContainer.append(
+                                $slideElement);
+                        } else {
+                            return;
+                        }
+                    }
+
+                    const slideUrl =
+                        newSlides[index] ||
+                        '';
+                    if (slideUrl) {
+                        $slideElement.attr(
+                            'src', slideUrl);
+                        $slideElement.removeAttr(
+                            'data-empty');
+                    } else {
+                        $slideElement.attr(
+                            'src',
+                            '/images/other/slide-jws-default.jpg'
+                        );
+                        $slideElement.attr(
+                            'data-empty', 'true');
+                    }
+                });
+
+                const newUrls = newSlides
+                    .filter(url => url !== '');
+                if (newUrls.length === 0) {
+                    console.warn(
+                        'Tidak ada slide baru, menggunakan default'
+                    );
+                    newUrls.push(
+                        '/images/other/slide-jws-default.jpg'
+                    );
+                }
+
+                const urlsToPreload = newUrls
+                    .filter(url => !window
+                        .imageCache[url] || !
+                        window.imageCache[url]
+                        .complete);
+                if (urlsToPreload.length > 0) {
+                    await preloadImages(
+                        urlsToPreload);
+                }
+
+                window.slideUrls = newUrls;
+                if (newUrls.length > 0) {
+                    const firstSlideUrl = newUrls[0];
+                    if ($mosqueImageContainer &&
+                        $mosqueImageContainer.length) {
+                        $mosqueImageContainer.css({
+                            'background-image': `url("${firstSlideUrl}")`,
+                            'display': 'block',
+                            'transition': 'background-image 0.5s ease-in-out'
+                        });
+                    }
+                }
+                $(document).trigger(
+                    'slidesUpdated', [
+                        newSlides,
+                        newUrls
+                    ]);
+
+                clearUnusedCache(newUrls);
+            };
+
+            const fetchLegacySlides = () => {
+                $.ajax({
+                    url: `/api/slides1/${slug}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    success: async function(legacyResponse) {
+                        await applySlideResponse(
+                            legacyResponse);
+                    },
+                    error: function(xhrLegacy, statusLegacy,
+                        errorLegacy) {
+                        console.error(
+                            'Error saat mengambil data slide (legacy):',
+                            errorLegacy,
+                            xhrLegacy.responseText);
+                    }
+                });
+            };
+
             $.ajax({
-                url: `/api/slides1/${slug}`,
+                url: `/api/new_slider/${slug}`,
                 method: 'GET',
                 dataType: 'json',
-                success: async function(response) {
-                    console.log('Respons API slides:',
-                        response);
-                    if (response.success) {
-                        const previousSlides = [
-                            $('#slide1').val() || '',
-                            $('#slide2').val() || '',
-                            $('#slide3').val() || '',
-                            $('#slide4').val() || '',
-                            $('#slide5').val() || '',
-                            $('#slide6').val() || ''
-                        ];
-
-                        const newSlides = [
-                            response.data.slide1 || '',
-                            response.data.slide2 || '',
-                            response.data.slide3 || '',
-                            response.data.slide4 || '',
-                            response.data.slide5 || '',
-                            response.data.slide6 || ''
-                        ];
-
-                        const hasChanges = !previousSlides
-                            .every((slide, index) =>
-                                slide ===
-                                newSlides[index]);
-
-                        if (hasChanges) {
-                            // console.log('Perubahan terdeteksi, memperbarui slide...');
-
-                            $('#slide1').val(newSlides[0]);
-                            $('#slide2').val(newSlides[1]);
-                            $('#slide3').val(newSlides[2]);
-                            $('#slide4').val(newSlides[3]);
-                            $('#slide5').val(newSlides[4]);
-                            $('#slide6').val(newSlides[5]);
-
-                            const newUrls = newSlides
-                                .filter(url => url
-                                    .trim() !== '');
-                            if (newUrls.length === 0) {
-                                console.warn(
-                                    'Tidak ada slide baru, menggunakan default'
-                                );
-                                newUrls.push(
-                                    '/images/other/slide-jws-default.jpg'
-                                );
-                            }
-
-                            // Preload gambar baru yang belum ada di cache
-                            const urlsToPreload = newUrls
-                                .filter(url => !window
-                                    .imageCache[url] || !
-                                    window.imageCache[url]
-                                    .complete);
-                            if (urlsToPreload.length > 0) {
-                                // console.log(`Preload gambar baru dari updateSlides: ${urlsToPreload}`);
-                                await preloadImages(
-                                    urlsToPreload);
-                            }
-
-                            window.slideUrls = newUrls;
-                            // console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
-                            $(document).trigger(
-                                'slidesUpdated', [
-                                    newSlides
-                                ]);
-                        } else {
-                            console.log(
-                                'Tidak ada perubahan pada slide, update diabaikan'
-                            );
-                        }
-
-                        // Bersihkan cache yang tidak digunakan
-                        clearUnusedCache(newSlides);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error(
-                        'Error saat mengambil data slide:',
-                        error, xhr.responseText);
+                    success: async function(response) {
+                        await applySlideResponse(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(
+                            'Error saat mengambil data slide (new slider):',
+                            error, xhr.responseText);
+                    fetchLegacySlides();
                 }
             });
         }
@@ -4906,14 +5002,16 @@
             }
 
             // Inisialisasi slideUrls
-            window.slideUrls = [
-                $('#slide1').val() || '',
-                $('#slide2').val() || '',
-                $('#slide3').val() || '',
-                $('#slide4').val() || '',
-                $('#slide5').val() || '',
-                $('#slide6').val() || ''
-            ].filter(url => url.trim() !== '');
+            window.slideUrls = $mosqueImageElement.find('img[id^="slide"]')
+                .map(function() {
+                    const $img = $(this);
+                    if ($img.attr('data-empty') === 'true') {
+                        return null;
+                    }
+                    const src = ($img.attr('src') || '').trim();
+                    return src !== '' ? src : null;
+                })
+                .get();
 
             if (window.slideUrls.length === 0) {
                 console.warn(
@@ -5059,11 +5157,14 @@
                     setInterval(updateSlide, 1000);
 
                     $(document).on('slidesUpdated', async function(
-                        event, newSlides) {
+                        event, newSlides, actualUrls) {
                         // console.log('Event slidesUpdated diterima, memperbarui slider');
-                        const newUrls = newSlides
-                            .filter(url => url
-                                .trim() !== '');
+                        const candidateUrls = Array.isArray(actualUrls) &&
+                            actualUrls.length > 0 ? actualUrls :
+                            newSlides;
+                        const newUrls = (candidateUrls || [])
+                            .filter(url => typeof url === 'string' &&
+                                url.trim() !== '');
                         if (newUrls.length === 0) {
                             console.warn(
                                 'Tidak ada slide baru yang valid, menggunakan gambar default'
@@ -5094,6 +5195,7 @@
                             .slideUrls, ...
                             window.jumbotronUrls
                         ]);
+                        updateSlide();
                     });
 
                     $(document).on('jumbotronUpdated',
