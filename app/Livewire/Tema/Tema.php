@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\File;
 use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use App\Events\ContentUpdatedEvent;
+use App\Models\Profil;
 
 class Tema extends Component
 {
@@ -337,13 +339,28 @@ class Tema extends Component
             $currentUser = Auth::user();
             $theme = Theme::find($this->selectedThemeId);
 
+            // Ambil slug profil untuk broadcasting
+            $slug = Profil::where('user_id', $currentUser->id)->value('slug');
+
             if ($theme) {
                 $currentUser->theme_id = $theme->id; // Simpan preferensi tema di tabel users
                 $currentUser->save();
+
+                // Broadcast perubahan tema ke channel masjid-{slug}
+                if ($slug) {
+                    event(new ContentUpdatedEvent($slug, 'theme'));
+                }
+
                 $this->dispatch('success', 'Tema berhasil dipilih!');
             } else {
                 $currentUser->theme_id = null;
                 $currentUser->save();
+
+                // Broadcast penghapusan tema ke channel masjid-{slug}
+                if ($slug) {
+                    event(new ContentUpdatedEvent($slug, 'theme'));
+                }
+
                 $this->dispatch('success', 'Tema dihapus!');
             }
 
