@@ -111,7 +111,7 @@
                                 <select class="form-select rounded-3 @error('final_shubuh') is-invalid @enderror"
                                     wire:model="final_shubuh">
                                     <option value="">Pilih durasi final</option>
-                                    @for ($i = 1; $i <= 10; $i++)
+                                    @for ($i = 1; $i <= 30; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
@@ -164,7 +164,7 @@
                                 <select class="form-select rounded-3 @error('final_dzuhur') is-invalid @enderror"
                                     wire:model="final_dzuhur">
                                     <option value="">Pilih durasi final</option>
-                                    @for ($i = 1; $i <= 10; $i++)
+                                    @for ($i = 1; $i <= 30; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
@@ -242,7 +242,7 @@
                                 <select class="form-select rounded-3 @error('final_ashar') is-invalid @enderror"
                                     wire:model="final_ashar">
                                     <option value="">Pilih durasi final</option>
-                                    @for ($i = 1; $i <= 10; $i++)
+                                    @for ($i = 1; $i <= 30; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
@@ -295,7 +295,7 @@
                                 <select class="form-select rounded-3 @error('final_maghrib') is-invalid @enderror"
                                     wire:model="final_maghrib">
                                     <option value="">Pilih durasi final</option>
-                                    @for ($i = 1; $i <= 10; $i++)
+                                    @for ($i = 1; $i <= 30; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
@@ -348,7 +348,7 @@
                                 <select class="form-select rounded-3 @error('final_isya') is-invalid @enderror"
                                     wire:model="final_isya">
                                     <option value="">Pilih durasi final</option>
-                                    @for ($i = 1; $i <= 10; $i++)
+                                    @for ($i = 1; $i <= 30; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor

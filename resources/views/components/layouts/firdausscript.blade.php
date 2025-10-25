@@ -1341,8 +1341,9 @@
             const $clockText = $('.clock-text');
             if ($clockText.length) {
                 const displayHours = now.getHours();
+                const colonStyle = (seconds % 2 === 0) ? 'visibility: visible;' : 'visibility: hidden;';
                 $clockText.html(
-                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+                    `${displayHours.toString().padStart(2, "0")}<span class="colon" style="${colonStyle}">:</span>${minutes.toString().padStart(2, "0")}`
                 );
             }
         }
@@ -1504,30 +1505,11 @@
                 const tanggalMasehi = moment(now).format('D MMMM YYYY');
                 const masehi = `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
 
-                // Helper: ambil waktu Maghrib hari ini dari DOM
-                function getTodayMaghribDate(baseNow) {
-                    const $maghribEl = $('.prayer-time').filter(function() {
-                        return $(this).find('.prayer-name').text().toLowerCase().includes('maghrib');
-                    }).first();
-                    const maghribStr = $maghribEl.find('.prayer-time-value').text();
-                    if (!maghribStr || !/^\d{2}:\d{2}$/.test(maghribStr)) return null;
-                    const [h, m] = maghribStr.split(':').map(Number);
-                    const maghrib = new Date(baseNow);
-                    maghrib.setHours(h, m, 0, 0);
-                    return maghrib;
-                }
+
 
                 let hijri = '';
                 if (typeof moment().iDate === 'function') {
-                    const maghribToday = getTodayMaghribDate(now);
-                    let hijriBaseMoment;
-                    if (maghribToday instanceof Date) {
-                        hijriBaseMoment = now < maghribToday ? moment(now).subtract(1, 'day') : moment(now);
-                    } else {
-                        // Fallback perkiraan jika jadwal Maghrib belum tersedia
-                        hijriBaseMoment = moment(now).subtract(6, 'hours');
-                    }
-
+                    const hijriBaseMoment = moment(now);
                     const hijriDate = hijriBaseMoment.iDate();
                     const hijriMonth = hijriBaseMoment.iMonth();
                     const hijriYear = hijriBaseMoment.iYear();
@@ -4405,22 +4387,10 @@
 
 
                 if (typeof moment().iDate === 'function') {
-                    // Gunakan batas Maghrib sebagai pergantian tanggal Hijriah
-                    let hijriBaseTime = now;
-                    const maghribDate = getTodayMaghribDate(now);
-                    if (maghribDate instanceof Date) {
-                        if (now < maghribDate) {
-                            // Sebelum Maghrib, tanggal Hijriah masih hari sebelumnya
-                            hijriBaseTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-                        }
-                    } else {
-                        // Fallback: kurang 6 jam bila data Maghrib belum tersedia
-                        hijriBaseTime = new Date(now.getTime() - 6 * 60 * 60 * 1000);
-                    }
-
-                    const hijriDate = moment(hijriBaseTime).iDate();
-                    const hijriMonth = moment(hijriBaseTime).iMonth();
-                    const hijriYear = moment(hijriBaseTime).iYear();
+                    const hijriBaseMoment = moment(now);
+                    const hijriDate = hijriBaseMoment.iDate();
+                    const hijriMonth = hijriBaseMoment.iMonth();
+                    const hijriYear = hijriBaseMoment.iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
                         'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
@@ -4515,6 +4485,7 @@
 
                 if (document.getElementById('audio-permission-overlay')) return;
 
+
                 const overlay = document.createElement('div');
                 overlay.id = 'audio-permission-overlay';
                 overlay.style.position = 'fixed';
@@ -4539,7 +4510,13 @@
 
                 const actions = document.createElement('div');
                 actions.style.display = 'flex';
+                actions.style.flexDirection = 'column';
+                actions.style.alignItems = 'flex-start';
                 actions.style.gap = '8px';
+
+                const buttonsRow = document.createElement('div');
+                buttonsRow.style.display = 'flex';
+                buttonsRow.style.gap = '8px';
 
                 const allowBtn = document.createElement('button');
                 allowBtn.type = 'button';
@@ -4559,15 +4536,63 @@
                 laterBtn.style.borderRadius = '6px';
                 laterBtn.style.border = '1px solid #bbb';
 
-                actions.appendChild(allowBtn);
-                actions.appendChild(laterBtn);
+                buttonsRow.appendChild(allowBtn);
+                buttonsRow.appendChild(laterBtn);
 
                 overlay.appendChild(text);
                 overlay.appendChild(actions);
 
+                // Auto hide dan hitung mundur 15 detik
+                let autoHideTimerId = null;
+                let countdownTimerId = null;
+                let remaining = 15;
+
+                const countdown = document.createElement('div');
+                countdown.id = 'audio-permission-countdown';
+                countdown.style.fontSize = '14px';
+                countdown.style.color = '#555';
+                countdown.style.fontFamily = '"JetBrains Mono", monospace';
+                countdown.textContent = 'Menutup otomatis dalam 15';
+                actions.appendChild(countdown);
+                actions.appendChild(buttonsRow);
+
+                function updateCountdown() {
+                    countdown.textContent = `Menutup otomatis dalam ${remaining}`;
+                }
+
                 const hideOverlay = () => {
-                    overlay.style.display = 'none';
+                    try {
+                        overlay.style.display = 'none';
+                    } catch (e) {}
+                    if (countdownTimerId) {
+                        clearInterval(countdownTimerId);
+                        countdownTimerId = null;
+                    }
+                    if (autoHideTimerId) {
+                        clearTimeout(autoHideTimerId);
+                        autoHideTimerId = null;
+                    }
+                    // Hapus overlay dari DOM untuk pembersihan total
+                    if (overlay && overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
                 };
+
+                countdownTimerId = setInterval(() => {
+                    remaining--;
+                    if (remaining <= 0) {
+                        remaining = 0;
+                        updateCountdown();
+                        clearInterval(countdownTimerId);
+                        countdownTimerId = null;
+                    } else {
+                        updateCountdown();
+                    }
+                }, 1000);
+
+                autoHideTimerId = setTimeout(() => {
+                    hideOverlay();
+                }, 15000);
 
                 // fungsi untuk masuk ke layar fullscreen
                 const enterFullscreen = async () => {
@@ -4586,49 +4611,12 @@
                 };
 
                 const unlockAudio = async () => {
-                    // Sembunyikan popup segera dan set flag izin
+                    // Tombol hanya sebagai trigger interaksi: tutup overlay dan masuk fullscreen
                     try {
-                        localStorage.setItem('firdausAudioUnlocked', 'true');
                         hideOverlay();
                     } catch (e) {}
 
-                    // Masuk fullscreen setelah izin pengguna
                     await enterFullscreen();
-
-                    // Lakukan unlock audio secara senyap tanpa bunyi
-                    try {
-                        if (typeof beepSound !== 'undefined' && beepSound) {
-                            const wasMuted = beepSound.muted;
-                            const oldVol = beepSound.volume;
-                            beepSound.muted = true;
-                            beepSound.volume = 0;
-                            await beepSound.play().catch(() => {});
-                            // hentikan dan kembalikan state
-                            beepSound.pause();
-                            beepSound.currentTime = 0;
-                            beepSound.muted = wasMuted;
-                            beepSound.volume = oldVol;
-                        } else {
-                            const unlockBeep = new Audio('/sounds/alarm/beep.mp3');
-                            unlockBeep.muted = true;
-                            unlockBeep.volume = 0;
-                            await unlockBeep.play().catch(() => {});
-                            unlockBeep.pause();
-                            unlockBeep.currentTime = 0;
-                        }
-                    } catch (e) {}
-
-                    // Siapkan adzanAudioPlayer secara senyap
-                    try {
-                        if (!window.adzanAudioPlayer) {
-                            window.adzanAudioPlayer = new Audio();
-                        }
-                        window.adzanAudioPlayer.muted = true;
-                        await window.adzanAudioPlayer.play().catch(() => {});
-                        window.adzanAudioPlayer.pause();
-                        window.adzanAudioPlayer.currentTime = 0;
-                        window.adzanAudioPlayer.muted = false;
-                    } catch (e) {}
                 };
 
                 const REPROMPT_MS = 60000; // 60 detik
