@@ -86,8 +86,8 @@
                     <label class="form-label">Nominal</label>
                     <div class="input-group">
                         <span class="input-group-text" id="visible-addon">Rp</span>
-                        <input type="number" step="1" wire:model="saldo" min="0"
-                            class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal">
+                        <input type="text" inputmode="numeric" wire:model.live="saldoInput"
+                             class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal" style="letter-spacing: 0.06em; font-variant-numeric: tabular-nums;">
                         @error('saldo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

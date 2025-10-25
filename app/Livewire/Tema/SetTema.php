@@ -8,6 +8,7 @@ use App\Models\User;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Events\ContentUpdatedEvent;
 use Illuminate\Support\Facades\Auth;
 
 class SetTema extends Component
@@ -100,14 +101,20 @@ class SetTema extends Component
             $this->dispatch('error', 'Anda tidak memiliki akses untuk menyimpan tema pengguna!');
             return;
         }
-
+    
         $this->validate();
-
+    
         try {
             $user = User::findOrFail($this->userId);
             $user->theme_id = $this->selectedThemeId ?: null;
             $user->save();
-
+    
+            // Broadcast perubahan tema ke channel masjid-{slug}
+            $slug = Profil::where('user_id', $user->id)->value('slug');
+            if ($slug) {
+                event(new ContentUpdatedEvent($slug, 'theme'));
+            }
+    
             $this->dispatch('success', 'Tema pengguna berhasil diperbarui!');
             $this->showTable = true;
             $this->reset(['userId', 'selectedThemeId', 'profilName']);

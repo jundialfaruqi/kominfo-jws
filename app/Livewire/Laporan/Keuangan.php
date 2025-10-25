@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use App\Events\ContentUpdatedEvent;
 
 class Keuangan extends Component
 {
@@ -35,6 +36,7 @@ class Keuangan extends Component
     public $uraian;
     public $jenis;
     public $saldo;
+    public $saldoInput;
     // flag saldo awal
     public $isOpening = false;
 
@@ -151,6 +153,18 @@ class Keuangan extends Component
 
     public function updated($name, $value)
     {
+        if ($name === 'saldoInput') {
+            $digits = preg_replace('/\D/', '', (string) $value);
+            if ($digits === '') {
+                $this->saldo = null;
+                $this->saldoInput = '';
+                $this->resetValidation(['saldo']);
+            } else {
+                $this->saldo = (int) $digits;
+                $this->saldoInput = number_format((int) $digits, 0, ',', '.');
+            }
+            return;
+        }
         if ($name === 'paginate') {
             $this->resetPage();
             return;
@@ -285,7 +299,7 @@ class Keuangan extends Component
             $month = substr($this->filterMonth, 5, 2);
             if (is_numeric($year) && is_numeric($month)) {
                 $baseQuery->whereYear('tanggal', (int) $year)
-                          ->whereMonth('tanggal', (int) $month);
+                    ->whereMonth('tanggal', (int) $month);
             }
         } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
             $baseQuery->whereYear('tanggal', (int) $this->filterYear);
@@ -350,7 +364,7 @@ class Keuangan extends Component
                 }
                 $agg = $aggQuery->selectRaw(
                     'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
-                    'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
+                        'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
                 )->first();
                 $sumMasuk = (int) ($agg->sum_masuk ?? 0);
                 $sumKeluar = (int) ($agg->sum_keluar ?? 0);
@@ -392,7 +406,7 @@ class Keuangan extends Component
                         ->where('tanggal', '<=', $prevEnd)
                         ->selectRaw(
                             "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
-                            "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                                "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
                         )
                         ->first();
 
@@ -432,7 +446,7 @@ class Keuangan extends Component
                     }
                     $agg = $aggQuery->selectRaw(
                         'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
-                        'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
+                            'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
                     )->first();
                     $sumMasuk = (int) ($agg->sum_masuk ?? 0);
                     $sumKeluar = (int) ($agg->sum_keluar ?? 0);
@@ -474,7 +488,7 @@ class Keuangan extends Component
                             ->where('tanggal', '<=', $prevEnd)
                             ->selectRaw(
                                 "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
-                                "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                                    "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
                             )
                             ->first();
 
@@ -755,6 +769,12 @@ class Keuangan extends Component
         $laporan->is_opening = $this->isOpening ? 1 : 0;
         $laporan->save();
 
+        // Broadcast pembaruan konten laporan untuk slug masjid terkait
+        $profilModel = Profil::find($laporan->id_masjid);
+        if ($profilModel && !empty($profilModel->slug)) {
+            event(new ContentUpdatedEvent($profilModel->slug, 'laporan'));
+        }
+
         $this->resetFormFields();
         $this->isEdit = false;
         $this->showForm = false;
@@ -787,7 +807,14 @@ class Keuangan extends Component
 
         $laporan = ModelsLaporan::findOrFail($this->deleteLaporanId);
         $this->authorize('delete', $laporan);
+        // Ambil slug sebelum delete
+        $slug = optional($laporan->profil)->slug;
         $laporan->delete();
+
+        // Broadcast pembaruan setelah delete
+        if (!empty($slug)) {
+            event(new ContentUpdatedEvent($slug, 'laporan'));
+        }
 
         // Reset state dan tutup modal
         $this->deleteLaporanId = null;
@@ -806,6 +833,7 @@ class Keuangan extends Component
             'uraian',
             'jenis',
             'saldo',
+            'saldoInput',
             'isOpening',
         ]);
     }

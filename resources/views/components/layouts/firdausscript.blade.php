@@ -1427,7 +1427,7 @@
                     isFinite(majorTickStartOffsetScale)) ?
                 clockRadius * majorTickStartOffsetScale :
                 getCssNum(hostEl, '--clock-major-tick-start-offset',
-                    20);
+                20);
             // Major tick end offset dengan dukungan scale
             const majorTickEndOffsetScale = getCssNum(hostEl,
                 '--clock-major-tick-end-offset-scale', null);
@@ -1453,7 +1453,7 @@
                     isFinite(minorTickStartOffsetScale)) ?
                 clockRadius * minorTickStartOffsetScale :
                 getCssNum(hostEl, '--clock-minor-tick-start-offset',
-                    10);
+                10);
             // Minor tick end offset dengan dukungan scale
             const minorTickEndOffsetScale = getCssNum(hostEl,
                 '--clock-minor-tick-end-offset-scale', null);
@@ -1490,7 +1490,7 @@
             const numberFontScale = getCssNum(hostEl,
                 '--clock-number-font-scale', NaN);
             const resolvedNumFontSize = Number.isFinite(
-                    numberFontScale) ?
+                numberFontScale) ?
                 Math.round(clockRadius * numberFontScale) :
                 numberFontSize;
             const numberFont =
@@ -1596,9 +1596,11 @@
 
                 ctx.beginPath();
                 ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart,
-                    clockCenter.y + Math.sin(angle) * tickStart);
+                    clockCenter.y + Math.sin(angle) *
+                    tickStart);
                 ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd,
-                    clockCenter.y + Math.sin(angle) * tickEnd);
+                    clockCenter.y + Math.sin(angle) *
+                    tickEnd);
                 ctx.strokeStyle = majorTickColor;
                 ctx.lineWidth = majorTickWidth;
                 ctx.stroke();
@@ -1686,8 +1688,10 @@
             const $clockText = $('.clock-text');
             if ($clockText.length) {
                 const displayHours = now.getHours();
+                const colonStyle = (seconds % 2 === 0) ?
+                    'visibility: visible;' : 'visibility: hidden;';
                 $clockText.html(
-                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+                    `${displayHours.toString().padStart(2, "0")}<span class="colon" style="${colonStyle}">:</span>${minutes.toString().padStart(2, "0")}`
                 );
             }
         }
@@ -1904,10 +1908,14 @@
                 const masehi =
                     `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
 
+
+
+                let hijri = '';
                 if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
+                    const hijriBaseMoment = moment(now);
+                    const hijriDate = hijriBaseMoment.iDate();
+                    const hijriMonth = hijriBaseMoment.iMonth();
+                    const hijriYear = hijriBaseMoment.iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal',
                         'Rabiulakhir', 'Jumadilawal',
@@ -1915,16 +1923,15 @@
                         'Rajab', 'Syaban', 'Ramadhan', 'Syawal',
                         'Zulkaidah', 'Zulhijah'
                     ];
-                    const hijri =
+                    hijri =
                         `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
-                    if ($dateElement.length) {
-                        $dateElement.html(`${masehi} / ${hijri}`);
-                    }
                 } else {
-                    if ($dateElement.length) {
-                        $dateElement.html(masehi);
-                        console.warn("moment-hijri tidak tersedia");
-                    }
+                    console.warn("moment-hijri tidak tersedia");
+                }
+
+                if ($dateElement.length) {
+                    $dateElement.html(hijri ? `${masehi} / ${hijri}` :
+                        masehi);
                 }
             } else {
                 console.warn("moment.js tidak tersedia");
@@ -3737,14 +3744,9 @@
         }
 
         function showFinanceError(message) {
-            const $overlay = $('#financeOverlay');
-            $('#financePeriodTitle').text(message);
-            $('#financeTotalMasukValue').text('-');
-            $('#financeTotalKeluarValue').text('-');
-            $('#financeEndingBalanceValue').text('-');
-            $('#financeTopCategoriesList').empty();
-            $('#financeLatestItemsList').empty();
-            $overlay.show();
+            // Ringan: jangan ubah UI saat error/patah koneksi.
+            // Tidak mengosongkan nilai, tidak menampilkan pesan status.
+            // Intentionally no-op to preserve last successful snapshot.
         }
 
         function truncateText(text, maxLen) {
@@ -4592,7 +4594,9 @@
             const applySlideResponse = async (response) => {
                 console.log('Respons API slides:', response);
                 if (!response || !response.success) {
-                    console.warn('Response slide tidak sukses, abaikan update');
+                    console.warn(
+                        'Response slide tidak sukses, abaikan update'
+                        );
                     return;
                 }
 
@@ -4627,7 +4631,8 @@
                     newSlidesRaw = [];
                 }
 
-                if (newSlidesRaw.length < slideSelectors.length) {
+                if (newSlidesRaw.length < slideSelectors
+                    .length) {
                     newSlidesRaw = [...newSlidesRaw, ...Array(
                         slideSelectors.length -
                         newSlidesRaw.length).fill('')];
@@ -4637,7 +4642,8 @@
                         slideSelectors.length);
                 }
 
-                const newSlides = newSlidesRaw.map(url => (url ||
+                const newSlides = newSlidesRaw.map(url => (
+                    url ||
                     '').trim());
 
                 const hasChanges = !previousSlides
@@ -4657,17 +4663,20 @@
                     let $slideElement = $(
                         selector);
                     if (!$slideElement.length) {
-                        const elementId = selector.replace(
-                            '#', '');
+                        const elementId = selector
+                            .replace(
+                                '#', '');
                         $slideElement = $('<img>', {
                             id: elementId,
                             alt: `Slide ${index + 1}`,
                             style: 'object-fit: stretch; width:100%; height:100%; display:none;'
                         });
                         if ($mosqueImageContainer &&
-                            $mosqueImageContainer.length) {
-                            $mosqueImageContainer.append(
-                                $slideElement);
+                            $mosqueImageContainer.length
+                            ) {
+                            $mosqueImageContainer
+                                .append(
+                                    $slideElement);
                         } else {
                             return;
                         }
@@ -4738,7 +4747,8 @@
                     url: `/api/slides1/${slug}`,
                     method: 'GET',
                     dataType: 'json',
-                    success: async function(legacyResponse) {
+                    success: async function(
+                    legacyResponse) {
                         await applySlideResponse(
                             legacyResponse);
                     },
@@ -4756,13 +4766,13 @@
                 url: `/api/new_slider/${slug}`,
                 method: 'GET',
                 dataType: 'json',
-                    success: async function(response) {
-                        await applySlideResponse(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error(
-                            'Error saat mengambil data slide (new slider):',
-                            error, xhr.responseText);
+                success: async function(response) {
+                    await applySlideResponse(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(
+                        'Error saat mengambil data slide (new slider):',
+                        error, xhr.responseText);
                     fetchLegacySlides();
                 }
             });
@@ -5002,7 +5012,8 @@
             }
 
             // Inisialisasi slideUrls
-            window.slideUrls = $mosqueImageElement.find('img[id^="slide"]')
+            window.slideUrls = $mosqueImageElement.find(
+                    'img[id^="slide"]')
                 .map(function() {
                     const $img = $(this);
                     if ($img.attr('data-empty') === 'true') {
@@ -5159,11 +5170,16 @@
                     $(document).on('slidesUpdated', async function(
                         event, newSlides, actualUrls) {
                         // console.log('Event slidesUpdated diterima, memperbarui slider');
-                        const candidateUrls = Array.isArray(actualUrls) &&
-                            actualUrls.length > 0 ? actualUrls :
+                        const candidateUrls = Array
+                            .isArray(actualUrls) &&
+                            actualUrls.length > 0 ?
+                            actualUrls :
                             newSlides;
-                        const newUrls = (candidateUrls || [])
-                            .filter(url => typeof url === 'string' &&
+                        const newUrls = (
+                                candidateUrls || [])
+                            .filter(url =>
+                                typeof url ===
+                                'string' &&
                                 url.trim() !== '');
                         if (newUrls.length === 0) {
                             console.warn(
@@ -5528,9 +5544,10 @@
 
 
                 if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
+                    const hijriBaseMoment = moment(now);
+                    const hijriDate = hijriBaseMoment.iDate();
+                    const hijriMonth = hijriBaseMoment.iMonth();
+                    const hijriYear = hijriBaseMoment.iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal',
                         'Rabiulakhir', 'Jumadilawal',
@@ -5627,128 +5644,222 @@
 
         // Tambahkan popup izin audio di bagian atas agar pemutaran sesuai kebijakan browser
         (function setupAudioPermissionPopup() {
-            try {
+                try {
 
-                // Jika tombol lama ada, hapus agar tidak duplikat
-                const oldBtn = document.getElementById(
-                    'start-audio-btn');
-                if (oldBtn) oldBtn.remove();
+                    // Jika tombol lama ada, hapus agar tidak duplikat
+                    const oldBtn = document.getElementById(
+                        'start-audio-btn');
+                    if (oldBtn) oldBtn.remove();
 
-                if (document.getElementById(
-                        'audio-permission-overlay')) return;
+                    if (document.getElementById(
+                            'audio-permission-overlay')) return;
 
-                const overlay = document.createElement('div');
-                overlay.id = 'audio-permission-overlay';
-                overlay.style.position = 'fixed';
-                overlay.style.top = '0';
-                overlay.style.left = '0';
-                overlay.style.right = '0';
-                overlay.style.zIndex = '10000';
-                overlay.style.background = '#fff';
-                overlay.style.color = '#003366';
-                overlay.style.padding = '12px 16px';
-                overlay.style.boxShadow =
-                    '0 2px 12px rgba(0,0,0,0.15)';
-                overlay.style.borderBottom = '1px solid #e5e7eb';
-                overlay.style.display = 'flex';
-                overlay.style.alignItems = 'center';
-                overlay.style.justifyContent = 'space-between';
-                overlay.style.gap = '12px';
 
-                const text = document.createElement('div');
-                text.textContent =
-                    'Izinkan pemutaran audio untuk Alarm Waktu Sholat.';
-                text.style.fontWeight = '600';
-                text.style.fontSize = '16px';
+                    const overlay = document.createElement('div');
+                    overlay.id = 'audio-permission-overlay';
+                    overlay.style.position = 'fixed';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.right = '0';
+                    overlay.style.zIndex = '10000';
+                    overlay.style.background = '#fff';
+                    overlay.style.color = '#003366';
+                    overlay.style.padding = '12px 16px';
+                    overlay.style.boxShadow =
+                        '0 2px 12px rgba(0,0,0,0.15)';
+                    overlay.style.borderBottom = '1px solid #e5e7eb';
+                    overlay.style.display = 'flex';
+                    overlay.style.alignItems = 'center';
+                    overlay.style.justifyContent = 'space-between';
+                    overlay.style.gap = '12px';
 
-                const actions = document.createElement('div');
-                actions.style.display = 'flex';
-                actions.style.gap = '8px';
+                    const text = document.createElement('div'); <<
+                    << << < HEAD
+                    text.textContent =
+                        'Izinkan pemutaran audio untuk Alarm Waktu Sholat.'; ===
+                    === =
+                    text.textContent =
+                        'Izinkan pemutaran audio Alarm Waktu Sholat dan Tampilkan Fullscreen.'; >>>
+                    >>> > main
+                    text.style.fontWeight = '600';
+                    text.style.fontSize = '16px';
 
-                const allowBtn = document.createElement('button');
-                allowBtn.type = 'button';
-                allowBtn.textContent = 'Izinkan Audio';
-                allowBtn.style.padding = '8px 12px';
-                allowBtn.style.borderRadius = '6px';
-                allowBtn.style.border = '1px solid #0a3a70';
-                allowBtn.style.fontWeight = '600';
-                allowBtn.style.background = '#003366';
-                allowBtn.style.color = '#fff';
-                allowBtn.style.cursor = 'pointer';
+                    const actions = document.createElement('div');
+                    actions.style.display = 'flex';
+                    actions.style.flexDirection = 'column';
+                    actions.style.alignItems = 'flex-start';
+                    actions.style.gap = '8px';
 
-                const laterBtn = document.createElement('button');
-                laterBtn.type = 'button';
-                laterBtn.textContent = 'Nanti';
-                laterBtn.style.padding = '8px 12px';
-                laterBtn.style.borderRadius = '6px';
-                laterBtn.style.border = '1px solid #bbb';
-                actions.appendChild(allowBtn);
+                    const buttonsRow = document.createElement('div');
+                    buttonsRow.style.display = 'flex';
+                    buttonsRow.style.gap = '8px';
 
-                overlay.appendChild(text);
-                overlay.appendChild(actions);
+                    const allowBtn = document.createElement('button');
+                    allowBtn.type = 'button';
+                    allowBtn.textContent = 'Izinkan Audio & Fullscreen';
+                    allowBtn.style.padding = '8px 12px';
+                    allowBtn.style.borderRadius = '6px';
+                    allowBtn.style.border = '1px solid #0a3a70';
+                    allowBtn.style.fontWeight = '600';
+                    allowBtn.style.background = '#003366';
+                    allowBtn.style.color = '#fff';
+                    allowBtn.style.cursor = 'pointer';
 
-                const hideOverlay = () => {
-                    overlay.style.display = 'none';
-                };
+                    const laterBtn = document.createElement('button');
+                    laterBtn.type = 'button';
+                    laterBtn.textContent = 'Nanti';
+                    laterBtn.style.padding = '8px 12px';
+                    laterBtn.style.borderRadius = '6px';
+                    laterBtn.style.border = '1px solid #bbb';
 
-                const unlockAudio = async () => {
-                    // Sembunyikan popup segera dan set flag izin
-                    try {
-                        localStorage.setItem(
-                            'firdausAudioUnlocked',
-                            'true');
+                    buttonsRow.appendChild(allowBtn);
+                    buttonsRow.appendChild(laterBtn);
+
+                    overlay.appendChild(text);
+                    overlay.appendChild(actions);
+
+                    // Auto hide dan hitung mundur 15 detik
+                    let autoHideTimerId = null;
+                    let countdownTimerId = null;
+                    let remaining = 15;
+
+                    const countdown = document.createElement('div');
+                    countdown.id = 'audio-permission-countdown';
+                    countdown.style.fontSize = '14px';
+                    countdown.style.color = '#555';
+                    countdown.style.fontFamily =
+                        '"JetBrains Mono", monospace';
+                    countdown.textContent = 'Menutup otomatis dalam 15';
+                    actions.appendChild(countdown);
+                    actions.appendChild(buttonsRow);
+
+                    function updateCountdown() {
+                        countdown.textContent =
+                            `Menutup otomatis dalam ${remaining}`;
+                    }
+
+                    const hideOverlay = () => {
+                        try {
+                            overlay.style.display = 'none';
+                        } catch (e) {}
+                        if (countdownTimerId) {
+                            clearInterval(countdownTimerId);
+                            countdownTimerId = null;
+                        }
+                        if (autoHideTimerId) {
+                            clearTimeout(autoHideTimerId);
+                            autoHideTimerId = null;
+                        }
+                        // Hapus overlay dari DOM untuk pembersihan total
+                        if (overlay && overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                        }
+                    };
+
+                    countdownTimerId = setInterval(() => {
+                        remaining--;
+                        if (remaining <= 0) {
+                            remaining = 0;
+                            updateCountdown();
+                            clearInterval(countdownTimerId);
+                            countdownTimerId = null;
+                        } else {
+                            updateCountdown();
+                        }
+                    }, 1000);
+
+                    autoHideTimerId = setTimeout(() => {
+                        hideOverlay();
+                    }, 15000);
+
+                    // fungsi untuk masuk ke layar fullscreen
+                    const enterFullscreen = async () => {
+                        try {
+                            const el = document.documentElement;
+                            if (!document.fullscreenElement) {
+                                if (el.requestFullscreen) {
+                                    await el
+                                .requestFullscreen();
+                                } else if (el
+                                    .webkitRequestFullscreen) {
+                                    await el
+                                        .webkitRequestFullscreen();
+                                } else if (el
+                                    .msRequestFullscreen) {
+                                    await el
+                                        .msRequestFullscreen();
+                                }
+                            }
+                        } catch (e) {}
+                    };
+
+                    const unlockAudio = async () => {
+                        // Tombol hanya sebagai trigger interaksi: tutup overlay dan masuk fullscreen
+                        try {
+                            <<
+                            << << < HEAD
+                            localStorage.setItem(
+                                'firdausAudioUnlocked',
+                                'true');
+                            hideOverlay();
+                        } catch (e) {}
+
+                        // Lakukan unlock audio secara senyap tanpa bunyi
+                        try {
+                            if (typeof beepSound !==
+                                'undefined' && beepSound) {
+                                const wasMuted = beepSound
+                                    .muted;
+                                const oldVol = beepSound.volume;
+                                beepSound.muted = true;
+                                beepSound.volume = 0;
+                                await beepSound.play().catch(
+                                    () => {});
+                                // hentikan dan kembalikan state
+                                beepSound.pause();
+                                beepSound.currentTime = 0;
+                                beepSound.muted = wasMuted;
+                                beepSound.volume = oldVol;
+                            } else {
+                                const unlockBeep = new Audio(
+                                    '/sounds/alarm/beep.mp3'
+                                );
+                                unlockBeep.muted = true;
+                                unlockBeep.volume = 0;
+                                await unlockBeep.play().catch(
+                                    () => {});
+                                unlockBeep.pause();
+                                unlockBeep.currentTime = 0;
+                            }
+                        } catch (e) {}
+
+                        // Siapkan adzanAudioPlayer secara senyap
+                        try {
+                            if (!window.adzanAudioPlayer) {
+                                window.adzanAudioPlayer =
+                                    new Audio();
+                            }
+                            window.adzanAudioPlayer.muted =
+                                true;
+                            await window.adzanAudioPlayer.play()
+                                .catch(() => {});
+                            window.adzanAudioPlayer.pause();
+                            window.adzanAudioPlayer
+                                .currentTime = 0;
+                            window.adzanAudioPlayer.muted =
+                                false;
+                        } catch (e) {} ===
+                        === =
                         hideOverlay();
                     } catch (e) {}
 
-                    // Lakukan unlock audio secara senyap tanpa bunyi
-                    try {
-                        if (typeof beepSound !==
-                            'undefined' && beepSound) {
-                            const wasMuted = beepSound
-                                .muted;
-                            const oldVol = beepSound.volume;
-                            beepSound.muted = true;
-                            beepSound.volume = 0;
-                            await beepSound.play().catch(
-                                () => {});
-                            // hentikan dan kembalikan state
-                            beepSound.pause();
-                            beepSound.currentTime = 0;
-                            beepSound.muted = wasMuted;
-                            beepSound.volume = oldVol;
-                        } else {
-                            const unlockBeep = new Audio(
-                                '/sounds/alarm/beep.mp3'
-                            );
-                            unlockBeep.muted = true;
-                            unlockBeep.volume = 0;
-                            await unlockBeep.play().catch(
-                                () => {});
-                            unlockBeep.pause();
-                            unlockBeep.currentTime = 0;
-                        }
-                    } catch (e) {}
-
-                    // Siapkan adzanAudioPlayer secara senyap
-                    try {
-                        if (!window.adzanAudioPlayer) {
-                            window.adzanAudioPlayer =
-                                new Audio();
-                        }
-                        window.adzanAudioPlayer.muted =
-                            true;
-                        await window.adzanAudioPlayer.play()
-                            .catch(() => {});
-                        window.adzanAudioPlayer.pause();
-                        window.adzanAudioPlayer
-                            .currentTime = 0;
-                        window.adzanAudioPlayer.muted =
-                            false;
-                    } catch (e) {}
+                    await enterFullscreen(); >>>
+                    >>> > main
                 };
 
                 const REPROMPT_MS = 60000; // 60 detik
                 allowBtn.addEventListener('click', unlockAudio);
+                laterBtn.addEventListener('click', hideOverlay);
 
                 document.body.appendChild(overlay);
 

@@ -79,6 +79,7 @@ class ProfilController extends Controller
 
             $data = [
                 'theme_id' => $theme->id,
+                'theme_name' => $theme->name,
                 'updated_at' => $updatedAt,
                 'css_file' => $theme->css_file ? asset($theme->css_file) : asset('css/style.css') // Tambahkan css_file
             ];
