@@ -3075,10 +3075,9 @@
                 // Top kategori (ambil 3 terbesar berdasarkan ending)
                 const categories = Array.isArray(data.categories) ? data.categories.slice() : [];
                 categories.sort((a, b) => (b.ending || 0) - (a.ending || 0));
-                const top3 = categories.slice(0, 3);
                 const $topList = $('#financeTopCategoriesList');
                 $topList.empty();
-                top3.forEach(cat => {
+                categories.forEach(cat => {
                     // Ambil aktivitas dari backend (dibatasi recent_limit=3)
                     let itemsHtml = '';
                     if (Array.isArray(data.categoriesWithItems)) {
