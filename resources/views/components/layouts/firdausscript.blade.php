@@ -3146,7 +3146,13 @@
             const container = $container[0];
             const content = $content[0];
             let offset = container.scrollTop || 0;
-            const speedPxPerSec = 10; // kecepatan scroll
+            const vwPerSec = 2; // kecepatan dalam vw per detik (konsisten lintas layar)
+            let speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
+
+            // Update saat ukuran layar berubah
+            window.addEventListener('resize', () => {
+                speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
+            });
             let lastTs = null;
             let direction = 1; // 1: turun, -1: naik
             let pauseUntil = null; // timestamp (ms) sampai kapan jeda berlangsung
