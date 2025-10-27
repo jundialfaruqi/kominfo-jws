@@ -389,6 +389,7 @@
                             <option value="bulan">Bulan</option>
                             <option value="tahun">Tahun</option>
                             <option value="rentang">Rentang</option>
+                            <option value="7hari">7 Hari (terakhir)</option>
                         </select>
                         @if ($filterDateMode === 'hari')
                             <input type="date" wire:model.live="filterDay" class="form-control rounded-3"

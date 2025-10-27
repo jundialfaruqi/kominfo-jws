@@ -83,9 +83,9 @@
                         </form>
                     </div>
                 </div>
-                <div class="text-center text-secondary mt-3">
+                {{-- <div class="text-center text-secondary mt-3">
                     Belum Punya Akun? <a wire:navigate href="{{ route('register') }}" tabindex="-1">Daftar</a>
-                </div>
+                </div> --}}
             </div>
         </div>
         <div class="col-lg d-none d-lg-block">

@@ -31,7 +31,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // Register Routes
-Route::get('/register', Register::class)->name('register');
+// Route::get('/register', Register::class)->name('register');
 
 Route::middleware('auth')->group(function () {
     Route::get('/inactive', Inactive::class)->name('inactive.index');
