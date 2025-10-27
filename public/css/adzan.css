@@ -19,6 +19,16 @@
     box-sizing: border-box;
 }
 
+/* Override global: sembunyikan progress bar jumbotron sepenuhnya */
+.jumbotron-progress-container {
+    display: none !important;
+}
+
+.jumbotron-progress-bar {
+    animation: none !important;
+    width: 0 !important;
+}
+
 .jumbotron-image {
     position: fixed;
     top: 0;
@@ -31,7 +41,7 @@
     align-items: center;
     z-index: 9999;
     box-sizing: border-box;
-    background-size: cover;
+    background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
 }

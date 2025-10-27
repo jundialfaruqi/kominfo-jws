@@ -472,7 +472,7 @@ class ProfilController extends Controller
     {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
-            $adzan = Adzan::where('user_id', $profil->user_id)->first();
+            $adzan = Adzan::where('user_id', $profil->user_id)->firstOrFail();
 
             return response()->json([
                 'success' => true,

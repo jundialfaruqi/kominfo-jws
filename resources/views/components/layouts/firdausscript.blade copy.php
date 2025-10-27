@@ -75,7 +75,7 @@
                 const cacheSlug = localStorage.getItem(AUDIO_CACHE_SLUG_KEY);
 
                 if (!cacheData || !cacheTimestamp || !cacheSlug) {
-                    console.log('Tidak ada cache audio di localStorage');
+                    // console.log('Tidak ada cache audio di localStorage');
                     return null;
                 }
 
@@ -117,7 +117,7 @@
                 localStorage.removeItem(AUDIO_CACHE_KEY);
                 localStorage.removeItem(AUDIO_CACHE_TIMESTAMP_KEY);
                 localStorage.removeItem(AUDIO_CACHE_SLUG_KEY);
-                console.log('Cache audio dihapus dari localStorage');
+                // console.log('Cache audio dihapus dari localStorage');
             } catch (error) {
                 console.warn('Gagal menghapus cache audio dari localStorage:', error);
             }
@@ -366,7 +366,7 @@
                     if (xhr.status === 404 || xhr.status === 500) {
                         const slug = window.location.pathname.replace(/^\//, '');
                         clearAudioCacheFromLocalStorage(slug);
-                        console.log('Cache localStorage dibersihkan');
+                        // console.log('Cache localStorage dibersihkan');
                     }
 
                     // Jika masih ada audio di cache, gunakan itu meskipun request gagal
@@ -386,7 +386,7 @@
                         }
                     } else {
                         // Coba lagi setelah beberapa waktu jika tidak ada cache
-                        console.log('Mencoba mengambil audio lagi dalam 5 menit...');
+                        // console.log('Mencoba mengambil audio lagi dalam 5 menit...');
                         setTimeout(updateAndPlayAudio, 5 * 60 * 1000);
                     }
                 },
@@ -1095,9 +1095,28 @@
             y: $canvas[0].height / 2
         };
 
+        // Sumber gaya dari CSS variables dengan fallback default JS
+        const hostEl = document.querySelector('.clock-container') || document.documentElement;
+
+        function getCssVar(el, name) {
+            const v = getComputedStyle(el).getPropertyValue(name);
+            return v ? v.trim() : '';
+        }
+
+        function getCssNum(el, name, fallback) {
+            const v = getCssVar(el, name);
+            const n = parseFloat(v);
+            return Number.isFinite(n) ? n : fallback;
+        }
+
+        function getCssStr(el, name, fallback) {
+            const v = getCssVar(el, name);
+            return v !== '' ? v : fallback;
+        }
+
         // Muat gambar logo
         const logo = new Image();
-        logo.src = '../theme/static/logo-small.png'; // Pastikan path ini benar
+        logo.src = getCssStr(hostEl, '--clock-logo-url', '../theme/static/logo-small.png');
 
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
@@ -1107,14 +1126,114 @@
             const seconds = now.getSeconds();
             const milliseconds = now.getMilliseconds();
 
+            // Ambil semua variabel gaya (CSS > default JS)
+            const faceFill = getCssStr(hostEl, '--clock-face-fill', '#003366');
+            const faceStroke = getCssStr(hostEl, '--clock-face-stroke', '#0055a4');
+            // Face stroke width dengan dukungan scale
+            const faceStrokeWidthScale = getCssNum(hostEl, '--clock-face-stroke-width-scale', null);
+            const faceStrokeWidth = (faceStrokeWidthScale && isFinite(faceStrokeWidthScale)) ?
+                clockRadius * faceStrokeWidthScale :
+                getCssNum(hostEl, '--clock-face-stroke-width', 15);
+            const faceShadowColor = getCssStr(hostEl, '--clock-face-shadow-color', 'rgba(0, 0, 0, 0.5)');
+            const faceShadowBlur = getCssNum(hostEl, '--clock-face-shadow-blur', 20);
+            const faceShadowOffsetX = getCssNum(hostEl, '--clock-face-shadow-offset-x', 0);
+            const faceShadowOffsetY = getCssNum(hostEl, '--clock-face-shadow-offset-y', 0);
+
+            const majorTickColor = getCssStr(hostEl, '--clock-major-tick-color', '#ffffff');
+            // Major tick width dengan dukungan scale
+            const majorTickWidthScale = getCssNum(hostEl, '--clock-major-tick-width-scale', null);
+            const majorTickWidth = (majorTickWidthScale && isFinite(majorTickWidthScale)) ?
+                clockRadius * majorTickWidthScale :
+                getCssNum(hostEl, '--clock-major-tick-width', 4);
+            // Major tick start offset dengan dukungan scale
+            const majorTickStartOffsetScale = getCssNum(hostEl, '--clock-major-tick-start-offset-scale', null);
+            const majorTickStartOffset = (majorTickStartOffsetScale && isFinite(majorTickStartOffsetScale)) ?
+                clockRadius * majorTickStartOffsetScale :
+                getCssNum(hostEl, '--clock-major-tick-start-offset', 20);
+            // Major tick end offset dengan dukungan scale
+            const majorTickEndOffsetScale = getCssNum(hostEl, '--clock-major-tick-end-offset-scale', null);
+            const majorTickEndOffset = (majorTickEndOffsetScale && isFinite(majorTickEndOffsetScale)) ?
+                clockRadius * majorTickEndOffsetScale :
+                getCssNum(hostEl, '--clock-major-tick-end-offset', 5);
+
+            const minorTickColor = getCssStr(hostEl, '--clock-minor-tick-color', 'rgba(255, 255, 255, 0.6)');
+            // Minor tick width dengan dukungan scale
+            const minorTickWidthScale = getCssNum(hostEl, '--clock-minor-tick-width-scale', null);
+            const minorTickWidth = (minorTickWidthScale && isFinite(minorTickWidthScale)) ?
+                clockRadius * minorTickWidthScale :
+                getCssNum(hostEl, '--clock-minor-tick-width', 2);
+            // Minor tick start offset dengan dukungan scale
+            const minorTickStartOffsetScale = getCssNum(hostEl, '--clock-minor-tick-start-offset-scale', null);
+            const minorTickStartOffset = (minorTickStartOffsetScale && isFinite(minorTickStartOffsetScale)) ?
+                clockRadius * minorTickStartOffsetScale :
+                getCssNum(hostEl, '--clock-minor-tick-start-offset', 10);
+            // Minor tick end offset dengan dukungan scale
+            const minorTickEndOffsetScale = getCssNum(hostEl, '--clock-minor-tick-end-offset-scale', null);
+            const minorTickEndOffset = (minorTickEndOffsetScale && isFinite(minorTickEndOffsetScale)) ?
+                clockRadius * minorTickEndOffsetScale :
+                getCssNum(hostEl, '--clock-minor-tick-end-offset', 5);
+
+            const numberRadiusOffsetScale = getCssNum(hostEl, '--clock-number-radius-offset-scale', NaN);
+            const numberRadiusOffset = Number.isFinite(numberRadiusOffsetScale) ?
+                Math.round(clockRadius * numberRadiusOffsetScale) :
+                getCssNum(hostEl, '--clock-number-radius-offset', 45);
+            const numberColor = getCssStr(hostEl, '--clock-number-color', '#ffffff');
+            const number12Color = getCssStr(hostEl, '--clock-number-12-color', '#ff0000');
+            const numberShadowColor = getCssStr(hostEl, '--clock-number-shadow-color', 'rgba(0, 0, 0, 0.7)');
+            const numberShadowBlur = getCssNum(hostEl, '--clock-number-shadow-blur', 5);
+            const numberShadowOffsetX = getCssNum(hostEl, '--clock-number-shadow-offset-x', 3);
+            const numberShadowOffsetY = getCssNum(hostEl, '--clock-number-shadow-offset-y', 3);
+
+            const numberFontFamily = getCssStr(hostEl, '--clock-number-font-family', 'Poppins');
+            const numberFontWeight = getCssStr(hostEl, '--clock-number-font-weight', 'bold');
+            const numberFontSize = getCssNum(hostEl, '--clock-number-font-size', 35);
+            const numberFontScale = getCssNum(hostEl, '--clock-number-font-scale', NaN);
+            const resolvedNumFontSize = Number.isFinite(numberFontScale) ?
+                Math.round(clockRadius * numberFontScale) :
+                numberFontSize;
+            const numberFont = `${numberFontWeight} ${resolvedNumFontSize}px ${numberFontFamily}`;
+
+            const hourHandColor = getCssStr(hostEl, '--clock-hour-hand-color', '#ffffff');
+            const hourHandWidth = getCssNum(hostEl, '--clock-hour-hand-width', 8);
+            const hourHandLengthScale = getCssNum(hostEl, '--clock-hour-hand-length-scale', 0.5);
+
+            const minuteHandColor = getCssStr(hostEl, '--clock-minute-hand-color', '#ffffff');
+            const minuteHandWidth = getCssNum(hostEl, '--clock-minute-hand-width', 5);
+            const minuteHandLengthScale = getCssNum(hostEl, '--clock-minute-hand-length-scale', 0.7);
+
+            const secondHandColor = getCssStr(hostEl, '--clock-second-hand-color', '#ff0000');
+            const secondHandWidth = getCssNum(hostEl, '--clock-second-hand-width', 2);
+            const secondHandLengthScale = getCssNum(hostEl, '--clock-second-hand-length-scale', 0.85);
+
+            const handShadowColor = getCssStr(hostEl, '--clock-hand-shadow-color', 'rgba(0, 0, 0, 0.6)');
+            const handShadowBlur = getCssNum(hostEl, '--clock-hand-shadow-blur', 8);
+            const handShadowOffsetX = getCssNum(hostEl, '--clock-hand-shadow-offset-x', 3);
+            const handShadowOffsetY = getCssNum(hostEl, '--clock-hand-shadow-offset-y', 3);
+
+            const secondShadowColor = getCssStr(hostEl, '--clock-second-shadow-color', 'rgba(0, 0, 0, 0.4)');
+            const secondShadowBlur = getCssNum(hostEl, '--clock-second-shadow-blur', 6);
+            const secondShadowOffsetX = getCssNum(hostEl, '--clock-second-shadow-offset-x', 2);
+            const secondShadowOffsetY = getCssNum(hostEl, '--clock-second-shadow-offset-y', 2);
+
+            const centerDotColor = getCssStr(hostEl, '--clock-center-dot-color', '#ff0000');
+            const centerDotRadius = getCssNum(hostEl, '--clock-center-dot-radius', 8);
+            const centerDotShadowColor = getCssStr(hostEl, '--clock-center-dot-shadow-color',
+                'rgba(0, 0, 0, 0.5)');
+            const centerDotShadowBlur = getCssNum(hostEl, '--clock-center-dot-shadow-blur', 5);
+            const centerDotShadowOffsetX = getCssNum(hostEl, '--clock-center-dot-shadow-offset-x', 1);
+            const centerDotShadowOffsetY = getCssNum(hostEl, '--clock-center-dot-shadow-offset-y', 1);
+
+            const logoScale = getCssNum(hostEl, '--clock-logo-scale', 0.23);
+            const logoOffsetYScale = getCssNum(hostEl, '--clock-logo-offset-y-scale', 0.33);
+
             ctx.save();
             ctx.beginPath();
             ctx.arc(clockCenter.x, clockCenter.y, clockRadius, 0, Math.PI * 2);
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 15;
-            ctx.shadowOffsetX = 5;
-            ctx.shadowOffsetY = 5;
-            ctx.fillStyle = '#003366';
+            ctx.shadowColor = faceShadowColor;
+            ctx.shadowBlur = faceShadowBlur;
+            ctx.shadowOffsetX = faceShadowOffsetX;
+            ctx.shadowOffsetY = faceShadowOffsetY;
+            ctx.fillStyle = faceFill;
             ctx.fill();
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
@@ -1123,46 +1242,45 @@
 
             ctx.beginPath();
             ctx.arc(clockCenter.x, clockCenter.y, clockRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = '#0055a4';
-            ctx.lineWidth = 15;
+            ctx.strokeStyle = faceStroke;
+            ctx.lineWidth = faceStrokeWidth;
             ctx.stroke();
 
             // Gambar logo di tengah
-            if (logo.complete) { // Pastikan logo sudah dimuat
-                const logoHeight = clockRadius * 0.23; // Misalnya, 10% dari radius jam
-                const logoWidth = (logo.naturalWidth / logo.naturalHeight) *
-                    logoHeight; // Hitung lebar berdasarkan rasio aspek
+            if (logo.complete) {
+                const logoHeight = clockRadius * logoScale;
+                const logoWidth = (logo.naturalWidth / logo.naturalHeight) * logoHeight;
                 const logoX = clockCenter.x - logoWidth / 2;
-                const logoY = clockCenter.y - logoHeight / 2 - clockRadius * 0.33;
+                const logoY = clockCenter.y - logoHeight / 2 - clockRadius * logoOffsetYScale;
                 ctx.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
             }
 
-            // Gambar angka dan tanda jam
+            // Gambar angka dan tanda jam (major ticks + numbers)
             for (let i = 0; i < 12; i++) {
                 const angle = (i * Math.PI / 6) - Math.PI / 2;
-                const tickStart = clockRadius - 20;
-                const tickEnd = clockRadius - 5;
+                const tickStart = clockRadius - majorTickStartOffset;
+                const tickEnd = clockRadius - majorTickEndOffset;
 
                 ctx.beginPath();
                 ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) *
                     tickStart);
                 ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd, clockCenter.y + Math.sin(angle) *
                     tickEnd);
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 4;
+                ctx.strokeStyle = majorTickColor;
+                ctx.lineWidth = majorTickWidth;
                 ctx.stroke();
 
-                const numRadius = clockRadius - 40;
+                const numRadius = clockRadius - numberRadiusOffset;
                 const numX = clockCenter.x + Math.cos(angle) * numRadius;
                 const numY = clockCenter.y + Math.sin(angle) * numRadius;
 
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-                ctx.shadowBlur = 5;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
+                ctx.shadowColor = numberShadowColor;
+                ctx.shadowBlur = numberShadowBlur;
+                ctx.shadowOffsetX = numberShadowOffsetX;
+                ctx.shadowOffsetY = numberShadowOffsetY;
 
-                ctx.fillStyle = i === 0 ? '#ff0000' : '#ffffff';
-                ctx.font = 'bold 30px Poppins';
+                ctx.fillStyle = i === 0 ? number12Color : numberColor;
+                ctx.font = numberFont;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText((i === 0 ? 12 : i).toString(), numX, numY);
@@ -1173,19 +1291,20 @@
                 ctx.shadowOffsetY = 0;
             }
 
+            // Minor ticks
             for (let i = 0; i < 60; i++) {
                 if (i % 5 !== 0) {
                     const angle = (i * Math.PI / 30) - Math.PI / 2;
-                    const tickStart = clockRadius - 10;
-                    const tickEnd = clockRadius - 5;
+                    const tickStart = clockRadius - minorTickStartOffset;
+                    const tickEnd = clockRadius - minorTickEndOffset;
 
                     ctx.beginPath();
                     ctx.moveTo(clockCenter.x + Math.cos(angle) * tickStart, clockCenter.y + Math.sin(angle) *
                         tickStart);
                     ctx.lineTo(clockCenter.x + Math.cos(angle) * tickEnd, clockCenter.y + Math.sin(angle) *
                         tickEnd);
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = minorTickColor;
+                    ctx.lineWidth = minorTickWidth;
                     ctx.stroke();
                 }
             }
@@ -1195,26 +1314,26 @@
             const minuteAngle = ((minutes + seconds / 60) * Math.PI / 30) - Math.PI / 2;
             const secondAngle = ((seconds + milliseconds / 1000) * Math.PI / 30) - Math.PI / 2;
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-            ctx.shadowBlur = 8;
-            ctx.shadowOffsetX = 3;
-            ctx.shadowOffsetY = 3;
-            drawHand(hourAngle, clockRadius * 0.5, 8, '#ffffff');
-            drawHand(minuteAngle, clockRadius * 0.7, 5, '#ffffff');
+            ctx.shadowColor = handShadowColor;
+            ctx.shadowBlur = handShadowBlur;
+            ctx.shadowOffsetX = handShadowOffsetX;
+            ctx.shadowOffsetY = handShadowOffsetY;
+            drawHand(hourAngle, clockRadius * hourHandLengthScale, hourHandWidth, hourHandColor);
+            drawHand(minuteAngle, clockRadius * minuteHandLengthScale, minuteHandWidth, minuteHandColor);
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
-            ctx.shadowBlur = 6;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-            drawHand(secondAngle, clockRadius * 0.85, 2, '#ff0000');
+            ctx.shadowColor = secondShadowColor;
+            ctx.shadowBlur = secondShadowBlur;
+            ctx.shadowOffsetX = secondShadowOffsetX;
+            ctx.shadowOffsetY = secondShadowOffsetY;
+            drawHand(secondAngle, clockRadius * secondHandLengthScale, secondHandWidth, secondHandColor);
 
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 5;
-            ctx.shadowOffsetX = 1;
-            ctx.shadowOffsetY = 1;
+            ctx.shadowColor = centerDotShadowColor;
+            ctx.shadowBlur = centerDotShadowBlur;
+            ctx.shadowOffsetX = centerDotShadowOffsetX;
+            ctx.shadowOffsetY = centerDotShadowOffsetY;
             ctx.beginPath();
-            ctx.arc(clockCenter.x, clockCenter.y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = '#ff0000';
+            ctx.arc(clockCenter.x, clockCenter.y, centerDotRadius, 0, Math.PI * 2);
+            ctx.fillStyle = centerDotColor;
             ctx.fill();
 
             ctx.restore();
@@ -1222,8 +1341,9 @@
             const $clockText = $('.clock-text');
             if ($clockText.length) {
                 const displayHours = now.getHours();
+                const colonStyle = (seconds % 2 === 0) ? 'visibility: visible;' : 'visibility: hidden;';
                 $clockText.html(
-                    `${displayHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+                    `${displayHours.toString().padStart(2, "0")}<span class="colon" style="${colonStyle}">:</span>${minutes.toString().padStart(2, "0")}`
                 );
             }
         }
@@ -1378,27 +1498,32 @@
 
             if (typeof moment !== 'undefined') {
                 moment.locale('id');
-                const hari = moment(now).format('dddd');
+                let hari = moment(now).format('dddd');
+                if (hari === 'Minggu') {
+                    hari = 'Ahad';
+                }
                 const tanggalMasehi = moment(now).format('D MMMM YYYY');
                 const masehi = `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
 
+
+
+                let hijri = '';
                 if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
+                    const hijriBaseMoment = moment(now);
+                    const hijriDate = hijriBaseMoment.iDate();
+                    const hijriMonth = hijriBaseMoment.iMonth();
+                    const hijriYear = hijriBaseMoment.iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
                         'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
                     ];
-                    const hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
-                    if ($dateElement.length) {
-                        $dateElement.html(`${masehi} / ${hijri}`);
-                    }
+                    hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
                 } else {
-                    if ($dateElement.length) {
-                        $dateElement.html(masehi);
-                        console.warn("moment-hijri tidak tersedia");
-                    }
+                    console.warn("moment-hijri tidak tersedia");
+                }
+
+                if ($dateElement.length) {
+                    $dateElement.html(hijri ? `${masehi} / ${hijri}` : masehi);
                 }
             } else {
                 console.warn("moment.js tidak tersedia");
@@ -1644,7 +1769,7 @@
             } else if (iqomahStartTime) {
                 const iqomahElapsedSeconds = (nowTime - iqomahStartTime) / 1000;
                 const iqomahDuration = getIqomahDuration(currentPrayerName || 'Dzuhur');
-                const finalPhaseDuration = getFinalDuration(currentPrayerName || 'Dzuhur') / 1000;
+                const finalPhaseDuration = getFinalDuration(currentPrayerName || 'Dzuhur');
 
                 if (iqomahElapsedSeconds < iqomahDuration) {
                     showIqomahPopup(currentPrayerTime, true);
@@ -1680,7 +1805,7 @@
                     const timeDiffSeconds = (currentTimeInMinutes - prayerToRestore.timeInMinutes) * 60;
                     const adzanDuration = getAdzanDuration(prayerToRestore.name);
                     const iqomahDuration = getIqomahDuration(prayerToRestore.name);
-                    const finalPhaseDuration = getFinalDuration(prayerToRestore.name) / 1000;
+                    const finalPhaseDuration = getFinalDuration(prayerToRestore.name);
 
                     if (timeDiffSeconds < adzanDuration) {
                         adzanStartTime = nowTime - (timeDiffSeconds * 1000);
@@ -1924,7 +2049,7 @@
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    console.log('Initial prayer times refreshed successfully');
+                    // console.log('Initial prayer times refreshed successfully');
                     updateDailyPrayerTimes();
                 } else {
                     console.error('Error refreshing initial prayer times:', response.message);
@@ -2034,26 +2159,26 @@
             return defaultDuration;
         }
 
-        // Fungsi untuk mendapatkan durasi final berdasarkan nama sholat (dalam milidetik)
+        // Fungsi untuk mendapatkan durasi final berdasarkan nama sholat (dalam detik)
         function getFinalDuration(prayerName) {
             const durasiData = getDurasiData();
             const prayerLower = prayerName.toLowerCase();
 
-            // Default durasi jika data tidak tersedia (dalam milidetik)
-            const defaultDuration = 60 * 1000; // 60 detik
+            // Default durasi jika data tidak tersedia (dalam detik)
+            const defaultDuration = 1 * 60; // 60 detik
 
             if (!durasiData) return defaultDuration;
 
             if (prayerLower === 'subuh' && durasiData.final_shubuh) {
-                return durasiData.final_shubuh * 1000;
+                return durasiData.final_shubuh * 60;
             } else if (prayerLower === 'dzuhur' && durasiData.final_dzuhur) {
-                return durasiData.final_dzuhur * 1000;
+                return durasiData.final_dzuhur * 60;
             } else if (prayerLower === 'ashar' && durasiData.final_ashar) {
-                return durasiData.final_ashar * 1000;
+                return durasiData.final_ashar * 60;
             } else if (prayerLower === 'maghrib' && durasiData.final_maghrib) {
-                return durasiData.final_maghrib * 1000;
+                return durasiData.final_maghrib * 60;
             } else if (prayerLower === 'isya' && durasiData.final_isya) {
-                return durasiData.final_isya * 1000;
+                return durasiData.final_isya * 60;
             }
 
             return defaultDuration;
@@ -2839,19 +2964,19 @@
                 imageUrl = '/images/other/lurus-rapat-shaf-default.webp';
             }
 
-            const duration = getFinalDuration(currentPrayerName || 'Dzuhur');
+            const durationMs = getFinalDuration(currentPrayerName || 'Dzuhur') * 1000; // convert seconds -> ms
 
-            displayAdzanImage(imageUrl, false, duration);
+            displayAdzanImage(imageUrl, false, durationMs);
 
             adzanImageTimeout = setTimeout(() => {
                 const $imageDisplay = $('#adzanImageDisplay');
                 $imageDisplay.css('display', 'none');
                 clearAdzanImageState();
-                // console.log('Final adzan image ditutup setelah', duration / 1000, 'detik');
+                // console.log('Final adzan image ditutup setelah', durationMs / 1000, 'detik');
 
                 // Lanjutkan pemutaran audio setelah fase adzanImageDisplay berakhir
                 resumeAudio();
-            }, duration);
+            }, durationMs);
         }
 
         // Fungsi helper untuk menutup gambar adzan
@@ -2882,6 +3007,251 @@
         let fridayInfoData = localStorage.getItem('fridayInfoData') ? JSON.parse(localStorage.getItem(
             'fridayInfoData')) : null;
         let fridayImageSliderInterval = null;
+
+        // ===================== Finance Overlay (summary + auto-scroll) =====================
+        let financeScrollRaf = null;
+        let financeScrollStartTs = null;
+        let financeActiveSection = 'top'; // 'top' or 'latest'
+
+        function initFinanceOverlay() {
+            fetchFinanceData();
+            // Refresh data setiap 1 menit
+            setInterval(fetchFinanceData, 60000);
+            // Tidak lagi alternating; kita pakai satu scroll untuk seluruh konten
+        }
+
+        function fetchFinanceData() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) {
+                console.error('Tidak dapat menentukan slug dari URL');
+                showFinanceError('Data tidak tersedia');
+                return;
+            }
+            $.ajax({
+                url: `/api/balance-summary/${encodeURIComponent(slug)}?details=full&full_month=true&recent_limit=3`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(resp) {
+                    if (resp && resp.success && resp.data) {
+                        renderFinanceOverlay(resp.data);
+                    } else {
+                        showFinanceError('Data tidak tersedia');
+                    }
+                },
+                error: function() {
+                    showFinanceError('Gagal memuat data keuangan');
+                }
+            });
+        }
+
+        function showFinanceError(message) {
+            // Ringan: jangan ubah UI saat error/patah koneksi.
+            // Tidak mengosongkan nilai, tidak menampilkan pesan status.
+            // Intentionally no-op to preserve last successful snapshot.
+        }
+
+        function truncateText(text, maxLen) {
+            if (!text) return '';
+            return text.length > maxLen ? (text.substring(0, maxLen - 1) + '…') : text;
+        }
+
+        function renderFinanceOverlay(data) {
+            try {
+                // Judul menampilkan bulan dan tahun saja (tanpa rentang tanggal)
+                if (data.period && data.period.month && data.period.year) {
+                    const title = `Keuangan Masjid ${data.period.month} ${data.period.year}`;
+                    $('#financePeriodTitle').text(title);
+                } else {
+                    $('#financePeriodTitle').text('Keuangan');
+                }
+
+                // Totals
+                if (data.grandTotals) {
+                    $('#financeTotalMasukValue').text(data.grandTotals.sumMasukDisplay || '-');
+                    $('#financeTotalKeluarValue').text(data.grandTotals.sumKeluarDisplay || '-');
+                    $('#financeEndingBalanceValue').text(data.grandTotals.endingDisplay || '-');
+                }
+
+                // Top kategori (ambil 3 terbesar berdasarkan ending)
+                const categories = Array.isArray(data.categories) ? data.categories.slice() : [];
+                categories.sort((a, b) => (b.ending || 0) - (a.ending || 0));
+                const $topList = $('#financeTopCategoriesList');
+                $topList.empty();
+                categories.forEach(cat => {
+                    // Ambil aktivitas dari backend (dibatasi recent_limit=3)
+                    let itemsHtml = '';
+                    if (Array.isArray(data.categoriesWithItems)) {
+                        const block = data.categoriesWithItems.find(b => (b.categoryName || '') === (cat
+                            .categoryName || ''));
+                        const itemsForCat = Array.isArray(block && block.items) ? block.items.slice() : [];
+                        itemsForCat.sort((a, b) => (b.id || 0) - (a.id || 0));
+                        const recent = itemsForCat; // backend sudah batasi ke 3 item terbaru
+                        itemsHtml = recent.map(it => {
+                            const nilaiMasuk = it.masukDisplay && it.masukDisplay !== '-';
+                            const nilaiKeluar = it.keluarDisplay && it.keluarDisplay !== '-';
+                            const nilaiClass = nilaiMasuk ? 'masuk' : (nilaiKeluar ? 'keluar' :
+                                'netral');
+                            const nilai = nilaiMasuk ? it.masukDisplay : (nilaiKeluar ? it
+                                .keluarDisplay : '-');
+                            const tanggal = it.tanggal || '-';
+                            const uraian = truncateText(it.uraian || '-', 28);
+                            return `<div class="activity-pill ${nilaiClass}">
+                                <span class="activity-line tanggal">${tanggal}</span>
+                                <span class="activity-line uraian">${uraian}</span>
+                                <span class="activity-line nominal ${nilaiClass}">${nilai}</span>
+                            </div>`;
+                        }).join('');
+                    }
+                    const row = `<div class="finance-row">
+                        <div class="finance-chip kategori">
+                            <div class="finance-chip-title">${cat.categoryName || '-'}</div>
+                            <div class="finance-pill-container">
+                                <div class="finance-pill masuk">
+                                    <span class="label">Masuk</span>
+                                    <span class="value">${cat.sumMasukDisplay || '-'}</span>
+                                </div>
+                                <div class="finance-pill keluar">
+                                    <span class="label">Keluar</span>
+                                    <span class="value">${cat.sumKeluarDisplay || '-'}</span>
+                                </div>
+                                <div class="finance-pill saldo">
+                                    <span class="label">Saldo</span>
+                                    <span class="value">${cat.endingDisplay || '-'}</span>
+                                </div>
+                            </div>
+                            ${itemsHtml ? `<div class="activity-pill-container">${itemsHtml}</div>` : ''}
+                        </div>
+                    </div>`;
+                    $topList.append(row);
+                });
+
+                // Tampilkan overlay
+                $('#financeOverlay').show();
+                // Mulai scroll pada konten gabungan (totals + kategori + aktivitas)
+                const $containerAll = $('#financeScrollContainerAll');
+                const $contentAll = $('#financeScrollContentAll');
+                startVerticalScroll($containerAll, $contentAll);
+
+            } catch (e) {
+                showFinanceError('Kesalahan memproses data keuangan');
+            }
+        }
+
+        // Auto-scroll util: scroll vertikal bolak-balik dengan jeda 2 detik di atas & bawah
+        function startVerticalScroll($container, $content) {
+            stopVerticalScroll();
+            if (!$container || !$content || $content.children().length === 0) return;
+
+            const container = $container[0];
+            const content = $content[0];
+            let offset = container.scrollTop || 0;
+            const vwPerSec = 2; // kecepatan dalam vw per detik (konsisten lintas layar)
+            let speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
+
+            // Update saat ukuran layar berubah
+            window.addEventListener('resize', () => {
+                speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
+            });
+            let lastTs = null;
+            let direction = 1; // 1: turun, -1: naik
+            let pauseUntil = null; // timestamp (ms) sampai kapan jeda berlangsung
+
+            function loop(ts) {
+                if (lastTs === null) lastTs = ts;
+                const dt = Math.min(0.033, (ts - lastTs) / 1000); // batasi dt ke ~33ms
+                lastTs = ts;
+
+                const maxScroll = Math.max(0, content.scrollHeight - container.clientHeight);
+                if (maxScroll <= 0) {
+                    // tidak ada yang bisa di-scroll
+                    stopVerticalScroll();
+                    return;
+                }
+
+                // Kelola jeda: tahan posisi, dan setelah jeda bawah selesai loncat ke atas
+                if (pauseUntil) {
+                    if (ts < pauseUntil) {
+                        // masih dalam jeda, tahan posisi sekarang
+                        container.scrollTop = offset;
+                        financeScrollRaf = requestAnimationFrame(loop);
+                        return;
+                    } else {
+                        // jeda selesai
+                        pauseUntil = null;
+                        if (offset >= maxScroll) {
+                            // selesai jeda di bawah: reset ke atas tanpa menyembunyikan overlay
+                            container.scrollTop = 0; // mulai dari atas
+                            offset = 0;
+                            direction = 1; // lanjut turun lagi
+                            // jeda 2 detik di atas sebelum mulai turun lagi
+                            pauseUntil = ts + 2000;
+                        }
+                        if (offset <= 0) {
+                            // selesai jeda di atas: lanjut turun
+                            direction = 1;
+                        }
+                    }
+                }
+
+                // Bergerak sesuai arah saat ini
+                offset += direction * speedPxPerSec * dt;
+
+                // Jika melewati batas bawah
+                if (offset >= maxScroll) {
+                    offset = maxScroll; // clamp ke bawah
+                    pauseUntil = ts + 2000; // jeda 2 detik
+                    direction = 0; // jangan naik; tunggu loncat ke atas setelah jeda
+                }
+
+                // Jika melewati batas atas
+                if (offset <= 0) {
+                    offset = 0; // clamp ke atas
+                    pauseUntil = ts + 2000; // jeda 2 detik
+                    direction = 1; // balik arah: turun
+                }
+
+                container.scrollTop = offset;
+                financeScrollRaf = requestAnimationFrame(loop);
+            }
+            financeScrollRaf = requestAnimationFrame(loop);
+        }
+
+        function stopVerticalScroll() {
+            if (financeScrollRaf) {
+                cancelAnimationFrame(financeScrollRaf);
+                financeScrollRaf = null;
+                financeScrollStartTs = null;
+            }
+        }
+
+        function startFinanceAlternating() {
+            // mulai dengan Top Kategori
+            activateFinanceSection('top');
+            setInterval(() => {
+                financeActiveSection = (financeActiveSection === 'top') ? 'latest' : 'top';
+                activateFinanceSection(financeActiveSection);
+            }, 20000); // perpanjang agar lebih santai
+        }
+
+        function activateFinanceSection(section) {
+            if (section === 'latest') {
+                $('#financeTopCategoriesSection').hide();
+                $('#financeLatestItemsSection').show();
+                startVerticalScroll($('#financeLatestItemsSection .finance-scroll-container'), $(
+                    '#financeLatestItemsList'));
+            } else {
+                $('#financeLatestItemsSection').hide();
+                $('#financeTopCategoriesSection').show();
+                startVerticalScroll($('#financeTopCategoriesSection .finance-scroll-container'), $(
+                    '#financeTopCategoriesList'));
+            }
+        }
+
+        // Inisialisasi saat dokumen siap
+        $(function() {
+            initFinanceOverlay();
+        });
+
         let fridaySliderStartTime = localStorage.getItem('fridaySliderStartTime') ? parseInt(localStorage
             .getItem('fridaySliderStartTime')) : null;
 
@@ -3375,7 +3745,7 @@
                 return;
             }
 
-            console.log('Memeriksa update slide untuk slug:', slug);
+            // console.log('Memeriksa update slide untuk slug:', slug);
 
             $.ajax({
                 url: `/api/slides1/${slug}`,
@@ -3406,7 +3776,7 @@
                             newSlides[index]);
 
                         if (hasChanges) {
-                            console.log('Perubahan terdeteksi, memperbarui slide...');
+                            // console.log('Perubahan terdeteksi, memperbarui slide...');
 
                             $('#slide1').val(newSlides[0]);
                             $('#slide2').val(newSlides[1]);
@@ -3425,13 +3795,12 @@
                             const urlsToPreload = newUrls.filter(url => !window.imageCache[url] || !
                                 window.imageCache[url].complete);
                             if (urlsToPreload.length > 0) {
-                                console.log(
-                                    `Preload gambar baru dari updateSlides: ${urlsToPreload}`);
+                                // console.log(`Preload gambar baru dari updateSlides: ${urlsToPreload}`);
                                 await preloadImages(urlsToPreload);
                             }
 
                             window.slideUrls = newUrls;
-                            console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
+                            // console.log('Slide diperbarui, jumlah slide:', window.slideUrls.length);
                             $(document).trigger('slidesUpdated', [newSlides]);
                         } else {
                             console.log('Tidak ada perubahan pada slide, update diabaikan');
@@ -3468,7 +3837,7 @@
             Object.keys(window.imageCache).forEach(url => {
                 if (!activeUrls.includes(url)) {
                     delete window.imageCache[url];
-                    console.log(`Gambar dihapus dari cache: ${url}`);
+                    // console.log(`Gambar dihapus dari cache: ${url}`);
                 }
             });
 
@@ -3496,7 +3865,7 @@
                     img.src = url;
 
                     img.onload = () => {
-                        console.log(`Gambar berhasil dimuat: ${url}`);
+                        // console.log(`Gambar berhasil dimuat: ${url}`);
                         window.imageCache[url] = img;
                         resolve(img);
                     };
@@ -3595,13 +3964,26 @@
                 success: function(response) {
                     console.log('Respons API jumbotron:', response);
                     if (response.success && response.data) {
-                        $('#jumbo1').val(response.data.jumbo1 || '');
-                        $('#jumbo2').val(response.data.jumbo2 || '');
-                        $('#jumbo3').val(response.data.jumbo3 || '');
-                        $('#jumbo4').val(response.data.jumbo4 || '');
-                        $('#jumbo5').val(response.data.jumbo5 || '');
-                        $('#jumbo6').val(response.data.jumbo6 || '');
-                        $('#jumbo_is_active').val(response.data.is_active ? 'true' : 'false');
+                        const data = response.data;
+                        if (Array.isArray(data)) {
+                            // API lama mengembalikan array URL
+                            $('#jumbo1').val(data[0] || '');
+                            $('#jumbo2').val(data[1] || '');
+                            $('#jumbo3').val(data[2] || '');
+                            $('#jumbo4').val(data[3] || '');
+                            $('#jumbo5').val(data[4] || '');
+                            $('#jumbo6').val(data[5] || '');
+                            $('#jumbo_is_active').val(data.length > 0 ? 'true' : 'false');
+                        } else {
+                            // API baru/object dengan key jumbo1..jumbo6 dan is_active
+                            $('#jumbo1').val(data.jumbo1 || '');
+                            $('#jumbo2').val(data.jumbo2 || '');
+                            $('#jumbo3').val(data.jumbo3 || '');
+                            $('#jumbo4').val(data.jumbo4 || '');
+                            $('#jumbo5').val(data.jumbo5 || '');
+                            $('#jumbo6').val(data.jumbo6 || '');
+                            $('#jumbo_is_active').val(data.is_active ? 'true' : 'false');
+                        }
                         $(document).trigger('jumbotronUpdated');
                     } else {
                         $('#jumbo_is_active').val('false');
@@ -3652,7 +4034,7 @@
                 try {
                     const allUrls = [...window.slideUrls, ...window.jumbotronUrls];
                     await preloadImages(allUrls);
-                    console.log('Semua gambar telah dimuat, memulai slider', allUrls);
+                    // console.log('Semua gambar telah dimuat, memulai slider', allUrls);
 
                     const slideDuration = 20000; // 20 detik per gambar
 
@@ -3662,8 +4044,6 @@
                         if (!isJumbotronActive) {
                             window.jumbotronUrls = [];
                             $jumbotronImageElement.css('display', 'none');
-                            // Hentikan animasi progress bar saat jumbotron tidak aktif
-                            $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                         }
 
                         if (window.slideUrls.length === 0) {
@@ -3701,13 +4081,9 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
-                            // Reset dan jalankan animasi progress bar
-                            const $progressBar = $('.jumbotron-progress-bar');
-                            $progressBar.css('width', '0%');
-                            $progressBar.css('animation',
-                                `progressAnimation ${slideDuration}ms linear forwards`);
-                            console.log(
-                                `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
+                            // Animasi progress bar jumbotron dihapus
+                            // console.log(
+                            // `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
                         } else {
                             const slideIndex = imageIndex % window.slideUrls.length;
                             currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
@@ -3719,9 +4095,8 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
-                            // Hentikan animasi progress bar saat jumbotron tidak ditampilkan
-                            $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
-                            console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
+                            // Animasi progress bar jumbotron dihapus
+                            // console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
                         clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
@@ -3732,7 +4107,7 @@
                     setInterval(updateSlide, 1000);
 
                     $(document).on('slidesUpdated', async function(event, newSlides) {
-                        console.log('Event slidesUpdated diterima, memperbarui slider');
+                        // console.log('Event slidesUpdated diterima, memperbarui slider');
                         const newUrls = newSlides.filter(url => url.trim() !== '');
                         if (newUrls.length === 0) {
                             console.warn(
@@ -3750,7 +4125,7 @@
                             await preloadImages(urlsToPreload);
                         }
 
-                        console.log('slideUrls diperbarui:', window.slideUrls);
+                        // console.log('slideUrls diperbarui:', window.slideUrls);
                         clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
                     });
 
@@ -3834,85 +4209,162 @@
         }, 60000);
 
         function updateFridayOfficials() {
+            console.log('=== updateFridayOfficials function called ===');
             const slug = window.location.pathname.replace(/^\//, '');
+            console.log('Current slug:', slug);
+
             if (!slug) {
+                console.log('No slug found, exiting function');
                 return;
             }
 
-            $.ajax({
-                url: `/api/petugas/${slug}`,
-                method: 'GET',
-                dataType: 'json',
-                retries: 3, // Maksimum jumlah percobaan
-                retryDelay: 5000, // Jeda 5 detik antara percobaan
-                success: function(response) {
-                    // console.log('Respons API petugas:', response);
-                    if (response.success) {
-                        // Cek apakah tanggal dan bulan pada field hari sesuai dengan waktu server
-                        const currentServerTime = getCurrentTimeFromServer();
-                        const petugasDate = new Date(response.data.hari);
+            function makeRequest(retryCount = 0) {
+                console.log(`Making AJAX request to: /api/petugas/${slug} (attempt ${retryCount + 1})`);
+                $.ajax({
+                    url: `/api/petugas/${slug}`,
+                    method: 'GET',
+                    dataType: 'json',
+                    timeout: 10000, // 10 detik timeout
+                    success: function(response) {
+                        console.log('Respons API petugas:', response);
+                        if (response.success && response.data) {
+                            const now = getCurrentTimeFromServer();
+                            const currentDay = now.getDate();
+                            const currentMonth = now.getMonth();
 
-                        // Bandingkan tanggal dan bulan
-                        const currentDay = currentServerTime.getDate();
-                        const currentMonth = currentServerTime.getMonth();
-                        const petugasDay = petugasDate.getDate();
-                        const petugasMonth = petugasDate.getMonth();
+                            let selected = null;
+                            const data = response.data;
 
-                        // Hanya update data petugas jika tanggal dan bulan cocok
-                        if (currentDay === petugasDay && currentMonth === petugasMonth) {
-                            // Simpan nilai sebelumnya untuk perbandingan
-                            const previousKhatib = $('#khatib').val();
-                            const previousImam = $('#imam').val();
-                            const previousMuadzin = $('#muadzin').val();
-
-                            // Perbarui nilai input hidden untuk petugas
-                            $('#khatib').val(response.data.khatib);
-                            $('#imam').val(response.data.imam);
-                            $('#muadzin').val(response.data.muadzin);
-
-                            // Jika popup sedang ditampilkan, perbarui kontennya tanpa mengganggu animasi
-                            if ($('#fridayInfoPopup').is(':visible')) {
-                                updateFridayInfoContent();
+                            if (Array.isArray(data)) {
+                                console.log(
+                                    `Menerima array petugas dengan panjang: ${data.length}`);
+                                for (let i = 0; i < data.length; i++) {
+                                    const item = data[i];
+                                    const d = new Date(item.hari);
+                                    if (isNaN(d.getTime())) {
+                                        continue; // lewati tanggal invalid
+                                    }
+                                    if (d.getDate() === currentDay && d.getMonth() ===
+                                        currentMonth) {
+                                        selected = item;
+                                        break; // ambil pertama yang cocok (diasumsikan DESC)
+                                    }
+                                }
+                            } else if (typeof data === 'object') {
+                                selected = data;
                             }
-                            // console.log('Data petugas Jumat diperbarui');
+
+                            if (!selected) {
+                                console.warn(
+                                    'Tidak ada entri petugas yang cocok untuk tanggal hari ini.'
+                                );
+                                clearPetugasData();
+                                return;
+                            }
+
+                            // Validasi tanggal terpilih
+                            const petugasDate = new Date(selected.hari);
+                            if (isNaN(petugasDate.getTime())) {
+                                console.warn('Format tanggal hari tidak valid pada entri terpilih:',
+                                    selected.hari);
+                                clearPetugasData();
+                                return;
+                            }
+
+                            // Bandingkan tanggal dan bulan
+                            const petugasDay = petugasDate.getDate();
+                            const petugasMonth = petugasDate.getMonth();
+                            if (currentDay === petugasDay && currentMonth === petugasMonth) {
+                                $('#khatib').val(selected.khatib || '');
+                                $('#imam').val(selected.imam || '');
+                                $('#muadzin').val(selected.muadzin || '');
+
+                                console.log('Data petugas Jumat diperbarui dari entri terpilih:', {
+                                    khatib: selected.khatib || '',
+                                    imam: selected.imam || '',
+                                    muadzin: selected.muadzin || ''
+                                });
+
+                                if ($('#fridayInfoPopup').is(':visible')) {
+                                    updateFridayInfoContent();
+                                }
+                            } else {
+                                clearPetugasData();
+                                console.log(
+                                    'Entri petugas terpilih tidak cocok dengan tanggal hari ini - data dikosongkan'
+                                );
+                            }
                         } else {
-                            // Kosongkan data petugas jika tanggal dan bulan tidak cocok
-                            $('#khatib').val('');
-                            $('#imam').val('');
-                            $('#muadzin').val('');
+                            // Handle response yang tidak success
+                            console.warn('Response API tidak success atau data tidak tersedia:',
+                                response.message || 'Unknown error');
+                            console.log('Full response:', response);
+                            clearPetugasData();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX Error occurred:', {
+                            xhr,
+                            status,
+                            error
+                        });
+                        let errorMessage = 'Unknown error';
+                        let shouldRetry = true;
 
-                            // Jika popup sedang ditampilkan, perbarui kontennya
-                            if ($('#fridayInfoPopup').is(':visible')) {
-                                updateFridayInfoContent();
+                        // Parse error response
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+
+                            // Jangan retry untuk error 404 (data tidak ditemukan)
+                            if (xhr.status === 404) {
+                                shouldRetry = false;
+                                clearPetugasData();
+                                console.warn('Data petugas tidak ditemukan untuk slug:', slug);
+                                return;
                             }
-                            // console.log('Data petugas tidak cocok dengan tanggal hari ini');
+                        } catch (e) {
+                            errorMessage = xhr.responseText || error || status;
+                        }
+
+                        console.error(
+                            `Error saat mengambil data petugas (Percobaan ${retryCount + 1}):`,
+                            errorMessage
+                        );
+
+                        // Retry logic untuk error selain 404
+                        if (shouldRetry && retryCount < 3) {
+                            setTimeout(() => {
+                                console.log(
+                                    `Mencoba ulang pengambilan data petugas (Percobaan ${retryCount + 2})...`
+                                );
+                                makeRequest(retryCount + 1);
+                            }, 5000); // 5 detik delay
+                        } else {
+                            console.error(
+                                'Maksimum percobaan pengambilan data petugas tercapai atau error tidak dapat di-retry.'
+                            );
+                            clearPetugasData();
                         }
                     }
-                },
-                error: function(xhr, status, error, retryCount = 0) {
-                    console.error(
-                        `Error saat mengambil data petugas (Percobaan ${retryCount + 1}):`,
-                        error, xhr.responseText);
-                    if (retryCount < this.retries) {
-                        setTimeout(() => {
-                            console.log(
-                                `Mencoba ulang pengambilan data petugas (Percobaan ${retryCount + 2})...`
-                            );
-                            $.ajax({
-                                ...this,
-                                error: (xhr, status, error) => {
-                                    this.error(xhr, status, error, retryCount +
-                                        1);
-                                }
-                            });
-                        }, this.retryDelay);
-                    } else {
-                        console.error(
-                            'Maksimum percobaan pengambilan data petugas tercapai. Tidak ada percobaan ulang lebih lanjut.'
-                        );
-                    }
+                });
+            }
+
+            // Helper function untuk membersihkan data petugas
+            function clearPetugasData() {
+                $('#khatib').val('');
+                $('#imam').val('');
+                $('#muadzin').val('');
+
+                // Jika popup sedang ditampilkan, perbarui kontennya
+                if ($('#fridayInfoPopup').is(':visible')) {
+                    updateFridayInfoContent();
                 }
-            });
+            }
+
+            // Mulai request
+            console.log('Starting makeRequest call...');
+            makeRequest();
         }
 
         // Tambahkan fungsi updateFridayInfoContent
@@ -3932,9 +4384,10 @@
 
 
                 if (typeof moment().iDate === 'function') {
-                    const hijriDate = moment(now).iDate();
-                    const hijriMonth = moment(now).iMonth();
-                    const hijriYear = moment(now).iYear();
+                    const hijriBaseMoment = moment(now);
+                    const hijriDate = hijriBaseMoment.iDate();
+                    const hijriMonth = hijriBaseMoment.iMonth();
+                    const hijriYear = hijriBaseMoment.iYear();
                     const bulanHijriyahID = [
                         'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
                         'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
@@ -3974,7 +4427,7 @@
             updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
-            updateFridayOfficials();
+            // updateFridayOfficials();
         }, 1200000); // 1200000 milidetik = 30 menit
 
         updateJumbotronData();
@@ -3987,6 +4440,10 @@
             updateSlides();
             updateDailyPrayerTimes();
         }, 120000); // 120000 milidetik = 2 menit
+
+        setInterval(function() {
+            updateFridayOfficials();
+        }, 300000); // 300000 milidetik = 5 menit
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
@@ -4014,5 +4471,160 @@
         //         window.adzanAudioPlayer.currentTime = 0;
         //     }
         // });
+
+        // Tambahkan popup izin audio di bagian atas agar pemutaran sesuai kebijakan browser
+        (function setupAudioPermissionPopup() {
+            try {
+
+                // Jika tombol lama ada, hapus agar tidak duplikat
+                const oldBtn = document.getElementById('start-audio-btn');
+                if (oldBtn) oldBtn.remove();
+
+                if (document.getElementById('audio-permission-overlay')) return;
+
+
+                const overlay = document.createElement('div');
+                overlay.id = 'audio-permission-overlay';
+                overlay.style.position = 'fixed';
+                overlay.style.top = '0';
+                overlay.style.left = '0';
+                overlay.style.right = '0';
+                overlay.style.zIndex = '10000';
+                overlay.style.background = '#fff';
+                overlay.style.color = '#003366';
+                overlay.style.padding = '12px 16px';
+                overlay.style.boxShadow = '0 2px 12px rgba(0,0,0,0.15)';
+                overlay.style.borderBottom = '1px solid #e5e7eb';
+                overlay.style.display = 'flex';
+                overlay.style.alignItems = 'center';
+                overlay.style.justifyContent = 'space-between';
+                overlay.style.gap = '12px';
+
+                const text = document.createElement('div');
+                text.textContent = 'Izinkan pemutaran audio Alarm Waktu Sholat dan Tampilkan Fullscreen.';
+                text.style.fontWeight = '600';
+                text.style.fontSize = '16px';
+
+                const actions = document.createElement('div');
+                actions.style.display = 'flex';
+                actions.style.flexDirection = 'column';
+                actions.style.alignItems = 'flex-start';
+                actions.style.gap = '8px';
+
+                const buttonsRow = document.createElement('div');
+                buttonsRow.style.display = 'flex';
+                buttonsRow.style.gap = '8px';
+
+                const allowBtn = document.createElement('button');
+                allowBtn.type = 'button';
+                allowBtn.textContent = 'Izinkan Audio & Fullscreen';
+                allowBtn.style.padding = '8px 12px';
+                allowBtn.style.borderRadius = '6px';
+                allowBtn.style.border = '1px solid #0a3a70';
+                allowBtn.style.fontWeight = '600';
+                allowBtn.style.background = '#003366';
+                allowBtn.style.color = '#fff';
+                allowBtn.style.cursor = 'pointer';
+
+                const laterBtn = document.createElement('button');
+                laterBtn.type = 'button';
+                laterBtn.textContent = 'Nanti';
+                laterBtn.style.padding = '8px 12px';
+                laterBtn.style.borderRadius = '6px';
+                laterBtn.style.border = '1px solid #bbb';
+
+                buttonsRow.appendChild(allowBtn);
+                buttonsRow.appendChild(laterBtn);
+
+                overlay.appendChild(text);
+                overlay.appendChild(actions);
+
+                // Auto hide dan hitung mundur 15 detik
+                let autoHideTimerId = null;
+                let countdownTimerId = null;
+                let remaining = 15;
+
+                const countdown = document.createElement('div');
+                countdown.id = 'audio-permission-countdown';
+                countdown.style.fontSize = '14px';
+                countdown.style.color = '#555';
+                countdown.style.fontFamily = '"JetBrains Mono", monospace';
+                countdown.textContent = 'Menutup otomatis dalam 15';
+                actions.appendChild(countdown);
+                actions.appendChild(buttonsRow);
+
+                function updateCountdown() {
+                    countdown.textContent = `Menutup otomatis dalam ${remaining}`;
+                }
+
+                const hideOverlay = () => {
+                    try {
+                        overlay.style.display = 'none';
+                    } catch (e) {}
+                    if (countdownTimerId) {
+                        clearInterval(countdownTimerId);
+                        countdownTimerId = null;
+                    }
+                    if (autoHideTimerId) {
+                        clearTimeout(autoHideTimerId);
+                        autoHideTimerId = null;
+                    }
+                    // Hapus overlay dari DOM untuk pembersihan total
+                    if (overlay && overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                };
+
+                countdownTimerId = setInterval(() => {
+                    remaining--;
+                    if (remaining <= 0) {
+                        remaining = 0;
+                        updateCountdown();
+                        clearInterval(countdownTimerId);
+                        countdownTimerId = null;
+                    } else {
+                        updateCountdown();
+                    }
+                }, 1000);
+
+                autoHideTimerId = setTimeout(() => {
+                    hideOverlay();
+                }, 15000);
+
+                // fungsi untuk masuk ke layar fullscreen
+                const enterFullscreen = async () => {
+                    try {
+                        const el = document.documentElement;
+                        if (!document.fullscreenElement) {
+                            if (el.requestFullscreen) {
+                                await el.requestFullscreen();
+                            } else if (el.webkitRequestFullscreen) {
+                                await el.webkitRequestFullscreen();
+                            } else if (el.msRequestFullscreen) {
+                                await el.msRequestFullscreen();
+                            }
+                        }
+                    } catch (e) {}
+                };
+
+                const unlockAudio = async () => {
+                    // Tombol hanya sebagai trigger interaksi: tutup overlay dan masuk fullscreen
+                    try {
+                        hideOverlay();
+                    } catch (e) {}
+
+                    await enterFullscreen();
+                };
+
+                const REPROMPT_MS = 60000; // 60 detik
+                allowBtn.addEventListener('click', unlockAudio);
+                laterBtn.addEventListener('click', hideOverlay);
+
+                document.body.appendChild(overlay);
+
+            } catch (e) {
+                console.error('Gagal membuat popup izin audio:', e);
+            }
+        })();
     });
 </script>

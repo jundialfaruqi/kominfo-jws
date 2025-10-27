@@ -45,6 +45,8 @@
                                     <option value="hari">Hari</option>
                                     <option value="bulan">Bulan</option>
                                     <option value="tahun">Tahun</option>
+                                    <option value="rentang">Rentang</option>
+                                    <option value="7hari">7 Hari (terakhir)</option>
                                 </select>
                                 @if ($filterDateMode === 'hari')
                                     <input type="date" wire:model.live="filterDay" class="form-control rounded-3"
@@ -76,6 +78,12 @@
                                     <input type="number" wire:model.live="filterYear" min="2000"
                                         max="{{ now()->year + 5 }}" class="form-control rounded-3" style="width: 8rem;"
                                         placeholder="YYYY">
+                                @elseif ($filterDateMode === 'rentang')
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <input type="date" wire:model.live="filterStartDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal awal">
+                                        <span class="mx-1">s.d.</span>
+                                        <input type="date" wire:model.live="filterEndDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal akhir">
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -116,6 +124,10 @@
                                         )->translatedFormat('F Y');
                                     } elseif ($filterDateMode === 'tahun' && !empty($filterYear)) {
                                         $filterLabel = $filterYear;
+                                    } elseif ($filterDateMode === 'rentang' && !empty($filterStartDate) && !empty($filterEndDate)) {
+                                        $filterLabel = \Carbon\Carbon::createFromFormat('Y-m-d', $filterStartDate)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::createFromFormat('Y-m-d', $filterEndDate)->translatedFormat('d F Y');
+                                    } elseif ($filterDateMode === '7hari') {
+                                        $filterLabel = \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
                                     } elseif ($filterDateMode === 'semua') {
                                         $filterLabel = 'Semua';
                                     }
@@ -127,6 +139,10 @@
                                         $filterLabel = $filterMonth ?? 'Semua';
                                     } elseif ($filterDateMode === 'tahun') {
                                         $filterLabel = $filterYear ?? 'Semua';
+                                    } elseif ($filterDateMode === 'rentang') {
+                                        $filterLabel = ($filterStartDate ?? '-') . ' s.d. ' . ($filterEndDate ?? '-');
+                                    } elseif ($filterDateMode === '7hari') {
+                                        $filterLabel = '7 hari terakhir';
                                     }
                                 }
                             @endphp
@@ -275,7 +291,16 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @php $currentSection = null; @endphp
                                             @foreach ($category['items'] as $row)
+                                                @if ($row['jenis'] !== $currentSection)
+                                                    @php $currentSection = $row['jenis']; @endphp
+                                                    <tr class="table-info">
+                                                        <td colspan="8" class="fw-bold">
+                                                            {{ $currentSection === 'masuk' ? 'Transaksi Masuk' : 'Transaksi Keluar' }}
+                                                        </td>
+                                                    </tr>
+                                                @endif
                                                 <tr>
                                                     <td>{{ $row['no'] }}</td>
                                                     <td>{{ $row['tanggal'] }}</td>
@@ -342,7 +367,7 @@
                                         <div class="text-danger small">*Tidak mengikuti filter tanggal</div>
                                     </div>
                                     <div class="ms-auto">
-                                        {{ $category['paginator']->links() }}
+                                            {{ $category['paginator']->links(data: ['scrollTo' => false]) }}
                                     </div>
                                 </div>
                             </div>
@@ -363,6 +388,7 @@
                             <option value="hari">Hari</option>
                             <option value="bulan">Bulan</option>
                             <option value="tahun">Tahun</option>
+                            <option value="rentang">Rentang</option>
                         </select>
                         @if ($filterDateMode === 'hari')
                             <input type="date" wire:model.live="filterDay" class="form-control rounded-3"
@@ -374,6 +400,12 @@
                             <input type="number" wire:model.live="filterYear" min="2000"
                                 max="{{ now()->year + 5 }}" class="form-control rounded-3" style="width: 8rem;"
                                 placeholder="YYYY">
+                        @elseif ($filterDateMode === 'rentang')
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <input type="date" wire:model.live="filterStartDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal awal">
+                                <span class="mx-1">s.d.</span>
+                                <input type="date" wire:model.live="filterEndDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal akhir">
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -394,6 +426,10 @@
                                 );
                             } elseif ($filterDateMode === 'tahun' && !empty($filterYear)) {
                                 $filterLabel = $filterYear;
+                            } elseif ($filterDateMode === 'rentang' && !empty($filterStartDate) && !empty($filterEndDate)) {
+                                $filterLabel = \Carbon\Carbon::createFromFormat('Y-m-d', $filterStartDate)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::createFromFormat('Y-m-d', $filterEndDate)->translatedFormat('d F Y');
+                            } elseif ($filterDateMode === '7hari') {
+                                $filterLabel = \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
                             } elseif ($filterDateMode === 'semua') {
                                 $filterLabel = 'Semua';
                             }
@@ -405,6 +441,10 @@
                                 $filterLabel = $filterMonth ?? 'Semua';
                             } elseif ($filterDateMode === 'tahun') {
                                 $filterLabel = $filterYear ?? 'Semua';
+                            } elseif ($filterDateMode === 'rentang') {
+                                $filterLabel = ($filterStartDate ?? '-') . ' s.d. ' . ($filterEndDate ?? '-');
+                            } elseif ($filterDateMode === '7hari') {
+                                $filterLabel = '7 hari terakhir';
                             }
                         }
                     @endphp
@@ -542,7 +582,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php $currentSection = null; @endphp
                                     @foreach ($cat['items'] as $row)
+                                        @if ($row['jenis'] !== $currentSection)
+                                            @php $currentSection = $row['jenis']; @endphp
+                                            <tr class="table-info">
+                                                <td colspan="8" class="fw-bold">
+                                                    {{ $currentSection === 'masuk' ? 'Transaksi Masuk' : 'Transaksi Keluar' }}
+                                                </td>
+                                            </tr>
+                                        @endif
                                         <tr>
                                             <td>{{ $row['no'] }}</td>
                                             <td>{{ $row['tanggal'] }}</td>
@@ -605,7 +654,7 @@
                                 <div class="text-danger small">*Tidak mengikuti filter tanggal</div>
                             </div>
                             <div class="ms-auto">
-                                {{ $cat['paginator']->links() }}
+                                        {{ $cat['paginator']->links(data: ['scrollTo' => false]) }}
                             </div>
                         </div>
                     </div>

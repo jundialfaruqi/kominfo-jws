@@ -47,13 +47,16 @@ class Keuangan extends Component
     public $deleteLaporanName;
 
     // Filter tanggal global: hari/bulan/tahun
-    public $filterDateMode = 'bulan'; // opsi: 'hari', 'bulan', 'tahun'
+    public $filterDateMode = 'bulan'; // opsi: 'semua', 'hari', 'bulan', 'tahun', 'rentang', '7hari'
     public $filterDay;   // format: Y-m-d
     public $filterMonth; // format: Y-m
     public $filterYear;  // integer (YYYY)
     // Tambahan untuk pilihan bulan agar konsisten (dropdown):
     public $filterMonthSelect; // 1-12
     public $filterMonthYearSelect; // YYYY
+    // Mode rentang tanggal
+    public $filterStartDate; // format: Y-m-d
+    public $filterEndDate;   // format: Y-m-d
 
     protected $rules = [
         'idMasjid' => 'required|exists:profils,id',
@@ -212,7 +215,22 @@ class Keuangan extends Component
             return;
         }
         // Reset halaman saat filter tanggal global berubah
-        if (in_array($name, ['filterDateMode', 'filterDay', 'filterMonth', 'filterYear'])) {
+        if (in_array($name, ['filterDateMode', 'filterDay', 'filterMonth', 'filterYear', 'filterStartDate', 'filterEndDate'])) {
+            // Sinkronisasi nilai untuk mode rentang: pastikan start <= end jika keduanya diisi
+            if ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate) && !empty($this->filterEndDate)) {
+                try {
+                    $start = Carbon::parse($this->filterStartDate);
+                    $end = Carbon::parse($this->filterEndDate);
+                    if ($start->gt($end)) {
+                        // Tukar agar tetap valid
+                        $tmp = $this->filterStartDate;
+                        $this->filterStartDate = $this->filterEndDate;
+                        $this->filterEndDate = $tmp;
+                    }
+                } catch (\Exception $e) {
+                    // Abaikan kesalahan parse; biarkan pengguna perbaiki input
+                }
+            }
             $this->resetPage();
             $this->resetAllCategoryPages();
             return;
@@ -303,10 +321,22 @@ class Keuangan extends Component
             }
         } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
             $baseQuery->whereYear('tanggal', (int) $this->filterYear);
+        } elseif ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate) && !empty($this->filterEndDate)) {
+            $baseQuery->whereBetween('tanggal', [
+                Carbon::parse($this->filterStartDate)->format('Y-m-d'),
+                Carbon::parse($this->filterEndDate)->format('Y-m-d'),
+            ]);
+        } elseif ($this->filterDateMode === '7hari') {
+            $start = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+            $end = Carbon::today('Asia/Jakarta')->format('Y-m-d');
+            $baseQuery->whereBetween('tanggal', [$start, $end]);
         }
 
-        // Urutkan kronologis
-        $baseQuery->orderBy('tanggal', 'asc');
+        // Urutkan: prioritas transaksi masuk, lalu kronologis tanggal dan id
+        $baseQuery
+            ->orderByRaw("CASE WHEN laporans.jenis = 'masuk' THEN 0 ELSE 1 END")
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('id', 'asc');
 
         // Daftar profil untuk admin memilih masjid
         $profils = collect([]);
@@ -339,6 +369,10 @@ class Keuangan extends Component
             }
         } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
             $periodStartDate = Carbon::createFromDate((int) $this->filterYear, 1, 1)->format('Y-m-d');
+        } elseif ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate)) {
+            $periodStartDate = Carbon::parse($this->filterStartDate)->format('Y-m-d');
+        } elseif ($this->filterDateMode === '7hari') {
+            $periodStartDate = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
         }
 
         // Ringkasan per kategori dan total keseluruhan (mengikuti filter tanggal)
@@ -361,6 +395,15 @@ class Keuangan extends Component
                     }
                 } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
                     $aggQuery->whereYear('tanggal', (int) $this->filterYear);
+                } elseif ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate) && !empty($this->filterEndDate)) {
+                    $aggQuery->whereBetween('tanggal', [
+                        Carbon::parse($this->filterStartDate)->format('Y-m-d'),
+                        Carbon::parse($this->filterEndDate)->format('Y-m-d'),
+                    ]);
+                } elseif ($this->filterDateMode === '7hari') {
+                    $start = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+                    $end = Carbon::today('Asia/Jakarta')->format('Y-m-d');
+                    $aggQuery->whereBetween('tanggal', [$start, $end]);
                 }
                 $agg = $aggQuery->selectRaw(
                     'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
@@ -443,6 +486,15 @@ class Keuangan extends Component
                         }
                     } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
                         $aggQuery->whereYear('tanggal', (int) $this->filterYear);
+                    } elseif ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate) && !empty($this->filterEndDate)) {
+                        $aggQuery->whereBetween('tanggal', [
+                            Carbon::parse($this->filterStartDate)->format('Y-m-d'),
+                            Carbon::parse($this->filterEndDate)->format('Y-m-d'),
+                        ]);
+                    } elseif ($this->filterDateMode === '7hari') {
+                        $start = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+                        $end = Carbon::today('Asia/Jakarta')->format('Y-m-d');
+                        $aggQuery->whereBetween('tanggal', [$start, $end]);
                     }
                     $agg = $aggQuery->selectRaw(
                         'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
@@ -574,6 +626,7 @@ class Keuangan extends Component
                             'tanggal' => Carbon::parse($laporan->tanggal)->format('d/m/Y'),
                             'uraian' => $laporan->is_opening ? ($laporan->uraian ?: 'Sisa bulan yang lalu') : $laporan->uraian,
                             'is_opening' => (bool) $laporan->is_opening,
+                            'jenis' => $laporan->is_opening ? 'masuk' : $laporan->jenis,
                             'groupCategoryName' => optional($laporan->groupCategory)->name ?? '-',
                             'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
                             'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',
@@ -664,6 +717,7 @@ class Keuangan extends Component
                             'tanggal' => Carbon::parse($laporan->tanggal)->format('d/m/Y'),
                             'uraian' => $laporan->is_opening ? ($laporan->uraian ?: 'Sisa bulan yang lalu') : $laporan->uraian,
                             'is_opening' => (bool) $laporan->is_opening,
+                            'jenis' => $laporan->is_opening ? 'masuk' : $laporan->jenis,
                             'groupCategoryName' => optional($laporan->groupCategory)->name ?? '-',
                             'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
                             'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',

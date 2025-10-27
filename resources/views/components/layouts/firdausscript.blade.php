@@ -2000,7 +2000,7 @@
                 fetchPrayerTimes();
 
                 // Update informasi masjid
-                updateMosqueInfo();
+                // updateMosqueInfo();
 
                 // Update teks marquee
                 updateScrollingText();
@@ -4045,8 +4045,6 @@
                         if (!isJumbotronActive) {
                             window.jumbotronUrls = [];
                             $jumbotronImageElement.css('display', 'none');
-                            // Hentikan animasi progress bar saat jumbotron tidak aktif
-                            $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                         }
 
                         if (window.slideUrls.length === 0) {
@@ -4085,10 +4083,10 @@
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
                             // Reset dan jalankan animasi progress bar
-                            const $progressBar = $('.jumbotron-progress-bar');
-                            $progressBar.css('width', '0%');
-                            $progressBar.css('animation',
-                                `progressAnimation ${slideDuration}ms linear forwards`);
+                            // const $progressBar = $('.jumbotron-progress-bar');
+                            // $progressBar.css('width', '0%');
+                            // $progressBar.css('animation',
+                            //     `progressAnimation ${slideDuration}ms linear forwards`);
                             // console.log(
                             // `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
                         } else {
@@ -4103,7 +4101,7 @@
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
                             // Hentikan animasi progress bar saat jumbotron tidak ditampilkan
-                            $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
+                            // $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                             // console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
@@ -4170,7 +4168,7 @@
                     });
                     $jumbotronImageElement.css('display', 'none');
                     // Hentikan animasi progress bar pada fallback
-                    $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
+                    // $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                     $(document).trigger('slideUpdated');
                 }
             }
@@ -4441,7 +4439,7 @@
         updateJumbotronData();
 
         setInterval(function() {
-            updateMosqueInfo();
+            // updateMosqueInfo();
             updateJumbotronData();
             updateMarqueeText();
             checkThemeUpdate();
@@ -4470,6 +4468,54 @@
         $(document).on('dblclick', function() {
             toggleFullScreen();
         });
+
+        // ===================== Realtime Profil Updates via Echo =====================
+        (function initProfileRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime profil updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Hanya tangani event untuk profil
+                                if (e && e.type === 'profil') {
+                                    console.log('Menerima event profil; memperbarui info masjid');
+                                    // Ambil data terbaru dari API dan render ke UI
+                                    updateMosqueInfo();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk profil`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn('Echo belum tersedia; realtime profil updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initProfileRealtimeUpdates error:', err);
+            }
+        })();
 
         // Event handler untuk menghentikan audio adzan saat halaman di-refresh atau ditutup
         // $(window).on('beforeunload', function() {
