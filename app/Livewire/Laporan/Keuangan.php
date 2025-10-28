@@ -135,6 +135,7 @@ class Keuangan extends Component
             'uraian',
             'jenis',
             'saldo',
+            'saldoInput',
             'isOpening',
         ]);
 
@@ -777,6 +778,11 @@ class Keuangan extends Component
         $this->jenis = $laporan->jenis;
         $this->saldo = $laporan->saldo;
         $this->isOpening = (bool) $laporan->is_opening;
+
+        // Set tampilan input nominal agar tidak kosong saat edit
+        $this->saldoInput = $this->saldo !== null
+            ? number_format((int) $this->saldo, 0, ',', '.')
+            : '';
 
         $this->isEdit = true;
         $this->showForm = true;
