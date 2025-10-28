@@ -16,6 +16,11 @@
             .listen('ContentUpdatedEvent', (e) => {
                 console.log(e)
             })
+
+        window.Echo.channel('global-masjid')
+            .listen('GlobalUpdatedEvent', (e) => {
+                console.log(e)
+            })
     }, 500)
 </script>
 

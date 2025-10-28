@@ -160,4 +160,5 @@ Route::get('test/testing-channel/event/{slug}', function ($slug) {
         return redirect()->route('dashboard.index')->with('error', 'Profil masjid tidak ditemukan !');
     }
     event(new \App\Events\ContentUpdatedEvent($slug, 'hello ' . $profil->name));
+    event(new \App\Events\GlobalUpdatedEvent('Testing channel global !'));
 });
