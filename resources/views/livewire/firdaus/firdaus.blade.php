@@ -315,6 +315,7 @@
     {{-- Iqomah Popup --}}
     <div id="iqomahPopup" class="iqomah-popup" style="display: none;">
         <div class="iqomah-popup-content">
+            <div id="adzanLabel" class="adzan">Menuju</div>
             <h2 class="iqomah-title">Iqomah</h2>
             <div class="iqomah-progress-container">
                 <div id="iqomahProgress" class="iqomah-progress-bar"></div>
