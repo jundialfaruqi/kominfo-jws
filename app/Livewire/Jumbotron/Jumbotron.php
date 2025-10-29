@@ -366,7 +366,7 @@ class Jumbotron extends Component
 
         // Check legacy role-based access OR Spatie permission (salah satu saja)
         $hasRoleAccess = in_array(Auth::user()->role, ['Super Admin', 'Admin']);
-        $hasPermission = Auth::user()->can('view-jumbotron');
+        $hasPermission = \Illuminate\Support\Facades\Gate::allows('view-jumbotron');
 
         // User hanya perlu memiliki SALAH SATU akses (role ATAU permission)
         if (!$hasRoleAccess && !$hasPermission) {

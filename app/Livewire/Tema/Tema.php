@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use App\Events\ContentUpdatedEvent;
 use App\Models\Profil;
+use App\Models\User;
 
 class Tema extends Component
 {
@@ -336,7 +337,8 @@ class Tema extends Component
     public function selectTheme()
     {
         try {
-            $currentUser = Auth::user();
+            // Pastikan bertipe Eloquent User agar method save() dikenali oleh linter
+            $currentUser = User::findOrFail(Auth::id());
             $theme = Theme::find($this->selectedThemeId);
 
             // Ambil slug profil untuk broadcasting

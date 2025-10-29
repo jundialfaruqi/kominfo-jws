@@ -1425,7 +1425,6 @@
             });
         }
 
-
         function updateMosqueInfo() {
             const slug = window.location.pathname.replace(/^\//, '');
 
@@ -2006,7 +2005,7 @@
                 updateScrollingText();
 
                 // Update tema jika ada perubahan
-                checkThemeUpdate();
+                // checkThemeUpdate();
 
                 // Update slides
                 updateSlides();
@@ -2016,10 +2015,10 @@
 
                 // Update audio dan gambar
                 updateAndPlayAudio();
-                updateFridayImages();
+                // updateFridayImages();
                 updateIqomahImages();
                 updateAdzanImages();
-                updateFridayOfficials();
+                // updateFridayOfficials();
 
                 // Reset prayer times handling untuk hari baru
                 handlePrayerTimes();
@@ -2061,8 +2060,6 @@
                 updateDailyPrayerTimes();
             }
         });
-
-
 
         function playBeepSound(times = 1) {
             let count = 0;
@@ -3015,8 +3012,6 @@
 
         function initFinanceOverlay() {
             fetchFinanceData();
-            // Refresh data setiap 1 menit
-            setInterval(fetchFinanceData, 60000);
             // Tidak lagi alternating; kita pakai satu scroll untuk seluruh konten
         }
 
@@ -3307,47 +3302,41 @@
                 dataType: 'json',
                 success: async function(response) {
                     if (response.success && response.data) {
-                        const previousAdzan = [];
-                        for (let i = 7; i <= 12; i++) {
-                            previousAdzan.push($(`#adzan${i}`).val() || '');
-                        }
-
-                        const adzanKeys = ['adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11',
+                        // Bangun daftar gambar langsung dari respons API
+                        const keys = ['adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11',
                             'adzan12'
                         ];
-                        adzanKeys.forEach(key => {
-                            $(`#${key}`).val(response.data[key] || '');
+                        const imagesFromApi = [];
+                        keys.forEach((key) => {
+                            const val = response.data[key];
+                            if (val) imagesFromApi.push(val);
                         });
 
-                        window.fridayImages = [];
-                        for (let i = 7; i <= 12; i++) {
-                            const adzanValue = $(`#adzan${i}`).val();
-                            if (adzanValue) {
-                                window.fridayImages.push(adzanValue);
-                            }
-                        }
-
-                        if (window.fridayImages.length === 0) {
-                            window.fridayImages = [
-                                '/images/other/doa-setelah-adzan-default.webp',
-                                '/images/other/doa-masuk-masjid-default.webp',
-                                '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                                '/images/other/non-silent-hp-default.webp'
-                            ];
+                        const prevImages = Array.isArray(window.fridayImages) ? window.fridayImages
+                            .slice() : [];
+                        window.fridayImages = imagesFromApi.length > 0 ? imagesFromApi : [
+                            '/images/other/doa-setelah-adzan-default.webp',
+                            '/images/other/doa-masuk-masjid-default.webp',
+                            '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                            '/images/other/non-silent-hp-default.webp'
+                        ];
+                        if (imagesFromApi.length === 0) {
                             console.log('Menggunakan gambar default karena respons API kosong:',
                                 window.fridayImages);
                         }
 
-                        // Preload gambar baru jika belum ada di cache
-                        const urlsToPreload = window.fridayImages.filter(url => !window.imageCache[
-                            url] || !window.imageCache[url].complete);
-                        if (urlsToPreload.length > 0) {
-                            await preloadImages(urlsToPreload);
-                        }
-                        // Bersihkan cache yang tidak digunakan
+                        // Preload semua gambar Friday yang baru
+                        await preloadImages(window.fridayImages);
                         clearUnusedCache(window.fridayImages);
-                        // Restart slider jika popup aktif
-                        if ($('#fridayInfoPopup').is(':visible') && !fridayImageSliderInterval) {
+
+                        // Jika daftar gambar berubah, restart slider agar memakai gambar terbaru
+                        const changed = prevImages.length !== window.fridayImages.length ||
+                            prevImages.some((v, i) => v !== window.fridayImages[i]);
+                        if (changed) {
+                            if (fridayImageSliderInterval) {
+                                clearInterval(fridayImageSliderInterval);
+                                fridayImageSliderInterval = null;
+                            }
                             startFridayImageSlider();
                         }
                     }
@@ -3359,13 +3348,7 @@
         }
 
         function startFridayImageSlider() {
-            window.fridayImages = [];
-            for (let i = 7; i <= 12; i++) {
-                const adzanElement = $(`#adzan${i}`);
-                if (adzanElement.val()) {
-                    window.fridayImages.push(adzanElement.val());
-                }
-            }
+            let images = Array.isArray(window.fridayImages) ? window.fridayImages.slice() : [];
 
             const $fridayImageElement = $('#currentFridayImage');
             if (!$fridayImageElement.length) {
@@ -3373,14 +3356,14 @@
                 return;
             }
 
-            if (window.fridayImages.length === 0) {
-                window.fridayImages = [
+            if (images.length === 0) {
+                images = [
                     '/images/other/doa-setelah-adzan-default.webp',
                     '/images/other/doa-masuk-masjid-default.webp',
                     '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
                     '/images/other/non-silent-hp-default.webp'
                 ];
-                console.log('Menggunakan 4 gambar default untuk slider Friday:', window.fridayImages);
+                console.log('Menggunakan 4 gambar default untuk slider Friday:', images);
             }
 
             if (!fridaySliderStartTime) {
@@ -3390,32 +3373,31 @@
 
             async function initFridaySlider() {
                 try {
-                    await preloadImages(window.fridayImages);
+                    await preloadImages(images);
                     console.log('Semua gambar Friday telah dimuat, memulai slider');
 
                     let lastIndex = -1;
 
                     function updateFridayImage() {
-                        if (!window.fridayImages || window.fridayImages.length === 0) {
-                            window.fridayImages = [
+                        if (!images || images.length === 0) {
+                            images = [
                                 '/images/other/doa-setelah-adzan-default.webp',
                                 '/images/other/doa-masuk-masjid-default.webp',
                                 '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
                                 '/images/other/non-silent-hp-default.webp'
                             ];
-                            console.log('Menggunakan 4 gambar default dalam updateFridayImage:', window
-                                .fridayImages);
+                            console.log('Menggunakan 4 gambar default dalam updateFridayImage:', images);
                         }
 
                         const now = getCurrentTimeFromServer().getTime();
                         const elapsedMs = now - fridaySliderStartTime;
                         const elapsedSeconds = Math.floor(elapsedMs / 1000);
-                        const currentIndex = Math.floor(elapsedSeconds / 20) % window.fridayImages.length;
+                        const currentIndex = Math.floor(elapsedSeconds / 20) % images.length;
 
                         if (currentIndex !== lastIndex) {
                             lastIndex = currentIndex;
 
-                            const currentUrl = window.imageCache[window.fridayImages[currentIndex]]?.src ||
+                            const currentUrl = window.imageCache[images[currentIndex]]?.src ||
                                 '/images/other/doa-masuk-masjid-default.webp';
 
                             $fridayImageElement.css({
@@ -3424,7 +3406,7 @@
                             });
                             console.log('Gambar Friday diperbarui ke:', currentUrl);
 
-                            clearUnusedCache(window.fridayImages);
+                            clearUnusedCache(images);
                         }
                     }
 
@@ -4017,7 +3999,7 @@
             ].filter(url => url.trim() !== '');
 
             if (window.slideUrls.length === 0) {
-                console.warn('Tidak ada slide mosque-image yang valid, menggunakan gambar default');
+                // console.warn('Tidak ada slide mosque-image yang valid, menggunakan gambar default');
                 window.slideUrls = ['/images/other/slide-jws-default.jpg'];
             }
 
@@ -4242,8 +4224,8 @@
                             const data = response.data;
 
                             if (Array.isArray(data)) {
-                                console.log(
-                                    `Menerima array petugas dengan panjang: ${data.length}`);
+                                // console.log(
+                                // `Menerima array petugas dengan panjang: ${data.length}`);
                                 for (let i = 0; i < data.length; i++) {
                                     const item = data[i];
                                     const d = new Date(item.hari);
@@ -4430,7 +4412,7 @@
         // Perbarui dan putar audio setiap 30 menit
         setInterval(function() {
             updateAndPlayAudio();
-            updateFridayImages();
+            // updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
             // updateFridayOfficials();
@@ -4441,15 +4423,15 @@
         setInterval(function() {
             // updateMosqueInfo();
             updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
+            // updateMarqueeText();
+            // checkThemeUpdate();
             updateSlides();
             updateDailyPrayerTimes();
         }, 120000); // 120000 milidetik = 2 menit
 
-        setInterval(function() {
-            updateFridayOfficials();
-        }, 300000); // 300000 milidetik = 5 menit
+        // setInterval(function() {
+        //     updateFridayOfficials();
+        // }, 300000);
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
@@ -4508,12 +4490,261 @@
                             subscribe();
                         } else if (attempts >= maxAttempts) {
                             clearInterval(interval);
-                            console.warn('Echo belum tersedia; realtime profil updates dinonaktifkan');
+                            console.warn(
+                                'Echo belum tersedia; realtime profil updates dinonaktifkan');
                         }
                     }, 500);
                 }
             } catch (err) {
                 console.warn('initProfileRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Petugas Updates via Echo =====================
+        (function initPetugasRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime petugas updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk petugas Jumat
+                                if (e && e.type === 'petugas') {
+                                    console.log(
+                                        'Menerima event petugas; memperbarui data petugas Jumat'
+                                    );
+                                    // Ambil data terbaru dari API dan render ke UI
+                                    updateFridayOfficials();
+                                }
+                            });
+                        // console.log(`Subscribed ke channel masjid-${slug} untuk petugas`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime petugas updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initPetugasRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Marquee Updates via Echo =====================
+        (function initMarqueeRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime marquee updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk marquee
+                                if (e && e.type === 'marquee') {
+                                    console.log(
+                                        'Menerima event marquee; memperbarui teks berjalan');
+                                    // Ambil data marquee terbaru dari API dan render ke UI
+                                    updateMarqueeText();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk marquee`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime marquee updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initMarqueeRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Slides (Friday Images) Updates via Echo =====================
+        (function initFridayImagesRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime slides updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk update gambar Friday
+                                // Komponen Adzan mem-broadcast dengan type 'adzan'
+                                if (e && e.type === 'adzan') {
+                                    console.log('Menerima event slide; memperbarui gambar Friday');
+                                    // Ambil data terbaru dari API dan render ke UI
+                                    updateFridayImages();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk slides friday`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime slides updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initFridayImagesRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Theme Updates via Echo =====================
+        (function initThemeRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime tema updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk perubahan tema
+                                if (e && e.type === 'theme') {
+                                    console.log('Menerima event tema; memeriksa pembaruan tema');
+                                    // Cek API tema dan reload bila perlu
+                                    checkThemeUpdate();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk tema`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime tema updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initThemeRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Finance Overlay Updates via Echo =====================
+        (function initFinanceRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime finance updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk pembaruan laporan keuangan
+                                if (e && e.type === 'laporan') {
+                                    console.log('Menerima event laporan; memuat ulang data finance overlay');
+                                    // Ambil data finance terbaru dari API dan render ke UI
+                                    fetchFinanceData();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk finance overlay`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel (finance):', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn('Echo belum tersedia; realtime finance updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initFinanceRealtimeUpdates error:', err);
             }
         })();
 
