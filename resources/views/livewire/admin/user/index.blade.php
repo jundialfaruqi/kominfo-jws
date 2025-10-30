@@ -56,8 +56,10 @@
                                 <div class="ms-auto text-secondary">
                                     <span>Cari</span>
                                     <div class="ms-2 d-inline-block">
-                                        <input wire:model.live="search" type="text"
-                                            class="form-control form-control py-1 rounded-3" placeholder="Ketik disini">
+                                        <input wire:model.live="search" type="search" name="q" id="q"
+                                            inputmode="search" autocapitalize="none" spellcheck="false"
+                                            class="form-control form-control py-1 rounded-3" autocomplete="off"
+                                            placeholder="Ketik disini">
                                     </div>
                                 </div>
                             </div>
@@ -66,7 +68,7 @@
                         @include('livewire.admin.user.table')
 
                         <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                            {{ $user->links() }}
+                            {{ $user->links(data: ['scrollTo' => false]) }}
                         </div>
                     </div>
                 </div>

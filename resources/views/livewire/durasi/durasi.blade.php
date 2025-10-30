@@ -72,7 +72,7 @@
                             @include('livewire.durasi.table')
 
                             <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                                {{ $durasiList->links() }}
+                                {{ $durasiList->links(data: ['scrollTo' => false]) }}
                             </div>
                         @endif
                     </div>

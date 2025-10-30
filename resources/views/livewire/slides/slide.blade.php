@@ -77,7 +77,7 @@
                                 @include('livewire.slides.table')
 
                                 <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                                    {{ $slideList->links() }}
+                                    {{ $slideList->links(data: ['scrollTo' => false]) }}
                                 </div>
                             @endif
                         @endif

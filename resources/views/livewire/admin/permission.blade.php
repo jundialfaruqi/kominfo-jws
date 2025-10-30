@@ -178,7 +178,7 @@
                             </table>
                         </div>
                         <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                            {{ $permissions->links() }}
+                            {{ $permissions->links(data: ['scrollTo' => false]) }}
                         </div>
                     </div>
                 </div>

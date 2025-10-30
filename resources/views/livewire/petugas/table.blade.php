@@ -104,6 +104,6 @@
     </div>
 
     <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-        {{ $petugasList->links() }}
+        {{ $petugasList->links(data: ['scrollTo' => false]) }}
     </div>
 @endif

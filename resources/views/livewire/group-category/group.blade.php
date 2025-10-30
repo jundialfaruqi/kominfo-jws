@@ -9,18 +9,21 @@
                                 {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Group Category' : 'Group Category Saya' }}
                             </h3>
                             @can('create-group-category')
-                            <div class="card-actions">
-                                <a href="{{ route('group-category.create') }}" class="btn py-2 px-2 rounded-3 shadow-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-plus">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                                        <path d="M13.5 6.5l4 4" />
-                                        <path d="M16 19h6" />
-                                        <path d="M19 16v6" />
-                                    </svg>
-                                    Tambah Group Category
-                                </a>
-                            </div>
+                                <div class="card-actions">
+                                    <a href="{{ route('group-category.create') }}" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-plus">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                                            <path d="M13.5 6.5l4 4" />
+                                            <path d="M16 19h6" />
+                                            <path d="M19 16v6" />
+                                        </svg>
+                                        Tambah Group Category
+                                    </a>
+                                </div>
                             @endcan
                         </div>
 
@@ -30,7 +33,8 @@
                                     <div class="text-secondary">
                                         Lihat
                                         <div class="mx-2 d-inline-block">
-                                            <select wire:model.live="paginate" class="form-select form-select py-1 rounded-3">
+                                            <select wire:model.live="paginate"
+                                                class="form-select form-select py-1 rounded-3">
                                                 <option>5</option>
                                                 <option>10</option>
                                                 <option>25</option>
@@ -42,7 +46,9 @@
                                     <div class="ms-auto text-secondary">
                                         <span>Cari</span>
                                         <div class="ms-2 d-inline-block">
-                                            <input wire:model.live="search" type="text" class="form-control form-control py-1 rounded-3" placeholder="Ketik disini">
+                                            <input wire:model.live="search" type="text"
+                                                class="form-control form-control py-1 rounded-3"
+                                                placeholder="Ketik disini">
                                         </div>
                                     </div>
                                 </div>
@@ -50,7 +56,8 @@
                         @endif
 
                         <div class="table-responsive">
-                            <table class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
+                            <table
+                                class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
                                 <thead>
                                     <tr>
                                         <th class="w-1">No.</th>
@@ -77,18 +84,30 @@
                                             </td>
                                             <td class="text-center">
                                                 @can('edit-group-category')
-                                                    <a wire:navigate href="{{ route('group-category.edit', $group->id) }}" class="btn py-2 px-2 rounded-3 shadow-sm" title="Edit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-pencil">
+                                                    <a wire:navigate href="{{ route('group-category.edit', $group->id) }}"
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm" title="Edit">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-pencil">
                                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                            <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                                                            <path
+                                                                d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
                                                             <path d="M13.5 6.5l4 4" />
                                                         </svg>
                                                         Edit
                                                     </a>
                                                 @endcan
                                                 @can('delete-group-category')
-                                                    <button wire:click="delete('{{ $group->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm ms-2" title="Hapus" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                                    <button wire:click="delete('{{ $group->id }}')"
+                                                        class="btn py-2 px-2 rounded-3 shadow-sm ms-2" title="Hapus"
+                                                        data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
                                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                             <path d="M4 7h16" />
                                                             <path d="M10 11v6" />
@@ -103,7 +122,8 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="{{ $isAdmin ? 4 : 3 }}" class="text-center text-muted">Tidak ada data.</td>
+                                            <td colspan="{{ $isAdmin ? 4 : 3 }}" class="text-center text-muted">Tidak
+                                                ada data.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -111,7 +131,7 @@
                         </div>
 
                         <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                            {{ $groupList->links() }}
+                            {{ $groupList->links(data: ['scrollTo' => false]) }}
                         </div>
                     </div>
                 </div>

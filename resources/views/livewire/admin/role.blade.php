@@ -189,7 +189,7 @@
                             </table>
                         </div>
                         <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                            {{ $roles->links() }}
+                            {{ $roles->links(data: ['scrollTo' => false]) }}
                         </div>
                     </div>
                 </div>

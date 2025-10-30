@@ -196,7 +196,7 @@
                                 </table>
                             </div>
                             <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                                {{ $profilList->links() }}
+                                {{ $profilList->links(data: ['scrollTo' => false]) }}
                             </div>
                         @endif
                     </div>
