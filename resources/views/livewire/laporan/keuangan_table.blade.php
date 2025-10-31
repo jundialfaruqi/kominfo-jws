@@ -80,9 +80,13 @@
                                         placeholder="YYYY">
                                 @elseif ($filterDateMode === 'rentang')
                                     <div class="d-flex flex-wrap align-items-center gap-2">
-                                        <input type="date" wire:model.live="filterStartDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal awal">
+                                        <input type="date" wire:model.live="filterStartDate"
+                                            class="form-control rounded-3" style="width: auto;"
+                                            placeholder="Tanggal awal">
                                         <span class="mx-1">s.d.</span>
-                                        <input type="date" wire:model.live="filterEndDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal akhir">
+                                        <input type="date" wire:model.live="filterEndDate"
+                                            class="form-control rounded-3" style="width: auto;"
+                                            placeholder="Tanggal akhir">
                                     </div>
                                 @endif
                             </div>
@@ -124,10 +128,27 @@
                                         )->translatedFormat('F Y');
                                     } elseif ($filterDateMode === 'tahun' && !empty($filterYear)) {
                                         $filterLabel = $filterYear;
-                                    } elseif ($filterDateMode === 'rentang' && !empty($filterStartDate) && !empty($filterEndDate)) {
-                                        $filterLabel = \Carbon\Carbon::createFromFormat('Y-m-d', $filterStartDate)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::createFromFormat('Y-m-d', $filterEndDate)->translatedFormat('d F Y');
+                                    } elseif (
+                                        $filterDateMode === 'rentang' &&
+                                        !empty($filterStartDate) &&
+                                        !empty($filterEndDate)
+                                    ) {
+                                        $filterLabel =
+                                            \Carbon\Carbon::createFromFormat(
+                                                'Y-m-d',
+                                                $filterStartDate,
+                                            )->translatedFormat('d F Y') .
+                                            ' s.d. ' .
+                                            \Carbon\Carbon::createFromFormat('Y-m-d', $filterEndDate)->translatedFormat(
+                                                'd F Y',
+                                            );
                                     } elseif ($filterDateMode === '7hari') {
-                                        $filterLabel = \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
+                                        $filterLabel =
+                                            \Carbon\Carbon::today('Asia/Jakarta')
+                                                ->subDays(6)
+                                                ->translatedFormat('d F Y') .
+                                            ' s.d. ' .
+                                            \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
                                     } elseif ($filterDateMode === 'semua') {
                                         $filterLabel = 'Semua';
                                     }
@@ -189,19 +210,34 @@
                                         @foreach ($summaryCategoriesAdmin ?? [] as $sum)
                                             <tr>
                                                 <td>{{ $sum['categoryName'] }}</td>
-                                                <td class="text-end">{{ number_format($sum['sumMasuk'], 0, ',', '.') }}
+                                                <td class="text-end">
+                                                    Rp
+                                                    {{ number_format($sum['sumMasuk'], 0, ',', '.') }}
                                                 </td>
                                                 <td class="text-end">
+                                                    Rp
                                                     {{ number_format($sum['sumKeluar'], 0, ',', '.') }}
                                                 </td>
-                                                <td class="text-end">{{ number_format($sum['ending'], 0, ',', '.') }}
+                                                <td class="text-end">
+                                                    Rp
+                                                    {{ number_format($sum['ending'], 0, ',', '.') }}
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
+                                        <tr>
+                                            <th class="text-end text-uppercase">Sisa saldo akhir saat ini</th>
+                                            <th class="text-end" colspan="3">
+                                                Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                            </th>
+                                        </tr>
                                         <tr class="bg-primary-lt">
-                                            <th class="text-end">Total :</th>
+                                            <th class="text-end text-uppercase">
+                                                Saldo akhir
+                                                {{ $filterLabel }}
+                                                <span class="text-muted small">(pemasukan - pengeluaran)</span>
+                                            </th>
                                             <th class="text-end">
                                                 Rp {{ number_format($grandTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
                                             </th>
@@ -210,16 +246,14 @@
                                                 {{ number_format($grandTotalsAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
                                             </th>
                                             <th class="text-end">
-                                                @if ($filterDateMode === 'bulan')
-                                                    Rp {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
-                                                @else
-                                                    Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}
-                                                @endif
+                                                Rp
+                                                {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                                             </th>
                                         </tr>
                                         @if ($filterDateMode === 'bulan')
                                             <tr class="bg-secondary text-white">
-                                                <th class="text-end">Total Termasuk Saldo Sebelumnya :</th>
+                                                <th class="text-end text-uppercase">Total pemasukan, pengeluaran dan
+                                                    saldo akhir saat ini</th>
                                                 <th class="text-end">
                                                     Rp
                                                     {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) + ($previousTotalsAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
@@ -259,7 +293,8 @@
                                         <div class="input-icon">
                                             <input
                                                 wire:model.live="searchPerCategory.{{ $group['masjidId'] }}.{{ $category['categoryId'] }}"
-                                                type="text" class="form-control form-control-sm rounded-3 py-2 w-100"
+                                                type="text"
+                                                class="form-control form-control-sm rounded-3 py-2 w-100"
                                                 placeholder="Cari uraian di kategori ini...">
                                             <span class="input-icon-addon">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20"
@@ -358,7 +393,9 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center p-3 border-top-0">
                                     <div>
-                                        <div class="fw-semibold">Total kategori {{ $category['categoryName'] }}</div>
+                                        <div class="fw-semibold">
+                                            Total kategori {{ $category['categoryName'] }}
+                                        </div>
                                         <div class="text-muted">Masuk:
                                             Rp {{ $category['totals']['totalMasukDisplay'] }} | Keluar:
                                             Rp {{ $category['totals']['totalKeluarDisplay'] }} | Sisa:
@@ -367,7 +404,7 @@
                                         <div class="text-danger small">*Tidak mengikuti filter tanggal</div>
                                     </div>
                                     <div class="ms-auto">
-                                            {{ $category['paginator']->links(data: ['scrollTo' => false]) }}
+                                        {{ $category['paginator']->links(data: ['scrollTo' => false]) }}
                                     </div>
                                 </div>
                             </div>
@@ -403,9 +440,11 @@
                                 placeholder="YYYY">
                         @elseif ($filterDateMode === 'rentang')
                             <div class="d-flex flex-wrap align-items-center gap-2">
-                                <input type="date" wire:model.live="filterStartDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal awal">
+                                <input type="date" wire:model.live="filterStartDate"
+                                    class="form-control rounded-3" style="width: auto;" placeholder="Tanggal awal">
                                 <span class="mx-1">s.d.</span>
-                                <input type="date" wire:model.live="filterEndDate" class="form-control rounded-3" style="width: auto;" placeholder="Tanggal akhir">
+                                <input type="date" wire:model.live="filterEndDate" class="form-control rounded-3"
+                                    style="width: auto;" placeholder="Tanggal akhir">
                             </div>
                         @endif
                     </div>
@@ -427,10 +466,24 @@
                                 );
                             } elseif ($filterDateMode === 'tahun' && !empty($filterYear)) {
                                 $filterLabel = $filterYear;
-                            } elseif ($filterDateMode === 'rentang' && !empty($filterStartDate) && !empty($filterEndDate)) {
-                                $filterLabel = \Carbon\Carbon::createFromFormat('Y-m-d', $filterStartDate)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::createFromFormat('Y-m-d', $filterEndDate)->translatedFormat('d F Y');
+                            } elseif (
+                                $filterDateMode === 'rentang' &&
+                                !empty($filterStartDate) &&
+                                !empty($filterEndDate)
+                            ) {
+                                $filterLabel =
+                                    \Carbon\Carbon::createFromFormat('Y-m-d', $filterStartDate)->translatedFormat(
+                                        'd F Y',
+                                    ) .
+                                    ' s.d. ' .
+                                    \Carbon\Carbon::createFromFormat('Y-m-d', $filterEndDate)->translatedFormat(
+                                        'd F Y',
+                                    );
                             } elseif ($filterDateMode === '7hari') {
-                                $filterLabel = \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') . ' s.d. ' . \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
+                                $filterLabel =
+                                    \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') .
+                                    ' s.d. ' .
+                                    \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
                             } elseif ($filterDateMode === 'semua') {
                                 $filterLabel = 'Semua';
                             }
@@ -495,15 +548,31 @@
                                 @foreach ($summaryCategoriesNonAdmin ?? [] as $sum)
                                     <tr>
                                         <td>{{ $sum['categoryName'] }}</td>
-                                        <td class="text-end">{{ number_format($sum['sumMasuk'], 0, ',', '.') }}</td>
-                                        <td class="text-end">{{ number_format($sum['sumKeluar'], 0, ',', '.') }}</td>
-                                        <td class="text-end">{{ number_format($sum['ending'], 0, ',', '.') }}</td>
+                                        <td class="text-end">
+                                            Rp {{ number_format($sum['sumMasuk'], 0, ',', '.') }}
+                                        </td>
+
+                                        <td class="text-end">
+                                            Rp {{ number_format($sum['sumKeluar'], 0, ',', '.') }}
+                                        </td>
+                                        <td class="text-end">
+                                            Rp {{ number_format($sum['ending'], 0, ',', '.') }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                             <tfoot>
+                                <tr>
+                                    <th class="text-end text-uppercase">Sisa saldo akhir saat ini
+                                    </th>
+                                    <th colspan="3" class="text-end">
+                                        Rp {{ number_format($grandTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                    </th>
+                                </tr>
                                 <tr class="bg-primary-lt text-white">
-                                    <th class="text-end">Total :</th>
+                                    <th class="text-end text-uppercase">Saldo Akhir {{ $filterLabel }}
+                                        <span class="text-muted small">(Pemasukan - Pengeluaran)</span>
+                                    </th>
                                     <th class="text-end">
                                         Rp {{ number_format($grandTotalsNonAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
                                     </th>
@@ -511,12 +580,14 @@
                                         Rp {{ number_format($grandTotalsNonAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
                                     </th>
                                     <th class="text-end">
-                                        Rp {{ number_format($grandTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}
+                                        Rp
+                                        {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) - ($grandTotalsNonAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                                     </th>
                                 </tr>
                                 @if ($filterDateMode === 'bulan')
                                     <tr class="bg-secondary text-white">
-                                        <th class="text-end">Total Termasuk Saldo Sebelumnya :</th>
+                                        <th class="text-end text-uppercase">Total pemasukan, pengeluaran dan saldo
+                                            akhir saat ini</th>
                                         <th class="text-end">
                                             Rp
                                             {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) + ($previousTotalsNonAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
@@ -646,7 +717,9 @@
                         </div>
                         <div class="d-flex justify-content-between align-items-center p-3 border-top-0">
                             <div>
-                                <div class="fw-semibold">Total kategori {{ $cat['categoryName'] }}</div>
+                                <div class="fw-semibold">
+                                    Total kategori {{ $cat['categoryName'] }}
+                                </div>
                                 <div class="text-muted">Masuk:
                                     Rp {{ $cat['totals']['totalMasukDisplay'] }} | Keluar:
                                     Rp {{ $cat['totals']['totalKeluarDisplay'] }} | Sisa:
@@ -655,7 +728,7 @@
                                 <div class="text-danger small">*Tidak mengikuti filter tanggal</div>
                             </div>
                             <div class="ms-auto">
-                                        {{ $cat['paginator']->links(data: ['scrollTo' => false]) }}
+                                {{ $cat['paginator']->links(data: ['scrollTo' => false]) }}
                             </div>
                         </div>
                     </div>

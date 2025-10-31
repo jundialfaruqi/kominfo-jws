@@ -66,5 +66,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // API route untuk membuat profil masjid milik user itu sendiri
     Route::post('profil-masjid/{id}', [API\ProfilMasjidController::class, 'createProfilMasjid'])->name('api.profil-masjid.create');
     // API route untuk update data profil masjid milik user itu sendiri untuk non admin super admin user
-    Route::put('profil-masjid/{id}', [API\ProfilMasjidController::class, 'updateProfilMasjid'])->name('api.profil-masjid.update');
+    Route::post('profil-masjid/{id}', [API\ProfilMasjidController::class, 'updateProfilMasjid'])->name('api.profil-masjid.update');
 });

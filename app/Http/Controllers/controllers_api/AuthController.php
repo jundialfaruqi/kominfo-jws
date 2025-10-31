@@ -24,7 +24,10 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return response()->json(['message' => 'Email atau password salah'], 401);
+            return response()->json([
+                'success' => false,
+                'message' => 'Email atau password salah'
+            ], 401);
         }
 
         $token = $user->createToken('api')->plainTextToken;
@@ -38,9 +41,11 @@ class AuthController extends Controller
         ];
 
         return response()->json([
+            'success' => true,
+            'message' => 'Login berhasil',
             'token' => $token,
             'user' => $userData,
-        ]);
+        ], 200);
     }
 
     public function user(Request $request)
@@ -61,6 +66,9 @@ class AuthController extends Controller
         if ($user && $user->currentAccessToken()) {
             $user->currentAccessToken()->delete();
         }
-        return response()->json(['message' => 'Logout berhasil']);
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout berhasil'
+        ], 200);
     }
 }

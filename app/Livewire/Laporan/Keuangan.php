@@ -605,6 +605,52 @@ class Keuangan extends Component
                     $totalKeluar = 0;
                     $rows = [];
 
+                    // Hitung jumlah transaksi per jenis yang sudah tampil di halaman sebelumnya (admin)
+                    $masukSeenBefore = 0;
+                    $keluarSeenBefore = 0;
+                    $firstItem = collect($paginator->items())->first();
+                    if ($startNo > 0 && $firstItem) {
+                        $boundaryDate = $firstItem->tanggal;
+                        $boundaryId = $firstItem->id;
+
+                        // Basis query untuk perhitungan offset dengan boundary item pertama halaman
+                        $offsetBase = ModelsLaporan::query()
+                            ->where('id_masjid', $masjidId)
+                            ->where('id_group_category', $catId);
+                        if (!empty($localSearchAdmin)) {
+                            $offsetBase->where('uraian', 'like', '%' . $localSearchAdmin . '%');
+                        }
+
+                        // Masuk (termasuk saldo awal) sebelum boundary
+                        $masukSeenBefore = (clone $offsetBase)
+                            ->where(function ($q) {
+                                $q->where('is_opening', 1)
+                                  ->orWhere('jenis', 'masuk');
+                            })
+                            ->where(function ($q) use ($boundaryDate, $boundaryId) {
+                                $q->where('tanggal', '<', $boundaryDate)
+                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                      $q2->where('tanggal', '=', $boundaryDate)
+                                         ->where('id', '<', $boundaryId);
+                                  });
+                            })
+                            ->count();
+
+                        // Keluar sebelum boundary (saldo awal tidak dihitung keluar)
+                        $keluarSeenBefore = (clone $offsetBase)
+                            ->where('jenis', 'keluar')
+                            ->where(function ($q) use ($boundaryDate, $boundaryId) {
+                                $q->where('tanggal', '<', $boundaryDate)
+                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                      $q2->where('tanggal', '=', $boundaryDate)
+                                         ->where('id', '<', $boundaryId);
+                                  });
+                            })
+                            ->count();
+                    }
+
+                    $masukLocal = 0;
+                    $keluarLocal = 0;
                     foreach ($paginator->items() as $i => $laporan) {
                         $masuk = 0;
                         $keluar = 0;
@@ -621,9 +667,20 @@ class Keuangan extends Component
                         $totalKeluar += $keluar;
                         $runningBalance += $masuk - $keluar;
 
+                        // Penomoran lintas halaman per jenis (saldo awal dianggap masuk)
+                        $jenisNormalized = $laporan->is_opening ? 'masuk' : $laporan->jenis;
+                        if ($jenisNormalized === 'masuk') {
+                            $masukLocal++;
+                        } elseif ($jenisNormalized === 'keluar') {
+                            $keluarLocal++;
+                        }
+                        $rowNo = $jenisNormalized === 'masuk'
+                            ? ($masukSeenBefore + $masukLocal)
+                            : ($keluarSeenBefore + $keluarLocal);
+
                         $rows[] = [
                             'id' => $laporan->id,
-                            'no' => (int) $startNo + (int) $i + 1,
+                            'no' => (int) $rowNo,
                             'tanggal' => Carbon::parse($laporan->tanggal)->format('d/m/Y'),
                             'uraian' => $laporan->is_opening ? ($laporan->uraian ?: 'Sisa bulan yang lalu') : $laporan->uraian,
                             'is_opening' => (bool) $laporan->is_opening,
@@ -691,11 +748,58 @@ class Keuangan extends Component
                     $paginator = $catQuery->paginate($perPageNonAdmin, ['*'], $pageName);
                     $startNo = ((int) $paginator->currentPage() - 1) * (int) $paginator->perPage();
 
+                    // Hitung jumlah transaksi per jenis yang sudah tampil di halaman sebelumnya
+                    $masukSeenBefore = 0;
+                    $keluarSeenBefore = 0;
+                    $firstItem = collect($paginator->items())->first();
+                    if ($startNo > 0 && $firstItem) {
+                        $boundaryDate = $firstItem->tanggal;
+                        $boundaryId = $firstItem->id;
+
+                        // Basis query untuk perhitungan offset dengan boundary item pertama halaman
+                        $offsetBase = ModelsLaporan::query()
+                            ->where('id_masjid', $profil->id)
+                            ->where('id_group_category', $catId);
+                        if (!empty($localSearchNonAdmin)) {
+                            $offsetBase->where('uraian', 'like', '%' . $localSearchNonAdmin . '%');
+                        }
+
+                        // Masuk (termasuk saldo awal) sebelum boundary
+                        $masukSeenBefore = (clone $offsetBase)
+                            ->where(function ($q) {
+                                $q->where('is_opening', 1)
+                                  ->orWhere('jenis', 'masuk');
+                            })
+                            ->where(function ($q) use ($boundaryDate, $boundaryId) {
+                                $q->where('tanggal', '<', $boundaryDate)
+                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                      $q2->where('tanggal', '=', $boundaryDate)
+                                         ->where('id', '<', $boundaryId);
+                                  });
+                            })
+                            ->count();
+
+                        // Keluar sebelum boundary (saldo awal tidak dihitung keluar)
+                        $keluarSeenBefore = (clone $offsetBase)
+                            ->where('is_opening', 0)
+                            ->where('jenis', 'keluar')
+                            ->where(function ($q) use ($boundaryDate, $boundaryId) {
+                                $q->where('tanggal', '<', $boundaryDate)
+                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                      $q2->where('tanggal', '=', $boundaryDate)
+                                         ->where('id', '<', $boundaryId);
+                                  });
+                            })
+                            ->count();
+                    }
+
                     $runningBalance = 0;
                     $totalMasuk = 0;
                     $totalKeluar = 0;
                     $rows = [];
 
+                    $masukIndex = 0;
+                    $keluarIndex = 0;
                     foreach ($paginator->items() as $i => $laporan) {
                         $masuk = 0;
                         $keluar = 0;
@@ -712,13 +816,19 @@ class Keuangan extends Component
                         $totalKeluar += $keluar;
                         $runningBalance += $masuk - $keluar;
 
+                        $jenisDisplay = $laporan->is_opening ? 'masuk' : $laporan->jenis;
+                        $noJenis = ($jenisDisplay === 'masuk')
+                            ? ($masukSeenBefore + (++$masukIndex))
+                            : ($keluarSeenBefore + (++$keluarIndex));
+
                         $rows[] = [
                             'id' => $laporan->id,
-                            'no' => (int) $startNo + (int) $i + 1,
+                            // Nomor berkelanjutan per jenis transaksi (masuk/keluar) lintas halaman
+                            'no' => (int) $noJenis,
                             'tanggal' => Carbon::parse($laporan->tanggal)->format('d/m/Y'),
                             'uraian' => $laporan->is_opening ? ($laporan->uraian ?: 'Sisa bulan yang lalu') : $laporan->uraian,
                             'is_opening' => (bool) $laporan->is_opening,
-                            'jenis' => $laporan->is_opening ? 'masuk' : $laporan->jenis,
+                            'jenis' => $jenisDisplay,
                             'groupCategoryName' => optional($laporan->groupCategory)->name ?? '-',
                             'masukDisplay' => $masuk > 0 ? number_format($masuk, 0, ',', '.') : '-',
                             'keluarDisplay' => $keluar > 0 ? number_format($keluar, 0, ',', '.') : '-',
