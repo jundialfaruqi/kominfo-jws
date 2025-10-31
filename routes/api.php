@@ -3,10 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\controllers_api as API;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
 // [ROUTE PROFIL MASJID]
 // API route untuk mendapatkan data profil masjid
 Route::get('profil/{slug}', [API\ProfilController::class, 'get_profil'])->name('api.profil');
@@ -54,3 +50,21 @@ Route::get('refresh-prayer-times', [API\MasterController::class, 'get_refresh_pr
 Route::get('balance-summary/{slug}', [API\ProfilController::class, 'get_balance_summary'])->name('api.balance-summary');
 // Endpoint yang sama mengembalikan rekap dan rincian items per kategori
 Route::get('balance-details/{slug}', [API\ProfilController::class, 'get_balance_summary'])->name('api.balance-details');
+
+// [ROUTE AUTH]
+Route::post('login', [API\AuthController::class, 'login'])->name('api.auth.login');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('user', [API\AuthController::class, 'user'])->name('api.auth.user');
+    Route::post('logout', [API\AuthController::class, 'logout'])->name('api.auth.logout');
+
+    // [ROUTE PROFIL MASJID]
+    // API route untuk mendapatkan data profil masjid
+    Route::get('profil-masjid', [API\ProfilMasjidController::class, 'getAllProfilMasjid'])->name('api.profil-masjid');
+    // API route untuk mendapatkan data profil masjid milik user itu sendiri (menggunakan path param id)
+    Route::get('profil-masjid/{id}', [API\ProfilMasjidController::class, 'getProfilMasjid'])->name('api.profil-masjid');
+    // API route untuk membuat profil masjid milik user itu sendiri
+    Route::post('profil-masjid/{id}', [API\ProfilMasjidController::class, 'createProfilMasjid'])->name('api.profil-masjid.create');
+    // API route untuk update data profil masjid milik user itu sendiri untuk non admin super admin user
+    Route::put('profil-masjid/{id}', [API\ProfilMasjidController::class, 'updateProfilMasjid'])->name('api.profil-masjid.update');
+});
