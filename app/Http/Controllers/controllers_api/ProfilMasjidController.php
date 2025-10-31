@@ -7,7 +7,6 @@ use App\Models\Profil;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
-use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Str;
 use App\Events\ContentUpdatedEvent;
 
@@ -16,96 +15,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProfilMasjidController extends Controller
 {
     public function __construct() {}
-
-    // Helper: resize, crop 1:1, dan simpan sebagai WebP dengan batas ukuran
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 800)
-    {
-        try {
-            $maxSizeBytes = $maxSizeKB * 1024;
-
-            $image = Image::read($uploadedFile->getRealPath());
-
-            // Crop ke rasio 1:1 (square)
-            $width = $image->width();
-            $height = $image->height();
-            $size = min($width, $height);
-            $image->crop($size, $size, ($width - $size) / 2, ($height - $size) / 2);
-
-            // Turunkan kualitas hingga memenuhi batas ukuran
-            $quality = 95;
-            $minQuality = 20;
-
-            do {
-                $encoded = $image->toWebp($quality);
-                $currentSize = strlen($encoded);
-
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                if ($currentSize > $maxSizeBytes * 1.5) {
-                    $quality -= 10;
-                } elseif ($currentSize > $maxSizeBytes * 1.2) {
-                    $quality -= 5;
-                } else {
-                    $quality -= 2;
-                }
-
-                // Jika masih terlalu besar pada kualitas minimum, lakukan resize dimensi
-                if ($quality < $minQuality && strlen($image->toWebp($minQuality)) > $maxSizeBytes) {
-                    $scaleFactor = 0.9;
-                    while (strlen($image->toWebp($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                        $newSize = (int)($size * $scaleFactor);
-                        $image->resize($newSize, $newSize);
-                        $scaleFactor -= 0.05;
-                    }
-                }
-            } while ($quality >= $minQuality);
-
-            return $image;
-        } catch (\Exception $e) {
-            throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
-        }
-    }
-
-    private function saveProcessedImage($uploadedFile, $type, $maxSizeKB = 800)
-    {
-        try {
-            $processedImage = $this->resizeImageToLimit($uploadedFile, $maxSizeKB);
-
-            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $fileName = time() . '_' . $type . '_' . $originalName . '.webp';
-            $filePath = public_path('images/logo/' . $fileName);
-
-            $directory = dirname($filePath);
-            if (!file_exists($directory)) {
-                mkdir($directory, 0755, true);
-            }
-
-            // Fine-tune kualitas untuk mendekati batas ukuran maksimum
-            $maxSizeBytes = $maxSizeKB * 1024;
-            $quality = 95;
-            do {
-                $encoded = $processedImage->toWebp($quality);
-                $currentSize = strlen($encoded);
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-                $quality -= 1;
-            } while ($quality >= 60);
-
-            $processedImage->toWebp($quality)->save($filePath);
-
-            $finalSize = filesize($filePath);
-            if ($finalSize > $maxSizeBytes) {
-                throw new \Exception('Ukuran file masih terlalu besar: ' . round($finalSize / 1024, 2) . 'KB');
-            }
-
-            return '/images/logo/' . $fileName;
-        } catch (\Exception $e) {
-            throw new \Exception('Gagal menyimpan gambar: ' . $e->getMessage());
-        }
-    }
 
     // Get All Profil Masjid For Admin and Super Admin Role
     public function getAllProfilMasjid(Request $request)
@@ -307,7 +216,7 @@ class ProfilMasjidController extends Controller
                 $validated['slug'] = Str::slug($validated['name']);
             }
 
-            // Handle upload file logo_masjid (konsisten dengan Livewire: crop + WebP, simpan ke /images/logo)
+            // Handle upload file logo_masjid (tanpa proses resize/crop, disimpan apa adanya)
             if ($request->hasFile('logo_masjid')) {
                 // Hapus file lama jika ada
                 if (!empty($profilMasjid->logo_masjid)) {
@@ -318,10 +227,19 @@ class ProfilMasjidController extends Controller
                 }
 
                 $file = $request->file('logo_masjid');
-                $validated['logo_masjid'] = $this->saveProcessedImage($file, 'masjid', 800);
+                $ext = strtolower($file->getClientOriginalExtension());
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeName = Str::slug($originalName);
+                $fileName = time() . '_masjid_' . $safeName . '.' . $ext;
+                $destDir = public_path('images/logo');
+                if (!file_exists($destDir)) {
+                    mkdir($destDir, 0755, true);
+                }
+                $file->move($destDir, $fileName);
+                $validated['logo_masjid'] = '/images/logo/' . $fileName;
             }
 
-            // Handle upload file logo_pemerintah (konsisten dengan Livewire: crop + WebP, simpan ke /images/logo)
+            // Handle upload file logo_pemerintah (tanpa proses resize/crop, disimpan apa adanya)
             if ($request->hasFile('logo_pemerintah')) {
                 // Hapus file lama jika ada
                 if (!empty($profilMasjid->logo_pemerintah)) {
@@ -332,7 +250,16 @@ class ProfilMasjidController extends Controller
                 }
 
                 $file = $request->file('logo_pemerintah');
-                $validated['logo_pemerintah'] = $this->saveProcessedImage($file, 'pemerintah', 800);
+                $ext = strtolower($file->getClientOriginalExtension());
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeName = Str::slug($originalName);
+                $fileName = time() . '_pemerintah_' . $safeName . '.' . $ext;
+                $destDir = public_path('images/logo');
+                if (!file_exists($destDir)) {
+                    mkdir($destDir, 0755, true);
+                }
+                $file->move($destDir, $fileName);
+                $validated['logo_pemerintah'] = '/images/logo/' . $fileName;
             }
 
             // Simpan data profil masjid (upsert)
@@ -468,16 +395,34 @@ class ProfilMasjidController extends Controller
                 $validated['slug'] = Str::slug($validated['name']);
             }
 
-            // Handle upload file logo_masjid
+            // Handle upload file logo_masjid (tanpa proses resize/crop)
             if ($request->hasFile('logo_masjid')) {
                 $file = $request->file('logo_masjid');
-                $validated['logo_masjid'] = $this->saveProcessedImage($file, 'masjid', 800);
+                $ext = strtolower($file->getClientOriginalExtension());
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeName = Str::slug($originalName);
+                $fileName = time() . '_masjid_' . $safeName . '.' . $ext;
+                $destDir = public_path('images/logo');
+                if (!file_exists($destDir)) {
+                    mkdir($destDir, 0755, true);
+                }
+                $file->move($destDir, $fileName);
+                $validated['logo_masjid'] = '/images/logo/' . $fileName;
             }
 
-            // Handle upload file logo_pemerintah
+            // Handle upload file logo_pemerintah (tanpa proses resize/crop)
             if ($request->hasFile('logo_pemerintah')) {
                 $file = $request->file('logo_pemerintah');
-                $validated['logo_pemerintah'] = $this->saveProcessedImage($file, 'pemerintah', 800);
+                $ext = strtolower($file->getClientOriginalExtension());
+                $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeName = Str::slug($originalName);
+                $fileName = time() . '_pemerintah_' . $safeName . '.' . $ext;
+                $destDir = public_path('images/logo');
+                if (!file_exists($destDir)) {
+                    mkdir($destDir, 0755, true);
+                }
+                $file->move($destDir, $fileName);
+                $validated['logo_pemerintah'] = '/images/logo/' . $fileName;
             }
 
             // Simpan data profil masjid
