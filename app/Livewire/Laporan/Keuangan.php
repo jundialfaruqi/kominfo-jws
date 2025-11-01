@@ -89,12 +89,12 @@ class Keuangan extends Component
 
         // Default filter tanggal
         $this->filterDateMode = 'bulan';
-        $this->filterDay = Carbon::now()->format('Y-m-d');
-        $this->filterMonth = Carbon::now()->format('Y-m');
-        $this->filterYear = Carbon::now()->year;
+        $this->filterDay = Carbon::now('Asia/Jakarta')->format('Y-m-d');
+        $this->filterMonth = Carbon::now('Asia/Jakarta')->format('Y-m');
+        $this->filterYear = Carbon::now('Asia/Jakarta')->year;
         // Default pilihan bulan (dropdown)
-        $this->filterMonthSelect = (int) Carbon::now()->format('m');
-        $this->filterMonthYearSelect = Carbon::now()->year;
+        $this->filterMonthSelect = (int) Carbon::now('Asia/Jakarta')->format('m');
+        $this->filterMonthYearSelect = Carbon::now('Asia/Jakarta')->year;
 
         // Tampilkan tabel untuk non-admin, dan set idMasjid ke profil user
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
@@ -143,8 +143,8 @@ class Keuangan extends Component
         $this->showForm = true;
         $this->showTable = false;
 
-        // Set default tanggal ke hari ini
-        $this->tanggal = Carbon::now()->format('Y-m-d');
+        // Set default tanggal ke hari ini (Asia/Jakarta)
+        $this->tanggal = Carbon::now('Asia/Jakarta')->format('Y-m-d');
 
         // Untuk non-admin, pastikan idMasjid sesuai profil user
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
@@ -240,7 +240,7 @@ class Keuangan extends Component
         if (in_array($name, ['filterMonthSelect', 'filterMonthYearSelect'])) {
             if ($this->filterDateMode === 'bulan') {
                 $month = str_pad((string) ($this->filterMonthSelect ?? 1), 2, '0', STR_PAD_LEFT);
-                $year = (int) ($this->filterMonthYearSelect ?? Carbon::now()->year);
+                $year = (int) ($this->filterMonthYearSelect ?? Carbon::now('Asia/Jakarta')->year);
                 $this->filterMonth = sprintf('%04d-%s', $year, $month);
             }
             $this->resetPage();
@@ -366,10 +366,10 @@ class Keuangan extends Component
             $year = substr($this->filterMonth, 0, 4);
             $month = substr($this->filterMonth, 5, 2);
             if (is_numeric($year) && is_numeric($month)) {
-                $periodStartDate = Carbon::createFromDate((int) $year, (int) $month, 1)->format('Y-m-d');
+                $periodStartDate = Carbon::createFromDate((int) $year, (int) $month, 1, 'Asia/Jakarta')->format('Y-m-d');
             }
         } elseif ($this->filterDateMode === 'tahun' && !empty($this->filterYear) && is_numeric($this->filterYear)) {
-            $periodStartDate = Carbon::createFromDate((int) $this->filterYear, 1, 1)->format('Y-m-d');
+            $periodStartDate = Carbon::createFromDate((int) $this->filterYear, 1, 1, 'Asia/Jakarta')->format('Y-m-d');
         } elseif ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate)) {
             $periodStartDate = Carbon::parse($this->filterStartDate)->format('Y-m-d');
         } elseif ($this->filterDateMode === '7hari') {
@@ -437,12 +437,12 @@ class Keuangan extends Component
                 $grandTotalsAdmin['ending'] += $ending;
             }
 
-            // Hitung totals saldo sebelumnya (akumulasi hingga akhir bulan sebelumnya)
+            // Hitung totals saldo sebelumnya (carry-forward hingga akhir periode sebelumnya)
             if ($this->filterDateMode === 'bulan' && !empty($this->filterMonth)) {
                 $year = substr($this->filterMonth, 0, 4);
                 $month = substr($this->filterMonth, 5, 2);
                 if (is_numeric($year) && is_numeric($month)) {
-                    $currentMonth = Carbon::createFromDate((int) $year, (int) $month, 1);
+                    $currentMonth = Carbon::createFromDate((int) $year, (int) $month, 1, 'Asia/Jakarta');
                     $prevEnd = $currentMonth->copy()->subMonth()->endOfMonth()->format('Y-m-d');
 
                     $aggPrev = DB::table('laporans')
@@ -462,6 +462,32 @@ class Keuangan extends Component
                         'sumKeluar' => $prevKeluar,
                         'ending' => $prevEnding,
                     ];
+                }
+            } elseif ($this->filterDateMode === '7hari') {
+                // Untuk 7 hari: akumulasi sampai akhir hari sebelum periode 7 hari saat ini
+                if (!empty($periodStartDate)) {
+                    try {
+                        $prevEnd7 = Carbon::parse($periodStartDate)->subDay()->format('Y-m-d');
+                        $aggPrev7 = DB::table('laporans')
+                            ->where('id_masjid', $this->idMasjid)
+                            ->where('tanggal', '<=', $prevEnd7)
+                            ->selectRaw(
+                                "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
+                                    "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                            )
+                            ->first();
+
+                        $prevMasuk7 = (int) ($aggPrev7->sum_masuk ?? 0);
+                        $prevKeluar7 = (int) ($aggPrev7->sum_keluar ?? 0);
+                        $prevEnding7 = $prevMasuk7 - $prevKeluar7;
+                        $previousTotalsAdmin = [
+                            'sumMasuk' => $prevMasuk7,
+                            'sumKeluar' => $prevKeluar7,
+                            'ending' => $prevEnding7,
+                        ];
+                    } catch (\Exception $e) {
+                        // Abaikan jika parsing tanggal gagal; biarkan nilai default 0
+                    }
                 }
             }
         }
@@ -528,7 +554,7 @@ class Keuangan extends Component
                     $grandTotalsNonAdmin['ending'] += $ending;
                 }
 
-                // Hitung totals saldo sebelumnya (akumulasi hingga akhir bulan sebelumnya)
+                // Hitung totals saldo sebelumnya (carry-forward hingga akhir periode sebelumnya)
                 if ($this->filterDateMode === 'bulan' && !empty($this->filterMonth)) {
                     $year = substr($this->filterMonth, 0, 4);
                     $month = substr($this->filterMonth, 5, 2);
@@ -553,6 +579,32 @@ class Keuangan extends Component
                             'sumKeluar' => $prevKeluar,
                             'ending' => $prevEnding,
                         ];
+                    }
+                } elseif ($this->filterDateMode === '7hari') {
+                    // Untuk 7 hari: akumulasi sampai akhir hari sebelum periode 7 hari saat ini
+                    if (!empty($periodStartDate)) {
+                        try {
+                            $prevEnd7 = Carbon::parse($periodStartDate)->subDay()->format('Y-m-d');
+                            $aggPrev7 = DB::table('laporans')
+                                ->where('id_masjid', $profil->id)
+                                ->where('tanggal', '<=', $prevEnd7)
+                                ->selectRaw(
+                                    "COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = 'masuk' THEN saldo ELSE 0 END), 0) AS sum_masuk, " .
+                                        "COALESCE(SUM(CASE WHEN jenis = 'keluar' THEN saldo ELSE 0 END), 0) AS sum_keluar"
+                                )
+                                ->first();
+
+                            $prevMasuk7 = (int) ($aggPrev7->sum_masuk ?? 0);
+                            $prevKeluar7 = (int) ($aggPrev7->sum_keluar ?? 0);
+                            $prevEnding7 = $prevMasuk7 - $prevKeluar7;
+                            $previousTotalsNonAdmin = [
+                                'sumMasuk' => $prevMasuk7,
+                                'sumKeluar' => $prevKeluar7,
+                                'ending' => $prevEnding7,
+                            ];
+                        } catch (\Exception $e) {
+                            // Abaikan jika parsing tanggal gagal; biarkan nilai default 0
+                        }
                     }
                 }
             }

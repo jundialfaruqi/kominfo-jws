@@ -74,6 +74,43 @@
                                             <option value="{{ $y }}">{{ $y }}</option>
                                         @endfor
                                     </select>
+                                    <a href="{{ route('laporan.pdf.bulan', ['idMasjid' => $group['masjidId'] ?? $idMasjid, 'filterMonth' => $filterMonth]) }}"
+                                        class="btn btn-primary rounded-3">
+                                        <span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                                <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                                <path d="M17 18h2" />
+                                                <path d="M20 15h-3v6" />
+                                                <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                            </svg>
+                                            Download PDF (Bulan)
+                                        </span>
+                                    </a>
+                                @elseif ($filterDateMode === '7hari')
+                                    <a href="{{ route('laporan.pdf.7hari', ['idMasjid' => $group['masjidId'] ?? $idMasjid]) }}"
+                                        class="btn btn-primary rounded-3">
+                                        <span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                                <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                                <path d="M17 18h2" />
+                                                <path d="M20 15h-3v6" />
+                                                <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                            </svg>
+                                            Download PDF (7 Hari)
+                                        </span>
+                                    </a>
                                 @elseif ($filterDateMode === 'tahun')
                                     <input type="number" wire:model.live="filterYear" min="2000"
                                         max="{{ now()->year + 5 }}" class="form-control rounded-3" style="width: 8rem;"
@@ -92,6 +129,16 @@
                             </div>
                         </div>
                     </div>
+                    @if (session('success'))
+                        <div class="alert alert-success mx-1 rounded-3">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if (session('error'))
+                        <div class="alert alert-warning mt-2 rounded-3">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -172,7 +219,9 @@
                                     Ringkasan per Kategori
                                     <span class="badge badge-small bg-primary text-white">{{ $filterLabel }}</span>
                                 </div>
-                                <div class="text-muted small">Profil: {{ $group['masjidName'] ?? '-' }}</div>
+                                <div class="align-items-center">
+                                    <div class="text-muted small">Profil: {{ $group['masjidName'] ?? '-' }}</div>
+                                </div>
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-sm table-striped">
@@ -187,12 +236,14 @@
                                     <tbody>
                                         @if (
                                             $filterDateMode === 'bulan' ||
+                                                $filterDateMode === '7hari' ||
                                                 (($previousTotalsAdmin['sumMasuk'] ?? 0) !== 0 ||
                                                     ($previousTotalsAdmin['sumKeluar'] ?? 0) !== 0 ||
                                                     ($previousTotalsAdmin['ending'] ?? 0) !== 0))
                                             <tr class="table-secondary">
                                                 <td><b>Saldo Sebelumnya</b> <span class="text-muted small">(s.d. akhir
-                                                        bulan sebelumnya)</span></td>
+                                                        {{ $filterDateMode === 'bulan' ? 'bulan sebelumnya' : ($filterDateMode === '7hari' ? '7 hari sebelumnya' : 'periode sebelumnya') }})</span>
+                                                </td>
                                                 <td class="text-end">
                                                     <b>Rp
                                                         {{ number_format($previousTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}</b>
@@ -250,7 +301,7 @@
                                                 {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                                             </th>
                                         </tr>
-                                        @if ($filterDateMode === 'bulan')
+                                        @if ($filterDateMode === 'bulan' || $filterDateMode === '7hari')
                                             <tr class="bg-secondary text-white">
                                                 <th class="text-end text-uppercase">Total pemasukan, pengeluaran dan
                                                     saldo akhir saat ini</th>
@@ -432,8 +483,63 @@
                             <input type="date" wire:model.live="filterDay" class="form-control rounded-3"
                                 style="width: auto;">
                         @elseif ($filterDateMode === 'bulan')
-                            <input type="month" wire:model.live="filterMonth" class="form-control rounded-3"
+                            <select wire:model.live="filterMonthSelect" class="form-select rounded-3"
                                 style="width: auto;">
+                                <option value="1">Januari</option>
+                                <option value="2">Februari</option>
+                                <option value="3">Maret</option>
+                                <option value="4">April</option>
+                                <option value="5">Mei</option>
+                                <option value="6">Juni</option>
+                                <option value="7">Juli</option>
+                                <option value="8">Agustus</option>
+                                <option value="9">September</option>
+                                <option value="10">Oktober</option>
+                                <option value="11">November</option>
+                                <option value="12">Desember</option>
+                            </select>
+                            <select wire:model.live="filterMonthYearSelect" class="form-select rounded-3"
+                                style="width: auto;">
+                                @for ($y = now()->year - 5; $y <= now()->year + 5; $y++)
+                                    <option value="{{ $y }}">{{ $y }}</option>
+                                @endfor
+                            </select>
+                            <a href="{{ route('laporan.pdf.bulan', ['idMasjid' => $idMasjid, 'filterMonth' => $filterMonth]) }}"
+                                class="btn btn-primary rounded-3">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                        <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                        <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                        <path d="M17 18h2" />
+                                        <path d="M20 15h-3v6" />
+                                        <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                    </svg>
+                                    Download PDF (Bulan)
+                                </span>
+                            </a>
+                        @elseif ($filterDateMode === '7hari')
+                            <a href="{{ route('laporan.pdf.7hari') }}" class="btn btn-primary rounded-3">
+                                <span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                        <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                        <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                        <path d="M17 18h2" />
+                                        <path d="M20 15h-3v6" />
+                                        <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                    </svg>
+                                    Download PDF (7 Hari)
+                                </span>
+                            </a>
                         @elseif ($filterDateMode === 'tahun')
                             <input type="number" wire:model.live="filterYear" min="2000"
                                 max="{{ now()->year + 5 }}" class="form-control rounded-3" style="width: 8rem;"
@@ -502,9 +608,11 @@
                             }
                         }
                     @endphp
-                    <div class="fw-semibold mb-2">
-                        Ringkasan per Kategori
-                        <span class="badge badge-small bg-primary text-white">{{ $filterLabel }}</span>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                        <div class="fw-semibold">
+                            Ringkasan per Kategori
+                            <span class="badge badge-small bg-primary text-white">{{ $filterLabel }}</span>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-sm table-striped">
@@ -519,12 +627,14 @@
                             <tbody>
                                 @if (
                                     $filterDateMode === 'bulan' ||
+                                        $filterDateMode === '7hari' ||
                                         (($previousTotalsNonAdmin['sumMasuk'] ?? 0) !== 0 ||
                                             ($previousTotalsNonAdmin['sumKeluar'] ?? 0) !== 0 ||
                                             ($previousTotalsNonAdmin['ending'] ?? 0) !== 0))
                                     <tr class="table-secondary">
-                                        <td><b>Saldo Sebelumnya</b> <span class="text-muted small">(s.d. akhir bulan
-                                                sebelumnya)</span></td>
+                                        <td><b>Saldo Sebelumnya</b> <span class="text-muted small">(s.d. akhir
+                                                {{ $filterDateMode === 'bulan' ? 'bulan sebelumnya' : ($filterDateMode === '7hari' ? '7 hari sebelumnya' : 'periode sebelumnya') }})</span>
+                                        </td>
                                         <td class="text-end">
                                             <b>
                                                 Rp
@@ -584,7 +694,7 @@
                                         {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) - ($grandTotalsNonAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                                     </th>
                                 </tr>
-                                @if ($filterDateMode === 'bulan')
+                                @if ($filterDateMode === 'bulan' || $filterDateMode === '7hari')
                                     <tr class="bg-secondary text-white">
                                         <th class="text-end text-uppercase">Total pemasukan, pengeluaran dan saldo
                                             akhir saat ini</th>

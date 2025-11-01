@@ -83,6 +83,14 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
         ->name('laporan-keuangan.index')
         ->middleware('can:view-laporan-keuangan');
 
+    // Export PDF bulanan
+    Route::get('/laporan/keuangan/pdf-bulan', [\App\Http\Controllers\LaporanPdfController::class, 'downloadPdfBulan'])
+        ->name('laporan.pdf.bulan');
+
+    // Export PDF 7 hari terakhir
+    Route::get('/laporan/keuangan/pdf-7hari', [\App\Http\Controllers\LaporanPdfController::class, 'downloadPdf7Hari'])
+        ->name('laporan.pdf.7hari');
+
     // Group Category Routes
     Route::get('/group-category', GroupCategoryGroup::class)
         ->name('group-category.index')
