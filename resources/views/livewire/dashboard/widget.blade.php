@@ -1,12 +1,14 @@
 <div class="row row-deck row-cards">
     {{-- Welcome Card --}}
     <div class="col-sm-12 col-lg-6">
-        <div class="card rounded-4">
+        <div class="card rounded-4 position-relative overflow-hidden border-0"
+            style="background-image: url('{{ asset('theme/static/illustrations/ilustrasi-welcome-dashboard.webp') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+            <div style="position:absolute; inset:0; background:rgba(0, 0, 0, 0.56);"></div>
             <div class="card-body">
                 <div class="row gy-3">
                     <div class="col-12 col-sm d-flex flex-column">
-                        <h3 class="h2 mb-5">Hi 👋 {{ auth()->user()->name }}</h3>
-                        <p class="mb-2">
+                        <h3 class="h2 mb-5 text-white">Assalamu'alaikum 👋 {{ auth()->user()->name }}!</h3>
+                        <p class="mb-2 text-white">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="currentColor" class="icon icon-tabler icons-tabler-filled icon-tabler-calendar">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -17,7 +19,7 @@
                             </svg>
                             Hari / Tanggal
                         </p>
-                        <small class="text-muted">
+                        <small class="text-white fw-semibold">
                             <livewire:servertime.server-time />
                         </small>
                         <div class="row g-5 mt-auto">
@@ -51,7 +53,7 @@
                     </div>
                     <div class="col-12 col-sm-auto d-flex justify-content-center">
                         <span>
-                            <svg xmlns="http://www.w3.org/2000/svg" height="200" fill="none" viewBox="0 0 800 600">
+                            {{-- <svg xmlns="http://www.w3.org/2000/svg" height="200" fill="none" viewBox="0 0 800 600">
                                 <path
                                     d="M125.93 300.392C125.93 346.056 174.224 379.274 195.614 416.213C217.61 454.339 222.991 512.425 260.996 534.543C297.935 555.933 350.519 532.034 396.183 532.034C441.848 532.034 494.432 555.945 531.371 534.543C569.376 512.547 574.757 454.339 596.753 416.213C618.143 379.274 666.437 346.165 666.437 300.392C666.437 254.618 618.034 221.509 596.753 184.57C574.757 146.444 569.376 88.2364 531.371 66.2405C494.432 44.8504 441.848 68.7491 396.183 68.7491C350.519 68.7491 297.935 44.8383 260.996 66.2405C222.87 88.2364 217.61 146.444 195.614 184.57C174.224 221.618 125.93 254.727 125.93 300.392Z"
                                     fill="#066FD1"
@@ -265,7 +267,7 @@
                                 <path
                                     d="M463.286 316.91C456.512 318.377 450.997 317.916 447.64 317.395C439.097 316.026 433.631 312.366 431.801 310.306C429.668 307.906 428.795 305.228 428.795 305.228C428.65 304.755 428.553 304.367 428.492 304.113C428.177 302.973 427.862 301.337 428.032 299.386C428.056 299.108 428.093 298.841 428.129 298.586C430.819 303.725 434.019 306.743 436.043 308.366C436.043 308.366 442.029 313.19 458.863 316.462C461.02 316.886 463.056 316.91 463.056 316.91C463.129 316.91 463.201 316.91 463.286 316.91Z"
                                     fill="black" opacity="0.5" />
-                            </svg>
+                            </svg> --}}
                         </span>
                     </div>
                 </div>
@@ -318,7 +320,8 @@
         <div class="card card-sm rounded-4">
             <div class="card-body px-4">
                 <small class="d-block text-center">Jadwal Sholat Pekanbaru</small>
-                <small class="d-block text-center mb-3">{{ \Carbon\Carbon::parse($serverTime, 'Asia/Jakarta')->translatedFormat('d F Y') }}</small>
+                <small
+                    class="d-block text-center mb-3">{{ \Carbon\Carbon::parse($serverTime, 'Asia/Jakarta')->translatedFormat('d F Y') }}</small>
                 <div class="row">
                     @if ($prayerTimes[0]['time'] === 'N/A')
                         <div class="col-12 text-center text-danger">

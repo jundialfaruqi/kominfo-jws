@@ -50,6 +50,8 @@ Route::get('refresh-prayer-times', [API\MasterController::class, 'get_refresh_pr
 Route::get('balance-summary/{slug}', [API\ProfilController::class, 'get_balance_summary'])->name('api.balance-summary');
 // Endpoint yang sama mengembalikan rekap dan rincian items per kategori
 Route::get('balance-details/{slug}', [API\ProfilController::class, 'get_balance_summary'])->name('api.balance-details');
+// API route untuk rekap 7 hari terakhir (endpoint baru, bebas dari perubahan bulanan)
+Route::get('balance-summary-7hari/{slug}', [API\ProfilController::class, 'get_balance_summary_7hari'])->name('api.balance-summary-7hari');
 
 // [ROUTE AUTH]
 Route::post('login', [API\AuthController::class, 'login'])->name('api.auth.login');

@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -25,35 +26,67 @@ class GambarAdzan extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $adzanId;
+
+    #[Validate('required|exists:users,id', message: 'Pilih Admin Masjid terlebih dahulu')]
     public $userId;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan1;
     public $tmp_adzan1;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan2;
     public $tmp_adzan2;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan3;
     public $tmp_adzan3;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan4;
     public $tmp_adzan4;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan5;
     public $tmp_adzan5;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan6;
     public $tmp_adzan6;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan7;
     public $tmp_adzan7;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan8;
     public $tmp_adzan8;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan9;
     public $tmp_adzan9;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan10;
     public $tmp_adzan10;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan11;
     public $tmp_adzan11;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan12;
     public $tmp_adzan12;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan13;
     public $tmp_adzan13;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan14;
     public $tmp_adzan14;
+
+    #[Validate('nullable|image|max:800|mimes:jpg,png,jpeg,webp,gif', message: 'Ukuran gambar terlalu besar. Ukuran file maksimal 800KB!')]
     public $adzan15;
     public $tmp_adzan15;
 
@@ -65,76 +98,32 @@ class GambarAdzan extends Component
     public $deleteAdzanId;
     public $deleteAdzanName;
 
-    protected $rules = [
-        'userId' => 'required|exists:users,id',
-        'adzan1' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan2' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan3' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan4' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan5' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan6' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan7' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan8' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan9' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan10' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan11' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan12' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan13' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan14' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'adzan15' => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-    ];
+    public function updated($propertyName)
+    {
+        $props = [
+            'userId',
+            'adzan1',
+            'adzan2',
+            'adzan3',
+            'adzan4',
+            'adzan5',
+            'adzan6',
+            'adzan7',
+            'adzan8',
+            'adzan9',
+            'adzan10',
+            'adzan11',
+            'adzan12',
+            'adzan13',
+            'adzan14',
+            'adzan15'
+        ];
+        if (in_array($propertyName, $props, true)) {
+            $this->validateOnly($propertyName);
+        }
+    }
 
-    public $messages = [
-        'userId.required' => 'Pilih Admin Masjid terlebih dahulu',
-        'userId.exists'   => 'Admin Masjdi tidak ditemukan',
-        'adzan1.image'    => 'File harus berupa gambar',
-        'adzan2.image'    => 'File harus berupa gambar',
-        'adzan3.image'    => 'File harus berupa gambar',
-        'adzan4.image'    => 'File harus berupa gambar',
-        'adzan5.image'    => 'File harus berupa gambar',
-        'adzan6.image'    => 'File harus berupa gambar',
-        'adzan7.image'    => 'File harus berupa gambar',
-        'adzan8.image'    => 'File harus berupa gambar',
-        'adzan9.image'    => 'File harus berupa gambar',
-        'adzan10.image'   => 'File harus berupa gambar',
-        'adzan11.image'   => 'File harus berupa gambar',
-        'adzan12.image'   => 'File harus berupa gambar',
-        'adzan13.image'   => 'File harus berupa gambar',
-        'adzan14.image'   => 'File harus berupa gambar',
-        'adzan15.image'   => 'File harus berupa gambar',
-        'adzan1.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan2.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan3.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan4.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan5.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan6.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan7.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan8.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan9.max'      => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan10.max'     => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan11.max'     => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan12.max'     => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan13.max'     => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan14.max'     => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan15.max'     => 'Ukuran gambar terlalu besar. Ukuran file maksimal 1MB!',
-        'adzan1.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan2.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan3.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan4.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan5.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan6.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan7.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan8.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan9.mimes'    => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan10.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan11.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan12.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan13.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan14.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-        'adzan15.mimes'   => 'Format gambar harus JPG, PNG, JPEG, GIF, WEBP',
-    ];
-
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
+    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 800)
     {
         try {
             // Konversi ke bytes
@@ -194,7 +183,7 @@ class GambarAdzan extends Component
     private function saveProcessedImage($uploadedFile, $adzanNumber)
     {
         try {
-            // Proses resize gambar dengan ukuran maksimal 990KB
+            // Proses resize gambar dengan ukuran maksimal 800KB
             $processedImage = $this->resizeImageToLimit($uploadedFile);
 
             // Generate nama file dengan ekstensi .jpg (karena kita convert ke JPEG)
@@ -209,10 +198,10 @@ class GambarAdzan extends Component
             }
 
             // Tentukan kualitas optimal berdasarkan ukuran target
-            $maxSizeBytes = 990 * 1024; // 990KB
+            $maxSizeBytes = 800 * 1024; // 800KB
             $quality = 95;
 
-            // Fine-tune kualitas untuk mendekati 990KB
+            // Fine-tune kualitas untuk mendekati 800KB
             do {
                 $encoded = $processedImage->toJpeg($quality);
                 $currentSize = strlen($encoded);
@@ -1190,7 +1179,7 @@ class GambarAdzan extends Component
                 $adzan->adzan5 = $this->tmp_adzan5;
             }
 
-            // Handle adzan 6 upload            
+            // Handle adzan 6 upload
             if ($this->adzan6) {
                 // delete old adzan 6 if exists
                 if ($this->isEdit && $adzan->adzan6 && file_exists(public_path($adzan->adzan6))) {
@@ -1203,7 +1192,7 @@ class GambarAdzan extends Component
                 $adzan->adzan6 = $this->tmp_adzan6;
             }
 
-            // Handle adzan 7 upload            
+            // Handle adzan 7 upload
             if ($this->adzan7) {
                 // delete old adzan 7 if exists
                 if ($this->isEdit && $adzan->adzan7 && file_exists(public_path($adzan->adzan7))) {
@@ -1216,7 +1205,7 @@ class GambarAdzan extends Component
                 $adzan->adzan7 = $this->tmp_adzan7;
             }
 
-            // Handle adzan 8 upload            
+            // Handle adzan 8 upload
             if ($this->adzan8) {
                 // delete old adzan 8 if exists
                 if ($this->isEdit && $adzan->adzan8 && file_exists(public_path($adzan->adzan8))) {
@@ -1229,7 +1218,7 @@ class GambarAdzan extends Component
                 $adzan->adzan8 = $this->tmp_adzan8;
             }
 
-            // Handle adzan 9 upload            
+            // Handle adzan 9 upload
             if ($this->adzan9) {
                 // delete old adzan 9 if exists
                 if ($this->isEdit && $adzan->adzan9 && file_exists(public_path($adzan->adzan9))) {
@@ -1242,7 +1231,7 @@ class GambarAdzan extends Component
                 $adzan->adzan9 = $this->tmp_adzan9;
             }
 
-            // Handle adzan 10 upload            
+            // Handle adzan 10 upload
             if ($this->adzan10) {
                 // delete old adzan 10 if exists
                 if ($this->isEdit && $adzan->adzan10 && file_exists(public_path($adzan->adzan10))) {
@@ -1255,7 +1244,7 @@ class GambarAdzan extends Component
                 $adzan->adzan10 = $this->tmp_adzan10;
             }
 
-            // Handle adzan 11 upload            
+            // Handle adzan 11 upload
             if ($this->adzan11) {
                 // delete old adzan 11 if exists
                 if ($this->isEdit && $adzan->adzan11 && file_exists(public_path($adzan->adzan11))) {
@@ -1268,7 +1257,7 @@ class GambarAdzan extends Component
                 $adzan->adzan11 = $this->tmp_adzan11;
             }
 
-            // Handle adzan 12 upload            
+            // Handle adzan 12 upload
             if ($this->adzan12) {
                 // delete old adzan 12 if exists
                 if ($this->isEdit && $adzan->adzan12 && file_exists(public_path($adzan->adzan12))) {
@@ -1281,7 +1270,7 @@ class GambarAdzan extends Component
                 $adzan->adzan12 = $this->tmp_adzan12;
             }
 
-            // Handle adzan 13 upload            
+            // Handle adzan 13 upload
             if ($this->adzan13) {
                 // delete old adzan 13 if exists
                 if ($this->isEdit && $adzan->adzan13 && file_exists(public_path($adzan->adzan13))) {
@@ -1294,7 +1283,7 @@ class GambarAdzan extends Component
                 $adzan->adzan13 = $this->tmp_adzan13;
             }
 
-            // Handle adzan 14 upload            
+            // Handle adzan 14 upload
             if ($this->adzan14) {
                 // delete old adzan 14 if exists
                 if ($this->isEdit && $adzan->adzan14 && file_exists(public_path($adzan->adzan14))) {
@@ -1307,7 +1296,7 @@ class GambarAdzan extends Component
                 $adzan->adzan14 = $this->tmp_adzan14;
             }
 
-            // Handle adzan 15 upload            
+            // Handle adzan 15 upload
             if ($this->adzan15) {
                 // delete old adzan 15 if exists
                 if ($this->isEdit && $adzan->adzan15 && file_exists(public_path($adzan->adzan15))) {
@@ -1322,7 +1311,7 @@ class GambarAdzan extends Component
 
             $adzan->save();
 
-            // Trigger event 
+            // Trigger event
             $profil = Profil::where('user_id', $this->userId)->first();
             if ($profil) event(new ContentUpdatedEvent($profil->slug, 'adzan'));
 

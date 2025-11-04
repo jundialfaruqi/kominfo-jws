@@ -84,7 +84,7 @@ class Keuangan extends Component
 
     public function mount()
     {
-        $this->paginate = 10;
+        $this->paginate = 22;
         $this->search = '';
 
         // Default filter tanggal
@@ -428,6 +428,7 @@ class Keuangan extends Component
                 $summaryCategoriesAdmin[] = [
                     'categoryId' => $cat->id,
                     'categoryName' => $cat->name,
+                    'opening' => $opening,
                     'sumMasuk' => $sumMasuk,
                     'sumKeluar' => $sumKeluar,
                     'ending' => $ending,
@@ -545,6 +546,7 @@ class Keuangan extends Component
                     $summaryCategoriesNonAdmin[] = [
                         'categoryId' => $cat->id,
                         'categoryName' => $cat->name,
+                        'opening' => $opening,
                         'sumMasuk' => $sumMasuk,
                         'sumKeluar' => $sumKeluar,
                         'ending' => $ending,
@@ -677,14 +679,14 @@ class Keuangan extends Component
                         $masukSeenBefore = (clone $offsetBase)
                             ->where(function ($q) {
                                 $q->where('is_opening', 1)
-                                  ->orWhere('jenis', 'masuk');
+                                    ->orWhere('jenis', 'masuk');
                             })
                             ->where(function ($q) use ($boundaryDate, $boundaryId) {
                                 $q->where('tanggal', '<', $boundaryDate)
-                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
-                                      $q2->where('tanggal', '=', $boundaryDate)
-                                         ->where('id', '<', $boundaryId);
-                                  });
+                                    ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                        $q2->where('tanggal', '=', $boundaryDate)
+                                            ->where('id', '<', $boundaryId);
+                                    });
                             })
                             ->count();
 
@@ -693,10 +695,10 @@ class Keuangan extends Component
                             ->where('jenis', 'keluar')
                             ->where(function ($q) use ($boundaryDate, $boundaryId) {
                                 $q->where('tanggal', '<', $boundaryDate)
-                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
-                                      $q2->where('tanggal', '=', $boundaryDate)
-                                         ->where('id', '<', $boundaryId);
-                                  });
+                                    ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                        $q2->where('tanggal', '=', $boundaryDate)
+                                            ->where('id', '<', $boundaryId);
+                                    });
                             })
                             ->count();
                     }
@@ -820,14 +822,14 @@ class Keuangan extends Component
                         $masukSeenBefore = (clone $offsetBase)
                             ->where(function ($q) {
                                 $q->where('is_opening', 1)
-                                  ->orWhere('jenis', 'masuk');
+                                    ->orWhere('jenis', 'masuk');
                             })
                             ->where(function ($q) use ($boundaryDate, $boundaryId) {
                                 $q->where('tanggal', '<', $boundaryDate)
-                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
-                                      $q2->where('tanggal', '=', $boundaryDate)
-                                         ->where('id', '<', $boundaryId);
-                                  });
+                                    ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                        $q2->where('tanggal', '=', $boundaryDate)
+                                            ->where('id', '<', $boundaryId);
+                                    });
                             })
                             ->count();
 
@@ -837,10 +839,10 @@ class Keuangan extends Component
                             ->where('jenis', 'keluar')
                             ->where(function ($q) use ($boundaryDate, $boundaryId) {
                                 $q->where('tanggal', '<', $boundaryDate)
-                                  ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
-                                      $q2->where('tanggal', '=', $boundaryDate)
-                                         ->where('id', '<', $boundaryId);
-                                  });
+                                    ->orWhere(function ($q2) use ($boundaryDate, $boundaryId) {
+                                        $q2->where('tanggal', '=', $boundaryDate)
+                                            ->where('id', '<', $boundaryId);
+                                    });
                             })
                             ->count();
                     }

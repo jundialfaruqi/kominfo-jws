@@ -277,13 +277,40 @@
                                         @endforeach
                                     </tbody>
                                     <tfoot>
-                                        <tr>
-                                            <th class="text-end text-uppercase">Sisa saldo akhir saat ini</th>
+                                        <tr class="bg-green-lt fw-semibold">
+                                            <th colspan="3">
+                                                Pemasukan
+                                            </th>
+                                            <th class="text-end">
+                                                Rp {{ number_format($grandTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
+                                            </th>
+                                        </tr>
+                                        <tr class="bg-red-lt">
+                                            <th colspan="3">
+                                                Pengeluaran
+                                            </th>
+                                            <th class="text-end">
+                                                Rp
+                                                {{ number_format($grandTotalsAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                            </th>
+                                        </tr>
+                                        <tr class="bg-primary-lt">
+                                            <th colspan="3">
+                                                Saldo
+                                            </th>
+                                            <th class="text-end">
+                                                Rp
+                                                {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                                            </th>
+                                        </tr>
+                                        <tr class="table-secondary">
+                                            <th class="text-uppercase">Total Saldo</th>
                                             <th class="text-end" colspan="3">
                                                 Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}
                                             </th>
                                         </tr>
-                                        <tr class="bg-primary-lt">
+
+                                        {{-- <tr class="bg-primary-lt">
                                             <th class="text-end text-uppercase">
                                                 Saldo akhir
                                                 {{ $filterLabel }}
@@ -300,11 +327,12 @@
                                                 Rp
                                                 {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                                             </th>
-                                        </tr>
+                                        </tr> --}}
                                         @if ($filterDateMode === 'bulan' || $filterDateMode === '7hari')
                                             <tr class="bg-secondary text-white">
-                                                <th class="text-end text-uppercase">Total pemasukan, pengeluaran dan
-                                                    saldo akhir saat ini</th>
+                                                <th class="text-uppercase">Total pemasukan - Total pengeluaran = Total
+                                                    Saldo
+                                                </th>
                                                 <th class="text-end">
                                                     Rp
                                                     {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) + ($previousTotalsAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
@@ -362,9 +390,9 @@
                                 {{-- Toolbar per kategori (opsional) dapat ditambahkan di sini jika diinginkan --}}
                             </div>
                             <div class="card-body p-0">
-                                <div class="table-responsive overflow-auto" style="max-height: 70vh;">
+                                <div class="table-responsive overflow-auto">
                                     <table class="table table-vcenter table-nowrap card-table mb-0">
-                                        <thead class="sticky-top bg-body shadow-sm" style="z-index: 1;">
+                                        <thead class="bg-body shadow-sm">
                                             <tr>
                                                 <th>No</th>
                                                 <th>Tanggal</th>
@@ -442,6 +470,64 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                {{-- Ringkasan periode (footer tabel) untuk filter Bulan & 7 Hari (Admin) --}}
+                                @if ($filterDateMode === 'bulan' || $filterDateMode === '7hari')
+                                    @php
+                                        $summaryList = $summaryCategoriesAdmin ?? [];
+                                        $summaryForCat = null;
+                                        foreach ($summaryList as $sumCat) {
+                                            if (($sumCat['categoryId'] ?? null) === ($category['categoryId'] ?? null)) {
+                                                $summaryForCat = $sumCat;
+                                                break;
+                                            }
+                                        }
+                                        $prevLabel =
+                                            $filterDateMode === 'bulan'
+                                                ? 'Saldo Sebelumnya (Bulan lalu)'
+                                                : 'Saldo Sebelumnya (Pekan lalu)';
+                                    @endphp
+                                    @if ($summaryForCat)
+                                        <div class="pt-3 pe-3 ps-3 pb-0">
+                                            <div class="fw-semibold mb-2 badge bg-primary text-white">Ringkasan Periode
+                                            </div>
+                                            <table class="table table-sm mb-0">
+                                                <tbody>
+                                                    <tr class="table-secondary fw-semibold">
+                                                        <td>{{ $prevLabel }}</td>
+                                                        <td class="text-end">Rp
+                                                            {{ number_format($summaryForCat['opening'] ?? 0, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="bg-green-lt fw-semibold">
+                                                        <td>Pemasukan</td>
+                                                        <td class="text-end">Rp
+                                                            {{ number_format($summaryForCat['sumMasuk'] ?? 0, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="bg-red-lt fw-semibold">
+                                                        <td>Pengeluaran</td>
+                                                        <td class="text-end">Rp
+                                                            {{ number_format($summaryForCat['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="fw-semibold">
+                                                        <td>Saldo</td>
+                                                        <td class="text-end">
+                                                            Rp
+                                                            {{ number_format($summaryForCat['sumMasuk'] - $summaryForCat['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="bg-blue-lt fw-semibold">
+                                                        <td><b>Total Saldo</b></td>
+                                                        <td class="text-end"><b>Rp
+                                                                {{ number_format($summaryForCat['ending'] ?? 0, 0, ',', '.') }}</b>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @endif
+                                @endif
                                 <div class="d-flex justify-content-between align-items-center p-3 border-top-0">
                                     <div>
                                         <div class="fw-semibold">
@@ -587,6 +673,7 @@
                                     );
                             } elseif ($filterDateMode === '7hari') {
                                 $filterLabel =
+                                    'Pekan Lalu ' .
                                     \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') .
                                     ' s.d. ' .
                                     \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
@@ -672,14 +759,38 @@
                                 @endforeach
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <th class="text-end text-uppercase">Sisa saldo akhir saat ini
+                                <tr class="bg-green-lt">
+                                    <th>
+                                        Pemasukan
+                                    </th>
+                                    <th colspan="3" class="text-end">
+                                        Rp {{ number_format($grandTotalsNonAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}
+                                    </th>
+                                </tr>
+                                <tr class="bg-red-lt">
+                                    <th>
+                                        Pengeluaran
+                                    </th>
+                                    <th colspan="3" class="text-end">
+                                        Rp {{ number_format($grandTotalsNonAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                    </th>
+                                </tr>
+                                <tr class="bg-blue-lt">
+                                    <th>Saldo
+                                    </th>
+                                    <th colspan="3" class="text-end">
+                                        Rp
+                                        {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) - ($grandTotalsNonAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                                    </th>
+                                </tr>
+                                <tr class="table-secondary">
+                                    <th class="text-uppercase">Total Saldo
                                     </th>
                                     <th colspan="3" class="text-end">
                                         Rp {{ number_format($grandTotalsNonAdmin['ending'] ?? 0, 0, ',', '.') }}
                                     </th>
                                 </tr>
-                                <tr class="bg-primary-lt text-white">
+                                {{-- <tr class="bg-primary-lt text-white">
                                     <th class="text-end text-uppercase">Saldo Akhir {{ $filterLabel }}
                                         <span class="text-muted small">(Pemasukan - Pengeluaran)</span>
                                     </th>
@@ -693,11 +804,11 @@
                                         Rp
                                         {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) - ($grandTotalsNonAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                                     </th>
-                                </tr>
+                                </tr> --}}
                                 @if ($filterDateMode === 'bulan' || $filterDateMode === '7hari')
                                     <tr class="bg-secondary text-white">
-                                        <th class="text-end text-uppercase">Total pemasukan, pengeluaran dan saldo
-                                            akhir saat ini</th>
+                                        <th class="text-uppercase">Total pemasukan - Total pengeluaran = Total Saldo
+                                        </th>
                                         <th class="text-end">
                                             Rp
                                             {{ number_format(($grandTotalsNonAdmin['sumMasuk'] ?? 0) + ($previousTotalsNonAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
@@ -749,9 +860,9 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive overflow-auto" style="max-height: 70vh;">
+                        <div class="table-responsive overflow-auto">
                             <table class="table table-vcenter table-nowrap card-table mb-0">
-                                <thead class="sticky-top bg-body shadow-sm" style="z-index: 1;">
+                                <thead class="bg-body shadow-sm">
                                     <tr>
                                         <th>No</th>
                                         <th>Tanggal</th>
@@ -825,6 +936,66 @@
                                 </tbody>
                             </table>
                         </div>
+                        {{-- Ringkasan periode (footer tabel) untuk filter Bulan & 7 Hari --}}
+                        @if ($filterDateMode === 'bulan' || $filterDateMode === '7hari')
+                            @php
+                                $summaryList = $isAdmin
+                                    ? $summaryCategoriesAdmin ?? []
+                                    : $summaryCategoriesNonAdmin ?? [];
+                                $summaryForCat = null;
+                                foreach ($summaryList as $sumCat) {
+                                    if (($sumCat['categoryId'] ?? null) === ($cat['categoryId'] ?? null)) {
+                                        $summaryForCat = $sumCat;
+                                        break;
+                                    }
+                                }
+                                $prevLabel =
+                                    $filterDateMode === 'bulan'
+                                        ? 'Saldo Sebelumnya (Bulan lalu)'
+                                        : 'Saldo Sebelumnya (Pekan lalu)';
+                            @endphp
+                            @if ($summaryForCat)
+                                <div class="pt-3 pe-3 ps-3 pb-0">
+                                    <div class="fw-semibold mb-2 badge bg-primary text-white">Ringkasan Periode
+                                    </div>
+                                    <table class="table table-sm mb-0">
+                                        <tbody>
+                                            <tr class="table-secondary fw-semibold">
+                                                <td>{{ $prevLabel }}</td>
+                                                <td class="text-end">Rp
+                                                    {{ number_format($summaryForCat['opening'] ?? 0, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr class="bg-green-lt fw-semibold">
+                                                <td>Pemasukan</td>
+                                                <td class="text-end">Rp
+                                                    {{ number_format($summaryForCat['sumMasuk'] ?? 0, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr class="bg-red-lt fw-semibold">
+                                                <td>Pengeluaran</td>
+                                                <td class="text-end">Rp
+                                                    {{ number_format($summaryForCat['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr class="fw-semibold">
+                                                <td>Saldo</td>
+                                                <td class="text-end">
+                                                    Rp
+                                                    {{ number_format($summaryForCat['sumMasuk'] - $summaryForCat['sumKeluar'] ?? 0, 0, ',', '.') }}
+                                                </td>
+                                            </tr>
+                                            <tr class="bg-blue-lt fw-semibold">
+                                                <td><b>Total Saldo</b></td>
+                                                <td class="text-end"><b>Rp
+                                                        {{ number_format($summaryForCat['ending'] ?? 0, 0, ',', '.') }}</b>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @endif
+                        @endif
                         <div class="d-flex justify-content-between align-items-center p-3 border-top-0">
                             <div>
                                 <div class="fw-semibold">

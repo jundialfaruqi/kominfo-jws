@@ -94,7 +94,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan1') is-invalid @enderror"
-                                    wire:model="adzan1" accept="image/*">
+                                    wire:model="adzan1" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan1-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan1 || $tmp_adzan1)
@@ -119,6 +120,7 @@
                             @error('adzan1')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="adzan1-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         {{-- Gambar Slide Iqomah 2 --}}
                         <div class="col-md-4 mb-2 px-2">
@@ -161,7 +163,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan2') is-invalid @enderror"
-                                    wire:model="adzan2" accept="image/*">
+                                    wire:model="adzan2" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan2-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan2 || $tmp_adzan2)
@@ -169,8 +172,9 @@
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
                                         wire:click="clearAdzan2" title="Hapus gambar">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-1">
                                             <path d="M4 7l16 0"></path>
                                             <path d="M10 11l0 6"></path>
                                             <path d="M14 11l0 6"></path>
@@ -187,6 +191,7 @@
                             @error('adzan2')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="adzan2-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         {{-- Gambar Slide Iqomah 3 --}}
                         <div class="col-md-4 mb-2 px-2">
@@ -229,7 +234,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan3') is-invalid @enderror"
-                                    wire:model="adzan3" accept="image/*">
+                                    wire:model="adzan3" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan3-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan3 || $tmp_adzan3)
@@ -255,6 +261,7 @@
                             @error('adzan3')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="adzan3-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         {{-- Gambar Slide Iqomah 4 --}}
                         <div class="col-md-4 mb-2 px-2">
@@ -297,7 +304,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan4') is-invalid @enderror"
-                                    wire:model="adzan4" accept="image/*">
+                                    wire:model="adzan4" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan4-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan4 || $tmp_adzan4)
@@ -323,6 +331,7 @@
                             @error('adzan4')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="adzan4-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         {{-- Gambar Slide Iqomah 5 --}}
                         <div class="col-md-4 mb-2 px-2">
@@ -365,7 +374,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan5') is-invalid @enderror"
-                                    wire:model="adzan5" accept="image/*">
+                                    wire:model="adzan5" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan5-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan5 || $tmp_adzan5)
@@ -391,6 +401,7 @@
                             @error('adzan5')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="adzan5-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         {{-- Gambar Slide Iqomah 6 --}}
                         <div class="col-md-4 mb-2 px-2">
@@ -433,7 +444,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan6') is-invalid @enderror"
-                                    wire:model="adzan6" accept="image/*">
+                                    wire:model="adzan6" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan6-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan6 || $tmp_adzan6)
@@ -460,6 +472,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan6-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                     </div>
 
@@ -501,7 +514,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan15') is-invalid @enderror"
-                                    wire:model="adzan15" accept="image/*">
+                                    wire:model="adzan15" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan15-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan15 || $tmp_adzan15)
@@ -528,6 +542,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan15-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                     </div>
 
@@ -573,7 +588,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan7') is-invalid @enderror"
-                                    wire:model="adzan7" accept="image/*">
+                                    wire:model="adzan7" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan7-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan7 || $tmp_adzan7)
@@ -600,6 +616,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan7-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         <div class="col-md-4 mb-2 px-2">
                             <label class="form-label">Slide Jum'at 2</label>
@@ -641,7 +658,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan8') is-invalid @enderror"
-                                    wire:model="adzan8" accept="image/*">
+                                    wire:model="adzan8" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan8-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan8 || $tmp_adzan8)
@@ -668,6 +686,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan8-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         <div class="col-md-4 mb-2 px-2">
                             <label class="form-label">Slide Jum'at 3</label>
@@ -710,7 +729,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan9') is-invalid @enderror"
-                                    wire:model="adzan9" accept="image/*">
+                                    wire:model="adzan9" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan9-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan9 || $tmp_adzan9)
@@ -737,6 +757,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan9-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         <div class="col-md-4 mb-2 px-2">
                             <label class="form-label">Slide Jum'at 4</label>
@@ -778,7 +799,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan10') is-invalid @enderror"
-                                    wire:model="adzan10" accept="image/*">
+                                    wire:model="adzan10" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan10-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan10 || $tmp_adzan10)
@@ -805,6 +827,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan10-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         <div class="col-md-4 mb-2 px-2">
                             <label class="form-label">Slide Jum'at 5</label>
@@ -846,7 +869,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan11') is-invalid @enderror"
-                                    wire:model="adzan11" accept="image/*">
+                                    wire:model="adzan11" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan11-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan11 || $tmp_adzan11)
@@ -873,6 +897,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan11-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                         <div class="col-md-4 mb-2 px-2">
                             <label class="form-label">Slide Jum'at 6</label>
@@ -914,7 +939,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file"
                                     class="form-control my-2 rounded-4 @error('adzan12') is-invalid @enderror"
-                                    wire:model="adzan12" accept="image/*">
+                                    wire:model="adzan12" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzan12-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');if(err){err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP.';err.style.display='block';}}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($adzan12 || $tmp_adzan12)
@@ -941,6 +967,7 @@
                                 <div class="invalid-feedback">{{ $message }}
                                 </div>
                             @enderror
+                            <div id="adzan12-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                     </div>
                 </div>
@@ -992,4 +1019,111 @@
             </div>
         </div>
     </form>
+
+    <script>
+        (function initAdzanUploadGuards() {
+            const SIZE_LIMIT = 800 * 1024; // 800KB
+            const MESSAGE = 'Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';
+
+            function ensureErrorEl(input) {
+                // Gunakan div statis jika tersedia (id: <model>-upload-error), jika tidak buat fallback dinamis
+                const model = input.getAttribute('wire:model');
+                let el = model ? document.getElementById(`${model}-upload-error`) : null;
+                if (!el) {
+                    el = input.parentElement.querySelector('.client-upload-error');
+                }
+                if (!el) {
+                    el = document.createElement('div');
+                    el.className = 'invalid-feedback client-upload-error';
+                    el.style.display = 'none';
+                    input.parentElement.appendChild(el);
+                }
+                return el;
+            }
+
+            function showError(input, msg) {
+                const el = ensureErrorEl(input);
+                el.textContent = msg;
+                el.style.display = 'block';
+                input.classList.add('is-invalid');
+            }
+
+            function clearError(input) {
+                const model = input.getAttribute('wire:model');
+                const elById = model ? document.getElementById(`${model}-upload-error`) : null;
+                const elDynamic = input.parentElement.querySelector('.client-upload-error');
+                if (elById) elById.style.display = 'none';
+                if (elDynamic) elDynamic.style.display = 'none';
+                input.classList.remove('is-invalid');
+            }
+
+            function attachGuards() {
+                // Tangkap semua input file yang terkait dengan properti adzan*
+                document.querySelectorAll('input[type="file"][wire\\:model]').forEach((input) => {
+                    const model = input.getAttribute('wire:model');
+                    if (!model || !model.startsWith('adzan')) return;
+
+                    input.addEventListener('change', function(e) {
+                        const file = this.files && this.files[0] ? this.files[0] : null;
+                        if (!file) {
+                            clearError(this);
+                            return;
+                        }
+                        if (file.size > SIZE_LIMIT) {
+                            // Tampilkan error di sisi klien, namun tetap biarkan Livewire memproses
+                            // agar validasi backend (validateOnly/save) ikut memunculkan pesan server.
+                            showError(this, MESSAGE);
+                            return;
+                        }
+                        clearError(this);
+                    });
+                });
+            }
+
+            function attachLivewireEvents() {
+                // Pasang listener Livewire upload events langsung pada setiap input adzan*
+                document.querySelectorAll('input[type="file"][wire\\:model]').forEach((input) => {
+                    const model = input.getAttribute('wire:model');
+                    if (!model || !model.startsWith('adzan')) return;
+
+                    input.addEventListener('livewire-upload-error', () => {
+                        showError(input, MESSAGE);
+                    });
+                    input.addEventListener('livewire-upload-start', () => {
+                        clearError(input);
+                    });
+                    input.addEventListener('livewire-upload-finish', () => {
+                        clearError(input);
+                    });
+                });
+            }
+
+            function attachResetListener() {
+                // Bersihkan error client ketika komponen mengirim event resetFileInput
+                window.addEventListener('resetFileInput', function(e) {
+                    const name = e.detail?.inputName;
+                    const input = document.querySelector(`input[type="file"][wire\\:model="${name}"]`);
+                    if (input) {
+                        input.value = '';
+                        clearError(input);
+                    }
+                });
+            }
+
+            // Jalankan segera jika DOM sudah siap; jika belum, tunggu DOMContentLoaded
+            function bootstrap() {
+                attachGuards();
+                attachLivewireEvents();
+                attachResetListener();
+            }
+
+            if (document.readyState !== 'loading') {
+                bootstrap();
+            } else {
+                document.addEventListener('DOMContentLoaded', bootstrap, {
+                    once: true
+                });
+            }
+        })();
+    </script>
 @endif

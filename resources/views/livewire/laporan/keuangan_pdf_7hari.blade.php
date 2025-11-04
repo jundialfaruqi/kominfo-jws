@@ -175,20 +175,32 @@
         </tbody>
         <tfoot>
             <tr>
-                <th class="text-end">Sisa saldo akhir saat ini</th>
-                <th class="text-end"></th>
-                <th class="text-end"></th>
-                <th class="text-end">Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}</th>
+                <th colspan="3" class="text-end">Pemasukan</th>
+                <th class="text-end">Rp {{ number_format($grandTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}</th>
             </tr>
             <tr>
+                <th colspan="3" class="text-end">Pengeluaran</th>
+                <th class="text-end">Rp {{ number_format($grandTotalsAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}</th>
+            </tr>
+            <tr>
+                <th colspan="3" class="text-end">Saldo</th>
+                <th class="text-end">Rp
+                    {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                </th>
+            </tr>
+            <tr>
+                <th colspan="3" class="text-end">Total Saldo</th>
+                <th class="text-end">Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}</th>
+            </tr>
+            {{-- <tr>
                 <th class="text-end">Saldo akhir periode (pemasukan - pengeluaran)</th>
                 <th class="text-end">Rp {{ number_format($grandTotalsAdmin['sumMasuk'] ?? 0, 0, ',', '.') }}</th>
                 <th class="text-end">Rp {{ number_format($grandTotalsAdmin['sumKeluar'] ?? 0, 0, ',', '.') }}</th>
                 <th class="text-end">Rp
                     {{ number_format(($grandTotalsAdmin['sumMasuk'] ?? 0) - ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                 </th>
-            </tr>
-            <tr>
+            </tr> --}}
+            {{-- <tr>
                 <th class="text-end">Total pemasukan, pengeluaran dan saldo akhir saat ini</th>
                 <th class="text-end">Rp
                     {{ number_format(($previousTotalsAdmin['sumMasuk'] ?? 0) + ($grandTotalsAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
@@ -197,8 +209,34 @@
                     {{ number_format(($previousTotalsAdmin['sumKeluar'] ?? 0) + ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
                 </th>
                 <th class="text-end">Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}</th>
-            </tr>
+            </tr> --}}
         </tfoot>
+    </table>
+
+    <h2>Total Saldo Akhir Semua Kategori Pada Saat ini
+        <span class="small">
+            (Total Pemasukan - Total Pengeluaran = Total Saldo)
+        </span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th class="text-end">Total Pemasukan</th>
+                <th class="text-end">Total Pengeluaran</th>
+                <th class="text-end">Total Saldo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="text-end">Rp
+                    {{ number_format(($previousTotalsAdmin['sumMasuk'] ?? 0) + ($grandTotalsAdmin['sumMasuk'] ?? 0), 0, ',', '.') }}
+                </td>
+                <td class="text-end">Rp
+                    {{ number_format(($previousTotalsAdmin['sumKeluar'] ?? 0) + ($grandTotalsAdmin['sumKeluar'] ?? 0), 0, ',', '.') }}
+                </td>
+                <td class="text-end">Rp {{ number_format($grandTotalsAdmin['ending'] ?? 0, 0, ',', '.') }}</td>
+            </tr>
+        </tbody>
     </table>
 
     @foreach ($group['categories'] as $category)
@@ -261,6 +299,10 @@
                 @endif
             </tbody>
             <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Saldo Sebelumnya {{ $category['categoryName'] }}</th>
+                    <th class="text-end">Rp {{ number_format($category['previousEnding'] ?? 0, 0, ',', '.') }}</th>
+                </tr>
                 <tr>
                     <th colspan="4" class="text-end">Total Masuk</th>
                     <th class="text-end">Rp {{ number_format($category['sumMasuk'] ?? 0, 0, ',', '.') }}</th>

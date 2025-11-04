@@ -103,7 +103,7 @@ class LaporanPdfController extends Controller
             $sumMasuk = (int) ($agg->sum_masuk ?? 0);
             $sumKeluar = (int) ($agg->sum_keluar ?? 0);
 
-            // Opening sebelum periode
+            // Opening sebelum periode 7 hari (semua transaksi sebelum awal rentang)
             $openingAgg = DB::table('laporans')
                 ->where('id_masjid', $idMasjid)
                 ->where('id_group_category', $cat->id)
@@ -130,6 +130,8 @@ class LaporanPdfController extends Controller
                 'categoryId' => $cat->id,
                 'categoryName' => $cat->name,
                 'rows' => $rows,
+                // saldo sebelumnya per kategori (s.d. akhir periode sebelumnya)
+                'previousEnding' => $opening,
                 'sumMasuk' => $sumMasuk,
                 'sumKeluar' => $sumKeluar,
                 'ending' => $ending,
@@ -275,11 +277,13 @@ class LaporanPdfController extends Controller
             $sumMasuk = (int) ($agg->sum_masuk ?? 0);
             $sumKeluar = (int) ($agg->sum_keluar ?? 0);
 
-            // Opening sebelum periode
+            // Opening sebelum periode bulan ini (hingga akhir bulan sebelumnya)
+            $currentMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta');
+            $prevEnd = $currentMonth->copy()->subMonth()->endOfMonth()->format('Y-m-d');
             $openingAgg = DB::table('laporans')
                 ->where('id_masjid', $idMasjid)
                 ->where('id_group_category', $cat->id)
-                ->where('tanggal', '<', $periodStartDate)
+                ->where('tanggal', '<=', $prevEnd)
                 ->selectRaw('COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE -saldo END), 0) AS opening')
                 ->first();
             $opening = (int) ($openingAgg->opening ?? 0);
@@ -302,16 +306,20 @@ class LaporanPdfController extends Controller
                 'categoryId' => $cat->id,
                 'categoryName' => $cat->name,
                 'rows' => $rows,
+                // saldo sebelumnya per kategori (s.d. akhir bulan sebelumnya)
+                'previousEnding' => $opening,
                 'sumMasuk' => $sumMasuk,
                 'sumKeluar' => $sumKeluar,
                 'ending' => $ending,
             ];
         }
 
-        // Hitung total sebelumnya (saldo sebelum periode, agregat semua kategori)
+        // Hitung total sebelumnya (saldo sebelum periode, agregat semua kategori) hingga akhir bulan sebelumnya
+        $currentMonth = Carbon::createFromDate($year, $month, 1, 'Asia/Jakarta');
+        $prevEnd = $currentMonth->copy()->subMonth()->endOfMonth()->format('Y-m-d');
         $prevAgg = DB::table('laporans')
             ->where('id_masjid', $idMasjid)
-            ->where('tanggal', '<', $periodStartDate)
+            ->where('tanggal', '<=', $prevEnd)
             ->selectRaw(
                 'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
                     'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'

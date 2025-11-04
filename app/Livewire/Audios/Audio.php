@@ -7,6 +7,7 @@ use App\Models\Audios;
 use App\Models\Profil;
 use App\Models\User;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -26,13 +27,37 @@ class Audio extends Component
     protected $paginationTheme = 'bootstrap';
 
     public $audioId;
+    #[Validate('required|exists:users,id', message: [
+        'required' => 'Admin Masjid wajib diisi',
+        'exists' => 'Admin Masjid tidak ditemukan',
+    ])]
     public $userId;
+
+    #[Validate('nullable|file|mimes:mp3,wav|max:51200', message: [
+        'file' => 'File harus berupa audio',
+        'mimes' => 'File harus berupa audio mp3 atau wav',
+        'max' => 'Ukuran file maksimal 50MB',
+    ])]
     public $audio1;
     public $tmp_audio1;
+    #[Validate('nullable|file|mimes:mp3,wav|max:51200', message: [
+        'file' => 'File harus berupa audio',
+        'mimes' => 'File harus berupa audio mp3 atau wav',
+        'max' => 'Ukuran file maksimal 50MB',
+    ])]
     public $audio2;
     public $tmp_audio2;
+    #[Validate('nullable|file|mimes:mp3,wav|max:51200', message: [
+        'file' => 'File harus berupa audio',
+        'mimes' => 'File harus berupa audio mp3 atau wav',
+        'max' => 'Ukuran file maksimal 50MB',
+    ])]
     public $audio3;
     public $tmp_audio3;
+    #[Validate('required|boolean', message: [
+        'required' => 'Status wajib diisi',
+        'boolean' => 'Status harus berupa aktif atau tidak aktif',
+    ])]
     public $status = 1; // Default status aktif
 
     // Upload validation success indicators
@@ -46,29 +71,7 @@ class Audio extends Component
     public $deleteAudioId;
     public $deleteAudioName;
 
-    protected $rules = [
-        'userId' => 'required|exists:users,id',
-        'audio1' => 'nullable|file|mimes:mp3,wav|max:51200', // Maks 50MB
-        'audio2' => 'nullable|file|mimes:mp3,wav|max:51200', // Maks 50MB
-        'audio3' => 'nullable|file|mimes:mp3,wav|max:51200', // Maks 50MB
-        'status' => 'required|boolean',
-    ];
-
-    protected $messages = [
-        'userId.required' => 'Admin Masjid wajib diisi',
-        'userId.exists'   => 'Admin Masjid tidak ditemukan',
-        'audio1.file'     => 'File harus berupa audio',
-        'audio2.file'     => 'File harus berupa audio',
-        'audio3.file'     => 'File harus berupa audio',
-        'audio1.mimes'    => 'File harus berupa audio mp3 atau wav',
-        'audio2.mimes'    => 'File harus berupa audio mp3 atau wav',
-        'audio3.mimes'    => 'File harus berupa audio mp3 atau wav',
-        'audio1.max'      => 'Ukuran file maksimal 50MB',
-        'audio2.max'      => 'Ukuran file maksimal 50MB',
-        'audio3.max'      => 'Ukuran file maksimal 50MB',
-        'status.required' => 'Status wajib diisi',
-        'status.boolean'  => 'Status harus berupa aktif atau tidak aktif',
-    ];
+    
 
     /**
      * Method untuk memeriksa direktori penyimpanan lokal

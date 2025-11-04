@@ -174,9 +174,10 @@
                                     10MB</small>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="audioadzan-input"
                                     class="form-control my-2 rounded-4 @error('audioadzan') is-invalid @enderror"
-                                    wire:model="audioadzan" accept="audio/*">
+                                    wire:model="audioadzan" accept="audio/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('audioadzan-upload-error');const show=(m)=>{el.classList.add('is-invalid');if(err){err.textContent=m;err.style.display='block';}};const hide=()=>{el.classList.remove('is-invalid');if(err){err.style.display='none';err.textContent='';}};if(!f){hide();return;}const name=(f.name||'').toLowerCase();const validExt=name.endsWith('.mp3')||name.endsWith('.wav');if(!validExt){event.stopImmediatePropagation();show('Format file harus MP3 atau WAV.');return;}if(f.size>10485760){event.stopImmediatePropagation();show('Ukuran file maksimal 10MB. Format diizinkan: MP3, WAV.');return;}hide();})(this)">
                                 @if ($audioadzan || $tmp_audioadzan)
                                     <button type="button"
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
@@ -207,6 +208,7 @@
                             @error('audioadzan')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="audioadzan-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
 
                         {{-- Audio Adzan Shubuh --}}
@@ -308,9 +310,10 @@
                                     10MB</small>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="adzanshubuh-input"
                                     class="form-control my-2 rounded-4 @error('adzanshubuh') is-invalid @enderror"
-                                    wire:model="adzanshubuh" accept="audio/*">
+                                    wire:model="adzanshubuh" accept="audio/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('adzanshubuh-upload-error');const show=(m)=>{el.classList.add('is-invalid');if(err){err.textContent=m;err.style.display='block';}};const hide=()=>{el.classList.remove('is-invalid');if(err){err.style.display='none';err.textContent='';}};if(!f){hide();return;}const name=(f.name||'').toLowerCase();const validExt=name.endsWith('.mp3')||name.endsWith('.wav');if(!validExt){event.stopImmediatePropagation();show('Format file harus MP3 atau WAV.');return;}if(f.size>10485760){event.stopImmediatePropagation();show('Ukuran file maksimal 10MB. Format diizinkan: MP3, WAV.');return;}hide();})(this)">
                                 @if ($adzanshubuh || $tmp_adzanshubuh)
                                     <button type="button"
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
@@ -341,6 +344,7 @@
                             @error('adzanshubuh')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="adzanshubuh-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                     </div>
                 </div>
@@ -392,4 +396,26 @@
             </div>
         </div>
     </form>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            window.addEventListener('livewire-upload-error', (event) => {
+                try {
+                    const name = event?.detail?.name;
+                    const idMap = {
+                        'audioadzan': 'audioadzan-upload-error',
+                        'adzanshubuh': 'adzanshubuh-upload-error',
+                    };
+                    const divId = idMap[name];
+                    if (!divId) return;
+                    const el = document.getElementById(divId);
+                    if (el) {
+                        el.textContent = 'Upload gagal di server. Kemungkinan melewati batas ukuran yang diizinkan.';
+                        el.style.display = 'block';
+                    }
+                } catch (e) {
+                    // noop
+                }
+            });
+        });
+    </script>
 @endif

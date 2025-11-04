@@ -385,6 +385,465 @@ class ProfilController extends Controller
         }
     }
 
+    // Duplicate GET REKAPAN total keseluruhan kategori per profile (id_masjid),
+    public function get_balance_summary_1(Request $request, $slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+
+            // Query params: details (none|summary|full), page, per_page
+            $details = strtolower($request->query('details', 'summary'));
+            if (!in_array($details, ['none', 'summary', 'full'])) {
+                $details = 'summary';
+            }
+            $page = max(1, (int) $request->query('page', 1));
+            $perPage = (int) $request->query('per_page', 50);
+            if ($perPage < 1) {
+                $perPage = 50;
+            }
+            if ($perPage > 500) {
+                $perPage = 500;
+            } // batas atas untuk mencegah respons terlalu besar
+            // Limit item per kategori pada mode full_month hanya jika recent_limit diberikan (clamp 1..50; default tidak ada limit)
+            $hasRecentLimit = $request->has('recent_limit');
+            $recentLimit = null;
+            if ($hasRecentLimit) {
+                $recentLimit = (int) $request->query('recent_limit');
+                if ($recentLimit < 1) {
+                    $recentLimit = 3;
+                }
+                if ($recentLimit > 50) {
+                    $recentLimit = 50;
+                }
+            }
+            // parameter tambahan: full_month => bila true, detail full dibatasi bulan berjalan tanpa paginasi
+            $fullMonth = filter_var($request->query('full_month', 'false'), FILTER_VALIDATE_BOOLEAN);
+            $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
+            $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+            $fullMonth = filter_var($request->query('full_month', 'false'), FILTER_VALIDATE_BOOLEAN);
+            // keep ISO format for DB query, but expose dd-mm-yyyy in response
+            $startOfMonthIso = Carbon::now()->startOfMonth()->toDateString();
+            $endOfMonthIso = Carbon::now()->endOfMonth()->toDateString();
+            $startOfMonthDisplay = Carbon::parse($startOfMonthIso)->format('d-m-Y');
+            $endOfMonthDisplay = Carbon::parse($endOfMonthIso)->format('d-m-Y');
+            // Tambahan: nama bulan (Indonesia) dan tahun untuk period saat full_month=true
+            $monthNameId = Carbon::now()->locale('id')->translatedFormat('F');
+            $yearNumber = Carbon::now()->year;
+            // Pada mode full_month, jangan sertakan running_balance untuk mengurangi payload
+            $skipRunningBalance = $fullMonth;
+            // Tambahan: dukung paginasi saat full_month=true bila page/per_page diberikan dan tanpa recent_limit
+            $monthPaginationRequested = $fullMonth && !$hasRecentLimit && ($request->has('page') || $request->has('per_page'));
+
+            $rows = DB::table('tb_balance')
+                ->leftJoin('group_categories', 'group_categories.id', '=', 'tb_balance.id_group_category')
+                ->where('tb_balance.id_masjid', $profil->id)
+                ->selectRaw('tb_balance.id_group_category as category_id, COALESCE(group_categories.name, "-") as category_name, tb_balance.total_masuk as sumMasuk, tb_balance.total_keluar as sumKeluar, tb_balance.ending_balance as ending')
+                ->orderBy('group_categories.name')
+                ->get();
+
+            $categories = [];
+            $categoriesWithItems = [];
+            $grandTotals = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+
+            foreach ($rows as $row) {
+                $sumMasuk = (int) ($row->sumMasuk ?? 0);
+                $sumKeluar = (int) ($row->sumKeluar ?? 0);
+                $ending = (int) ($row->ending ?? 0);
+                $categories[] = [
+                    'categoryId' => (int) $row->category_id,
+                    'categoryName' => $row->category_name,
+                    'sumMasuk' => $sumMasuk,
+                    'sumKeluar' => $sumKeluar,
+                    'ending' => $ending,
+                    // tambahan: tampilan terformat ribuan
+                    'sumMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                    'sumKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                    'endingDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
+                ];
+
+                if ($details === 'full') {
+                    // Pagination per kategori
+                    if ($fullMonth) {
+                        $totalItems = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->whereBetween('laporans.tanggal', [$startOfMonth, $endOfMonth])
+                            ->count();
+
+                        // Hanya kirim N item terbaru (urut terbaru) untuk mengurangi payload
+                        $selectCols = 'laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening' . ($skipRunningBalance ? '' : ', laporans.running_balance');
+                        $queryItems = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->whereBetween('laporans.tanggal', [$startOfMonth, $endOfMonth])
+                            ->selectRaw($selectCols)
+                            ->orderBy('tanggal', 'desc')
+                            ->orderBy('id', 'desc');
+
+                        if ($hasRecentLimit && $recentLimit !== null) {
+                            $queryItems->limit($recentLimit);
+                        }
+                        if ($monthPaginationRequested && !$hasRecentLimit) {
+                            $queryItems->offset(($page - 1) * $perPage)->limit($perPage);
+                        }
+
+                        $itemRows = $queryItems->get();
+
+                        $items = [];
+                        $startNo = ($monthPaginationRequested && !$hasRecentLimit) ? (($page - 1) * $perPage) : 0; // nomor awal saat paginasi
+                    } else {
+                        $totalItems = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->count();
+
+                        $itemRows = DB::table('laporans')
+                            ->where('laporans.id_masjid', $profil->id)
+                            ->where('laporans.id_group_category', $row->category_id)
+                            ->selectRaw('laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening, laporans.running_balance')
+                            ->orderBy('tanggal', 'asc')
+                            ->orderBy('id', 'asc')
+                            ->offset(($page - 1) * $perPage)
+                            ->limit($perPage)
+                            ->get();
+
+                        $items = [];
+                        $startNo = ($page - 1) * $perPage; // dengan paginasi
+                    }
+                    foreach ($itemRows as $i => $lap) {
+                        $masuk = 0;
+                        $keluar = 0;
+                        if ($lap->is_opening) {
+                            $masuk = (int) $lap->saldo;
+                        } else {
+                            if ($lap->jenis === 'masuk') {
+                                $masuk = (int) $lap->saldo;
+                            } elseif ($lap->jenis === 'keluar') {
+                                $keluar = (int) $lap->saldo;
+                            }
+                        }
+                        $item = [
+                            'id' => (int) $lap->id,
+                            'no' => (int) $startNo + (int) $i + 1,
+                            'tanggal' => Carbon::parse($lap->tanggal)->format('d/m/Y'),
+                            'uraian' => $lap->is_opening ? ($lap->uraian ?: 'Sisa bulan yang lalu') : $lap->uraian,
+                            'is_opening' => (bool) $lap->is_opening,
+                            'groupCategoryName' => $row->category_name,
+                            'masukDisplay' => $masuk > 0 ? ('Rp ' . number_format($masuk, 0, ',', '.')) : '-',
+                            'keluarDisplay' => $keluar > 0 ? ('Rp ' . number_format($keluar, 0, ',', '.')) : '-',
+                        ];
+                        if (!$skipRunningBalance) {
+                            $item['runningBalanceDisplay'] = 'Rp ' . number_format((int) ($lap->running_balance ?? 0), 0, ',', '.');
+                        }
+                        $items[] = $item;
+                    }
+
+                    $categoryBlock = [
+                        'categoryId' => (int) $row->category_id,
+                        'categoryName' => $row->category_name,
+                        'items' => $items,
+                        'totals' => [
+                            'totalMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                            'totalKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                            'endingBalanceDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
+                        ],
+                    ];
+
+                    if (!$fullMonth) {
+                        $categoryBlock['pagination'] = [
+                            'page' => $page,
+                            'perPage' => $perPage,
+                            'total' => (int) $totalItems,
+                            'lastPage' => (int) ceil($totalItems / $perPage),
+                        ];
+                    } elseif ($monthPaginationRequested) {
+                        $categoryBlock['pagination'] = [
+                            'page' => $page,
+                            'perPage' => $perPage,
+                            'total' => (int) $totalItems,
+                            'lastPage' => (int) ceil($totalItems / $perPage),
+                        ];
+                    }
+
+                    $categoriesWithItems[] = $categoryBlock;
+                }
+
+                $grandTotals['sumMasuk'] += $sumMasuk;
+                $grandTotals['sumKeluar'] += $sumKeluar;
+                $grandTotals['ending'] += $ending;
+            }
+
+            // tambahan: grandTotals tampilan terformat ribuan
+            $grandTotals['sumMasukDisplay'] = 'Rp ' . number_format($grandTotals['sumMasuk'], 0, ',', '.');
+            $grandTotals['sumKeluarDisplay'] = 'Rp ' . number_format($grandTotals['sumKeluar'], 0, ',', '.');
+            $grandTotals['endingDisplay'] = 'Rp ' . number_format($grandTotals['ending'], 0, ',', '.');
+
+            $data = [
+                'profil' => [
+                    'id' => $profil->id,
+                    'name' => $profil->name,
+                ],
+                'categories' => $categories,
+                // hanya sertakan detail ketika diminta
+                // 'categoriesWithItems' akan ditambahkan di bawah bila $details === 'full'
+                'grandTotals' => $grandTotals,
+            ];
+
+            if ($details === 'full') {
+                $data['categoriesWithItems'] = $categoriesWithItems;
+                $data['details'] = 'full';
+                $data['full_month'] = $fullMonth;
+                if (!$fullMonth) {
+                    $data['page'] = $page;
+                    $data['per_page'] = $perPage;
+                } else {
+                    $data['period'] = [
+                        'type' => 'current_month',
+                        'month' => $monthNameId,
+                        'year' => (int) $yearNumber,
+                        'start' => $startOfMonthDisplay,
+                        'end' => $endOfMonthDisplay,
+                    ];
+                    if ($monthPaginationRequested) {
+                        $data['page'] = $page;
+                        $data['per_page'] = $perPage;
+                    }
+                }
+            } else {
+                $data['details'] = $details; // none atau summary
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data rekap balance masjid !',
+                'data' => $data
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // Endpoint baru: Rekap 7 hari terakhir per profil (slug)
+    public function get_balance_summary_7hari(Request $request, $slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+
+            // Query params: details (none|summary|full), recent_limit (opsional), page/per_page (opsional, dipakai bila details=full tanpa recent_limit)
+            $details = strtolower($request->query('details', 'summary'));
+            if (!in_array($details, ['none', 'summary', 'full'])) {
+                $details = 'summary';
+            }
+            $page = max(1, (int) $request->query('page', 1));
+            $perPage = (int) $request->query('per_page', 50);
+            if ($perPage < 1) { $perPage = 50; }
+            if ($perPage > 500) { $perPage = 500; }
+
+            // Dukungan filter untuk menyembunyikan kategori kosong
+            $hideEmptyParam = $request->query('hide_empty', null);
+            $hideEmpty = false;
+            if ($hideEmptyParam !== null) {
+                $val = strtolower((string) $hideEmptyParam);
+                $hideEmpty = in_array($val, ['1', 'true', 't', 'yes', 'y', 'on'], true);
+            }
+
+            $hasRecentLimit = $request->has('recent_limit');
+            $recentLimit = null;
+            if ($hasRecentLimit) {
+                $recentLimit = (int) $request->query('recent_limit');
+                if ($recentLimit < 1) { $recentLimit = 3; }
+                if ($recentLimit > 50) { $recentLimit = 50; }
+            }
+
+            // Periode 7 hari terakhir (timezone Asia/Jakarta)
+            $start7 = \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->toDateString();
+            $end7 = \Carbon\Carbon::today('Asia/Jakarta')->toDateString();
+            $startDisplay = \Carbon\Carbon::parse($start7)->format('d-m-Y');
+            $endDisplay = \Carbon\Carbon::parse($end7)->format('d-m-Y');
+
+            // Ambil daftar kategori untuk profil ini
+            $rows = \Illuminate\Support\Facades\DB::table('group_categories')
+                ->where('group_categories.id_masjid', $profil->id)
+                ->select(['id as category_id', 'name as category_name'])
+                ->orderBy('name')
+                ->get();
+
+            $categories = [];
+            $categoriesWithItems = [];
+            $grandTotals = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+
+            foreach ($rows as $row) {
+                // Ringkasan per kategori berdasarkan 7 hari
+                $agg = \Illuminate\Support\Facades\DB::table('laporans')
+                    ->where('laporans.id_masjid', $profil->id)
+                    ->where('laporans.id_group_category', $row->category_id)
+                    ->whereBetween('laporans.tanggal', [$start7, $end7])
+                    ->selectRaw(
+                        'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
+                        'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
+                    )
+                    ->first();
+                $sumMasuk = (int) ($agg->sum_masuk ?? 0);
+                $sumKeluar = (int) ($agg->sum_keluar ?? 0);
+                $ending = $sumMasuk - $sumKeluar;
+
+                if ($details === 'full') {
+                    // Detail item per kategori pada periode 7 hari, urut terbaru
+                    $selectCols = 'laporans.id, laporans.id_masjid, laporans.id_group_category, laporans.tanggal, laporans.uraian, laporans.jenis, laporans.saldo, laporans.is_opening';
+                    $queryItems = \Illuminate\Support\Facades\DB::table('laporans')
+                        ->where('laporans.id_masjid', $profil->id)
+                        ->where('laporans.id_group_category', $row->category_id)
+                        ->whereBetween('laporans.tanggal', [$start7, $end7])
+                        ->selectRaw($selectCols)
+                        ->orderBy('tanggal', 'desc')
+                        ->orderBy('id', 'desc');
+
+                    if ($hasRecentLimit && $recentLimit !== null) {
+                        $queryItems->limit($recentLimit);
+                    } else {
+                        // Opsional: dukung paginasi bila diminta tanpa recent_limit
+                        if ($request->has('page') || $request->has('per_page')) {
+                            $queryItems->offset(($page - 1) * $perPage)->limit($perPage);
+                        }
+                    }
+
+                    // Hitung saldo sebelumnya (sebelum periode 7 hari dimulai)
+                    $prevAgg = \Illuminate\Support\Facades\DB::table('laporans')
+                        ->where('laporans.id_masjid', $profil->id)
+                        ->where('laporans.id_group_category', $row->category_id)
+                        ->where('laporans.tanggal', '<', $start7)
+                        ->selectRaw(
+                            'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_prev_masuk, ' .
+                            'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_prev_keluar'
+                        )
+                        ->first();
+                    $prevMasuk = (int) ($prevAgg->sum_prev_masuk ?? 0);
+                    $prevKeluar = (int) ($prevAgg->sum_prev_keluar ?? 0);
+                    $previousEnding = $prevMasuk - $prevKeluar;
+
+                    $itemRows = $queryItems->get();
+
+                    $items = [];
+                    $startNo = ($request->has('page') || $request->has('per_page')) && !$hasRecentLimit ? (($page - 1) * $perPage) : 0;
+                    foreach ($itemRows as $i => $lap) {
+                        $masuk = 0; $keluar = 0;
+                        if ($lap->is_opening) {
+                            $masuk = (int) $lap->saldo;
+                        } else {
+                            if ($lap->jenis === 'masuk') { $masuk = (int) $lap->saldo; }
+                            elseif ($lap->jenis === 'keluar') { $keluar = (int) $lap->saldo; }
+                        }
+                        $items[] = [
+                            'id' => (int) $lap->id,
+                            'no' => (int) $startNo + (int) $i + 1,
+                            'tanggal' => \Carbon\Carbon::parse($lap->tanggal)->format('d/m/Y'),
+                            'uraian' => $lap->is_opening ? ($lap->uraian ?: 'Sisa periode sebelumnya') : $lap->uraian,
+                            'is_opening' => (bool) $lap->is_opening,
+                            'groupCategoryName' => $row->category_name,
+                            'masukDisplay' => $masuk > 0 ? ('Rp ' . number_format($masuk, 0, ',', '.')) : '-',
+                            'keluarDisplay' => $keluar > 0 ? ('Rp ' . number_format($keluar, 0, ',', '.')) : '-',
+                        ];
+                    }
+
+                    // Tentukan apakah kategori ini perlu disembunyikan (kosong dan semua total 0)
+                    $isEmptyCategory = $hideEmpty && (count($itemRows) === 0) && ($sumMasuk === 0) && ($sumKeluar === 0) && ($ending === 0) && ($previousEnding === 0);
+                    if ($isEmptyCategory) {
+                        // Jangan tambahkan ke daftar categories maupun categoriesWithItems
+                        // Lanjutkan ke kategori berikutnya
+                        // Catatan: grandTotals tidak terpengaruh karena semuanya 0
+                        continue;
+                    }
+
+                    // Tambahkan ringkasan kategori (summary) setelah memastikan tidak disembunyikan
+                    $categories[] = [
+                        'categoryId' => (int) $row->category_id,
+                        'categoryName' => $row->category_name,
+                        'sumMasuk' => $sumMasuk,
+                        'sumKeluar' => $sumKeluar,
+                        'ending' => $ending,
+                        'sumMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                        'sumKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                        'endingDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
+                    ];
+
+                    $categoriesWithItems[] = [
+                        'categoryId' => (int) $row->category_id,
+                        'categoryName' => $row->category_name,
+                        'items' => $items,
+                        'totals' => [
+                            // Raw numeric totals
+                            'previousBalance' => (int) $previousEnding,
+                            'totalMasuk' => (int) $sumMasuk,
+                            'totalKeluar' => (int) $sumKeluar,
+                            'endingBalance' => (int) $ending,
+                            'totalSaldo' => (int) ($previousEnding + $ending),
+                            // Display strings (kompatibilitas)
+                            'previousBalanceDisplay' => 'Rp ' . number_format($previousEnding, 0, ',', '.'),
+                            'totalMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                            'totalKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                            'endingBalanceDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
+                            'totalSaldoDisplay' => 'Rp ' . number_format($previousEnding + $ending, 0, ',', '.'),
+                        ],
+                    ];
+                } else {
+                    // details bukan 'full' => tetap kirim ringkasan tanpa filter hide_empty
+                    $categories[] = [
+                        'categoryId' => (int) $row->category_id,
+                        'categoryName' => $row->category_name,
+                        'sumMasuk' => $sumMasuk,
+                        'sumKeluar' => $sumKeluar,
+                        'ending' => $ending,
+                        'sumMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
+                        'sumKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
+                        'endingDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
+                    ];
+                }
+
+                $grandTotals['sumMasuk'] += $sumMasuk;
+                $grandTotals['sumKeluar'] += $sumKeluar;
+                $grandTotals['ending'] += $ending;
+            }
+
+            $grandTotals['sumMasukDisplay'] = 'Rp ' . number_format($grandTotals['sumMasuk'], 0, ',', '.');
+            $grandTotals['sumKeluarDisplay'] = 'Rp ' . number_format($grandTotals['sumKeluar'], 0, ',', '.');
+            $grandTotals['endingDisplay'] = 'Rp ' . number_format($grandTotals['ending'], 0, ',', '.');
+
+            $data = [
+                'profil' => [ 'id' => $profil->id, 'name' => $profil->name ],
+                'categories' => $categories,
+                'grandTotals' => $grandTotals,
+            ];
+
+            if ($details === 'full') {
+                $data['categoriesWithItems'] = $categoriesWithItems;
+                $data['details'] = 'full';
+                $data['period'] = [
+                    'type' => 'last_7_days',
+                    'start' => $startDisplay,
+                    'end' => $endDisplay,
+                ];
+                if (($request->has('page') || $request->has('per_page')) && !$hasRecentLimit) {
+                    $data['page'] = $page;
+                    $data['per_page'] = $perPage;
+                }
+            } else {
+                $data['details'] = $details; // none atau summary
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data rekap balance masjid untuk 7 hari terakhir!',
+                'data' => $data,
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
     // GET SLIDES (API LAMA)
     public function get_slides1($slug)
     {

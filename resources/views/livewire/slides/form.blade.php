@@ -80,7 +80,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format:
-                                    JPG, PNG, JPEG, WEBP
+                                    JPG, PNG, JPEG, WEBP. Size: 800KB max
                                 </small>
                             </div>
                             <div class="form-text">
@@ -90,9 +90,10 @@
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="slide1-input"
                                     class="form-control my-2 rounded-4 @error('slide1') is-invalid @enderror"
-                                    wire:model="slide1" accept="image/*">
+                                    wire:model="slide1" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('slide1-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($slide1 || $tmp_slide1)
@@ -118,6 +119,7 @@
                             @error('slide1')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="slide1-upload-error" class="invalid-feedback"></div>
                         </div>
 
                         {{-- Gambar Slide 2 --}}
@@ -149,7 +151,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format:
-                                    JPG, PNG, JPEG, WEBP
+                                    JPG, PNG, JPEG, WEBP. Size: 800KB max
                                 </small>
                             </div>
                             <div class="form-text">
@@ -159,9 +161,10 @@
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="slide2-input"
                                     class="form-control my-2 rounded-4 @error('slide2') is-invalid @enderror"
-                                    wire:model="slide2" accept="image/*">
+                                    wire:model="slide2" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('slide2-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($slide2 || $tmp_slide2)
@@ -169,8 +172,9 @@
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
                                         wire:click="clearSlide2" title="Hapus gambar">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-1">
                                             <path d="M4 7l16 0"></path>
                                             <path d="M10 11l0 6"></path>
                                             <path d="M14 11l0 6"></path>
@@ -187,6 +191,7 @@
                             @error('slide2')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="slide2-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
 
                         {{-- Gambar Slide 3 --}}
@@ -219,7 +224,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format:
-                                    JPG, PNG, JPEG, WEBP
+                                    JPG, PNG, JPEG, WEBP. Size: 800KB max
                                 </small>
                             </div>
                             <div class="form-text">
@@ -229,9 +234,10 @@
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="slide3-input"
                                     class="form-control my-2 rounded-4 @error('slide3') is-invalid @enderror"
-                                    wire:model="slide3" accept="image/*">
+                                    wire:model="slide3" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('slide3-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($slide3 || $tmp_slide3)
@@ -258,6 +264,7 @@
                             @error('slide3')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="slide3-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
 
                         {{-- Gambar Slide 4 --}}
@@ -290,7 +297,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format:
-                                    JPG, PNG, JPEG, WEBP
+                                    JPG, PNG, JPEG, WEBP. Size: 800KB max
                                 </small>
                             </div>
                             <div class="form-text">
@@ -300,9 +307,10 @@
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="slide4-input"
                                     class="form-control my-2 rounded-4 @error('slide4') is-invalid @enderror"
-                                    wire:model="slide4" accept="image/*">
+                                    wire:model="slide4" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('slide4-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($slide4 || $tmp_slide4)
@@ -329,6 +337,7 @@
                             @error('slide4')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="slide4-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
 
                         {{-- Gambar Slide 5 --}}
@@ -361,7 +370,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format:
-                                    JPG, PNG, JPEG, WEBP
+                                    JPG, PNG, JPEG, WEBP. Size: 800KB max
                                 </small>
                             </div>
                             <div class="form-text">
@@ -371,9 +380,10 @@
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="slide5-input"
                                     class="form-control my-2 rounded-4 @error('slide5') is-invalid @enderror"
-                                    wire:model="slide5" accept="image/*">
+                                    wire:model="slide5" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('slide5-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($slide5 || $tmp_slide5)
@@ -400,6 +410,7 @@
                             @error('slide5')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="slide5-upload-error" class="invalid-feedback" style="display:none"></div>
 
                         </div>
 
@@ -433,7 +444,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format:
-                                    JPG, PNG, JPEG, WEBP
+                                    JPG, PNG, JPEG, WEBP. Size: 800KB max
                                 </small>
                             </div>
                             <div class="form-text">
@@ -441,9 +452,10 @@
                                     16:9 (Rekomendasi : 1920x1080 Piksel)</small>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="slide6-input"
                                     class="form-control my-2 rounded-4 @error('slide6') is-invalid @enderror"
-                                    wire:model="slide6" accept="image/*">
+                                    wire:model="slide6" accept="image/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('slide6-upload-error');if(f&&f.size>819200){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
 
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($slide6 || $tmp_slide6)
@@ -469,6 +481,7 @@
                             @error('slide6')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="slide6-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                     </div>
                 </div>
@@ -521,3 +534,35 @@
         </div>
     </form>
 @endif
+
+{{-- Listener pesan error upload Livewire untuk blokir awal (800KB & format gambar) --}}
+<script>
+    document.addEventListener('livewire:load', () => {
+        const setupUploadError = (name) => {
+            const input = document.getElementById(`${name}-input`);
+            const errorEl = document.getElementById(`${name}-upload-error`);
+            if (!input || !errorEl) return;
+
+            const showError = (message) => {
+                input.classList.add('is-invalid');
+                errorEl.textContent = message ||
+                    'Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.';
+                errorEl.style.display = 'block';
+            };
+            const clearError = () => {
+                input.classList.remove('is-invalid');
+                errorEl.style.display = 'none';
+            };
+
+            input.addEventListener('livewire-upload-error', (e) => {
+                // Tampilkan pesan saat upload ditolak oleh aturan sementara
+                showError(
+                    'Ukuran file maksimal 800KB. Format diizinkan: JPG, PNG, JPEG, WEBP, GIF.');
+            });
+            input.addEventListener('livewire-upload-start', clearError);
+            input.addEventListener('livewire-upload-finish', clearError);
+        };
+
+        ['slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slide6'].forEach(setupUploadError);
+    });
+</script>

@@ -7,6 +7,7 @@ use App\Models\Profil;
 use App\Models\Slides;
 use App\Models\User;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -26,16 +27,22 @@ class Slide extends Component
 
     public $slideId;
     public $userId;
+    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
     public $slide1;
     public $tmp_slide1;
+    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
     public $slide2;
     public $tmp_slide2;
+    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
     public $slide3;
     public $tmp_slide3;
+    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
     public $slide4;
     public $tmp_slide4;
+    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
     public $slide5;
     public $tmp_slide5;
+    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
     public $slide6;
     public $tmp_slide6;
 
@@ -47,12 +54,12 @@ class Slide extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
-        'slide1' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide2' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide3' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide4' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide5' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
-        'slide6' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif',
+        'slide1' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+        'slide2' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+        'slide3' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+        'slide4' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+        'slide5' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+        'slide6' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
     ];
 
     protected $messages = [
@@ -70,12 +77,18 @@ class Slide extends Component
         'slide4.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
         'slide5.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
         'slide6.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
+        'slide1.max'      => 'Ukuran gambar maksimal 800KB',
+        'slide2.max'      => 'Ukuran gambar maksimal 800KB',
+        'slide3.max'      => 'Ukuran gambar maksimal 800KB',
+        'slide4.max'      => 'Ukuran gambar maksimal 800KB',
+        'slide5.max'      => 'Ukuran gambar maksimal 800KB',
+        'slide6.max'      => 'Ukuran gambar maksimal 800KB',
     ];
 
     /**
-     * Method untuk resize gambar dengan ukuran maksimal 990KB
+     * Method untuk resize gambar dengan ukuran maksimal 800KB
      */
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
+    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 800)
     {
         try {
             // Konversi ke bytes
@@ -131,7 +144,7 @@ class Slide extends Component
     private function saveProcessedImage($uploadedFile, $slideNumber)
     {
         try {
-            // Proses resize gambar dengan ukuran maksimal 990KB
+            // Proses resize gambar dengan ukuran maksimal 800KB
             $processedImage = $this->resizeImageToLimit($uploadedFile);
 
             // Generate nama file dengan ekstensi .jpg (karena kita convert ke JPEG)
@@ -146,10 +159,10 @@ class Slide extends Component
             }
 
             // Tentukan kualitas optimal berdasarkan ukuran target
-            $maxSizeBytes = 990 * 1024; // 990KB
+            $maxSizeBytes = 800 * 1024; // 800KB
             $quality = 95;
 
-            // Fine-tune kualitas untuk mendekati 990KB
+            // Fine-tune kualitas untuk mendekati 800KB
             do {
                 $encoded = $processedImage->toJpeg($quality);
                 $currentSize = strlen($encoded);
@@ -173,6 +186,16 @@ class Slide extends Component
             return '/images/slides/' . $fileName;
         } catch (\Exception $e) {
             throw new \Exception('Gagal menyimpan gambar: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Validasi langsung saat properti slide diperbarui agar UI menampilkan error segera.
+     */
+    public function updated($name)
+    {
+        if (in_array($name, ['slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slide6'])) {
+            $this->validateOnly($name);
         }
     }
 
@@ -685,7 +708,7 @@ class Slide extends Component
 
             $slide->save();
 
-            // Trigger event 
+            // Trigger event
             $profil = Profil::where('user_id', $this->userId)->first();
             if ($profil) event(new ContentUpdatedEvent($profil->slug, 'slide'));
 
@@ -768,7 +791,7 @@ class Slide extends Component
 
             $slide->delete();
 
-            // Trigger event 
+            // Trigger event
             if ($profil) event(new ContentUpdatedEvent($profil->slug, 'slide'));
 
             $this->dispatch('closeDeleteModal');

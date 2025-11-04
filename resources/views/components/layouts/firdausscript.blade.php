@@ -3023,7 +3023,7 @@
                 return;
             }
             $.ajax({
-                url: `/api/balance-summary/${encodeURIComponent(slug)}?details=full&full_month=true&recent_limit=3`,
+                url: `/api/balance-summary-7hari/${encodeURIComponent(slug)}?details=full&hide_empty=true`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(resp) {
@@ -3052,9 +3052,9 @@
 
         function renderFinanceOverlay(data) {
             try {
-                // Judul menampilkan bulan dan tahun saja (tanpa rentang tanggal)
-                if (data.period && data.period.month && data.period.year) {
-                    const title = `Keuangan Masjid ${data.period.month} ${data.period.year}`;
+                // Judul menampilkan periode 7 hari (start s/d end)
+                if (data.period && data.period.type === 'last_7_days' && data.period.start && data.period.end) {
+                    const title = `${data.period.start} s/d ${data.period.end}`;
                     $('#financePeriodTitle').text(title);
                 } else {
                     $('#financePeriodTitle').text('Keuangan');
@@ -3068,21 +3068,43 @@
                 }
 
                 // Top kategori (ambil 3 terbesar berdasarkan ending)
-                const categories = Array.isArray(data.categories) ? data.categories.slice() : [];
+                let categories = Array.isArray(data.categories) ? data.categories.slice() : [];
                 categories.sort((a, b) => (b.ending || 0) - (a.ending || 0));
+
+                // Frontend guard: sembunyikan kategori kosong (items kosong & semua total 0)
+                // Menggunakan totals numerik dari backend bila tersedia
+                if (Array.isArray(data.categoriesWithItems)) {
+                    const byName = new Map();
+                    data.categoriesWithItems.forEach(b => {
+                        byName.set((b.categoryName || ''), b);
+                    });
+                    categories = categories.filter(cat => {
+                        const block = byName.get(cat.categoryName || '');
+                        if (!block) return true; // jika tidak ada blok, jangan sembunyikan di sini
+                        const totals = block.totals || {};
+                        const allZero =
+                            (totals.previousBalance || 0) === 0 &&
+                            (totals.totalMasuk || 0) === 0 &&
+                            (totals.totalKeluar || 0) === 0 &&
+                            (totals.endingBalance || 0) === 0 &&
+                            (totals.totalSaldo || 0) === 0;
+                        const hasItems = Array.isArray(block.items) && block.items.length > 0;
+                        return !(allZero && !hasItems);
+                    });
+                }
                 const $topList = $('#financeTopCategoriesList');
                 $topList.empty();
                 categories.forEach(cat => {
                     // Ambil aktivitas dari backend (dibatasi recent_limit=3)
                     let itemsHtml = '';
+                    let prevDisplay = null;
+                    let totalSaldoDisplay = null;
                     if (Array.isArray(data.categoriesWithItems)) {
                         const block = data.categoriesWithItems.find(b => (b.categoryName || '') === (cat
                             .categoryName || ''));
-                        const itemsForCat = Array.isArray(block && block.items) ? block.items.slice() :
-                            [];
-                        itemsForCat.sort((a, b) => (b.id || 0) - (a.id || 0));
-                        const recent = itemsForCat; // backend sudah batasi ke 3 item terbaru
-                        itemsHtml = recent.map(it => {
+                        const itemsForCat = Array.isArray(block && block.items) ? block.items : [];
+                        // Tampilkan sesuai urutan dari backend (tanggal desc, id desc)
+                        itemsHtml = itemsForCat.map(it => {
                             const nilaiMasuk = it.masukDisplay && it.masukDisplay !== '-';
                             const nilaiKeluar = it.keluarDisplay && it.keluarDisplay !== '-';
                             const nilaiClass = nilaiMasuk ? 'masuk' : (nilaiKeluar ? 'keluar' :
@@ -3097,6 +3119,12 @@
                                 <span class="activity-line nominal ${nilaiClass}">${nilai}</span>
                             </div>`;
                         }).join('');
+
+                        // Ambil totals tambahan: saldo sebelumnya & total saldo
+                        if (block && block.totals) {
+                            prevDisplay = block.totals.previousBalanceDisplay || null;
+                            totalSaldoDisplay = block.totals.totalSaldoDisplay || null;
+                        }
                     }
                     const row = `<div class="finance-row">
                         <div class="finance-chip kategori">
@@ -3114,6 +3142,16 @@
                                     <span class="label">Saldo</span>
                                     <span class="value">${cat.endingDisplay || '-'}</span>
                                 </div>
+                                ${prevDisplay ? `
+                                <div class="finance-pill saldobefore">
+                                    <span class="label">Saldo Sebelumnya</span>
+                                    <span class="value">${prevDisplay}</span>
+                                </div>` : ''}
+                                ${totalSaldoDisplay ? `
+                                <div class="finance-pill totalsaldo">
+                                    <span class="label">Total</span>
+                                    <span class="value">${totalSaldoDisplay}</span>
+                                </div>` : ''}
                             </div>
                             ${itemsHtml ? `<div class="activity-pill-container">${itemsHtml}</div>` : ''}
                         </div>
@@ -4715,7 +4753,9 @@
                             .listen('ContentUpdatedEvent', (e) => {
                                 // Tangani event untuk pembaruan laporan keuangan
                                 if (e && e.type === 'laporan') {
-                                    console.log('Menerima event laporan; memuat ulang data finance overlay');
+                                    console.log(
+                                        'Menerima event laporan; memuat ulang data finance overlay'
+                                    );
                                     // Ambil data finance terbaru dari API dan render ke UI
                                     fetchFinanceData();
                                 }
@@ -4739,7 +4779,8 @@
                             subscribe();
                         } else if (attempts >= maxAttempts) {
                             clearInterval(interval);
-                            console.warn('Echo belum tersedia; realtime finance updates dinonaktifkan');
+                            console.warn(
+                                'Echo belum tersedia; realtime finance updates dinonaktifkan');
                         }
                     }, 500);
                 }

@@ -121,7 +121,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Ukuran maksimal:
-                                    10MB</small>
+                                    50MB</small>
                             </div>
                             <!-- Progress Bar untuk Audio 1 -->
                             @if ($audio1)
@@ -170,9 +170,10 @@
                                 </div>
                             @endif
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="audio1-input"
                                     class="form-control my-2 rounded-4 @error('audio1') is-invalid @enderror"
-                                    wire:model="audio1" accept="audio/*">
+                                    wire:model="audio1" accept="audio/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('audio1-upload-error');if(f&&f.size>52428800){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 50MB. Format diizinkan: MP3, WAV.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
                                 @if ($tmp_audio1)
                                     <button type="button"
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
@@ -203,6 +204,7 @@
                             @error('audio1')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="audio1-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
 
                         {{-- Audio 2 --}}
@@ -256,7 +258,7 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Ukuran maksimal:
-                                    10MB</small>
+                                    50MB</small>
                             </div>
                             <!-- Progress Bar untuk Audio 2 -->
                             @if ($audio2)
@@ -306,9 +308,10 @@
                                 </div>
                             @endif
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="audio2-input"
                                     class="form-control my-2 rounded-4 @error('audio2') is-invalid @enderror"
-                                    wire:model="audio2" accept="audio/*">
+                                    wire:model="audio2" accept="audio/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('audio2-upload-error');if(f&&f.size>52428800){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 50MB. Format diizinkan: MP3, WAV.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
                                 @if ($tmp_audio2)
                                     <button type="button"
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
@@ -339,6 +342,7 @@
                             @error('audio2')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="audio2-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
 
                         {{-- Audio 3 --}}
@@ -394,8 +398,9 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Ukuran maksimal:
-                                    10MB</small>
+                                    50MB</small>
                             </div>
+
                             <!-- Progress Bar untuk Audio 3 -->
                             @if ($audio3)
                                 <div wire:loading wire:target="save" class="mt-2 w-100">
@@ -444,9 +449,10 @@
                                 </div>
                             @endif
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="audio3-input"
                                     class="form-control my-2 rounded-4 @error('audio3') is-invalid @enderror"
-                                    wire:model="audio3" accept="audio/*">
+                                    wire:model="audio3" accept="audio/*"
+                                    onchange="(function(el){const f=el.files[0];const err=document.getElementById('audio3-upload-error');if(f&&f.size>52428800){event.stopImmediatePropagation();el.classList.add('is-invalid');err.textContent='Ukuran file maksimal 50MB. Format diizinkan: MP3, WAV.';err.style.display='block';}else{el.classList.remove('is-invalid');if(err){err.style.display='none';}}})(this)">
                                 @if ($tmp_audio3)
                                     <button type="button"
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
@@ -477,6 +483,7 @@
                             @error('audio3')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div id="audio3-upload-error" class="invalid-feedback" style="display:none"></div>
                         </div>
                     </div>
                 </div>
