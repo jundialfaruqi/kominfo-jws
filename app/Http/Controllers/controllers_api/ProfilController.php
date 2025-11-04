@@ -779,14 +779,24 @@ class ProfilController extends Controller
                             'totalKeluar' => (int) $sumKeluar,
                             'endingBalance' => (int) $ending,
                             'totalSaldo' => (int) ($previousEnding + $ending),
+                            'cumulativeMasuk' => (int) (($prevMasuk ?? 0) + $sumMasuk),
+                            'cumulativeKeluar' => (int) (($prevKeluar ?? 0) + $sumKeluar),
                             // Display strings (kompatibilitas)
                             'previousBalanceDisplay' => 'Rp ' . number_format($previousEnding, 0, ',', '.'),
                             'totalMasukDisplay' => 'Rp ' . number_format($sumMasuk, 0, ',', '.'),
                             'totalKeluarDisplay' => 'Rp ' . number_format($sumKeluar, 0, ',', '.'),
                             'endingBalanceDisplay' => 'Rp ' . number_format($ending, 0, ',', '.'),
                             'totalSaldoDisplay' => 'Rp ' . number_format($previousEnding + $ending, 0, ',', '.'),
+                            'cumulativeMasukDisplay' => 'Rp ' . number_format((($prevMasuk ?? 0) + $sumMasuk), 0, ',', '.'),
+                            'cumulativeKeluarDisplay' => 'Rp ' . number_format((($prevKeluar ?? 0) + $sumKeluar), 0, ',', '.'),
                         ],
                     ];
+
+                    // Akumulasi total saldo kumulatif (saldo sebelumnya + saldo 7 hari) ke grandTotals
+                    $grandTotals['totalSaldo'] = ($grandTotals['totalSaldo'] ?? 0) + ((int) $previousEnding + (int) $ending);
+                    // Akumulasi kumulatif masuk/keluar (sebelum periode + periode berjalan)
+                    $grandTotals['cumulativeMasuk'] = ($grandTotals['cumulativeMasuk'] ?? 0) + (((int) ($prevMasuk ?? 0)) + (int) $sumMasuk);
+                    $grandTotals['cumulativeKeluar'] = ($grandTotals['cumulativeKeluar'] ?? 0) + (((int) ($prevKeluar ?? 0)) + (int) $sumKeluar);
                 } else {
                     // details bukan 'full' => tetap kirim ringkasan tanpa filter hide_empty
                     $categories[] = [
@@ -809,6 +819,15 @@ class ProfilController extends Controller
             $grandTotals['sumMasukDisplay'] = 'Rp ' . number_format($grandTotals['sumMasuk'], 0, ',', '.');
             $grandTotals['sumKeluarDisplay'] = 'Rp ' . number_format($grandTotals['sumKeluar'], 0, ',', '.');
             $grandTotals['endingDisplay'] = 'Rp ' . number_format($grandTotals['ending'], 0, ',', '.');
+            if ($details === 'full' && isset($grandTotals['totalSaldo'])) {
+                $grandTotals['totalSaldoDisplay'] = 'Rp ' . number_format((int) $grandTotals['totalSaldo'], 0, ',', '.');
+                if (isset($grandTotals['cumulativeMasuk'])) {
+                    $grandTotals['cumulativeMasukDisplay'] = 'Rp ' . number_format((int) $grandTotals['cumulativeMasuk'], 0, ',', '.');
+                }
+                if (isset($grandTotals['cumulativeKeluar'])) {
+                    $grandTotals['cumulativeKeluarDisplay'] = 'Rp ' . number_format((int) $grandTotals['cumulativeKeluar'], 0, ',', '.');
+                }
+            }
 
             $data = [
                 'profil' => [ 'id' => $profil->id, 'name' => $profil->name ],

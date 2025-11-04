@@ -3062,9 +3062,15 @@
 
                 // Totals
                 if (data.grandTotals) {
-                    $('#financeTotalMasukValue').text(data.grandTotals.sumMasukDisplay || '-');
-                    $('#financeTotalKeluarValue').text(data.grandTotals.sumKeluarDisplay || '-');
-                    $('#financeEndingBalanceValue').text(data.grandTotals.endingDisplay || '-');
+                    const masukDisplay = data.grandTotals.cumulativeMasukDisplay || data.grandTotals
+                        .sumMasukDisplay || '-';
+                    const keluarDisplay = data.grandTotals.cumulativeKeluarDisplay || data.grandTotals
+                        .sumKeluarDisplay || '-';
+                    const endingDisplay = data.grandTotals.totalSaldoDisplay || data.grandTotals
+                        .endingDisplay || '-';
+                    $('#financeTotalMasukValue').text(masukDisplay);
+                    $('#financeTotalKeluarValue').text(keluarDisplay);
+                    $('#financeEndingBalanceValue').text(endingDisplay);
                 }
 
                 // Top kategori (ambil 3 terbesar berdasarkan ending)
@@ -3139,7 +3145,7 @@
                                     <span class="value">${cat.sumKeluarDisplay || '-'}</span>
                                 </div>
                                 <div class="finance-pill saldo">
-                                    <span class="label">Saldo</span>
+                                    <span class="label">Total</span>
                                     <span class="value">${cat.endingDisplay || '-'}</span>
                                 </div>
                                 ${prevDisplay ? `
@@ -3149,7 +3155,7 @@
                                 </div>` : ''}
                                 ${totalSaldoDisplay ? `
                                 <div class="finance-pill totalsaldo">
-                                    <span class="label">Total</span>
+                                    <span class="label">Saldo</span>
                                     <span class="value">${totalSaldoDisplay}</span>
                                 </div>` : ''}
                             </div>
