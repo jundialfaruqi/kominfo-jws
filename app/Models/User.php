@@ -57,4 +57,39 @@ class User extends Authenticatable
     {
         return $this->hasOne(Profil::class);
     }
+
+    /**
+     * Recalculate and persist the latest activity timestamp for this user
+     * based on related tables: petugas, slides, and laporans (via profil).
+     */
+    public function recalculateLastActivity(): void
+    {
+        // Petugas and Slides link directly by user_id
+        $petugasLast = \App\Models\Petugas::where('user_id', $this->id)->max('updated_at');
+        $slidesLast = \App\Models\Slides::where('user_id', $this->id)->max('updated_at');
+
+        // Laporans belong to Profil (masjid); Profil has user_id
+        $profilId = $this->profil?->id;
+        $laporansLast = null;
+        if ($profilId) {
+            $laporansLast = \App\Models\Laporan::where('id_masjid', $profilId)->max('updated_at');
+        }
+
+        $candidates = array_filter([$petugasLast, $slidesLast, $laporansLast]);
+        $latest = null;
+        foreach ($candidates as $ts) {
+            if ($ts && (!$latest || $ts > $latest)) {
+                $latest = $ts;
+            }
+        }
+
+        // Persist if changed
+        if ($latest !== $this->last_activity_at) {
+            $this->last_activity_at = $latest; // can be null if no activity
+            // Avoid touching other timestamps unintentionally
+            $this->timestamps = false;
+            $this->save(['timestamps' => false]);
+            $this->timestamps = true;
+        }
+    }
 }

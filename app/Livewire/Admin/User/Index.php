@@ -46,7 +46,7 @@ class Index extends Component
     public function render()
     {
         $query = User::with(['roles', 'profil']) // Tambahkan relasi profil
-            ->select('id', 'name', 'phone', 'email', 'role', 'status')
+            ->select('id', 'name', 'phone', 'email', 'role', 'status', 'last_activity_at')
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('email', 'like', '%' . $this->search . '%')

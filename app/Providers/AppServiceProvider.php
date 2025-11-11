@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
@@ -11,6 +12,13 @@ use App\Models\Laporan;
 use App\Policies\LaporanPolicy;
 use App\Models\GroupCategory;
 use App\Policies\GroupCategoryPolicy;
+use App\Models\Petugas;
+use App\Models\Slides;
+use App\Observers\PetugasObserver;
+use App\Observers\SlidesObserver;
+use App\Observers\LaporanObserver;
+use App\Models\Profil;
+use App\Observers\ProfilObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -43,5 +51,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Laporan::class, LaporanPolicy::class);
         // Register policy untuk GroupCategory
         Gate::policy(GroupCategory::class, GroupCategoryPolicy::class);
+
+        // Register observers untuk aktivitas user
+        Petugas::observe(PetugasObserver::class);
+        Slides::observe(SlidesObserver::class);
+        Laporan::observe(LaporanObserver::class);
+        Profil::observe(ProfilObserver::class);
+
+        // Set locale Carbon ke bahasa Indonesia untuk diffForHumans()
+        Carbon::setLocale('id');
     }
 }

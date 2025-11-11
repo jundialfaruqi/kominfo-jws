@@ -3,7 +3,7 @@
     <div class="row g-3">
         {{-- Total Users Card --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm bg-primary-lt border-primary rounded-3">
+            <div class="card card-sm bg-primary-lt rounded-3">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -35,7 +35,7 @@
 
         {{-- Active Users Card --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm bg-success-lt border-success rounded-3">
+            <div class="card card-sm bg-success-lt rounded-3">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -66,7 +66,7 @@
 
         {{-- Inactive Users Card --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm bg-danger-lt border-danger rounded-3">
+            <div class="card card-sm bg-danger-lt rounded-3">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -98,7 +98,7 @@
 
         {{-- User Role Card --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm bg-info-lt border-info rounded-3">
+            <div class="card card-sm bg-info-lt rounded-3">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">

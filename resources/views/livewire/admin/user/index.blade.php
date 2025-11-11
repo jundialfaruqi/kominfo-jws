@@ -39,8 +39,8 @@
                         @include('livewire.admin.user.statistic')
 
                         <div class="card-body border-bottom py-3">
-                            <div class="d-flex">
-                                <div class="text-secondary">
+                            <div class="d-flex flex-column flex-md-row align-items-center gap-2">
+                                <div class="text-secondary d-flex align-items-center gap-2 flex-grow-1">
                                     Lihat
                                     <div class="mx-2 d-inline-block">
                                         <select wire:model.live="paginate"
@@ -52,16 +52,48 @@
                                             <option>100</option>
                                         </select>
                                     </div>
+                                    <div class="d-flex align-items-center flex-wrap">
+                                        <a href="{{ route('admin.user.pdf', ['role' => 'User']) }}"
+                                            class="btn py-1 btn-primary rounded-3">
+                                            <span class="d-inline-flex align-items-center gap-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                    <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                                    <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                                    <path d="M17 18h2" />
+                                                    <path d="M20 15h-3v6" />
+                                                    <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                                </svg>
+                                                <span>Export PDF User</span>
+                                            </span>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div class="ms-auto text-secondary">
+                                <div class="text-secondary d-flex align-items-center ms-md-auto">
                                     <span>Cari</span>
                                     <div class="ms-2 d-inline-block">
                                         <input wire:model.live="search" type="search" name="q" id="q"
                                             inputmode="search" autocapitalize="none" spellcheck="false"
-                                            class="form-control form-control py-1 rounded-3" autocomplete="off"
+                                            class="form-control form-control py-1 rounded-3 w-auto" autocomplete="off"
                                             placeholder="Ketik disini">
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Ket Aktivitas-->
+                        <div class="card-body border-top-0 border-bottom-1 py-2"
+                            style="border-bottom: 1px solid #dee2e6;">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="text-secondary">Keterangan Aktifitas:</span>
+                                <span class="badge bg-green-lt">Aktif ≤ 30 hari</span>
+                                <span class="badge bg-yellow-lt">Kurang (31–90 hari)</span>
+                                <span class="badge bg-red-lt">Tidak aktif > 3 bulan</span>
+                                <span class="badge bg-gray-lt">Tidak ada aktivitas</span>
                             </div>
                         </div>
 

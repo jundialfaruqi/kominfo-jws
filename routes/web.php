@@ -48,6 +48,9 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/user', UserIndex::class)->name('user.index')->middleware('can:view-users');
+        Route::get('/user/pdf', [\App\Http\Controllers\UserPdfController::class, 'downloadByRole'])
+            ->name('user.pdf')
+            ->middleware('can:view-users');
         Route::get('/role', \App\Livewire\Admin\Role::class)->name('role.index')->middleware('can:view-roles');
         Route::get('/permission', \App\Livewire\Admin\Permission::class)->name('permission.index')->middleware('can:view-permissions');
         Route::get('/user-role-assignment', \App\Livewire\Admin\UserRoleAssignment::class)->name('user-role-assignment.index')->middleware('can:view-user-role-assignment');

@@ -6,9 +6,10 @@
                 <th>Nama & Email</th>
                 <th>Nama Masjid</th>
                 <th>No. HP</th>
-                <th>Role (Legacy)</th>
-                <th>Spatie Roles</th>
-                <th>Status</th>
+                {{-- <th>Role (Legacy)</th> --}}
+                <th>Peran</th>
+                <th>Akun</th>
+                <th>Aktifitas</th>
                 <th></th>
             </tr>
         </thead>
@@ -58,7 +59,7 @@
                         @endif
                     </td>
                     <td>{{ $users->phone }}</td>
-                    @if ($users->role == 'Super Admin')
+                    {{-- @if ($users->role == 'Super Admin')
                         <td>
                             <span class="badge bg-purple-lt d-inline-flex align-items-center gap-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -103,7 +104,7 @@
                                 {{ $users->role }}
                             </span>
                         </td>
-                    @endif
+                    @endif --}}
                     <td>
                         @if ($users->roles->count() > 0)
                             @foreach ($users->roles as $role)
@@ -162,6 +163,31 @@
                             </span>
                         </td>
                     @endif
+                    <td>
+                        @php
+                            $last = $users->last_activity_at ?? null;
+                            $diffDays = $last ? \Carbon\Carbon::parse($last)->diffInDays(now()) : null;
+                        @endphp
+
+                        @if (is_null($last))
+                            <span class="badge bg-gray-lt">Tidak ada aktivitas</span>
+                        @elseif ($diffDays <= 30)
+                            <span class="badge bg-green-lt d-inline-flex align-items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-activity">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M3 12h4l3 8l4 -16l3 8h4" />
+                                </svg>
+                                Aktif {{ \Carbon\Carbon::parse($last)->diffForHumans() }}
+                            </span>
+                        @elseif ($diffDays <= 90)
+                            <span class="badge bg-yellow-lt">Kurang</span>
+                        @else
+                            <span class="badge bg-red-lt">Tidak aktif lebih dari 3 bulan</span>
+                        @endif
+                    </td>
                     <td class="text-end">
                         @php
                             $canEdit = false;
@@ -178,9 +204,8 @@
                         @endphp
 
                         @if ($canEdit)
-                            <button wire:click="edit('{{ $users->id }}')"
-                                class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
-                                data-bs-target="#editModal">
+                            <button wire:click="edit('{{ $users->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm"
+                                data-bs-toggle="modal" data-bs-target="#editModal">
                                 <span wire:loading.remove wire:target="edit('{{ $users->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
