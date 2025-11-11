@@ -19,6 +19,8 @@ use App\Observers\SlidesObserver;
 use App\Observers\LaporanObserver;
 use App\Models\Profil;
 use App\Observers\ProfilObserver;
+use App\Models\Marquee;
+use App\Observers\MarqueeObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -57,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         Slides::observe(SlidesObserver::class);
         Laporan::observe(LaporanObserver::class);
         Profil::observe(ProfilObserver::class);
+        Marquee::observe(MarqueeObserver::class);
 
         // Set locale Carbon ke bahasa Indonesia untuk diffForHumans()
         Carbon::setLocale('id');

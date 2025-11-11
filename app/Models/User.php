@@ -67,6 +67,7 @@ class User extends Authenticatable
         // Petugas and Slides link directly by user_id
         $petugasLast = \App\Models\Petugas::where('user_id', $this->id)->max('updated_at');
         $slidesLast = \App\Models\Slides::where('user_id', $this->id)->max('updated_at');
+        $marqueeLast = \App\Models\Marquee::where('user_id', $this->id)->max('updated_at');
 
         // Laporans belong to Profil (masjid); Profil has user_id
         $profilId = $this->profil?->id;
@@ -75,7 +76,7 @@ class User extends Authenticatable
             $laporansLast = \App\Models\Laporan::where('id_masjid', $profilId)->max('updated_at');
         }
 
-        $candidates = array_filter([$petugasLast, $slidesLast, $laporansLast]);
+        $candidates = array_filter([$petugasLast, $slidesLast, $marqueeLast, $laporansLast]);
         $latest = null;
         foreach ($candidates as $ts) {
             if ($ts && (!$latest || $ts > $latest)) {
