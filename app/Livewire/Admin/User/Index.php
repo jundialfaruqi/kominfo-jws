@@ -15,7 +15,7 @@ class Index extends Component
 
     #[Title('Data User')]
     protected $paginationTheme = 'bootstrap';
-    public $paginate = '10';
+    public $paginate = '20';
     public $search = '';
     public $userId;
     public $deleteUserId;

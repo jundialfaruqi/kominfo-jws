@@ -53,7 +53,7 @@
                                         </select>
                                     </div>
                                     <div class="d-flex align-items-center flex-wrap">
-                                        <a href="{{ route('admin.user.pdf', ['role' => 'User']) }}"
+                                        <a href="{{ route('admin.user.pdf', ['role' => 'Admin Masjid']) }}"
                                             class="btn py-1 btn-primary rounded-3">
                                             <span class="d-inline-flex align-items-center gap-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

@@ -56,7 +56,7 @@
                                 {{ $activeUsers }}
                             </div>
                             <div class="text-secondary small">
-                                Pengguna Aktif
+                                Akun Pengguna Aktif
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                                 {{ $inactiveUsers }}
                             </div>
                             <div class="text-secondary small">
-                                Pengguna Tidak Aktif
+                                Akun Pengguna Tidak Aktif
                             </div>
                         </div>
                     </div>
