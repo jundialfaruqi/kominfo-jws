@@ -80,7 +80,7 @@ class Index extends Component
             'totalUsers' => $baseQuery->count(),
             'activeUsers' => (clone $baseQuery)->where('status', 'Active')->count(),
             'inactiveUsers' => (clone $baseQuery)->where('status', 'Inactive')->count(),
-            'userRoleCount' => User::where('role', 'User')->count(),
+            'userRoleCount' => User::role('Admin Masjid')->count(),
         );
 
         return view('livewire.admin.user.index', $data);

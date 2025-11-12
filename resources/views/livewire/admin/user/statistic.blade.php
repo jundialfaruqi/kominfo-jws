@@ -56,7 +56,7 @@
                                 {{ $activeUsers }}
                             </div>
                             <div class="text-secondary small">
-                                Akun Pengguna Aktif
+                                Pengguna Disetujui
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                                 {{ $inactiveUsers }}
                             </div>
                             <div class="text-secondary small">
-                                Akun Pengguna Tidak Aktif
+                                Pengguna Belum Disetujui
                             </div>
                         </div>
                     </div>
