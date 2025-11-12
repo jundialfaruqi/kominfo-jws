@@ -7,9 +7,9 @@
                 <th>Nama & Url Masjid</th>
                 {{-- <th>No. HP</th> --}}
                 {{-- <th>Role (Legacy)</th> --}}
+                <th>Keterangan Aktifitas</th>
                 <th>Peran</th>
                 <th>Akun</th>
-                <th>Keterangan Aktifitas</th>
                 <th></th>
             </tr>
         </thead>
@@ -66,6 +66,31 @@
                             </a>
                         @else
                             <span class="text-gray-400"></span>
+                        @endif
+                    </td>
+                    <td>
+                        @php
+                            $last = $users->last_activity_at ?? null;
+                            $diffDays = $last ? \Carbon\Carbon::parse($last)->diffInDays(now()) : null;
+                        @endphp
+
+                        @if (is_null($last))
+                            <span class="badge bg-gray-lt">Tidak ada aktivitas</span>
+                        @elseif ($diffDays <= 30)
+                            <span class="badge bg-green-lt d-inline-flex align-items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-activity">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M3 12h4l3 8l4 -16l3 8h4" />
+                                </svg>
+                                Aktif {{ \Carbon\Carbon::parse($last)->diffForHumans() }}
+                            </span>
+                        @elseif ($diffDays <= 90)
+                            <span class="badge bg-yellow-lt">Kurang</span>
+                        @else
+                            <span class="badge bg-red-lt">Tidak aktif lebih dari 3 bulan</span>
                         @endif
                     </td>
                     {{-- <td>{{ $users->phone }}</td> --}}
@@ -173,31 +198,6 @@
                             </span>
                         </td>
                     @endif
-                    <td>
-                        @php
-                            $last = $users->last_activity_at ?? null;
-                            $diffDays = $last ? \Carbon\Carbon::parse($last)->diffInDays(now()) : null;
-                        @endphp
-
-                        @if (is_null($last))
-                            <span class="badge bg-gray-lt">Tidak ada aktivitas</span>
-                        @elseif ($diffDays <= 30)
-                            <span class="badge bg-green-lt d-inline-flex align-items-center gap-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-activity">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M3 12h4l3 8l4 -16l3 8h4" />
-                                </svg>
-                                Aktif {{ \Carbon\Carbon::parse($last)->diffForHumans() }}
-                            </span>
-                        @elseif ($diffDays <= 90)
-                            <span class="badge bg-yellow-lt">Kurang</span>
-                        @else
-                            <span class="badge bg-red-lt">Tidak aktif lebih dari 3 bulan</span>
-                        @endif
-                    </td>
                     <td class="text-end">
                         @php
                             $canEdit = false;

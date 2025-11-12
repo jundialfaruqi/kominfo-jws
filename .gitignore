@@ -6,6 +6,7 @@
 /public/images
 /public/sounds
 /public/css/themes
+/public/note
 /storage/*.key
 /storage/pail
 /vendor

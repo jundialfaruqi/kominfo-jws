@@ -3282,77 +3282,75 @@
             }
         }
 
-        // Auto-scroll util: scroll vertikal bolak-balik dengan jeda 2 detik di atas & bawah
+        // Auto-scroll util: loop turun tanpa henti, wrap mulus di atas
         function startVerticalScroll($container, $content) {
             stopVerticalScroll();
             if (!$container || !$content || $content.children().length === 0) return;
 
             const container = $container[0];
             const content = $content[0];
+
+            // Bersihkan clone loop sebelumnya agar tidak menumpuk
+            const prevClones = container.querySelectorAll('[data-loop-clone="true"]');
+            prevClones.forEach(n => n.remove());
+            // Bersihkan spacer sebelumnya bila ada
+            const prevSpacers = container.querySelectorAll('[data-loop-spacer="true"]');
+            prevSpacers.forEach(n => n.remove());
+
+            // Clone satu kali untuk membuat efek seamless saat wrap
+            const baseHeight = content.scrollHeight;
+            if (baseHeight <= container.clientHeight) {
+                // Tidak perlu scroll jika konten tidak melebihi kontainer
+                return;
+            }
+            // Spacer sebagai margin antar putaran (sedikit lebih kecil)
+            const gapPx = Math.max(16, Math.round(container.clientHeight * 0.03));
+            const spacer = document.createElement('div');
+            spacer.setAttribute('data-loop-spacer', 'true');
+            spacer.style.height = gapPx + 'px';
+            spacer.style.minHeight = gapPx + 'px';
+            spacer.style.width = '100%';
+            spacer.style.flex = '0 0 ' + gapPx + 'px';
+            spacer.style.pointerEvents = 'none';
+            spacer.style.background = 'transparent';
+
+            const clone = content.cloneNode(true);
+            if (clone.id) clone.id = '';
+            clone.setAttribute('data-loop-clone', 'true');
+            // Susun: konten asli -> spacer -> clone
+            container.appendChild(spacer);
+            container.appendChild(clone);
+
             let offset = container.scrollTop || 0;
             const vwPerSec = 2; // kecepatan dalam vw per detik (konsisten lintas layar)
             let speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
 
-            // Update saat ukuran layar berubah
-            window.addEventListener('resize', () => {
+            // Update kecepatan saat ukuran layar berubah
+            const onResize = () => {
                 speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
-            });
+            };
+            window.addEventListener('resize', onResize);
+
             let lastTs = null;
-            let direction = 1; // 1: turun, -1: naik
-            let pauseUntil = null; // timestamp (ms) sampai kapan jeda berlangsung
+            const loopLength = baseHeight + gapPx; // panjang satu putaran termasuk margin
 
             function loop(ts) {
                 if (lastTs === null) lastTs = ts;
-                const dt = Math.min(0.033, (ts - lastTs) / 1000); // batasi dt ke ~33ms
+                const dt = Math.min(0.033, (ts - lastTs) / 1000);
                 lastTs = ts;
 
-                const maxScroll = Math.max(0, content.scrollHeight - container.clientHeight);
-                if (maxScroll <= 0) {
-                    // tidak ada yang bisa di-scroll
+                // Jika karena perubahan layout tinggi dasar jadi tidak valid, hentikan
+                if (baseHeight <= container.clientHeight) {
                     stopVerticalScroll();
                     return;
                 }
 
-                // Kelola jeda: tahan posisi, dan setelah jeda bawah selesai loncat ke atas
-                if (pauseUntil) {
-                    if (ts < pauseUntil) {
-                        // masih dalam jeda, tahan posisi sekarang
-                        container.scrollTop = offset;
-                        financeScrollRaf = requestAnimationFrame(loop);
-                        return;
-                    } else {
-                        // jeda selesai
-                        pauseUntil = null;
-                        if (offset >= maxScroll) {
-                            // selesai jeda di bawah: reset ke atas tanpa menyembunyikan overlay
-                            container.scrollTop = 0; // mulai dari atas
-                            offset = 0;
-                            direction = 1; // lanjut turun lagi
-                            // jeda 2 detik di atas sebelum mulai turun lagi
-                            pauseUntil = ts + 2000;
-                        }
-                        if (offset <= 0) {
-                            // selesai jeda di atas: lanjut turun
-                            direction = 1;
-                        }
-                    }
-                }
+                // Gerak turun terus
+                offset += speedPxPerSec * dt;
 
-                // Bergerak sesuai arah saat ini
-                offset += direction * speedPxPerSec * dt;
-
-                // Jika melewati batas bawah
-                if (offset >= maxScroll) {
-                    offset = maxScroll; // clamp ke bawah
-                    pauseUntil = ts + 2000; // jeda 2 detik
-                    direction = 0; // jangan naik; tunggu loncat ke atas setelah jeda
-                }
-
-                // Jika melewati batas atas
-                if (offset <= 0) {
-                    offset = 0; // clamp ke atas
-                    pauseUntil = ts + 2000; // jeda 2 detik
-                    direction = 1; // balik arah: turun
+                // Wrap mulus saat melewati panjang putaran (konten + spacer)
+                if (offset >= loopLength) {
+                    offset -= loopLength;
                 }
 
                 container.scrollTop = offset;
