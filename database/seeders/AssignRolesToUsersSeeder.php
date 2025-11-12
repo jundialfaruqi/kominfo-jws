@@ -37,7 +37,7 @@ class AssignRolesToUsersSeeder extends Seeder
                     break;
 
                 case 'User':
-                    $role = Role::where('name', 'User')->first();
+                    $role = Role::where('name', 'Admin Masjid')->first();
                     if ($role) {
                         $user->assignRole($role);
                         $this->command->info("Assigned 'User' role to user: {$user->name}");
@@ -45,7 +45,7 @@ class AssignRolesToUsersSeeder extends Seeder
                     break;
 
                 case 'Admin Masjid':
-                    $role = Role::where('name', 'Admin Masjid')->first();
+                    $role = Role::where('name', 'Admin Jumbotron')->first();
                     if ($role) {
                         $user->assignRole($role);
                         $this->command->info("Assigned 'Admin Masjid' role to user: {$user->name}");

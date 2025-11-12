@@ -57,6 +57,18 @@ class RolePermissionSeeder extends Seeder
             'edit-user-role-assignment',
             'delete-user-role-assignment',
 
+            // Group Category
+            'view-group-category',
+            'create-group-category',
+            'edit-group-category',
+            'delete-group-category',
+
+            // Keuangan
+            'view-laporan-keuangan',
+            'create-laporan-keuangan',
+            'edit-laporan-keuangan',
+            'delete-laporan-keuangan',
+
         ];
 
         foreach ($permissions as $permission) {
@@ -85,16 +97,32 @@ class RolePermissionSeeder extends Seeder
             'create-jumbotron',
             'edit-jumbotron',
             'delete-jumbotron',
+            'view-group-category',
+            'create-group-category',
+            'edit-group-category',
+            'delete-group-category',
+            'view-laporan-keuangan',
+            'create-laporan-keuangan',
+            'edit-laporan-keuangan',
+            'delete-laporan-keuangan',
         ]);
 
-        // User - basic permissions for their own content
-        $userRole = Role::create(['name' => 'User']);
+        // Admin Masjid - basic permissions for their own content
+        $userRole = Role::create(['name' => 'Admin Masjid']);
         $userRole->givePermissionTo([
             'view-dashboard',
+            'view-group-category',
+            'create-group-category',
+            'edit-group-category',
+            'delete-group-category',
+            'view-laporan-keuangan',
+            'create-laporan-keuangan',
+            'edit-laporan-keuangan',
+            'delete-laporan-keuangan',
         ]);
 
         // Admin Masjid - similar to User but with more content management permissions
-        $adminMasjidRole = Role::create(['name' => 'Admin Masjid']);
+        $adminMasjidRole = Role::create(['name' => 'Admin Jumbotron']);
         $adminMasjidRole->givePermissionTo([
             'view-jumbotron',
             'create-jumbotron',
