@@ -112,6 +112,7 @@ class RolePermissionSeeder extends Seeder
         $userRole->givePermissionTo([
             'view-dashboard',
             'view-group-category',
+            'view-profil-masjid',
             'create-group-category',
             'edit-group-category',
             'delete-group-category',
