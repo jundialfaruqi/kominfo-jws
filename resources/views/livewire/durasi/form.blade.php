@@ -46,31 +46,6 @@
                     </div>
                 @endif
 
-                {{-- Durasi Shuruq --}}
-                <div class="row g-2 mb-3">
-                    <div class="col-md-2">
-                        <label class="form-label required">Syuruq</label>
-                    </div>
-                    <div class="col-md-10">
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="form-label">Menit</label>
-                                <select class="form-select rounded-3 @error('adzan_shuruq') is-invalid @enderror"
-                                    wire:model="adzan_shuruq">
-                                    <option value="">Pilih durasi shuruq</option>
-                                    @for ($i = 2; $i <= 20; $i++)
-                                        <option value="{{ $i }}">
-                                            {{ $i }} menit</option>
-                                    @endfor
-                                </select>
-                                @error('adzan_shuruq')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- Durasi Shubuh --}}
                 <div class="row g-2 mb-3">
                     <div class="col-md-2">
@@ -117,6 +92,56 @@
                                     @endfor
                                 </select>
                                 @error('final_shubuh')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Durasi Shuruq --}}
+                <div class="row g-2 mb-3">
+                    <div class="col-md-2">
+                        <label class="form-label required">Syuruq</label>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row g-2">
+                            <div class="col-md-12">
+                                <label class="form-label">Menit</label>
+                                <select class="form-select rounded-3 @error('adzan_shuruq') is-invalid @enderror"
+                                    wire:model="adzan_shuruq">
+                                    <option value="">Pilih durasi shuruq</option>
+                                    @for ($i = 2; $i <= 20; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
+                                </select>
+                                @error('adzan_shuruq')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Durasi Dhuha --}}
+                <div class="row g-2 mb-3">
+                    <div class="col-md-2">
+                        <label class="form-label required">Dhuha</label>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row g-2">
+                            <div class="col-md-12">
+                                <label class="form-label">Menit</label>
+                                <select class="form-select rounded-3 @error('adzan_dhuha') is-invalid @enderror"
+                                    wire:model="adzan_dhuha">
+                                    <option value="">Pilih durasi dhuha</option>
+                                    @for ($i = 2; $i <= 20; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
+                                </select>
+                                @error('adzan_dhuha')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -180,7 +205,7 @@
                 {{-- Durasi Jum'at --}}
                 <div class="row g-2 mb-3">
                     <div class="col-md-2">
-                        <label class="form-label required">Jum'at</label>
+                        <label class="form-label required">Kutbah Jum'at</label>
                     </div>
                     <div class="col-md-10">
                         <div class="row g-2">

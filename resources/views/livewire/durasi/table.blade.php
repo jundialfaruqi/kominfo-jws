@@ -4,8 +4,9 @@
             <tr>
                 <th class="w-1">No</th>
                 <th>Nama Admin Masjid</th>
-                <th class="text-center">Syuruq</th>
                 <th class="text-center">Shubuh (A/I/F)</th>
+                <th class="text-center">Syuruq</th>
+                <th class="text-center">Dhuha</th>
                 <th class="text-center">Dzuhur (A/I/F)</th>
                 <th class="text-center">Jum'at (Slide)</th>
                 <th class="text-center">Ashar (A/I/F)</th>
@@ -21,10 +22,12 @@
                         {{ $loop->iteration + ($durasiList->currentPage() - 1) * $durasiList->perPage() }}
                     </td>
                     <td class="text-wrap">{{ $durasi->user->name }}</td>
-                    <td class="text-center">{{ $durasi->adzan_shuruq }}
-                    </td>
                     <td class="text-center">
                         {{ $durasi->adzan_shubuh }}/{{ $durasi->iqomah_shubuh }}/{{ $durasi->final_shubuh }}
+                    </td>
+                    <td class="text-center">{{ $durasi->adzan_shuruq }}
+                    </td>
+                    <td class="text-center">{{ $durasi->adzan_dhuha }}
                     </td>
                     <td class="text-center">
                         {{ $durasi->adzan_dzuhur }}/{{ $durasi->iqomah_dzuhur }}/{{ $durasi->final_dzuhur }}

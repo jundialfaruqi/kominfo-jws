@@ -22,6 +22,21 @@
                                 <path d="m6.34 17.66-1.41 1.41" />
                                 <path d="m19.07 4.93-1.41 1.41" />
                             </svg>
+                        @elseif ($prayer['icon'] === 'sunlow')
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-sun-low">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                <path d="M4 12h.01" />
+                                <path d="M12 4v.01" />
+                                <path d="M20 12h.01" />
+                                <path d="M12 20v.01" />
+                                <path d="M6.31 6.31l-.01 -.01" />
+                                <path d="M17.71 6.31l-.01 -.01" />
+                                <path d="M17.7 17.7l.01 .01" />
+                                <path d="M6.3 17.7l.01 .01" />
+                            </svg>
                         @elseif ($prayer['icon'] === 'sunrise')
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

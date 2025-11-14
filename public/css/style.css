@@ -74,9 +74,9 @@ body {
 .prayer-time {
   display: flex;
   align-items: center;
-  padding: 0 1em;
-  padding-top: clamp(0.07rem, 0.4em, 1.6rem);
-  padding-bottom: clamp(0.04rem, 0.2em, 1.5rem);
+  padding-left: 1em;
+  /* padding-top: clamp(0.07rem, 0.4em, 1.6rem); */
+  /* padding-bottom: clamp(0.04rem, 0.2em, 1.5rem); */
   border-radius: 1em;
   border-top-right-radius: 20% 100%;
   border-bottom-right-radius: 20% 100%;
@@ -175,7 +175,7 @@ body {
   /* Optional: use scaling for face stroke width */
   --clock-face-stroke-width-scale: 0.1;
   --clock-face-shadow-color: rgba(0, 0, 0, 0.5);
-  --clock-face-shadow-blur: 20;
+  --clock-face-shadow-blur: 5;
   --clock-face-shadow-offset-x: 0;
   --clock-face-shadow-offset-y: 0;
 
@@ -263,7 +263,7 @@ body {
   /* width: calc(20vw - 5px);
   height: calc(20vw - 5px); */
   border-radius: 50%;
-  background-color: #003366;
+  /* background-color: #003366; */
   /* box-shadow: 0.3125rem 0.625rem 1.875rem rgba(0, 0, 0, 1); */
   overflow: hidden;
 }

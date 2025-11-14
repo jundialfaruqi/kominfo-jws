@@ -186,6 +186,7 @@ class Firdaus extends Component
                     $this->prayerTimes = [
                         ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunset'],
                         ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
+                        ['name' => 'Dhuha', 'time' => $jadwalHariIni['dhuha'], 'icon' => 'sunlow'],
                         ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
                         ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
                         ['name' => 'Maghrib', 'time' => $jadwalHariIni['maghrib'], 'icon' => 'hazemoon'],
@@ -238,7 +239,7 @@ class Firdaus extends Component
         }
 
         if ($activeIndex == -1) {
-            $activeIndex = 5;
+            $activeIndex = 6;
         }
 
         return [
@@ -324,7 +325,7 @@ class Firdaus extends Component
 
         if ($activeIndex == -1) {
             if ($isEarlyMorning) {
-                $activeIndex = 5;
+                $activeIndex = 6;
             } else {
                 return null;
             }
@@ -402,6 +403,9 @@ class Firdaus extends Component
         } elseif ($prayerLower === "syuruq") {
             // Syuruq hanya memiliki fase adzan (tanpa iqomah dan final)
             return ($this->durasi->adzan_shuruq ?? 3) * 60;
+        } elseif ($prayerLower === "dhuha") {
+            // Dhuha hanya memiliki fase adzan (tanpa iqomah dan final)
+            return ($this->durasi->adzan_dhuha ?? 1) * 60;
         }
 
         return 0;
@@ -464,6 +468,11 @@ class Firdaus extends Component
                     'adzan' => ($this->durasi->adzan_shuruq ?? 3) * 60,
                     // Syuruq tidak memiliki iqomah dan final, hanya adzan
                 ];
+            } elseif ($prayerLower === 'dhuha') {
+                $durasi = [
+                    'adzan' => ($this->durasi->adzan_dhuha ?? 1) * 60,
+                    // Dhuha tidak memiliki iqomah dan final, hanya adzan
+                ];
             }
         }
 
@@ -490,6 +499,14 @@ class Firdaus extends Component
                 $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
             }
             $status['isSyuruq'] = true;
+        } elseif ($prayerLower === 'dhuha') {
+            // Dhuha memiliki sifat yang sama seperti Syuruq: hanya fase adzan
+            if ($elapsedSeconds <= $durasi['adzan']) {
+                $status['phase'] = 'adzan';
+                $status['remainingSeconds'] = $durasi['adzan'] - $elapsedSeconds;
+                $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
+            }
+            $status['isDhuha'] = true;
         } else {
             // Adzan phase
             if ($elapsedSeconds <= $durasi['adzan']) {
@@ -615,6 +632,7 @@ class Firdaus extends Component
                         $this->prayerTimes = [
                             ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunrise'],
                             ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sun'],
+                            ['name' => 'Dhuha', 'time' => $jadwalHariIni['dhuha'], 'icon' => 'sunlow'],
                             ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
                             ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
                             ['name' => 'Maghrib', 'time' => $jadwalHariIni['maghrib'], 'icon' => 'hazemoon'],
