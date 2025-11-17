@@ -89,7 +89,7 @@
                         <div class="card-body border-top-0 border-bottom-1 py-2"
                             style="border-bottom: 1px solid #dee2e6;">
                             <div class="d-flex align-items-center gap-2 flex-wrap">
-                                <span class="text-secondary">Keterangan Aktifitas:</span>
+                                <span class="text-secondary">Tingkat Aktivitas User:</span>
                                 <span class="badge bg-green-lt">Aktif ≤ 30 hari</span>
                                 <span class="badge bg-yellow-lt">Kurang (31–90 hari)</span>
                                 <span class="badge bg-red-lt">Tidak aktif > 3 bulan</span>

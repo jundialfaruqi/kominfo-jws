@@ -131,6 +131,10 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
         ->name('jumbotron-masjid.edit')
         ->middleware('can:create-jumbotron-masjid');
 
+    Route::get('/data-jumbotron-semua-masjid', \App\Livewire\JumbotronMasjid\AdminJumbotronMasjid::class)
+        ->name('data-jumbotron-semua-masjid.index')
+        ->middleware('can:view-data-jumbotron-semua-masjid');
+
     // Balance API Docs
     Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)
         ->name('api-docs.balance')

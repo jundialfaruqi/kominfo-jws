@@ -52,7 +52,7 @@
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Format:
-                                                        JPG, PNG, JPEG, WEBP Maksimal 1MB</small>
+                                                        JPG, PNG, JPEG, WEBP Maksimal 800Kb</small>
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Rasio
@@ -104,7 +104,7 @@
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Format:
-                                                        JPG, PNG, JPEG, WEBP Maksimal 1MB</small>
+                                                        JPG, PNG, JPEG, WEBP Maksimal 800Kb</small>
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Rasio
@@ -157,7 +157,7 @@
                                                 <div class="form-text">
                                                     <small class="text-muted"><span
                                                             class="text-danger">*</span>Format: JPG, PNG, JPEG, WEBP
-                                                        Maksimal 1MB</small>
+                                                        Maksimal 800Kb</small>
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Rasio
@@ -210,7 +210,7 @@
                                                 <div class="form-text">
                                                     <small class="text-muted"><span
                                                             class="text-danger">*</span>Format: JPG, PNG, JPEG, WEBP
-                                                        Maksimal 1MB</small>
+                                                        Maksimal 800Kb</small>
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Rasio
@@ -263,7 +263,7 @@
                                                 <div class="form-text">
                                                     <small class="text-muted"><span
                                                             class="text-danger">*</span>Format: JPG, PNG, JPEG, WEBP
-                                                        Maksimal 1MB</small>
+                                                        Maksimal 800Kb</small>
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Rasio
@@ -316,7 +316,7 @@
                                                 <div class="form-text">
                                                     <small class="text-muted"><span
                                                             class="text-danger">*</span>Format: JPG, PNG, JPEG, WEBP
-                                                        Maksimal 1MB</small>
+                                                        Maksimal 800Kb</small>
                                                 </div>
                                                 <div class="form-text">
                                                     <small class="text-muted"><span class="text-danger">*</span>Rasio
