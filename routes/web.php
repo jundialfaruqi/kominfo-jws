@@ -118,6 +118,19 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     // faq routes
     Route::get('/faq', \App\Livewire\Faq\Index::class)->name('faq.index');
 
+    // Jumbotron Masjid Route
+    Route::get('/jumbotron-masjid', \App\Livewire\JumbotronMasjid\JumbotronMasjid::class)
+        ->name('jumbotron-masjid.index')
+        ->middleware('can:view-jumbotron-masjid');
+
+    // Route::get('/jumbotron-masjid/create', \App\Livewire\JumbotronMasjid\CreateJumbotronMasjid::class)
+    //     ->name('jumbotron-masjid.create')
+    //     ->middleware('can:create-jumbotron-masjid');
+
+    Route::get('/jumbotron-masjid/edit', \App\Livewire\JumbotronMasjid\EditJumbotronMasjid::class)
+        ->name('jumbotron-masjid.edit')
+        ->middleware('can:create-jumbotron-masjid');
+
     // Balance API Docs
     Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)
         ->name('api-docs.balance')
@@ -155,9 +168,7 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
 
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
 
-
-
-// TESTING WEB SOCKER
+// TESTING WEB SOCKET
 Route::get('test/testing-channel/view/{slug}', function ($slug) {
     $profil = Profil::where('slug', $slug)->first();
     if (!$profil) {

@@ -250,24 +250,9 @@
         <input type="hidden" id="{{ $key }}" value="{{ $value }}">
     @endforeach
 
-    {{-- Hidden inputs for jumbotron data --}}
-    @if ($jumbotron)
-        <input type="hidden" id="jumbo1" value="{{ $jumbotron->jumbo1 ?? '' }}">
-        <input type="hidden" id="jumbo2" value="{{ $jumbotron->jumbo2 ?? '' }}">
-        <input type="hidden" id="jumbo3" value="{{ $jumbotron->jumbo3 ?? '' }}">
-        <input type="hidden" id="jumbo4" value="{{ $jumbotron->jumbo4 ?? '' }}">
-        <input type="hidden" id="jumbo5" value="{{ $jumbotron->jumbo5 ?? '' }}">
-        <input type="hidden" id="jumbo6" value="{{ $jumbotron->jumbo6 ?? '' }}">
-        <input type="hidden" id="jumbo_is_active" value="{{ $jumbotron->is_active ? 'true' : 'false' }}">
-    @else
-        <input type="hidden" id="jumbo1" value="">
-        <input type="hidden" id="jumbo2" value="">
-        <input type="hidden" id="jumbo3" value="">
-        <input type="hidden" id="jumbo4" value="">
-        <input type="hidden" id="jumbo5" value="">
-        <input type="hidden" id="jumbo6" value="">
-        <input type="hidden" id="jumbo_is_active" value="false">
-    @endif
+    {{-- Hidden inputs for jumbotron sequence (merged masjid+global) --}}
+    <input type="hidden" id="jumbotron_is_active" value="false">
+    <input type="hidden" id="jumbotron-sequence" value="[]">
 
     {{-- Hidden inputs for audio data --}}
     @if ($audio)

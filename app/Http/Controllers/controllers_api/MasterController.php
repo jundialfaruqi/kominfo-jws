@@ -11,14 +11,17 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use App\Models\Jumbotron;
+use App\Models\Profil;
+use App\Models\JumbotronMasjid;
 
-class MasterController extends Controller {
-    
-    public function __construct() {
-    }
+class MasterController extends Controller
+{
+
+    public function __construct() {}
 
     // GET JUMBOTRON (API LAMA)
-    public function get_jumbotron1() {
+    public function get_jumbotron1()
+    {
         try {
             $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
             $data = [];
@@ -33,17 +36,16 @@ class MasterController extends Controller {
                 'message' => 'Berhasil get data jumbotron !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Jumbotron tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET JUMBOTRON
-    public function get_jumbotron() {
+    public function get_jumbotron()
+    {
         try {
             $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
             $data = [];
@@ -58,21 +60,99 @@ class MasterController extends Controller {
                 'message' => 'Berhasil get data jumbotron !',
                 'data' => $data
             ]);
-        }
-        catch (ModelNotFoundException $ex) {
+        } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Jumbotron tidak ditemukan !'], 404);
-        } 
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // GET JUMBOTRON MASJID BY SLUG
+    public function get_jumbotron_masjid($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $jm = JumbotronMasjid::where('masjid_id', $profil->id)->where('aktif', true)->firstOrFail();
+            $data = [
+                'jumbo1' => $jm->jumbotron_masjid_1 ? asset($jm->jumbotron_masjid_1) : null,
+                'jumbo2' => $jm->jumbotron_masjid_2 ? asset($jm->jumbotron_masjid_2) : null,
+                'jumbo3' => $jm->jumbotron_masjid_3 ? asset($jm->jumbotron_masjid_3) : null,
+                'jumbo4' => $jm->jumbotron_masjid_4 ? asset($jm->jumbotron_masjid_4) : null,
+                'jumbo5' => $jm->jumbotron_masjid_5 ? asset($jm->jumbotron_masjid_5) : null,
+                'jumbo6' => $jm->jumbotron_masjid_6 ? asset($jm->jumbotron_masjid_6) : null,
+                'is_active' => (bool) $jm->aktif,
+            ];
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data jumbotron masjid!',
+                'data' => $data,
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Jumbotron masjid tidak ditemukan!'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    public function get_jumbotron_all($slug)
+    {
+        try {
+            $globalItems = [];
+            $globalActive = false;
+            try {
+                $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
+                if ($jumbotron->jumbo1) $globalItems[] = asset($jumbotron->jumbo1);
+                if ($jumbotron->jumbo2) $globalItems[] = asset($jumbotron->jumbo2);
+                if ($jumbotron->jumbo3) $globalItems[] = asset($jumbotron->jumbo3);
+                if ($jumbotron->jumbo4) $globalItems[] = asset($jumbotron->jumbo4);
+                if ($jumbotron->jumbo5) $globalItems[] = asset($jumbotron->jumbo5);
+                if ($jumbotron->jumbo6) $globalItems[] = asset($jumbotron->jumbo6);
+                $globalActive = true;
+            } catch (ModelNotFoundException $e) {
+            }
+
+            $masjidItems = [];
+            $masjidActive = false;
+            try {
+                $profil = Profil::where('slug', $slug)->firstOrFail();
+                $jm = JumbotronMasjid::where('masjid_id', $profil->id)->where('aktif', true)->firstOrFail();
+                if ($jm->jumbotron_masjid_1) $masjidItems[] = asset($jm->jumbotron_masjid_1);
+                if ($jm->jumbotron_masjid_2) $masjidItems[] = asset($jm->jumbotron_masjid_2);
+                if ($jm->jumbotron_masjid_3) $masjidItems[] = asset($jm->jumbotron_masjid_3);
+                if ($jm->jumbotron_masjid_4) $masjidItems[] = asset($jm->jumbotron_masjid_4);
+                if ($jm->jumbotron_masjid_5) $masjidItems[] = asset($jm->jumbotron_masjid_5);
+                if ($jm->jumbotron_masjid_6) $masjidItems[] = asset($jm->jumbotron_masjid_6);
+                $masjidActive = (bool) $jm->aktif;
+            } catch (ModelNotFoundException $e) {
+            }
+
+            $mergedItems = [];
+            $maxLen = max(count($masjidItems), count($globalItems));
+            for ($i = 0; $i < $maxLen; $i++) {
+                if (isset($masjidItems[$i])) $mergedItems[] = $masjidItems[$i];
+                if (isset($globalItems[$i])) $mergedItems[] = $globalItems[$i];
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data jumbotron masjid dan global !',
+                'data' => [
+                    'is_active' => ($globalActive || $masjidActive),
+                    'items' => $mergedItems,
+                ],
+            ]);
+        } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
     }
 
     // GET SERVER TIME
-    public function get_server_time() {
+    public function get_server_time()
+    {
         try {
             // Gunakan waktu server langsung dengan Carbon
             $serverDateTime = Carbon::now('Asia/Jakarta');
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Server Asia/Jakarta',
@@ -82,8 +162,7 @@ class MasterController extends Controller {
                     'source' => 'server'
                 ]
             ]);
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             try {
                 // Coba API utama (Pekanbaru)
                 $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
@@ -114,12 +193,10 @@ class MasterController extends Controller {
                             'source' => 'pekanbaru'
                         ]
                     ]);
-                } 
-                else {
+                } else {
                     throw new \Exception('API utama gagal');
                 }
-            } 
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
                 try {
                     // Fallback ke timeapi.io
                     $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
@@ -137,12 +214,10 @@ class MasterController extends Controller {
                                 'source' => 'timeapi'
                             ]
                         ]);
-                    } 
-                    else {
+                    } else {
                         throw new \Exception('API timeapi.io gagal');
                     }
-                } 
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                     try {
                         // Fallback ke API Google Script
                         $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
@@ -160,12 +235,10 @@ class MasterController extends Controller {
                                     'source' => 'google-script'
                                 ]
                             ]);
-                        } 
-                        else {
+                        } else {
                             throw new \Exception('API Google Script gagal');
                         }
-                    } 
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                         try {
                             // Fallback ke waktu server lokal
                             $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
@@ -178,8 +251,7 @@ class MasterController extends Controller {
                                     'source' => 'local'
                                 ]
                             ]);
-                        }
-                        catch (\Exception $e) {
+                        } catch (\Exception $e) {
                             return response()->json(['success' => false, 'message' => 'Gagal mengambil semua waktu !'], 500);
                         }
                     }
@@ -189,15 +261,15 @@ class MasterController extends Controller {
     }
 
     // GET REFRESH PRAYER TIME
-    public function get_refresh_prayer_times() {
+    public function get_refresh_prayer_times()
+    {
         try {
             // Gunakan waktu server langsung dengan Carbon sebagai sumber utama
             $serverDateTime = Carbon::now('Asia/Jakarta');
             $serverTime = $serverDateTime->toDateTimeString();
             $currentMonth = (int) $serverDateTime->format('n');
             $currentYear = (int) $serverDateTime->format('Y');
-        } 
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             // Jika gagal menggunakan Carbon, coba API eksternal sebagai fallback
             try {
                 $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
@@ -243,5 +315,4 @@ class MasterController extends Controller {
             return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
-
 }

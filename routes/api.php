@@ -39,6 +39,9 @@ Route::get('prayer-status/{slug}', [API\ProfilController::class, 'get_prayer_sta
 // API route untuk mendapatkan data jumbotron
 Route::get('jumbotron1', [API\MasterController::class, 'get_jumbotron1'])->name('api.jumbotron1'); // API LAMA
 Route::get('jumbotron', [API\MasterController::class, 'get_jumbotron'])->name('api.jumbotron');
+// API route untuk mendapatkan data jumbotron masjid berdasarkan slug
+// Route::get('jumbotron-masjid/{slug}', [API\MasterController::class, 'get_jumbotron_masjid'])->name('api.jumbotron-masjid');
+Route::get('jumbotron-all/{slug}', [API\MasterController::class, 'get_jumbotron_all'])->name('api.jumbotron-all');
 
 // API route untuk mendapatkan server time
 Route::get('server-time', [API\MasterController::class, 'get_server_time'])->name('api.server-time');

@@ -69,6 +69,11 @@ class RolePermissionSeeder extends Seeder
             'edit-laporan-keuangan',
             'delete-laporan-keuangan',
 
+            // Jumbotron Masjid Management
+            'view-jumbotron-masjid',
+            'create-jumbotron-masjid',
+            'edit-jumbotron-masjid',
+            'delete-jumbotron-masjid',
         ];
 
         foreach ($permissions as $permission) {
@@ -105,6 +110,10 @@ class RolePermissionSeeder extends Seeder
             'create-laporan-keuangan',
             'edit-laporan-keuangan',
             'delete-laporan-keuangan',
+            'view-jumbotron-masjid',
+            'create-jumbotron-masjid',
+            'edit-jumbotron-masjid',
+            'delete-jumbotron-masjid',
         ]);
 
         // Admin Masjid - basic permissions for their own content
@@ -120,6 +129,10 @@ class RolePermissionSeeder extends Seeder
             'create-laporan-keuangan',
             'edit-laporan-keuangan',
             'delete-laporan-keuangan',
+            'view-jumbotron-masjid',
+            'create-jumbotron-masjid',
+            'edit-jumbotron-masjid',
+            'delete-jumbotron-masjid',
         ]);
 
         // Admin Masjid - similar to User but with more content management permissions

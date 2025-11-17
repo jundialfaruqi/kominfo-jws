@@ -4072,7 +4072,7 @@
             const slideUrls = window.slideUrls || [];
             const iqomahImages = window.iqomahImages || [];
             const fridayImages = window.fridayImages || [];
-            const jumbotronUrls = window.jumbotronUrls || [];
+            const jumbotronUrls = Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [];
             const adzan15 = $('#adzan15').val() || '/images/other/lurus-rapat-shaf-default.webp';
             return [...new Set([...slideUrls, ...iqomahImages, ...fridayImages, ...jumbotronUrls, adzan15])]
                 .filter(url => url.trim() !== '');
@@ -4146,16 +4146,16 @@
                 $('#jumbotron-clock-time').text(`${hours}:${minutes}:${seconds}`);
 
                 // Lanjutkan animasi
-                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0 && $(
-                        '#jumbotronImage').is(':visible')) {
+                const isActive = ($('#jumbotron_is_active').val() === 'true') && Array.isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
+                if (isActive && $('#jumbotronImage').is(':visible')) {
                     animationFrameId = requestAnimationFrame(updateContent);
                 }
             }
 
             // Mulai pembaruan jika jumbotron aktif
             function startJumbotronUpdates() {
-                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0 && $(
-                        '#jumbotronImage').is(':visible')) {
+                const isActive = ($('#jumbotron_is_active').val() === 'true') && Array.isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
+                if (isActive && $('#jumbotronImage').is(':visible')) {
                     if (!animationFrameId) {
                         updateContent(); // Perbarui segera
                         console.log('Jumbotron countdown updates started with requestAnimationFrame');
@@ -4177,7 +4177,8 @@
 
             // Pantau perubahan status jumbotron
             $(document).on('jumbotronUpdated', function() {
-                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0) {
+                const isActive = ($('#jumbotron_is_active').val() === 'true') && Array.isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
+                if (isActive) {
                     startJumbotronUpdates();
                 } else {
                     stopJumbotronUpdates();
@@ -4199,48 +4200,42 @@
 
         // Panggil fungsi ini saat jumbotron ditampilkan
         $(document).on('jumbotronUpdated', function() {
-            if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0) {
-                updateJumbotronContent();
-            }
+            const isActive = $('#jumbotron_is_active').val() === 'true' && Array.isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
+            if (isActive) updateJumbotronContent();
         });
 
         function updateJumbotronData() {
+            const parts = window.location.pathname.split('/').filter(Boolean);
+            const slug = parts[parts.length - 1] || '';
+            if (!slug) return;
             $.ajax({
-                url: '/api/jumbotron1',
+                url: `/api/jumbotron-all/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Respons API jumbotron:', response);
                     if (response.success && response.data) {
-                        const data = response.data;
-                        if (Array.isArray(data)) {
-                            // API lama mengembalikan array URL
-                            $('#jumbo1').val(data[0] || '');
-                            $('#jumbo2').val(data[1] || '');
-                            $('#jumbo3').val(data[2] || '');
-                            $('#jumbo4').val(data[3] || '');
-                            $('#jumbo5').val(data[4] || '');
-                            $('#jumbo6').val(data[5] || '');
-                            $('#jumbo_is_active').val(data.length > 0 ? 'true' : 'false');
-                        } else {
-                            // API baru/object dengan key jumbo1..jumbo6 dan is_active
-                            $('#jumbo1').val(data.jumbo1 || '');
-                            $('#jumbo2').val(data.jumbo2 || '');
-                            $('#jumbo3').val(data.jumbo3 || '');
-                            $('#jumbo4').val(data.jumbo4 || '');
-                            $('#jumbo5').val(data.jumbo5 || '');
-                            $('#jumbo6').val(data.jumbo6 || '');
-                            $('#jumbo_is_active').val(data.is_active ? 'true' : 'false');
+                        const d = response.data;
+                        $('#jumbotron_is_active').val(d.is_active ? 'true' : 'false');
+                        try {
+                            const seq = Array.isArray(d.items) ? d.items : [];
+                            window.jumbotronSequence = seq.filter(u => typeof u === 'string' && u.trim() !== '');
+                            $('#jumbotron-sequence').val(JSON.stringify(window.jumbotronSequence));
+                        } catch (e) {
+                            window.jumbotronSequence = [];
+                            $('#jumbotron-sequence').val('[]');
                         }
                         $(document).trigger('jumbotronUpdated');
                     } else {
-                        $('#jumbo_is_active').val('false');
-                        console.log('Tidak ada data jumbotron aktif');
+                        $('#jumbotron_is_active').val('false');
+                        window.jumbotronSequence = [];
+                        $('#jumbotron-sequence').val('[]');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error saat mengambil data jumbotron:', error, xhr.responseText);
-                    $('#jumbo_is_active').val('false');
+                error: function(xhr) {
+                    console.error('Error saat mengambil jumbotron-all:', xhr.responseText);
+                    $('#jumbotron_is_active').val('false');
+                    window.jumbotronSequence = [];
+                    $('#jumbotron-sequence').val('[]');
                 }
             });
         }
@@ -4268,29 +4263,26 @@
                 window.slideUrls = ['/images/other/slide-jws-default.jpg'];
             }
 
-            // Inisialisasi jumbotronUrls
-            window.jumbotronUrls = [
-                $('#jumbo1').val() || '',
-                $('#jumbo2').val() || '',
-                $('#jumbo3').val() || '',
-                $('#jumbo4').val() || '',
-                $('#jumbo5').val() || '',
-                $('#jumbo6').val() || ''
-            ].filter(url => url.trim() !== '');
+            // Inisialisasi jumbotron sequence dari hidden input
+            try {
+                const rawSeq = $('#jumbotron-sequence').val();
+                window.jumbotronSequence = JSON.parse(rawSeq || '[]').filter(u => typeof u === 'string' && u.trim() !== '');
+            } catch (e) {
+                window.jumbotronSequence = [];
+            }
 
             async function initSlider() {
                 try {
-                    const allUrls = [...window.slideUrls, ...window.jumbotronUrls];
+                    const allUrls = [...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])];
                     await preloadImages(allUrls);
                     // console.log('Semua gambar telah dimuat, memulai slider', allUrls);
 
                     const slideDuration = 20000; // 20 detik per gambar
 
                     function updateSlide() {
-                        const isJumbotronActive = $('#jumbo_is_active').val() === 'true' && window
-                            .jumbotronUrls.length > 0;
-                        if (!isJumbotronActive) {
-                            window.jumbotronUrls = [];
+                        const isSequenceActive = $('#jumbotron_is_active').val() === 'true' && Array.isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
+                        if (!isSequenceActive) {
+                            window.jumbotronSequence = [];
                             $jumbotronImageElement.css('display', 'none');
                         }
 
@@ -4304,7 +4296,7 @@
                             .getSeconds();
                         const slideCycleDuration = slideDuration * window.slideUrls
                             .length; // Durasi siklus penuh mosque-image
-                        const totalCycleDuration = isJumbotronActive ? slideCycleDuration + slideDuration :
+                        const totalCycleDuration = isSequenceActive ? slideCycleDuration + slideDuration :
                             slideCycleDuration;
 
                         const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
@@ -4312,17 +4304,18 @@
                         const imageIndex = Math.floor(cyclePosition / slideDuration);
 
                         let currentUrl;
-                        if (isJumbotronActive && imageIndex === window.slideUrls.length) {
-                            // Hitung currentJumboIndex berdasarkan waktu server
-                            const totalJumboCycle = totalCycleDuration * window.jumbotronUrls.length;
-                            const jumboCyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
-                                totalJumboCycle;
-                            const currentJumboIndex = Math.floor(jumboCyclePosition / totalCycleDuration) %
-                                window.jumbotronUrls.length;
-
-                            currentUrl = window.imageCache[window.jumbotronUrls[currentJumboIndex]]?.src ||
-                                window.jumbotronUrls[currentJumboIndex] ||
-                                '/images/other/slide-jws-default.jpg';
+                        if (isSequenceActive && imageIndex === window.slideUrls.length) {
+                            if (!window.inJumbotronPhase) {
+                                window.inJumbotronPhase = true;
+                                window.jsIndex = typeof window.jsIndex === 'number' ? window.jsIndex : 0;
+                                const seqLen = window.jumbotronSequence.length;
+                                const nextIndex = seqLen > 0 ? (window.jsIndex % seqLen) : 0;
+                                window.jsIndex++;
+                                window.currentJumbotronUrl = window.imageCache[window.jumbotronSequence[nextIndex]]?.src ||
+                                    window.jumbotronSequence[nextIndex] ||
+                                    '/images/other/slide-jws-default.jpg';
+                            }
+                            currentUrl = window.currentJumbotronUrl || '/images/other/slide-jws-default.jpg';
                             $mosqueImageElement.css('display', 'none');
                             $jumbotronImageElement.css({
                                 'background-image': `url("${currentUrl}")`,
@@ -4337,6 +4330,8 @@
                             // console.log(
                             // `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
                         } else {
+                            window.inJumbotronPhase = false;
+                            window.currentJumbotronUrl = null;
                             const slideIndex = imageIndex % window.slideUrls.length;
                             currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
                                 window.slideUrls[slideIndex] ||
@@ -4352,7 +4347,7 @@
                             // console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
-                        clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
+                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])]);
                         $(document).trigger('slideUpdated'); // Picu event slideUpdated
                     }
 
@@ -4379,30 +4374,33 @@
                         }
 
                         // console.log('slideUrls diperbarui:', window.slideUrls);
-                        clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
+                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])]);
                     });
 
                     $(document).on('jumbotronUpdated', async function() {
-                        console.log('Event jumbotronUpdated diterima, memperbarui jumbotron');
-                        window.jumbotronUrls = [
-                            $('#jumbo1').val() || '',
-                            $('#jumbo2').val() || '',
-                            $('#jumbo3').val() || '',
-                            $('#jumbo4').val() || '',
-                            $('#jumbo5').val() || '',
-                            $('#jumbo6').val() || ''
-                        ].filter(url => url.trim() !== '');
-
-                        const urlsToPreload = window.jumbotronUrls.filter(url => !window
-                            .imageCache[url] || !window.imageCache[url].complete);
+                        try {
+                            const seqRaw = $('#jumbotron-sequence').val();
+                            window.jumbotronSequence = JSON.parse(seqRaw || '[]').filter(u => typeof u === 'string' && u.trim() !== '');
+                        } catch (e) {
+                            window.jumbotronSequence = [];
+                        }
+                        const urlsToPreload = window.jumbotronSequence.filter(url => !window.imageCache[url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
-                            console.log(`Preload gambar jumbotron baru: ${urlsToPreload}`);
                             await preloadImages(urlsToPreload);
                         }
-
-                        console.log('jumbotronUrls diperbarui:', window.jumbotronUrls);
-                        clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
+                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])]);
+                        try {
+                            const newHash = JSON.stringify(window.jumbotronSequence);
+                            if (newHash !== window.jumbotronSequenceHash) {
+                                window.jumbotronSequenceHash = newHash;
+                                window.jsIndex = 0;
+                                window.inJumbotronPhase = false;
+                                window.currentJumbotronUrl = null;
+                            }
+                        } catch (e) {}
                     });
+
+                    // jumbotronMasjidUpdated deprecated; use jumbotronUpdated
                 } catch (error) {
                     console.error('Error saat menginisialisasi slider:', error);
                     // Fallback: Gunakan gambar default jika preload gagal
