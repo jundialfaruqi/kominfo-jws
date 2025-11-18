@@ -58,9 +58,35 @@
                             <div class="card rounded-4">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center gap-3">
+                                        <button type="button"
+                                            class="btn btn-sm rounded-circle btn-outline-primary btn-icon"
+                                            wire:click="decrementMarqueeSpeed" aria-label="Kurangi">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-minus">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M5 12h14" />
+                                            </svg>
+                                        </button>
+
                                         <input type="range" step="0.1" min="0.1" max="10"
                                             class="form-range @error('marquee_speed') is-invalid @enderror"
                                             wire:model.live="marquee_speed">
+
+                                        <button type="button"
+                                            class="btn btn-sm rounded-circle btn-outline-primary btn-icon"
+                                            wire:click="incrementMarqueeSpeed" aria-label="Tambah">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M12 5v14" />
+                                                <path d="M5 12h14" />
+                                            </svg>
+                                        </button>
+
                                         <span
                                             class="badge bg-primary w-25 text-white">{{ $marquee_speed ?? 1.0 }}x</span>
                                     </div>

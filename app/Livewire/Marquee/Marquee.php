@@ -368,4 +368,16 @@ class Marquee extends Component
             $this->dispatch('error', 'Terjadi kesalahan saat menghapus marquee: ' . $e->getMessage());
         }
     }
+
+    public function incrementMarqueeSpeed()
+    {
+        $current = is_numeric($this->marquee_speed) ? (float) $this->marquee_speed : 1.0;
+        $this->marquee_speed = min(10.0, round($current + 0.1, 1));
+    }
+
+    public function decrementMarqueeSpeed()
+    {
+        $current = is_numeric($this->marquee_speed) ? (float) $this->marquee_speed : 1.0;
+        $this->marquee_speed = max(0.1, round($current - 0.1, 1));
+    }
 }

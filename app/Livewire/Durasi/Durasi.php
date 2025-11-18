@@ -41,6 +41,7 @@ class Durasi extends Component
     public $adzan_isya;
     public $iqomah_isya;
     public $final_isya;
+    public $finance_scroll_speed;
 
     public $showForm = false;
     public $isEdit = false;
@@ -68,6 +69,7 @@ class Durasi extends Component
         'adzan_isya' => 'required|numeric|min:1',
         'iqomah_isya' => 'required|numeric|min:1',
         'final_isya' => 'required|numeric|min:1',
+        'finance_scroll_speed' => 'nullable|numeric|min:0.1|max:10',
     ];
 
     protected $messages = [
@@ -164,10 +166,12 @@ class Durasi extends Component
                 $this->adzan_isya = $durasi->adzan_isya;
                 $this->iqomah_isya = $durasi->iqomah_isya;
                 $this->final_isya = $durasi->final_isya;
+                $this->finance_scroll_speed = $durasi->finance_scroll_speed ?? 2.0;
                 $this->isEdit = true;
             } else {
                 // Untuk durasi baru, set isEdit ke false
                 $this->isEdit = false;
+                $this->finance_scroll_speed = 2.0;
             }
         }
     }
@@ -198,6 +202,7 @@ class Durasi extends Component
             'adzan_isya',
             'iqomah_isya',
             'final_isya',
+            'finance_scroll_speed',
         ]);
     }
 
@@ -230,7 +235,8 @@ class Durasi extends Component
                 'final_maghrib',
                 'adzan_isya',
                 'iqomah_isya',
-                'final_isya'
+                'final_isya',
+                'finance_scroll_speed'
             );
 
         // Jika bukan Super Admin, filter durasi dan kecualikan user dengan role 'Super Admin' atau 'Admin'
@@ -340,6 +346,7 @@ class Durasi extends Component
         $this->adzan_isya = $durasi->adzan_isya;
         $this->iqomah_isya = $durasi->iqomah_isya;
         $this->final_isya = $durasi->final_isya;
+        $this->finance_scroll_speed = $durasi->finance_scroll_speed ?? 2.0;
 
         $this->showForm = true;
         $this->isEdit = true;
@@ -372,6 +379,7 @@ class Durasi extends Component
             'adzan_isya',
             'iqomah_isya',
             'final_isya',
+            'finance_scroll_speed',
         ]);
     }
 
@@ -441,6 +449,7 @@ class Durasi extends Component
             $durasi->adzan_isya = $this->adzan_isya;
             $durasi->iqomah_isya = $this->iqomah_isya;
             $durasi->final_isya = $this->final_isya;
+            $durasi->finance_scroll_speed = $this->finance_scroll_speed ? (float) $this->finance_scroll_speed : 2.0;
             $durasi->save();
 
             // Trigger event
@@ -480,25 +489,26 @@ class Durasi extends Component
                 $this->showForm = true;
                 $durasi = ModelsDurasi::where('user_id', Auth::id())->first();
                 if ($durasi) {
-                    $this->durasiId = $durasi->id;
-                    $this->adzan_shuruq = $durasi->adzan_shuruq;
-                    $this->adzan_dhuha = $durasi->adzan_dhuha;
-                    $this->adzan_shubuh = $durasi->adzan_shubuh;
-                    $this->iqomah_shubuh = $durasi->iqomah_shubuh;
-                    $this->final_shubuh = $durasi->final_shubuh;
-                    $this->adzan_dzuhur = $durasi->adzan_dzuhur;
-                    $this->iqomah_dzuhur = $durasi->iqomah_dzuhur;
-                    $this->final_dzuhur = $durasi->final_dzuhur;
-                    $this->jumat_slide = $durasi->jumat_slide;
-                    $this->adzan_ashar = $durasi->adzan_ashar;
-                    $this->iqomah_ashar = $durasi->iqomah_ashar;
-                    $this->final_ashar = $durasi->final_ashar;
-                    $this->adzan_maghrib = $durasi->adzan_maghrib;
-                    $this->iqomah_maghrib = $durasi->iqomah_maghrib;
-                    $this->final_maghrib = $durasi->final_maghrib;
-                    $this->adzan_isya = $durasi->adzan_isya;
-                    $this->iqomah_isya = $durasi->iqomah_isya;
-                    $this->final_isya = $durasi->final_isya;
+                    $this->durasiId             = $durasi->id;
+                    $this->adzan_shuruq         = $durasi->adzan_shuruq;
+                    $this->adzan_dhuha          = $durasi->adzan_dhuha;
+                    $this->adzan_shubuh         = $durasi->adzan_shubuh;
+                    $this->iqomah_shubuh        = $durasi->iqomah_shubuh;
+                    $this->final_shubuh         = $durasi->final_shubuh;
+                    $this->adzan_dzuhur         = $durasi->adzan_dzuhur;
+                    $this->iqomah_dzuhur        = $durasi->iqomah_dzuhur;
+                    $this->final_dzuhur         = $durasi->final_dzuhur;
+                    $this->jumat_slide          = $durasi->jumat_slide;
+                    $this->adzan_ashar          = $durasi->adzan_ashar;
+                    $this->iqomah_ashar         = $durasi->iqomah_ashar;
+                    $this->final_ashar          = $durasi->final_ashar;
+                    $this->adzan_maghrib        = $durasi->adzan_maghrib;
+                    $this->iqomah_maghrib       = $durasi->iqomah_maghrib;
+                    $this->final_maghrib        = $durasi->final_maghrib;
+                    $this->adzan_isya           = $durasi->adzan_isya;
+                    $this->iqomah_isya          = $durasi->iqomah_isya;
+                    $this->final_isya           = $durasi->final_isya;
+                    $this->finance_scroll_speed = $durasi->finance_scroll_speed ?? 2.0;
                     $this->isEdit = true;
                 }
             }
@@ -522,11 +532,26 @@ class Durasi extends Component
             $durasi = ModelsDurasi::findOrFail($this->deleteDurasiId);
             $profil = $durasi->user->profil;
             $durasi->delete();
+
+            // Trigger Event Hapus
             if ($profil) event(new ContentUpdatedEvent($profil->slug, 'adzan'));
+
             $this->dispatch('closeDeleteModal');
             $this->dispatch('success', 'Durasi berhasil dihapus!');
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menghapus durasi: ' . $e->getMessage());
         }
+    }
+
+    public function incrementFinanceSpeed()
+    {
+        $current = is_numeric($this->finance_scroll_speed) ? (float) $this->finance_scroll_speed : 2.0;
+        $this->finance_scroll_speed = min(10.0, round($current + 0.1, 1));
+    }
+
+    public function decrementFinanceSpeed()
+    {
+        $current = is_numeric($this->finance_scroll_speed) ? (float) $this->finance_scroll_speed : 2.0;
+        $this->finance_scroll_speed = max(0.1, round($current - 0.1, 1));
     }
 }

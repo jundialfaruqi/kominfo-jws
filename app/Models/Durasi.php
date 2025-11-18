@@ -31,6 +31,7 @@ class Durasi extends Model
         'adzan_isya',
         'iqomah_isya',
         'final_isya',
+        'finance_scroll_speed',
     ];
 
     public function user()

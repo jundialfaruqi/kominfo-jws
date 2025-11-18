@@ -46,6 +46,58 @@
                     </div>
                 @endif
 
+                <div class="row g-2 mb-3">
+                    <div class="col-md-2">
+                        <label class="form-label">Kecepatan Scroll Laporan Keuangan</label>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card rounded-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-3">
+                                    <button type="button"
+                                        class="btn btn-sm rounded-circle btn-outline-primary btn-icon"
+                                        wire:click="decrementFinanceSpeed" aria-label="Kurangi">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-minus">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M5 12h14" />
+                                        </svg>
+                                    </button>
+
+                                    <input type="range" step="0.1" min="0.1" max="10"
+                                        class="form-range @error('finance_scroll_speed') is-invalid @enderror"
+                                        wire:model.live="finance_scroll_speed">
+
+                                    <button type="button"
+                                        class="btn btn-sm rounded-circle btn-outline-primary btn-icon"
+                                        wire:click="incrementFinanceSpeed" aria-label="Tambah">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-plus">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M12 5v14" />
+                                            <path d="M5 12h14" />
+                                        </svg>
+                                    </button>
+
+                                    <span class="badge bg-primary w-25 text-white">{{ $finance_scroll_speed ?? 2.0 }}x
+                                    </span>
+                                </div>
+                                @error('finance_scroll_speed')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-text">
+                            <small class="text-muted">Semakin besar nilai, semakin cepat (rentang 0.1–10, default
+                                2.0)</small>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Durasi Shubuh --}}
                 <div class="row g-2 mb-3">
                     <div class="col-md-2">

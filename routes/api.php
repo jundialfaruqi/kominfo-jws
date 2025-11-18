@@ -13,6 +13,8 @@ Route::get('theme-check/{slug}', [API\ProfilController::class, 'get_theme'])->na
 // API route untuk mendapatkan data marquee
 Route::get('marquee1/{slug}', [API\ProfilController::class, 'get_marquee1'])->name('api.marquee1'); // API LAMA
 Route::get('marquee/{slug}', [API\ProfilController::class, 'get_marquee'])->name('api.marquee');
+// API route untuk mendapatkan data durasi (raw)
+Route::get('durasi/{slug}', [API\ProfilController::class, 'get_durasi'])->name('api.durasi');
 
 // API route untuk mendapatkan data slide
 Route::get('slides1/{slug}', [API\ProfilController::class, 'get_slides1'])->name('api.slides1'); // API LAMA

@@ -149,6 +149,45 @@ class ProfilController extends Controller
         }
     }
 
+    // GET DURASI (raw values per user, termasuk finance_scroll_speed)
+    public function get_durasi($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+            $durasi = Durasi::where('user_id', $profil->user_id)->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data durasi masjid !',
+                'data' => [
+                    'adzan_shuruq' => (int) $durasi->adzan_shuruq,
+                    'adzan_dhuha' => (int) $durasi->adzan_dhuha,
+                    'adzan_shubuh' => (int) $durasi->adzan_shubuh,
+                    'iqomah_shubuh' => (int) $durasi->iqomah_shubuh,
+                    'final_shubuh' => (int) $durasi->final_shubuh,
+                    'adzan_dzuhur' => (int) $durasi->adzan_dzuhur,
+                    'iqomah_dzuhur' => (int) $durasi->iqomah_dzuhur,
+                    'final_dzuhur' => (int) $durasi->final_dzuhur,
+                    'jumat_slide' => (int) $durasi->jumat_slide,
+                    'adzan_ashar' => (int) $durasi->adzan_ashar,
+                    'iqomah_ashar' => (int) $durasi->iqomah_ashar,
+                    'final_ashar' => (int) $durasi->final_ashar,
+                    'adzan_maghrib' => (int) $durasi->adzan_maghrib,
+                    'iqomah_maghrib' => (int) $durasi->iqomah_maghrib,
+                    'final_maghrib' => (int) $durasi->final_maghrib,
+                    'adzan_isya' => (int) $durasi->adzan_isya,
+                    'iqomah_isya' => (int) $durasi->iqomah_isya,
+                    'final_isya' => (int) $durasi->final_isya,
+                    'finance_scroll_speed' => (float) ($durasi->finance_scroll_speed ?? 2.0),
+                ]
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil / Durasi tidak ditemukan !'], 404);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
     // GET REKAPAN total keseluruhan kategori per profile (id_masjid),
     public function get_balance_summary(Request $request, $slug)
     {

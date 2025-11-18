@@ -3447,7 +3447,19 @@
             container.appendChild(clone);
 
             let offset = container.scrollTop || 0;
-            const vwPerSec = 2; // kecepatan dalam vw per detik (konsisten lintas layar)
+            let vwPerSec = 2; // default
+            try {
+                const durasiRaw = $('#durasi-data').val();
+                if (durasiRaw) {
+                    const d = JSON.parse(durasiRaw);
+                    if (typeof d.finance_scroll_speed !== 'undefined') {
+                        const s = parseFloat(d.finance_scroll_speed);
+                        if (isFinite(s)) {
+                            vwPerSec = Math.max(0.1, Math.min(s, 10));
+                        }
+                    }
+                }
+            } catch (e) {}
             let speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
 
             // Update kecepatan saat ukuran layar berubah
@@ -4919,6 +4931,84 @@
                 }
             } catch (err) {
                 console.warn('initFridayImagesRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Durasi Updates via Echo =====================
+        (function initDurasiRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime durasi updates dinonaktifkan');
+                    return;
+                }
+
+                function applyDurasiData(d) {
+                    try {
+                        $('#durasi-data').val(JSON.stringify(d));
+                        // Jika finance overlay sedang tampil, restart scroll dengan kecepatan baru
+                        const overlayVisible = $('#financeOverlay').is(':visible');
+                        if (overlayVisible) {
+                            try {
+                                stopVerticalScroll();
+                            } catch (e) {}
+                            const $containerAll = $('#financeScrollContainerAll');
+                            const $contentAll = $('#financeScrollContentAll');
+                            startVerticalScroll($containerAll, $contentAll);
+                        }
+                    } catch (err) {
+                        console.warn('Gagal menerapkan data durasi:', err);
+                    }
+                }
+
+                function fetchDurasiData() {
+                    return $.ajax({
+                        url: `/api/durasi/${slug}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    }).then(function(response) {
+                        if (response && response.success && response.data) {
+                            applyDurasiData(response.data);
+                        }
+                    }).catch(function(err) {
+                        console.warn('Gagal mengambil data durasi:', err);
+                    });
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Komponen Durasi membroadcast dengan type 'adzan'
+                                if (e && e.type === 'adzan') {
+                                    console.log('Menerima event durasi; memperbarui durasi-data');
+                                    fetchDurasiData();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk durasi`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel (durasi):', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn('Echo belum tersedia; realtime durasi updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initDurasiRealtimeUpdates error:', err);
             }
         })();
 
