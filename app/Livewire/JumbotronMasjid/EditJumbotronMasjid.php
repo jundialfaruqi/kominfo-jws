@@ -9,6 +9,7 @@ use Livewire\WithFileUploads;
 use App\Models\JumbotronMasjid as ModelsJumbotronMasjid;
 use App\Models\Profil;
 use Illuminate\Support\Facades\Auth;
+use App\Events\ContentUpdatedEvent;
 
 #[Title('Edit Jumbotron Masjid')]
 class EditJumbotronMasjid extends Component
@@ -256,6 +257,10 @@ class EditJumbotronMasjid extends Component
             $model->jumbotron_masjid_6 = $paths['jumbotron_masjid_6'] ?? $this->tmp_jumbotron_masjid_6;
             $model->aktif = (bool) $this->is_active;
             $model->save();
+
+            // Trigger event
+            event(new ContentUpdatedEvent($profil->slug, 'jumbotron_masjid'));
+
             $this->jumbotronMasjidId = $model->id;
             session()->flash('success', 'Jumbotron masjid berhasil disimpan');
             return redirect()->route('jumbotron-masjid.index');
