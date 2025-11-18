@@ -209,6 +209,7 @@
                     <input type="hidden" id="marquee4" value="{{ $marquee->marquee4 }}">
                     <input type="hidden" id="marquee5" value="{{ $marquee->marquee5 }}">
                     <input type="hidden" id="marquee6" value="{{ $marquee->marquee6 }}">
+                    <input type="hidden" id="marquee-speed" value="{{ $marquee->marquee_speed ?? 1 }}">
                 @endif
                 <p>
                     Matikan ponsel atau gunakan mode senyap saat berada di dalam masjid

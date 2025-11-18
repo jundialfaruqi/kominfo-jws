@@ -18,6 +18,7 @@ class Marquee extends Model
         'marquee4',
         'marquee5',
         'marquee6',
+        'marquee_speed',
     ];
 
     public function user()

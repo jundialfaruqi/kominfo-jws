@@ -1677,10 +1677,15 @@
 
             const combinedText = marqueeTexts.join(' <span class="separator">•</span> ');
 
-            // Hitung durasi animasi
+            // Hitung durasi animasi dengan kecepatan dinamis
             const textLength = combinedText.length;
             const baseDuration = 240;
-            const calculatedDuration = Math.max(baseDuration, textLength / 20);
+            const speedRaw = marqueeData && typeof marqueeData.speed !== 'undefined' ? marqueeData.speed : ($('#marquee-speed').val() || '1');
+            let speedMultiplier = parseFloat(speedRaw);
+            if (!isFinite(speedMultiplier)) speedMultiplier = 1;
+            // Clamp 0.1..10 agar aman
+            speedMultiplier = Math.max(0.1, Math.min(speedMultiplier, 10));
+            const calculatedDuration = Math.max(baseDuration, textLength / 20) / speedMultiplier;
 
             // Gunakan waktu server untuk sinkronisasi
             const now = getCurrentTimeFromServer().getTime();
@@ -1731,6 +1736,9 @@
                         $('#marquee4').val(response.data.marquee4);
                         $('#marquee5').val(response.data.marquee5);
                         $('#marquee6').val(response.data.marquee6);
+                        if (typeof response.data.speed !== 'undefined') {
+                            $('#marquee-speed').val(response.data.speed);
+                        }
 
                         updateScrollingText(response.data);
                         // console.log('Teks marquee diperbarui');

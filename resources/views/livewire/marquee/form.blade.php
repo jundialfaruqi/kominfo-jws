@@ -52,6 +52,33 @@
 
                     <div class="row g-2 mb-3">
                         <div class="col-md-2">
+                            <label class="form-label">Kecepatan Marquee</label>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card rounded-4">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <input type="range" step="0.1" min="0.1" max="10"
+                                            class="form-range @error('marquee_speed') is-invalid @enderror"
+                                            wire:model.live="marquee_speed">
+                                        <span
+                                            class="badge bg-primary w-25 text-white">{{ $marquee_speed ?? 1.0 }}x</span>
+                                    </div>
+                                    @error('marquee_speed')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="form-text">
+                                <small class="text-muted">Semakin besar nilai, semakin cepat (rentang 0.1–10,
+                                    default
+                                    1.0)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-2">
                             <label class="form-label required">Marquee Teks 1</label>
                         </div>
                         <div class="col-md-10">
@@ -135,9 +162,9 @@
                 @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                     <button type="button" wire:click="cancelForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                         <span wire:loading.remove wire:target="cancelForm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
                                 class="icon icon-tabler icons-tabler-outline icon-tabler-copy-x">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path stroke="none" d="M0 0h24v24H0z" />

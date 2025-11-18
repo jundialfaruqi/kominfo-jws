@@ -29,6 +29,7 @@ class Marquee extends Component
     public $marquee4;
     public $marquee5;
     public $marquee6;
+    public $marquee_speed;
 
     public $showForm = false;
     public $isEdit = false;
@@ -44,6 +45,7 @@ class Marquee extends Component
         'marquee4'  => 'required',
         'marquee5'  => 'required',
         'marquee6'  => 'required',
+        'marquee_speed' => 'nullable|numeric|min:0.1|max:10',
     ];
 
     protected $messages = [
@@ -80,10 +82,12 @@ class Marquee extends Component
                 $this->marquee4  = $marquee->marquee4;
                 $this->marquee5  = $marquee->marquee5;
                 $this->marquee6  = $marquee->marquee6;
+                $this->marquee_speed = $marquee->marquee_speed ?? 1.0;
                 $this->isEdit    = true;
             } else {
                 // For new marquee, set isEdit to false
                 $this->isEdit = false;
+                $this->marquee_speed = 1.0;
             }
         }
     }
@@ -103,6 +107,7 @@ class Marquee extends Component
                 'marquee4',
                 'marquee5',
                 'marquee6',
+                'marquee_speed',
             ]
         );
     }
@@ -116,7 +121,7 @@ class Marquee extends Component
 
         // Query builder for marquee
         $query = ModelsMarquee::with('user')
-            ->select('id', 'user_id', 'marquee1', 'marquee2', 'marquee3', 'marquee4', 'marquee5', 'marquee6');
+            ->select('id', 'user_id', 'marquee1', 'marquee2', 'marquee3', 'marquee4', 'marquee5', 'marquee6', 'marquee_speed');
 
         // If user is not Super Admin, filter marquee and exclude users with 'Super Admin' or 'Admin' roles
         if (!$isSuperAdmin) {
@@ -213,6 +218,7 @@ class Marquee extends Component
         $this->marquee4  = $marquee->marquee4;
         $this->marquee5  = $marquee->marquee5;
         $this->marquee6  = $marquee->marquee6;
+        $this->marquee_speed = $marquee->marquee_speed ?? 1.0;
 
         $this->showForm  = true;
         $this->isEdit    = true;
@@ -234,6 +240,7 @@ class Marquee extends Component
                 'marquee4',
                 'marquee5',
                 'marquee6',
+                'marquee_speed',
             ]
         );
     }
@@ -292,6 +299,7 @@ class Marquee extends Component
             $marquee->marquee4 = $this->marquee4;
             $marquee->marquee5 = $this->marquee5;
             $marquee->marquee6 = $this->marquee6;
+            $marquee->marquee_speed = $this->marquee_speed ? (float) $this->marquee_speed : 1.0;
             $marquee->save();
 
             // Trigger event 
@@ -328,6 +336,7 @@ class Marquee extends Component
                     $this->marquee4 = $marquee->marquee4;
                     $this->marquee5 = $marquee->marquee5;
                     $this->marquee6 = $marquee->marquee6;
+                    $this->marquee_speed = $marquee->marquee_speed ?? 1.0;
                 }
             }
         } catch (\Exception $e) {

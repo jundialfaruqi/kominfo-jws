@@ -109,7 +109,8 @@ class ProfilController extends Controller
                     'marquee3' => $marquee->marquee3,
                     'marquee4' => $marquee->marquee4,
                     'marquee5' => $marquee->marquee5,
-                    'marquee6' => $marquee->marquee6
+                    'marquee6' => $marquee->marquee6,
+                    'speed'    => (float) ($marquee->marquee_speed ?? 1.0)
                 ]
             ]);
         } catch (ModelNotFoundException $ex) {
@@ -136,7 +137,10 @@ class ProfilController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data marquee masjid !',
-                'data' => $data
+                'data' => [
+                    'items' => $data,
+                    'speed' => (float) ($marquee->marquee_speed ?? 1.0)
+                ]
             ]);
         } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Marquee tidak ditemukan !'], 404);
