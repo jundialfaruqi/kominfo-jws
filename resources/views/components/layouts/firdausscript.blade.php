@@ -1646,8 +1646,6 @@
             }
         }
 
-
-
         function updateScrollingText(marqueeData) {
             const $scrollingTextElement = $('.scrolling-text');
 
@@ -2144,7 +2142,7 @@
                 // updateFridayImages();
                 updateIqomahImages();
                 updateAdzanImages();
-                // updateFridayOfficials();
+                updateFridayOfficials();
 
                 // Reset prayer times handling untuk hari baru
                 handlePrayerTimes();
@@ -4347,7 +4345,7 @@
                                     '/images/other/slide-jws-default.jpg';
                             }
                             currentUrl = window.currentJumbotronUrl ||
-                            '/images/other/slide-jws-default.jpg';
+                                '/images/other/slide-jws-default.jpg';
                             $mosqueImageElement.css('display', 'none');
                             $jumbotronImageElement.css({
                                 'background-image': `url("${currentUrl}")`,
@@ -4470,6 +4468,44 @@
 
         handlePrayerTimes();
         setInterval(handlePrayerTimes, 1000);
+
+        (function initSyuruqDhuhaToggle() {
+            try {
+                let lastToggle = Date.now();
+                let showSyuruq = true;
+                const period = 10000;
+
+                function apply() {
+                    const $items = $('.prayer-time');
+                    const $syuruq = $items.eq(1);
+                    const $dhuha = $items.eq(2);
+                    if (!$syuruq.length || !$dhuha.length) return;
+
+                    const syuIsActive = $syuruq.hasClass('active');
+                    const syuIsNext = $syuruq.hasClass('next-prayer');
+                    const dhuIsActive = $dhuha.hasClass('active');
+                    const dhuIsNext = $dhuha.hasClass('next-prayer');
+
+                    if (syuIsActive) {
+                        $dhuha.removeClass('active');
+                        if (!$dhuha.hasClass('next-prayer')) $dhuha.addClass('next-prayer');
+                    } else if (syuIsNext) {
+                        $dhuha.removeClass('active next-prayer');
+                    } else if (dhuIsActive) {
+                        $syuruq.removeClass('active next-prayer');
+                    }
+
+                    if (Date.now() - lastToggle > period) {
+                        showSyuruq = !showSyuruq;
+                        lastToggle = Date.now();
+                    }
+                    $syuruq.toggle(showSyuruq);
+                    $dhuha.toggle(!showSyuruq);
+                }
+                apply();
+                setInterval(apply, 1000);
+            } catch (e) {}
+        })();
 
         // Update tanggal awal dengan waktu lokal, akan diperbarui setelah sinkronisasi server
         updateDate();
