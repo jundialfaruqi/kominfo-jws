@@ -445,5 +445,45 @@
                 });
             }
         });
+        Livewire.on('reset_success', (message) => {
+            if (window.iziToast) {
+                iziToast.success({
+                    title: 'Berhasil',
+                    message,
+                    position: 'topRight'
+                });
+            }
+        });
+        Livewire.on('reset_error', (message) => {
+            if (window.iziToast) {
+                iziToast.error({
+                    title: 'Gagal',
+                    message,
+                    position: 'topRight'
+                });
+            }
+        });
     });
 </script>
+@script
+<script>
+    $wire.on('reset_success', message => {
+        if (window.iziToast) {
+            iziToast.success({
+                title: 'Berhasil',
+                message,
+                position: 'topRight'
+            });
+        }
+    });
+    $wire.on('reset_error', message => {
+        if (window.iziToast) {
+            iziToast.error({
+                title: 'Gagal',
+                message,
+                position: 'topRight'
+            });
+        }
+    });
+</script>
+@endscript

@@ -10,6 +10,7 @@ use App\Models\JumbotronMasjid as ModelsJumbotronMasjid;
 use App\Models\Profil;
 use Illuminate\Support\Facades\Auth;
 use App\Events\ContentUpdatedEvent;
+use Illuminate\Support\Facades\File;
 
 #[Title('Edit Jumbotron Masjid')]
 class EditJumbotronMasjid extends Component
@@ -161,33 +162,107 @@ class EditJumbotronMasjid extends Component
 
     public function clearJumbotronMasjid1()
     {
-        $this->jumbotron_masjid_1 = null;
-        $this->tmp_jumbotron_masjid_1 = null;
+        $this->deleteJumbotronFile('jumbotron_masjid_1');
     }
     public function clearJumbotronMasjid2()
     {
-        $this->jumbotron_masjid_2 = null;
-        $this->tmp_jumbotron_masjid_2 = null;
+        $this->deleteJumbotronFile('jumbotron_masjid_2');
     }
     public function clearJumbotronMasjid3()
     {
-        $this->jumbotron_masjid_3 = null;
-        $this->tmp_jumbotron_masjid_3 = null;
+        $this->deleteJumbotronFile('jumbotron_masjid_3');
     }
     public function clearJumbotronMasjid4()
     {
-        $this->jumbotron_masjid_4 = null;
-        $this->tmp_jumbotron_masjid_4 = null;
+        $this->deleteJumbotronFile('jumbotron_masjid_4');
     }
     public function clearJumbotronMasjid5()
     {
-        $this->jumbotron_masjid_5 = null;
-        $this->tmp_jumbotron_masjid_5 = null;
+        $this->deleteJumbotronFile('jumbotron_masjid_5');
     }
     public function clearJumbotronMasjid6()
     {
-        $this->jumbotron_masjid_6 = null;
-        $this->tmp_jumbotron_masjid_6 = null;
+        $this->deleteJumbotronFile('jumbotron_masjid_6');
+    }
+
+    private function deleteJumbotronFile($field)
+    {
+        try {
+            $profil = Profil::where('user_id', Auth::id())->first();
+            if (!$profil) {
+                $this->dispatch('error', 'Profil masjid untuk user ini tidak ditemukan');
+                return;
+            }
+
+            $existing = null;
+            if ($this->jumbotronMasjidId) {
+                $existing = ModelsJumbotronMasjid::find($this->jumbotronMasjidId);
+            }
+            if (!$existing) {
+                $existing = ModelsJumbotronMasjid::where('masjid_id', $profil->id)
+                    ->where('created_by', Auth::id())
+                    ->first();
+            }
+
+            $tmpField = 'tmp_' . $field;
+            $path = null;
+            if (property_exists($this, $tmpField) && !empty($this->$tmpField)) {
+                $path = $this->$tmpField;
+            } elseif ($existing) {
+                $path = $existing->$field ?? null;
+            }
+            if ($path) {
+                $this->deleteByPathOrSuffix($path);
+            }
+
+            if ($existing) {
+                ModelsJumbotronMasjid::where('id', $existing->id)->update([$field => null]);
+            }
+
+            $this->$field = null;
+            if (property_exists($this, $tmpField)) {
+                $this->$tmpField = null;
+            }
+
+            event(new ContentUpdatedEvent($profil->slug, 'jumbotron_masjid'));
+            $this->dispatch('reset_success', 'Gambar jumbotron berhasil direset');
+        } catch (\Exception $e) {
+            $this->dispatch('reset_error', 'Gagal mereset gambar jumbotron: ' . $e->getMessage());
+        }
+    }
+
+    private function deleteByPathOrSuffix(string $path): void
+    {
+        $relative = ltrim($path, '/');
+        $basename = basename($relative);
+        $deleted = false;
+
+        $candidates = [public_path($relative), public_path('/' . $relative)];
+        $real = realpath(public_path($relative));
+        if ($real) $candidates[] = $real;
+        foreach (array_unique($candidates) as $candidate) {
+            if (is_file($candidate)) {
+                try { File::delete($candidate); } catch (\Exception $e) {}
+                if (file_exists($candidate)) { @unlink($candidate); }
+                if (!file_exists($candidate)) $deleted = true;
+            }
+        }
+
+        if (!$deleted && $basename) {
+            $suffix = preg_replace('/^\d+_/', '', $basename);
+            $dir = public_path('images/jumbotrons');
+            if (is_dir($dir) && $suffix) {
+                $matches = glob($dir . '/*' . $suffix);
+                if (is_array($matches)) {
+                    foreach ($matches as $file) {
+                        if (is_file($file)) {
+                            try { File::delete($file); } catch (\Exception $e) {}
+                            if (file_exists($file)) { @unlink($file); }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public function cancelForm()
@@ -223,21 +298,39 @@ class EditJumbotronMasjid extends Component
             }
             $paths = [];
             if ($this->jumbotron_masjid_1) {
+                if ($this->tmp_jumbotron_masjid_1) {
+                    $this->deleteByPathOrSuffix($this->tmp_jumbotron_masjid_1);
+                }
                 $paths['jumbotron_masjid_1'] = $this->saveProcessedImage($this->jumbotron_masjid_1, 1);
             }
             if ($this->jumbotron_masjid_2) {
+                if ($this->tmp_jumbotron_masjid_2) {
+                    $this->deleteByPathOrSuffix($this->tmp_jumbotron_masjid_2);
+                }
                 $paths['jumbotron_masjid_2'] = $this->saveProcessedImage($this->jumbotron_masjid_2, 2);
             }
             if ($this->jumbotron_masjid_3) {
+                if ($this->tmp_jumbotron_masjid_3) {
+                    $this->deleteByPathOrSuffix($this->tmp_jumbotron_masjid_3);
+                }
                 $paths['jumbotron_masjid_3'] = $this->saveProcessedImage($this->jumbotron_masjid_3, 3);
             }
             if ($this->jumbotron_masjid_4) {
+                if ($this->tmp_jumbotron_masjid_4) {
+                    $this->deleteByPathOrSuffix($this->tmp_jumbotron_masjid_4);
+                }
                 $paths['jumbotron_masjid_4'] = $this->saveProcessedImage($this->jumbotron_masjid_4, 4);
             }
             if ($this->jumbotron_masjid_5) {
+                if ($this->tmp_jumbotron_masjid_5) {
+                    $this->deleteByPathOrSuffix($this->tmp_jumbotron_masjid_5);
+                }
                 $paths['jumbotron_masjid_5'] = $this->saveProcessedImage($this->jumbotron_masjid_5, 5);
             }
             if ($this->jumbotron_masjid_6) {
+                if ($this->tmp_jumbotron_masjid_6) {
+                    $this->deleteByPathOrSuffix($this->tmp_jumbotron_masjid_6);
+                }
                 $paths['jumbotron_masjid_6'] = $this->saveProcessedImage($this->jumbotron_masjid_6, 6);
             }
 
