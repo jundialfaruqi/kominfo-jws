@@ -1,4 +1,4 @@
-<aside class="navbar navbar-vertical navbar-expand-lg sticky-top" data-bs-theme="light">
+<aside class="navbar navbar-vertical navbar-expand-lg sticky-top" data-bs-theme="dark">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,10 +64,14 @@
         <div class="collapse navbar-collapse" id="sidebar-menu">
             <ul class="navbar-nav">
                 @if (Auth::user()->status === 'Active')
-                    <li
-                        class="nav-item mx-3 {{ request()->routeIs('dashboard.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <div class="mt-3 mb-1 px-3">
+                        <div class="d-flex align-items-center">
+                            <div class="text-muted small fw-bold ms-2">MENU</div>
+                        </div>
+                    </div>
+                    <li class="nav-item mx-2 {{ request()->routeIs('dashboard.index') ? 'bg-azure rounded-4' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('dashboard.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -83,15 +87,15 @@
                                         d="M15 4h4a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-2a1 1 0 0 1 1 -1" />
                                 </svg>
                             </span>
-                            <span class="nav-link-title">
+                            <span class="nav-link-title text-white">
                                 Dashboard
                             </span>
                         </a>
                     </li>
                     <li
-                        class="nav-item mx-3 {{ request()->routeIs('profilmasjid.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        class="nav-item mx-2 {{ request()->routeIs('profilmasjid.index') ? 'bg-azure rounded-4' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -110,15 +114,14 @@
                                     <path d="M12 6v2" />
                                 </svg>
                             </span>
-                            <span class="nav-link-title">
+                            <span class="nav-link-title text-white">
                                 Profil Masjid
                             </span>
                         </a>
                     </li>
-                    <li
-                        class="nav-item mx-3 {{ request()->routeIs('tema.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                    <li class="nav-item mx-2 {{ request()->routeIs('tema.index') ? 'bg-azure rounded-4' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -133,16 +136,16 @@
                                     <path d="M14 20l6 0" />
                                 </svg>
                             </span>
-                            <span class="nav-link-title">
+                            <span class="nav-link-title text-white">
                                 Tema JWS
                             </span>
                         </a>
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('tema.set-tema') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                            class="nav-item mx-2 {{ request()->routeIs('tema.set-tema') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('tema.set-tema') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -154,7 +157,7 @@
                                         <path d="M10.6 9a9 9 0 0 1 4.4 4.4" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Set Tema
                                 </span>
                             </a>
@@ -167,26 +170,13 @@
                             <div>
                                 <div class="mt-3 mb-1 px-3">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 border-top opacity-50"></div>
-                                        <span class="mx-2 text-muted text-uppercase small" style="letter-spacing:.08em">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="icon icon-tabler icons-tabler-outline icon-tabler-users">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
-                                                <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                                                <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
-                                            </svg>
-                                        </span>
-                                        <div class="flex-grow-1 border-top opacity-50"></div>
+                                        <div class="text-muted small fw-bold ms-2">MANAJEMEN USER</div>
                                     </div>
                                 </div>
                                 <li
-                                    class="nav-item mx-3 {{ request()->routeIs('admin.user.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                    class="nav-item mx-2 {{ request()->routeIs('admin.user.index') ? 'bg-azure rounded-4 shadow-sm' : '' }}">
                                     <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -198,7 +188,7 @@
                                                 <path d="M21 21v-2a4 4 0 0 0 -3 -3.85" />
                                             </svg>
                                         </span>
-                                        <span class="nav-link-title">
+                                        <span class="nav-link-title text-white">
                                             User
                                         </span>
                                     </a>
@@ -207,9 +197,9 @@
 
                             @can('view-roles')
                                 <li
-                                    class="nav-item mx-3 {{ request()->routeIs('admin.role.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                    class="nav-item mx-2 {{ request()->routeIs('admin.role.index') ? 'bg-azure rounded-4' : '' }}">
                                     <a wire:navigate class="nav-link" href="{{ route('admin.role.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -226,7 +216,7 @@
                                                 <path d="M20.733 20l1.3 .75" />
                                             </svg>
                                         </span>
-                                        <span class="nav-link-title">
+                                        <span class="nav-link-title text-white">
                                             Role
                                         </span>
                                     </a>
@@ -235,9 +225,9 @@
 
                             @can('view-permissions')
                                 <li
-                                    class="nav-item mx-3 {{ request()->routeIs('admin.permission.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                    class="nav-item mx-2 {{ request()->routeIs('admin.permission.index') ? 'bg-azure rounded-4' : '' }}">
                                     <a wire:navigate class="nav-link" href="{{ route('admin.permission.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -249,7 +239,7 @@
                                                 <path d="M13 11v-4a4 4 0 1 1 8 0v4" />
                                             </svg>
                                         </span>
-                                        <span class="nav-link-title">
+                                        <span class="nav-link-title text-white">
                                             Permission
                                         </span>
                                     </a>
@@ -258,10 +248,10 @@
 
                             @can('view-user-role-assignment')
                                 <li
-                                    class="nav-item mx-3 {{ request()->routeIs('admin.user-role-assignment.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                    class="nav-item mx-2 {{ request()->routeIs('admin.user-role-assignment.index') ? 'bg-azure rounded-4' : '' }}">
                                     <a wire:navigate class="nav-link"
                                         href="{{ route('admin.user-role-assignment.index') }}">
-                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -278,7 +268,7 @@
                                                 <path d="M20.733 20l1.3 .75" />
                                             </svg>
                                         </span>
-                                        <span class="nav-link-title">
+                                        <span class="nav-link-title text-white">
                                             Assign User Roles
                                         </span>
                                     </a>
@@ -291,33 +281,13 @@
                     <div>
                         <div class="mt-3 mb-1 px-3">
                             <div class="d-flex align-items-center">
-                                <div class="flex-grow-1 border-top opacity-50"></div>
-                                <span class="mx-2 text-muted text-uppercase small" style="letter-spacing:.08em">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-cash-register">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M21 15h-2.5c-.398 0 -.779 .158 -1.061 .439c-.281 .281 -.439 .663 -.439 1.061c0 .398 .158 .779 .439 1.061c.281 .281 .663 .439 1.061 .439h1c.398 0 .779 .158 1.061 .439c.281 .281 .439 .663 .439 1.061c0 .398 -.158 .779 -.439 1.061c-.281 .281 -.663 .439 -1.061 .439h-2.5" />
-                                        <path d="M19 21v1m0 -8v1" />
-                                        <path
-                                            d="M13 21h-7c-.53 0 -1.039 -.211 -1.414 -.586c-.375 -.375 -.586 -.884 -.586 -1.414v-10c0 -.53 .211 -1.039 .586 -1.414c.375 -.375 .884 -.586 1.414 -.586h2m12 3.12v-1.12c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586h-2" />
-                                        <path
-                                            d="M16 10v-6c0 -.53 -.211 -1.039 -.586 -1.414c-.375 -.375 -.884 -.586 -1.414 -.586h-4c-.53 0 -1.039 .211 -1.414 .586c-.375 .375 -.586 .884 -.586 1.414v6m8 0h-8m8 0h1m-9 0h-1" />
-                                        <path d="M8 14v.01" />
-                                        <path d="M8 17v.01" />
-                                        <path d="M12 13.99v.01" />
-                                        <path d="M12 17v.01" />
-                                    </svg>
-                                </span>
-                                <div class="flex-grow-1 border-top opacity-50"></div>
+                                <div class="text-muted small fw-bold ms-2">KEUANGAN</div>
                             </div>
                         </div>
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('group-category.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                            class="nav-item mx-2 {{ request()->routeIs('group-category.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('group-category.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -329,15 +299,15 @@
                                         <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Group Category
                                 </span>
                             </a>
                         </li>
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('laporan-keuangan.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                            class="nav-item mx-2 {{ request()->routeIs('laporan-keuangan.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('laporan-keuangan.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -349,7 +319,7 @@
                                         <path d="M12 14a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Laporan Keuangan
                                 </span>
                             </a>
@@ -360,27 +330,12 @@
                     <div>
                         <div class="mt-3 mb-1 px-3">
                             <div class="d-flex align-items-center">
-                                <div class="flex-grow-1 border-top opacity-50"></div>
-                                <span class="mx-2 text-muted text-uppercase small" style="letter-spacing:.08em">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-microphone">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
-                                        <path d="M5 10a7 7 0 0 0 14 0" />
-                                        <path d="M8 21l8 0" />
-                                        <path d="M12 17l0 4" />
-                                    </svg>
-                                </span>
-                                <div class="flex-grow-1 border-top opacity-50"></div>
+                                <div class="text-muted small fw-bold ms-2">AUDIO</div>
                             </div>
                         </div>
-                        <li
-                            class="nav-item mx-3 {{ request()->routeIs('audios') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('audios') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('audios') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -392,15 +347,15 @@
                                         <path d="M9 8h10" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Audio Murottal
                                 </span>
                             </a>
                         </li>
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('adzan-audio.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                            class="nav-item mx-2 {{ request()->routeIs('adzan-audio.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('adzan-audio.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -412,7 +367,7 @@
                                             d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Audio Adzan
                                 </span>
                             </a>
@@ -423,24 +378,14 @@
                     <div>
                         <div class="mt-3 mb-1 px-3">
                             <div class="d-flex align-items-center">
-                                <div class="flex-grow-1 border-top opacity-50"></div>
-                                <span class="mx-2 text-muted text-uppercase small" style="letter-spacing:.08em">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="currentColor"
-                                        class="icon icon-tabler icons-tabler-filled icon-tabler-photo">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M8.813 11.612c.457 -.38 .918 -.38 1.386 .011l.108 .098l4.986 4.986l.094 .083a1 1 0 0 0 1.403 -1.403l-.083 -.094l-1.292 -1.293l.292 -.293l.106 -.095c.457 -.38 .918 -.38 1.386 .011l.108 .098l4.674 4.675a4 4 0 0 1 -3.775 3.599l-.206 .005h-12a4 4 0 0 1 -3.98 -3.603l6.687 -6.69l.106 -.095zm9.187 -9.612a4 4 0 0 1 3.995 3.8l.005 .2v9.585l-3.293 -3.292l-.15 -.137c-1.256 -1.095 -2.85 -1.097 -4.096 -.017l-.154 .14l-.307 .306l-2.293 -2.292l-.15 -.137c-1.256 -1.095 -2.85 -1.097 -4.096 -.017l-.154 .14l-5.307 5.306v-9.585a4 4 0 0 1 3.8 -3.995l.2 -.005h12zm-2.99 5l-.127 .007a1 1 0 0 0 0 1.986l.117 .007l.127 -.007a1 1 0 0 0 0 -1.986l-.117 -.007z" />
-                                    </svg>
-                                </span>
-                                <div class="flex-grow-1 border-top opacity-50"></div>
+                                <div class="text-muted small fw-bold ms-2">SLIDER</div>
                             </div>
                         </div>
                         @if (Auth::check() && (in_array(Auth::user()->role, ['Super Admin', 'Admin']) || Auth::user()->can('view-jumbotron')))
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('jumbotron.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                class="nav-item mx-2 {{ request()->routeIs('jumbotron.index') ? 'bg-azure rounded-4' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('jumbotron.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -455,16 +400,15 @@
                                             <path d="M15 12l1.644 -1.644a1.21 1.21 0 0 1 1.712 0l2.644 2.644" />
                                         </svg>
                                     </span>
-                                    <span class="nav-link-title">
+                                    <span class="nav-link-title text-white">
                                         Jumbotron
                                     </span>
                                 </a>
                             </li>
                         @endif
-                        <li
-                            class="nav-item mx-3 {{ request()->routeIs('slide.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('slide.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('slide.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -480,17 +424,17 @@
                                         <path d="M16 21l.01 0" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Slide Utama
                                 </span>
                             </a>
                         </li>
                         @can('view-data-jumbotron-semua-masjid')
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('data-jumbotron-semua-masjid.*') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                class="nav-item mx-2 {{ request()->routeIs('data-jumbotron-semua-masjid.*') ? 'bg-azure rounded-4' : '' }}">
                                 <a wire:navigate class="nav-link"
                                     href="{{ route('data-jumbotron-semua-masjid.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -506,7 +450,7 @@
                                             <path d="M16 21l.01 0" />
                                         </svg>
                                     </span>
-                                    <span class="nav-link-title">
+                                    <span class="nav-link-title text-white">
                                         Data Jumbotron Masjid
                                     </span>
                                 </a>
@@ -514,9 +458,9 @@
                         @endcan
                         @can('view-jumbotron-masjid')
                             <li
-                                class="nav-item mx-3 {{ request()->routeIs('jumbotron-masjid.*') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                                class="nav-item mx-2 {{ request()->routeIs('jumbotron-masjid.*') ? 'bg-azure rounded-4' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('jumbotron-masjid.index') }}">
-                                    <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -532,16 +476,16 @@
                                             <path d="M16 21l.01 0" />
                                         </svg>
                                     </span>
-                                    <span class="nav-link-title">
+                                    <span class="nav-link-title text-white">
                                         Jumbotron Masjid
                                     </span>
                                 </a>
                             </li>
                         @endcan
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('adzan.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
+                            class="nav-item mx-2 {{ request()->routeIs('adzan.index') ? 'bg-azure rounded-4' : '' }} ">
                             <a wire:navigate class="nav-link" href="{{ route('adzan.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -555,7 +499,7 @@
                                         <path d="M7 6v.01" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Slide Iqomah & Jumat
                                 </span>
                             </a>
@@ -566,25 +510,13 @@
                     <div>
                         <div class="mt-3 mb-1 px-3">
                             <div class="d-flex align-items-center">
-                                <div class="flex-grow-1 border-top opacity-50"></div>
-                                <span class="mx-2 text-muted text-uppercase small" style="letter-spacing:.08em">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-folders">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M9 3h3l2 2h5a2 2 0 0 1 2 2v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" />
-                                        <path d="M17 16v2a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2h2" />
-                                    </svg>
-                                </span>
-                                <div class="flex-grow-1 border-top opacity-50"></div>
+                                <div class="text-muted small fw-bold ms-2">MENU LAINNYA</div>
                             </div>
                         </div>
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('petugas.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                            class="nav-item mx-2 {{ request()->routeIs('petugas.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('petugas.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -598,15 +530,15 @@
                                         <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Petugas Jum'at
                                 </span>
                             </a>
                         </li>
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('marquee.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }}">
+                            class="nav-item mx-2 {{ request()->routeIs('marquee.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('marquee.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -621,15 +553,15 @@
                                         <path d="M14 20l2 2l5 -5" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Teks Berjalan
                                 </span>
                             </a>
                         </li>
                         <li
-                            class="nav-item mx-3 {{ request()->routeIs('durasi.index') ? 'bg-primary-subtle mx-3 rounded-3 shadow-sm' : '' }} ">
+                            class="nav-item mx-2 {{ request()->routeIs('durasi.index') ? 'bg-azure rounded-4' : '' }} ">
                             <a wire:navigate class="nav-link" href="{{ route('durasi.index') }}">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -645,7 +577,7 @@
                                         <path d="M12 21a9 9 0 0 0 0 -18" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Pengaturan Durasi
                                 </span>
                             </a>
@@ -655,8 +587,8 @@
                     {{-- Lihat halaman utama --}}
                     @if (Auth::user()->role === 'User')
                         <li class="nav-item">
-                            <a class="nav-link mx-3" href="{{ route('my.mosque') }}" target="_blank">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <a class="nav-link mx-2" href="{{ route('my.mosque') }}" target="_blank">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -667,7 +599,7 @@
                                         <path d="M15 4h5v5" />
                                     </svg>
                                 </span>
-                                <span class="nav-link-title">
+                                <span class="nav-link-title text-white">
                                     Lihat Jadwal Sholat
                                 </span>
                             </a>
