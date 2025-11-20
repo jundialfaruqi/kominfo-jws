@@ -12,9 +12,9 @@
 </head>
 
 <body class=" d-flex flex-column">
-    <div class="page page-center">
-        {{ $slot }}
-    </div>
+    {{-- <div class="row flex-fill"> --}}
+    {{ $slot }}
+    {{-- </div> --}}
     @include('components.layouts.script')
     @livewireScripts
 </body>
