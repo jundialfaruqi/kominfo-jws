@@ -1,5 +1,5 @@
-    <div class="row align-items-stretch min-vh-100">
-        <div class="col-lg-7 d-none d-lg-block p-0 h-100">
+    <div class="row align-items-stretch min-vh-100 g-0">
+        <div class="col-lg-7 d-none d-lg-block h-100">
             <div id="carousel-captions" class="carousel slide h-100 shadow-sm border-0" data-bs-ride="carousel">
                 <div class="carousel-inner h-100">
                     <div class="carousel-item active h-100">

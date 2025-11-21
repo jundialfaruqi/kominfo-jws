@@ -11,10 +11,8 @@
 
 </head>
 
-<body class=" d-flex flex-column">
-    {{-- <div class="row flex-fill"> --}}
+<body class="d-flex flex-column">
     {{ $slot }}
-    {{-- </div> --}}
     @include('components.layouts.script')
     @livewireScripts
 </body>

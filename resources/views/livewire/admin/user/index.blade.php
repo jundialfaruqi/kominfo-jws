@@ -86,8 +86,10 @@
                             </div>
                         </div>
 
+                        @include('livewire.admin.user.table')
+
                         <!-- Ket Aktivitas-->
-                        <div class="card-body border-top-0 border-bottom-1 py-2"
+                        <div class="card-body border-top-0 border-0 py-3 small"
                             style="border-bottom: 1px solid #dee2e6;">
                             <div class="d-flex align-items-center gap-2 flex-wrap">
                                 <span class="text-secondary">Tingkat Aktivitas User:</span>
@@ -97,8 +99,6 @@
                                 <span class="badge bg-gray-lt">Tidak ada aktivitas</span>
                             </div>
                         </div>
-
-                        @include('livewire.admin.user.table')
 
                         <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
                             {{ $user->links(data: ['scrollTo' => false]) }}
