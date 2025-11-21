@@ -1,6 +1,10 @@
 <div>
     <div class="page-body">
         <div class="container-xl">
+
+            <h3>Statistik User</h3>
+            @include('livewire.admin.user.statistic')
+
             <div class="row row-deck row-cards">
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm">
@@ -24,7 +28,7 @@
                                                 <path d="M16 19h6" />
                                                 <path d="M19 16v6" />
                                             </svg>
-                                            Tambah User
+                                            Tambah User Baru
                                         </span>
                                         <span wire:loading wire:target="add">
                                             <span class="spinner-border spinner-border-sm" role="status"
@@ -35,9 +39,6 @@
                                 @endif
                             </div>
                         </div>
-
-                        @include('livewire.admin.user.statistic')
-
                         <div class="card-body border-bottom py-3">
                             <div class="d-flex flex-column flex-md-row align-items-center gap-2">
                                 <div class="text-secondary d-flex align-items-center gap-2 flex-grow-1">
