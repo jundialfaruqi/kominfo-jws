@@ -184,9 +184,10 @@ class Firdaus extends Component
                 if ($jadwalHariIni) {
                     $dzuhurLabel = $this->currentDayOfWeek == 5 ? "Jum'at" : "Dzuhur";
                     $this->prayerTimes = [
+                        ['name' => 'Imsak', 'time' => $jadwalHariIni['imsak'], 'icon' => 'moonlow'],
                         ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunset'],
-                        ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
                         ['name' => 'Dhuha', 'time' => $jadwalHariIni['dhuha'], 'icon' => 'sunlow'],
+                        ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
                         ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
                         ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
                         ['name' => 'Maghrib', 'time' => $jadwalHariIni['maghrib'], 'icon' => 'hazemoon'],
@@ -325,7 +326,7 @@ class Firdaus extends Component
 
         if ($activeIndex == -1) {
             if ($isEarlyMorning) {
-                $activeIndex = 6;
+                $activeIndex = count($this->prayerTimes) - 1; // terakhir (Isya)
             } else {
                 return null;
             }
@@ -350,6 +351,14 @@ class Firdaus extends Component
         $tomorrow = $tomorrowDate->format('Y-m-d');
         $yesterdayDate = (clone $serverDate)->modify('-1 day');
         $yesterday = $yesterdayDate->format('Y-m-d');
+
+        if ($prayerName === 'Imsak') {
+            // Imsak selalu dianggap hari ini kecuali saat malam/sore bergerak ke esok hari
+            if ($isEvening || $isAfternoon) {
+                return $tomorrow;
+            }
+            return $today;
+        }
 
         if ($prayerName === 'Subuh') {
             if ($isEarlyMorning) {
@@ -400,6 +409,9 @@ class Firdaus extends Component
             return ($this->durasi->adzan_maghrib * 60) + ($this->durasi->iqomah_maghrib * 60) + $this->durasi->final_maghrib;
         } elseif ($prayerLower === "isya") {
             return ($this->durasi->adzan_isya * 60) + ($this->durasi->iqomah_isya * 60) + $this->durasi->final_isya;
+        } elseif ($prayerLower === "imsak") {
+            // Imsak hanya memiliki fase adzan
+            return ($this->durasi->adzan_imsak ?? 3) * 60;
         } elseif ($prayerLower === "syuruq") {
             // Syuruq hanya memiliki fase adzan (tanpa iqomah dan final)
             return ($this->durasi->adzan_shuruq ?? 3) * 60;
@@ -463,6 +475,10 @@ class Firdaus extends Component
                     'iqomah' => $this->durasi->iqomah_isya * 60,
                     'final' => $this->durasi->final_isya * 60,
                 ];
+            } elseif ($prayerLower === 'imsak') {
+                $durasi = [
+                    'adzan' => ($this->durasi->adzan_imsak ?? 3) * 60,
+                ];
             } elseif ($prayerLower === 'syuruq') {
                 $durasi = [
                     'adzan' => ($this->durasi->adzan_shuruq ?? 3) * 60,
@@ -507,6 +523,14 @@ class Firdaus extends Component
                 $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
             }
             $status['isDhuha'] = true;
+        } elseif ($prayerLower === 'imsak') {
+            // Imsak hanya memiliki fase adzan
+            if ($elapsedSeconds <= $durasi['adzan']) {
+                $status['phase'] = 'adzan';
+                $status['remainingSeconds'] = $durasi['adzan'] - $elapsedSeconds;
+                $status['progressPercentage'] = ($elapsedSeconds / $durasi['adzan']) * 100;
+            }
+            $status['isImsak'] = true;
         } else {
             // Adzan phase
             if ($elapsedSeconds <= $durasi['adzan']) {
@@ -630,9 +654,10 @@ class Firdaus extends Component
                         $dzuhurLabel = ($this->currentDayOfWeek === 5) ? "Jum'at" : 'Dzuhur';
 
                         $this->prayerTimes = [
-                            ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunrise'],
-                            ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sun'],
+                            ['name' => 'Imsak', 'time' => $jadwalHariIni['imsak'], 'icon' => 'moonlow'],
+                            ['name' => 'Subuh', 'time' => $jadwalHariIni['subuh'], 'icon' => 'sunset'],
                             ['name' => 'Dhuha', 'time' => $jadwalHariIni['dhuha'], 'icon' => 'sunlow'],
+                            ['name' => 'Syuruq', 'time' => $jadwalHariIni['terbit'], 'icon' => 'sunrise'],
                             ['name' => $dzuhurLabel, 'time' => $jadwalHariIni['dzuhur'], 'icon' => 'sun'],
                             ['name' => 'Ashar', 'time' => $jadwalHariIni['ashar'], 'icon' => 'sunwind'],
                             ['name' => 'Maghrib', 'time' => $jadwalHariIni['maghrib'], 'icon' => 'hazemoon'],

@@ -25,6 +25,7 @@ class Durasi extends Component
     public $userId;
     public $adzan_shuruq;
     public $adzan_dhuha;
+    public $adzan_imsak;
     public $adzan_shubuh;
     public $iqomah_shubuh;
     public $final_shubuh;
@@ -51,9 +52,10 @@ class Durasi extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
+        'adzan_imsak' => 'required|numeric|min:2',
         'adzan_shubuh' => 'required|numeric|min:1',
-        'adzan_shuruq' => 'required|numeric|min:1',
-        'adzan_dhuha' => 'required|numeric|min:1',
+        'adzan_shuruq' => 'required|numeric|min:2',
+        'adzan_dhuha' => 'required|numeric|min:2',
         'iqomah_shubuh' => 'required|numeric|min:1',
         'final_shubuh' => 'required|numeric|min:1',
         'adzan_dzuhur' => 'required|numeric|min:1',
@@ -75,12 +77,15 @@ class Durasi extends Component
     protected $messages = [
         'userId.required' => 'Admin Masjid wajib diisi',
         'userId.exists' => 'Admin Masjid tidak ditemukan',
+        'adzan_imsak.required' => 'Durasi Imsak wajib diisi',
+        'adzan_imsak.numeric' => 'Durasi Imsak harus berupa angka',
+        'adzan_imsak.min' => 'Durasi Imsak minimal 2 menit',
         'adzan_shuruq.required' => 'Durasi Shuruq wajib diisi',
         'adzan_shuruq.numeric' => 'Durasi Shuruq harus berupa angka',
-        'adzan_shuruq.min' => 'Durasi Shuruq minimal 1 menit',
+        'adzan_shuruq.min' => 'Durasi Shuruq minimal 2 menit',
         'adzan_dhuha.required' => 'Durasi Dhuha wajib diisi',
         'adzan_dhuha.numeric' => 'Durasi Dhuha harus berupa angka',
-        'adzan_dhuha.min' => 'Durasi Dhuha minimal 1 menit',
+        'adzan_dhuha.min' => 'Durasi Dhuha minimal 2 menit',
         'adzan_shubuh.required' => 'Durasi adzan Shubuh wajib diisi',
         'adzan_shubuh.numeric' => 'Durasi adzan Shubuh harus berupa angka',
         'adzan_shubuh.min' => 'Durasi adzan Shubuh minimal 1 menit',
@@ -148,6 +153,7 @@ class Durasi extends Component
             if ($durasi) {
                 // Jika durasi sudah ada, muat data
                 $this->durasiId = $durasi->id;
+                $this->adzan_imsak = $durasi->adzan_imsak;
                 $this->adzan_shuruq = $durasi->adzan_shuruq;
                 $this->adzan_dhuha = $durasi->adzan_dhuha;
                 $this->adzan_shubuh = $durasi->adzan_shubuh;
@@ -184,6 +190,7 @@ class Durasi extends Component
         $this->reset([
             'durasiId',
             'userId',
+            'adzan_imsak',
             'adzan_shuruq',
             'adzan_dhuha',
             'adzan_shubuh',
@@ -218,6 +225,7 @@ class Durasi extends Component
             ->select(
                 'id',
                 'user_id',
+                'adzan_imsak',
                 'adzan_shuruq',
                 'adzan_dhuha',
                 'adzan_shubuh',
@@ -290,6 +298,7 @@ class Durasi extends Component
         $this->reset([
             'durasiId',
             'userId',
+            'adzan_imsak',
             'adzan_shubuh',
             'iqomah_shubuh',
             'final_shubuh',
@@ -328,6 +337,7 @@ class Durasi extends Component
 
         $this->durasiId = $durasi->id;
         $this->userId = $durasi->user_id;
+        $this->adzan_imsak = $durasi->adzan_imsak;
         $this->adzan_shuruq = $durasi->adzan_shuruq;
         $this->adzan_dhuha = $durasi->adzan_dhuha;
         $this->adzan_shubuh = $durasi->adzan_shubuh;
@@ -361,6 +371,7 @@ class Durasi extends Component
         $this->reset([
             'durasiId',
             'userId',
+            'adzan_imsak',
             'adzan_shuruq',
             'adzan_dhuha',
             'adzan_shubuh',
@@ -431,6 +442,7 @@ class Durasi extends Component
             }
 
             $durasi->user_id = $this->userId;
+            $durasi->adzan_imsak = $this->adzan_imsak;
             $durasi->adzan_shuruq = $this->adzan_shuruq;
             $durasi->adzan_dhuha = $this->adzan_dhuha;
             $durasi->adzan_shubuh = $this->adzan_shubuh;
@@ -465,6 +477,7 @@ class Durasi extends Component
                 $this->reset([
                     'durasiId',
                     'userId',
+                    'adzan_imsak',
                     'adzan_shuruq',
                     'adzan_dhuha',
                     'adzan_shubuh',
@@ -490,6 +503,7 @@ class Durasi extends Component
                 $durasi = ModelsDurasi::where('user_id', Auth::id())->first();
                 if ($durasi) {
                     $this->durasiId             = $durasi->id;
+                    $this->adzan_imsak         = $durasi->adzan_imsak;
                     $this->adzan_shuruq         = $durasi->adzan_shuruq;
                     $this->adzan_dhuha          = $durasi->adzan_dhuha;
                     $this->adzan_shubuh         = $durasi->adzan_shubuh;

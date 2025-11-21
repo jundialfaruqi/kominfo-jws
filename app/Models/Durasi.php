@@ -13,6 +13,7 @@ class Durasi extends Model
 
     protected $fillable = [
         'user_id',
+        'adzan_imsak',
         'adzan_shuruq',
         'adzan_dhuha',
         'adzan_shubuh',

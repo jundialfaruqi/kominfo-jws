@@ -4,6 +4,7 @@
             <tr>
                 <th class="w-1">No</th>
                 <th>Nama Admin Masjid</th>
+                <th class="text-center">Imsak</th>
                 <th class="text-center">Shubuh (A/I/F)</th>
                 <th class="text-center">Syuruq</th>
                 <th class="text-center">Dhuha</th>
@@ -22,6 +23,7 @@
                         {{ $loop->iteration + ($durasiList->currentPage() - 1) * $durasiList->perPage() }}
                     </td>
                     <td class="text-wrap">{{ $durasi->user->name }}</td>
+                    <td class="text-center">{{ $durasi->adzan_imsak }}</td>
                     <td class="text-center">
                         {{ $durasi->adzan_shubuh }}/{{ $durasi->iqomah_shubuh }}/{{ $durasi->final_shubuh }}
                     </td>

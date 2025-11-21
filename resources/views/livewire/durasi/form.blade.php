@@ -101,6 +101,31 @@
                 {{-- Durasi Shubuh --}}
                 <div class="row g-2 mb-3">
                     <div class="col-md-2">
+                        <label class="form-label required">Imsak</label>
+                    </div>
+                    <div class="col-md-10">
+                        <div class="row g-2">
+                            <div class="col-md-12">
+                                <label class="form-label">Menit</label>
+                                <select class="form-select rounded-3 @error('adzan_imsak') is-invalid @enderror"
+                                    wire:model="adzan_imsak">
+                                    <option value="">Pilih durasi imsak</option>
+                                    @for ($i = 2; $i <= 9; $i++)
+                                        <option value="{{ $i }}">
+                                            {{ $i }} menit</option>
+                                    @endfor
+                                </select>
+                                @error('adzan_imsak')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Durasi Shubuh --}}
+                <div class="row g-2 mb-3">
+                    <div class="col-md-2">
                         <label class="form-label required">Shubuh</label>
                     </div>
                     <div class="col-md-10">
