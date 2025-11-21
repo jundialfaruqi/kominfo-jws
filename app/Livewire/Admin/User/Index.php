@@ -13,7 +13,7 @@ class Index extends Component
 {
     use WithPagination;
 
-    #[Title('Data User')]
+    #[Title('User')]
     protected $paginationTheme = 'bootstrap';
     public $paginate = '20';
     public $search = '';

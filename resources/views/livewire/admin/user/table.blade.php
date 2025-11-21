@@ -215,7 +215,7 @@
 
                         @if ($canEdit)
                             <button wire:click="edit('{{ $users->id }}')"
-                                class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
+                                class="btn py-2 px-2 rounded-4 shadow-sm" data-bs-toggle="modal"
                                 data-bs-target="#editModal">
                                 <span wire:loading.remove wire:target="edit('{{ $users->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -240,7 +240,7 @@
 
                         @if ($canDelete)
                             <button wire:click="delete('{{ $users->id }}')"
-                                class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
+                                class="btn py-2 px-2 rounded-4 shadow-sm" data-bs-toggle="modal"
                                 data-bs-target="#deleteModal">
                                 <span wire:loading.remove wire:target="delete('{{ $users->id }}')">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

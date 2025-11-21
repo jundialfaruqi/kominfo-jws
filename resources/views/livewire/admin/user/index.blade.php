@@ -2,20 +2,62 @@
     <div class="page-body">
         <div class="container-xl">
 
-            <h3>Statistik User</h3>
+            <div class="card mb-3 rounded-4 border-0 overflow-hidden">
+                <div class="card-body"
+                    style="background: linear-gradient(90deg, #0ea5a3 0%, #1f7ae0 60%, #3b82f6 100%); color: #fff;">
+                    <div class="row align-items-center">
+                        <div class="col-12 col-md-7 mb-3 mb-md-0">
+                            <h1 class="mb-1">Data User</h1>
+                            <div class="text-white" style="opacity:.9;">Real-time monitoring data pengguna dan status
+                                persetujuan</div>
+                        </div>
+                        <div class="col-12 col-md-5">
+                            <div class="d-flex flex-wrap justify-content-md-end">
+                                <div class="text-center"
+                                    style="border-right: 1px solid rgba(255, 255, 255, 0.498); padding-right: 1rem; margin-right: 1rem;">
+                                    <div class="text-white fw-bold lh-1" style="font-size: 2rem;">
+                                        {{ $totalUsers }}
+                                    </div>
+                                    <div class="text-white small" style="opacity:.85;">
+                                        Total User
+                                    </div>
+                                </div>
+                                <div class="text-center"
+                                    style="border-right: 1px solid rgba(255, 255, 255, 0.498); padding-right: 1rem; margin-right: 1rem;">
+                                    <div class="text-white fw-bold lh-1" style="font-size: 2rem;">
+                                        {{ $activeUsers }}
+                                    </div>
+                                    <div class="text-white small" style="opacity:.85;" style="font-size: 2rem;">
+                                        Disetujui
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-white fw-bold lh-1" style="font-size: 2rem;">
+                                        {{ $inactiveUsers }}
+                                    </div>
+                                    <div class="text-white small" style="opacity:.85;">
+                                        Belum Disetujui
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             @include('livewire.admin.user.statistic')
 
             <div class="row row-deck row-cards">
                 <div class="col-12">
-                    <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
+                    <div class="card rounded-4 shadow-sm border-0">
+                        <div class="card-header bg-dark text-white rounded-top-4">
                             <h3 class="card-title d-none d-md-block">
                                 Daftar User
                             </h3>
                             <div class="card-actions">
                                 @if (auth()->user()->role === 'Super Admin' || auth()->user()->role === 'Admin')
                                     <button wire:loading.attr="disabled" wire:click="add" type="button"
-                                        class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
+                                        class="btn btn-primary py-2 rounded-4 shadow-sm" data-bs-toggle="modal"
                                         data-bs-target="#createModal">
                                         <span wire:loading.remove wire:target="add">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -44,8 +86,7 @@
                                 <div class="text-secondary d-flex align-items-center gap-2 flex-grow-1">
                                     Lihat
                                     <div class="mx-2 d-inline-block">
-                                        <select wire:model.live="paginate"
-                                            class="form-select form-select py-1 rounded-3">
+                                        <select wire:model.live="paginate" class="form-select form-select rounded-4">
                                             <option>5</option>
                                             <option>10</option>
                                             <option>25</option>
@@ -55,7 +96,7 @@
                                     </div>
                                     <div class="d-flex align-items-center flex-wrap">
                                         <a href="{{ route('admin.user.pdf', ['role' => 'Admin Masjid']) }}"
-                                            class="btn py-1 btn-primary rounded-3">
+                                            class="btn btn-warning rounded-4">
                                             <span class="d-inline-flex align-items-center gap-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -74,7 +115,23 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="text-secondary d-flex align-items-center ms-md-auto">
+                                <div class="input-group align-items-center rounded-4 w-auto">
+                                    <span class="input-group-text rounded-start-4 gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                            <path d="M21 21l-6 -6" />
+                                        </svg>
+                                        Cari
+                                    </span>
+                                    <input wire:model.live="search" type="text" class="form-control rounded-end-4"
+                                        placeholder="Ketik disini" autocomplete="off" />
+                                </div>
+
+                                {{-- <div class="text-secondary d-flex align-items-center ms-md-auto">
                                     <span>Cari</span>
                                     <div class="ms-2 d-inline-block">
                                         <input wire:model.live="search" type="search" name="q" id="q"
@@ -82,7 +139,7 @@
                                             class="form-control form-control py-1 rounded-3 w-auto" autocomplete="off"
                                             placeholder="Ketik disini">
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
 
