@@ -137,9 +137,7 @@ class ProfilController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data marquee masjid !',
-                'data' => [
-                    $data
-                ],
+                'data' => $data,
                 'speed' => (float) ($marquee->marquee_speed ?? 1.0)
             ]);
         } catch (ModelNotFoundException $ex) {
