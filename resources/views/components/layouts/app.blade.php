@@ -17,9 +17,11 @@
         {{-- Sidebar --}}
         @include('components.layouts.sidebar')
         {{-- Navbar --}}
-        @include('components.layouts.navbar')
+        {{-- @include('components.layouts.navbar') --}}
         {{-- Page wrapper --}}
         <div class="page-wrapper">
+            {{-- Navbar --}}
+            @include('components.layouts.navbar')
             {{-- Page header --}}
             @include('components.layouts.header')
             {{-- Page body --}}

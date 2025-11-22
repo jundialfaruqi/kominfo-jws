@@ -22,9 +22,8 @@
                     $now = \Carbon\Carbon::now('Asia/Jakarta');
                 @endphp
                 <div class="d-flex align-items-center">
-                    <div class="pe-3" style="border-right: 1px dotted rgba(17,24,39,.15);">
-                        <span class="fw-bold"
-                            style="font-size: 1.25rem; color:#111827;">{{ $now->translatedFormat('H:i') }}</span>
+                    <div class="pe-3" style="border-right: 1px dotted gray;">
+                        <span class="fw-bold" style="font-size: 1.25rem;">{{ $now->translatedFormat('H:i') }}</span>
                     </div>
                     <div class="ps-3">
                         <span class="small" style="color:#6b7280;">{{ $now->translatedFormat('l, j M Y') }}</span>

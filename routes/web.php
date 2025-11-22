@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Auth\Login;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Admin\User\Index as UserIndex;
+use App\Livewire\Agenda\AgendaAll;
 use App\Livewire\Inactive\Inactive;
 use App\Livewire\Petugas\Petugas;
 use App\Livewire\Profil\ProfilMasjid;
@@ -134,6 +135,11 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     Route::get('/data-jumbotron-semua-masjid', \App\Livewire\JumbotronMasjid\AdminJumbotronMasjid::class)
         ->name('data-jumbotron-semua-masjid.index')
         ->middleware('can:view-data-jumbotron-semua-masjid');
+
+    // Route Agenda All untuk Super Admin
+    // Route::get('/agenda', AgendaAll::class)
+    //     ->name('agenda-all.index')
+    //     ->middleware('can:view-agenda-all');
 
     // Balance API Docs
     Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)
