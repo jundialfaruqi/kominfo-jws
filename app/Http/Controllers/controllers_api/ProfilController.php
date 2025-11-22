@@ -138,9 +138,9 @@ class ProfilController extends Controller
                 'success' => true,
                 'message' => 'Berhasil get data marquee masjid !',
                 'data' => [
-                    'items' => $data,
-                    'speed' => (float) ($marquee->marquee_speed ?? 1.0)
-                ]
+                    $data
+                ],
+                'speed' => (float) ($marquee->marquee_speed ?? 1.0)
             ]);
         } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil / Marquee tidak ditemukan !'], 404);
@@ -681,8 +681,12 @@ class ProfilController extends Controller
             }
             $page = max(1, (int) $request->query('page', 1));
             $perPage = (int) $request->query('per_page', 50);
-            if ($perPage < 1) { $perPage = 50; }
-            if ($perPage > 500) { $perPage = 500; }
+            if ($perPage < 1) {
+                $perPage = 50;
+            }
+            if ($perPage > 500) {
+                $perPage = 500;
+            }
 
             // Dukungan filter untuk menyembunyikan kategori kosong
             $hideEmptyParam = $request->query('hide_empty', null);
@@ -696,8 +700,12 @@ class ProfilController extends Controller
             $recentLimit = null;
             if ($hasRecentLimit) {
                 $recentLimit = (int) $request->query('recent_limit');
-                if ($recentLimit < 1) { $recentLimit = 3; }
-                if ($recentLimit > 50) { $recentLimit = 50; }
+                if ($recentLimit < 1) {
+                    $recentLimit = 3;
+                }
+                if ($recentLimit > 50) {
+                    $recentLimit = 50;
+                }
             }
 
             // Periode 7 hari terakhir (timezone Asia/Jakarta)
@@ -725,7 +733,7 @@ class ProfilController extends Controller
                     ->whereBetween('laporans.tanggal', [$start7, $end7])
                     ->selectRaw(
                         'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_masuk, ' .
-                        'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
+                            'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_keluar'
                     )
                     ->first();
                 $sumMasuk = (int) ($agg->sum_masuk ?? 0);
@@ -759,7 +767,7 @@ class ProfilController extends Controller
                         ->where('laporans.tanggal', '<', $start7)
                         ->selectRaw(
                             'COALESCE(SUM(CASE WHEN is_opening = 1 OR jenis = "masuk" THEN saldo ELSE 0 END), 0) AS sum_prev_masuk, ' .
-                            'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_prev_keluar'
+                                'COALESCE(SUM(CASE WHEN jenis = "keluar" THEN saldo ELSE 0 END), 0) AS sum_prev_keluar'
                         )
                         ->first();
                     $prevMasuk = (int) ($prevAgg->sum_prev_masuk ?? 0);
@@ -771,12 +779,16 @@ class ProfilController extends Controller
                     $items = [];
                     $startNo = ($request->has('page') || $request->has('per_page')) && !$hasRecentLimit ? (($page - 1) * $perPage) : 0;
                     foreach ($itemRows as $i => $lap) {
-                        $masuk = 0; $keluar = 0;
+                        $masuk = 0;
+                        $keluar = 0;
                         if ($lap->is_opening) {
                             $masuk = (int) $lap->saldo;
                         } else {
-                            if ($lap->jenis === 'masuk') { $masuk = (int) $lap->saldo; }
-                            elseif ($lap->jenis === 'keluar') { $keluar = (int) $lap->saldo; }
+                            if ($lap->jenis === 'masuk') {
+                                $masuk = (int) $lap->saldo;
+                            } elseif ($lap->jenis === 'keluar') {
+                                $keluar = (int) $lap->saldo;
+                            }
                         }
                         $items[] = [
                             'id' => (int) $lap->id,
@@ -873,7 +885,7 @@ class ProfilController extends Controller
             }
 
             $data = [
-                'profil' => [ 'id' => $profil->id, 'name' => $profil->name ],
+                'profil' => ['id' => $profil->id, 'name' => $profil->name],
                 'categories' => $categories,
                 'grandTotals' => $grandTotals,
             ];
