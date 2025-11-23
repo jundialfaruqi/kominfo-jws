@@ -4,6 +4,11 @@ namespace App\Livewire\Profil;
 
 use App\Events\ContentUpdatedEvent;
 use App\Models\Profil;
+use App\Models\Slides;
+use App\Models\Marquee;
+use App\Models\Petugas;
+use App\Models\Laporan;
+use Carbon\Carbon;
 use App\Models\User;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -159,6 +164,66 @@ class ProfilMasjid extends Component
         $profilList = $query->orderBy('name', 'asc')
             ->paginate($this->paginate);
 
+        // Profil metrics (moved from Blade): total, active (slug not null), new this week
+        $now = Carbon::now('Asia/Jakarta');
+        $startWeek = $now->copy()->startOfWeek();
+        $endWeek = $now->copy()->endOfWeek();
+
+        $totalMasjid = Profil::count();
+        $jwsAktif = Profil::whereNotNull('slug')->count();
+        $baruMingguIni = Profil::whereBetween('created_at', [$startWeek, $endWeek])->count();
+
+        // Aggregated content readiness metrics
+        $profilesAll = Profil::select('id', 'user_id', 'name', 'slug', 'address', 'phone', 'logo_masjid', 'logo_pemerintah')->get();
+        $readyMasjid = 0;
+        $needsMasjid = 0;
+        $profileCompletenessSum = 0.0;
+
+        foreach ($profilesAll as $p) {
+            // Slides & Marquee are per-user
+            $slides = Slides::where('user_id', $p->user_id)->first();
+            $marquee = Marquee::where('user_id', $p->user_id)->first();
+
+            $slidesFilled = $slides
+                ? collect([$slides->slide1, $slides->slide2, $slides->slide3, $slides->slide4, $slides->slide5, $slides->slide6])
+                ->filter(fn($v) => !empty($v))
+                ->count()
+                : 0;
+            $marqueeFilled = $marquee
+                ? collect([$marquee->marquee1, $marquee->marquee2, $marquee->marquee3, $marquee->marquee4, $marquee->marquee5, $marquee->marquee6])
+                ->filter(fn($v) => !empty($v))
+                ->count()
+                : 0;
+
+            // Hanya gunakan Slides & Marquee
+            $moduleCompletenessRatio = ((($slidesFilled / 6) + ($marqueeFilled / 6)) / 2);
+
+            if ($slidesFilled === 6 && $marqueeFilled === 6) {
+                $readyMasjid++;
+            }
+            if ($moduleCompletenessRatio < 0.5) {
+                $needsMasjid++;
+            }
+
+            $profileFields = [$p->name, $p->address, $p->phone, $p->logo_masjid, $p->logo_pemerintah];
+            $profileCompleteness = count($profileFields) > 0
+                ? (collect($profileFields)->filter(fn($v) => !empty($v))->count() / count($profileFields))
+                : 0;
+            $profileCompletenessSum += $profileCompleteness;
+        }
+
+        $kontenSiapTayangPercent = $totalMasjid > 0 ? (int) round(($readyMasjid / $totalMasjid) * 100) : 0;
+        $kelengkapanProfilRata = $totalMasjid > 0 ? (int) round(($profileCompletenessSum / $totalMasjid) * 100) : 0;
+        $masjidPerluDilengkapi = $needsMasjid;
+
+        // Changes in the last 24 hours across modules
+        $since = Carbon::now('Asia/Jakarta')->subDay();
+        $perubahan24JamTerakhir =
+            Slides::where('updated_at', '>=', $since)->count()
+            + Marquee::where('updated_at', '>=', $since)->count()
+            + Petugas::where('updated_at', '>=', $since)->count()
+            + Laporan::where('updated_at', '>=', $since)->count();
+
         // Only admin can see list of users for assignment
         $users = collect([]);
         if ($isAdmin) {
@@ -176,7 +241,15 @@ class ProfilMasjid extends Component
 
         return view('livewire.profil.profil-masjid', [
             'profilList' => $profilList,
-            'users' => $users
+            'users' => $users,
+            'totalMasjid' => $totalMasjid,
+            'jwsAktif' => $jwsAktif,
+            'baruMingguIni' => $baruMingguIni,
+            // Aggregated metrics for cards
+            'kontenSiapTayangPercent' => $kontenSiapTayangPercent,
+            'kelengkapanProfilRata' => $kelengkapanProfilRata,
+            'masjidPerluDilengkapi' => $masjidPerluDilengkapi,
+            'perubahan24JamTerakhir' => $perubahan24JamTerakhir,
         ]);
     }
 
@@ -568,7 +641,7 @@ class ProfilMasjid extends Component
 
             $profil->save();
 
-            // Trigger event 
+            // Trigger event
             if ($this->isEdit) {
                 event(new ContentUpdatedEvent($profil->slug, 'profil'));
             }

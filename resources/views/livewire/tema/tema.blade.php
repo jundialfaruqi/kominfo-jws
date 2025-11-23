@@ -3,8 +3,8 @@
         <div class="container-xl">
             <div class="row row-deck row-cards">
                 <div class="col-12">
-                    <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
+                    <div class="card rounded-4 shadow-sm border-0">
+                        <div class="card-header rounded-top-4 bg-dark text-white">
                             <h3 class="card-title d-none d-md-block">
                                 @if ($isAdmin && $showForm)
                                     {{ $isEdit ? 'Ubah Pengaturan Tema' : 'Tambah Tema Baru' }}
@@ -14,7 +14,7 @@
                             </h3>
                             @if ($isAdmin && !$showForm)
                                 <div class="card-actions">
-                                    <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm"
+                                    <button wire:click="showAddForm" class="btn btn-primary py-2 rounded-4 shadow-sm"
                                         @if (Auth::user()->role !== 'Super Admin') style="display: none;" @endif>
                                         <span wire:loading.remove wire:target="showAddForm">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

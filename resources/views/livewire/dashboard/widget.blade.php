@@ -1,7 +1,7 @@
 <div class="row row-deck row-cards">
     {{-- Welcome Card --}}
     <div class="col-sm-12 col-lg-6">
-        <div class="card rounded-4 position-relative overflow-hidden border-0"
+        <div class="card rounded-4 position-relative overflow-hidden border-0 shadow-sm"
             style="background-image: url('{{ asset('theme/static/illustrations/ilustrasi-welcome-dashboard.webp') }}'); background-size: cover; background-position: center; background-repeat: no-repeat;">
             <div style="position:absolute; inset:0; background:rgba(0, 0, 0, 0.56);"></div>
             <div class="card-body">
@@ -278,7 +278,7 @@
 
     {{-- CALENDAR --}}
     <div class="col-sm-12 col-lg-3">
-        <div class="card rounded-4">
+        <div class="card rounded-4 border-0 shadow-sm">
             <div class="card-body pt-3">
                 <small
                     class="d-block text-center mb-2">{{ \Carbon\Carbon::create($currentYear, $currentMonth, 1)->translatedFormat('F Y') }}
@@ -317,7 +317,7 @@
 
     {{-- Jadwal Sholat --}}
     <div class="col-sm-12 col-lg-3">
-        <div class="card card-sm rounded-4">
+        <div class="card card-sm rounded-4 border-0 shadow-sm">
             <div class="card-body px-4">
                 <small class="d-block text-center">Jadwal Sholat Pekanbaru</small>
                 <small

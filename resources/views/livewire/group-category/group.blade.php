@@ -3,14 +3,15 @@
         <div class="container-xl">
             <div class="row row-deck row-cards">
                 <div class="col-12">
-                    <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
+                    <div class="card rounded-4 shadow-sm border-0">
+                        <div class="card-header rounded-top-4 bg-dark text-white">
                             <h3 class="card-title d-none d-md-block">
                                 {{ Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) ? 'Daftar Group Category' : 'Group Category Saya' }}
                             </h3>
                             @can('create-group-category')
                                 <div class="card-actions">
-                                    <a href="{{ route('group-category.create') }}" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    <a href="{{ route('group-category.create') }}"
+                                        class="btn btn-primary py-2 rounded-4 shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
@@ -21,7 +22,7 @@
                                             <path d="M16 19h6" />
                                             <path d="M19 16v6" />
                                         </svg>
-                                        Tambah Group Category
+                                        Buat Group Category Baru
                                     </a>
                                 </div>
                             @endcan
@@ -85,29 +86,31 @@
                                             <td class="text-center">
                                                 @can('edit-group-category')
                                                     <a wire:navigate href="{{ route('group-category.edit', $group->id) }}"
-                                                        class="btn py-2 px-2 rounded-3 shadow-sm" title="Edit">
+                                                        class="btn py-2 px-2 rounded-4 shadow-sm" title="Edit">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                             height="24" viewBox="0 0 24 24" fill="none"
                                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                                             stroke-linejoin="round"
-                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-pencil">
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-edit me-1">
                                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                             <path
-                                                                d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                                                            <path d="M13.5 6.5l4 4" />
+                                                                d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                                            <path
+                                                                d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                                            <path d="M16 5l3 3" />
                                                         </svg>
-                                                        Edit
+                                                        Ubah
                                                     </a>
                                                 @endcan
                                                 @can('delete-group-category')
                                                     <button wire:click="delete('{{ $group->id }}')"
-                                                        class="btn py-2 px-2 rounded-3 shadow-sm ms-2" title="Hapus"
+                                                        class="btn py-2 px-2 rounded-4 shadow-sm ms-2" title="Hapus"
                                                         data-bs-toggle="modal" data-bs-target="#deleteModal">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="24"
                                                             height="24" viewBox="0 0 24 24" fill="none"
                                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                                             stroke-linejoin="round"
-                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash me-1">
                                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                             <path d="M4 7h16" />
                                                             <path d="M10 11v6" />

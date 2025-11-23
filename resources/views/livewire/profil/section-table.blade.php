@@ -6,7 +6,7 @@
                 <div class="text-secondary">
                     Lihat
                     <div class="mx-2 d-inline-block">
-                        <select wire:model.live="paginate" class="form-select form-select py-1 rounded-3">
+                        <select wire:model.live="paginate" class="form-select form-select rounded-4">
                             <option>5</option>
                             <option>10</option>
                             <option>25</option>
@@ -15,12 +15,19 @@
                         </select>
                     </div>
                 </div>
-                <div class="ms-auto text-secondary">
-                    <span>Cari</span>
-                    <div class="ms-2 d-inline-block">
-                        <input wire:model.live="search" type="text" class="form-control form-control py-1 rounded-3"
-                            placeholder="Ketik disini">
-                    </div>
+                <div class="input-group align-items-center rounded-4 w-auto ms-auto">
+                    <span class="input-group-text rounded-start-4 gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                            <path d="M21 21l-6 -6" />
+                        </svg>
+                        Cari
+                    </span>
+                    <input wire:model.live="search" type="text" class="form-control rounded-end-4"
+                        placeholder="Ketik disini" autocomplete="off" />
                 </div>
             </div>
         </div>
@@ -34,7 +41,6 @@
                         <th>Alamat</th>
                         <th>No Hp</th>
                         <th>Logo</th>
-                        <th class="text-center">Lihat JWS</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -44,18 +50,42 @@
                             <td class="text-center text-muted">
                                 {{ $loop->iteration + ($profilList->currentPage() - 1) * $profilList->perPage() }}</td>
                             <td class="text-wrap">
-                                <div>{{ $profil->name }}</div>
-                                <div class="text-muted">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path
-                                            d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
-                                        <path d="M3 7l9 6l9 -6" />
-                                    </svg>
-                                    {{ $profil->user->email ?? '-' }}
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="flex-shrink-0">
+                                        @if ($profil->slug)
+                                            <a href="{{ route('firdaus', $profil->slug) }}"
+                                                class="btn btn-icon bg-blue-lt text-blue-lt-fg rounded-circle border-0 shadow-sm"
+                                                target="_blank">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-external-link">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path
+                                                        d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+                                                    <path d="M11 13l9 -9" />
+                                                    <path d="M15 4h5v5" />
+                                                </svg>
+                                            </a>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div>{{ $profil->name }}</div>
+                                        <div class="text-muted">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-mail">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path
+                                                    d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+                                                <path d="M3 7l9 6l9 -6" />
+                                            </svg>
+                                            {{ $profil->user->email ?? '-' }}
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                             <td class="text-wrap">{{ $profil->address }}</td>
@@ -67,33 +97,14 @@
                                     <span class="text-gray-400">-</span>
                                 @endif
                             </td>
-                            <td class="text-center">
-                                @if ($profil->slug)
-                                    <a href="{{ route('firdaus', $profil->slug) }}"
-                                        class="btn btn-icon bg-blue-lt text-blue-lt-fg rounded-3 border-0 shadow-sm"
-                                        target="_blank">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-external-link">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
-                                            <path d="M11 13l9 -9" />
-                                            <path d="M15 4h5v5" />
-                                        </svg>
-                                    </a>
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
                             <td class="text-end">
                                 <button wire:click="edit('{{ $profil->id }}')"
-                                    class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    class="btn py-2 px-2 rounded-4 shadow-sm">
                                     <span wire:loading.remove wire:target="edit('{{ $profil->id }}')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-edit me-0">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                             <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
                                             <path
@@ -109,13 +120,13 @@
                                     </span>
                                 </button>
                                 <button wire:click="delete('{{ $profil->id }}')"
-                                    class="btn py-2 px-2 rounded-3 shadow-sm " data-bs-toggle="modal"
+                                    class="btn py-2 px-2 rounded-4 shadow-sm " data-bs-toggle="modal"
                                     data-bs-target="#deleteModal">
                                     <span wire:loading.remove wire:target="delete('{{ $profil->id }}')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash me-0">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                             <path d="M4 7l16 0" />
                                             <path d="M10 11l0 6" />

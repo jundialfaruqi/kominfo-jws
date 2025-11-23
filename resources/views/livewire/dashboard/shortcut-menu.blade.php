@@ -1,6 +1,6 @@
 <div class="row row-deck row-cards">
     <div class="col-sm-12 col-lg-3">
-        <div class="card card-sm rounded-4">
+        <div class="card card-sm rounded-4 border-0 shadow-sm">
             <a wire:navigate href="{{ route('slide.index') }}" class="card-body">
                 <div class="row align-items-center">
                     <div class="col-auto">
@@ -31,7 +31,7 @@
     </div>
 
     <div class="col-sm-12 col-lg-3">
-        <div class="card card-sm rounded-4">
+        <div class="card card-sm rounded-4 border-0 shadow-sm">
             <a wire:navigate href="{{ route('petugas.index') }}" class="card-body">
                 <div class="row align-items-center">
                     <div class="col-auto">
@@ -60,7 +60,7 @@
     </div>
 
     <div class="col-sm-12 col-lg-3">
-        <div class="card card-sm rounded-4">
+        <div class="card card-sm rounded-4 border-0 shadow-sm">
             <a wire:navigate href="{{ route('marquee.index') }}" class="card-body">
                 <div class="row align-items-center">
                     <div class="col-auto">
@@ -86,7 +86,7 @@
     </div>
 
     <div class="col-sm-12 col-lg-3">
-        <div class="card card-sm rounded-4">
+        <div class="card card-sm rounded-4 border-0 shadow-sm">
             <a wire:navigate href="{{ route('tema.index') }}" class="card-body">
                 <div class="row align-items-center">
                     <div class="col-auto">
