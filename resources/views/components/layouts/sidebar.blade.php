@@ -622,7 +622,7 @@
                                     </svg>
                                 </span>
                                 <span class="nav-link-title text-white">
-                                    Lihat Jadwal Sholat
+                                    Lihat JWS Saya
                                 </span>
                             </a>
                         </li>
