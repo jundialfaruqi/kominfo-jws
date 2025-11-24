@@ -29,7 +29,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4 mb-lg-0">
-                    <h1 class="lh-1 mb-4">
+                    <h1 class="lh-1 mb-4 fw-bold">
                         Jadwal Waktu Sholat Pemerintah Kota Pekanbaru
                     </h1>
                     <p class="mb-4">Aplikasi resmi untuk masjid-masjid paripurna di Kota Pekanbaru yang
@@ -201,30 +201,86 @@
                     <h2 class="mb-3 text-gov-dark">
                         Aplikasi Jadwal Waktu Sholat Pemerintah Kota Pekanbaru
                     </h2>
-                    <li class="d-flex align-items-center mb-2"><i class="fa-solid fa-mosque text-primary me-2">
-                        </i>
+                    <li class="d-flex align-items-center mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque text-primary me-2">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
+                            <path d="M4 21v-10" />
+                            <path d="M20 21v-10" />
+                            <path d="M4 16h3v-3h10v3h3" />
+                            <path d="M17 13a5 5 0 0 0 -10 0" />
+                            <path
+                                d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
+                        </svg>
                         <span>
                             Jadwal sholat harian Pekanbaru
                         </span>
                     </li>
                     <li class="d-flex align-items-center mb-2">
-                        <i class="fa-regular fa-bell text-primary me-2"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-bell text-primary me-2">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path
+                                d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                        </svg>
                         <span>
                             Pengingat adzan dan iqomah
                         </span>
                     </li>
-                    <li class="d-flex align-items-center mb-2"><i
-                            class="fa-solid fa-calendar-days text-primary me-2"></i><span>Kalender
-                            hijriah</span>
+                    <li class="d-flex align-items-center mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-month text-primary me-2">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
+                            <path d="M16 3v4" />
+                            <path d="M8 3v4" />
+                            <path d="M4 11h16" />
+                            <path d="M8 14v4" />
+                            <path d="M12 14v4" />
+                            <path d="M16 14v4" />
+                        </svg>
+                        <span>Kalender hijriah</span>
                     </li>
-                    <li class="d-flex align-items-center"><i
-                            class="fa-solid fa-bullhorn text-primary me-2"></i><span>Pesan resmi
+                    <li class="d-flex align-items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-microphone text-primary me-2">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
+                            <path d="M5 10a7 7 0 0 0 14 0" />
+                            <path d="M8 21l8 0" />
+                            <path d="M12 17l0 4" />
+                        </svg>
+                        <span>Pesan resmi
                             Pemerintah
-                            Kota</span></li>
+                            Kota</span>
+                    </li>
                     </ul>
-                    <a class="btn btn-gov-blue rounded-4 my-4"
-                        href="https://jadwalsholat.pekanbaru.go.id/firdaus">Buka
-                        Jadwal Sholat</a>
+                    <a class="btn btn-gov-blue rounded-4 my-4" href="https://jadwalsholat.pekanbaru.go.id/demo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="icon icon-tabler icons-tabler-outline icon-tabler-hand-move">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5" />
+                            <path d="M11 11.5v-2a1.5 1.5 0 0 1 3 0v2.5" />
+                            <path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5" />
+                            <path
+                                d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" />
+                            <path d="M2.541 5.594a13.487 13.487 0 0 1 2.46 -1.427" />
+                            <path d="M14 3.458c1.32 .354 2.558 .902 3.685 1.612" />
+                        </svg>
+                        Lihat Demo
+                    </a>
                 </div>
             </div>
         </div>
