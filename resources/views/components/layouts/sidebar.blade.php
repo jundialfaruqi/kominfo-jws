@@ -535,9 +535,9 @@
                                 </span>
                             </a>
                         </li>
-                        {{-- <li
-                            class="nav-item mx-2 {{ request()->routeIs('petugas.index') ? 'bg-azure rounded-4' : '' }}">
-                            <a wire:navigate class="nav-link" href="{{ route('petugas.index') }}">
+                        <li
+                            class="nav-item mx-2 {{ request()->routeIs('agenda-all.*') ? 'bg-azure rounded-4' : '' }}">
+                            <a wire:navigate class="nav-link" href="{{ route('agenda-all.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -553,10 +553,10 @@
                                     </svg>
                                 </span>
                                 <span class="nav-link-title text-white">
-                                    Data Agenda Masjid
+                                    Semua Agenda
                                 </span>
                             </a>
-                        </li> --}}
+                        </li>
                         <li
                             class="nav-item mx-2 {{ request()->routeIs('marquee.index') ? 'bg-azure rounded-4' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('marquee.index') }}">

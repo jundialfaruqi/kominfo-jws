@@ -5,6 +5,8 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Admin\User\Index as UserIndex;
 use App\Livewire\Agenda\AgendaAll;
+use App\Livewire\Agenda\AgendaAllCreate;
+use App\Livewire\Agenda\AgendaAllEdit;
 use App\Livewire\Inactive\Inactive;
 use App\Livewire\Petugas\Petugas;
 use App\Livewire\Profil\ProfilMasjid;
@@ -137,9 +139,19 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
         ->middleware('can:view-data-jumbotron-semua-masjid');
 
     // Route Agenda All untuk Super Admin
-    // Route::get('/agenda', AgendaAll::class)
-    //     ->name('agenda-all.index')
-    //     ->middleware('can:view-agenda-all');
+    Route::get('/semua-agenda', AgendaAll::class)
+        ->name('agenda-all.index')
+        ->middleware('can:view-agenda-all');
+
+    // Route Agenda All untuk create oleh Super Admin
+    Route::get('/semua-agenda/buat-agenda-baru', AgendaAllCreate::class)
+        ->name('agenda-all.create')
+        ->middleware('can:create-agenda-all');
+
+    // Route Agenda All untuk edit oleh Super Admin
+    Route::get('/semua-agenda/{id}/edit', AgendaAllEdit::class)
+        ->name('agenda-all.edit')
+        ->middleware('can:edit-agenda-all');
 
     // Balance API Docs
     Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)

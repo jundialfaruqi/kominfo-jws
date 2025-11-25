@@ -93,4 +93,9 @@ class User extends Authenticatable
             $this->timestamps = true;
         }
     }
+
+    public function agenda()
+    {
+        return $this->hasMany(Agenda::class, 'id_user');
+    }
 }
