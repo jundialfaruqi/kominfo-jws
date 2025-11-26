@@ -7,6 +7,9 @@ use App\Livewire\Admin\User\Index as UserIndex;
 use App\Livewire\Agenda\AgendaAll;
 use App\Livewire\Agenda\AgendaAllCreate;
 use App\Livewire\Agenda\AgendaAllEdit;
+use App\Livewire\Agenda\AgendaMasjid;
+use App\Livewire\Agenda\AgendaMasjidCreate;
+use App\Livewire\Agenda\AgendaMasjidEdit;
 use App\Livewire\Inactive\Inactive;
 use App\Livewire\Petugas\Petugas;
 use App\Livewire\Profil\ProfilMasjid;
@@ -152,6 +155,21 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     Route::get('/semua-agenda/{id}/edit', AgendaAllEdit::class)
         ->name('agenda-all.edit')
         ->middleware('can:edit-agenda-all');
+
+    // Route Agenda Masjid Saya
+    Route::get('/agenda-masjid', AgendaMasjid::class)
+        ->name('agenda-masjid.index')
+        ->middleware('can:view-agenda-masjid');
+
+    // Route Create Agenda Masjid Saya
+    Route::get('/agenda-masjid/create', AgendaMasjidCreate::class)
+        ->name('agenda-masjid.create')
+        ->middleware('can:create-agenda-masjid');
+
+    // Route Edit Agenda Masjid Saya
+    Route::get('/agenda-masjid/{id}/edit', AgendaMasjidEdit::class)
+        ->name('agenda-masjid.edit')
+        ->middleware('can:edit-agenda-masjid');
 
     // Balance API Docs
     Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)

@@ -72,17 +72,18 @@ class AgendaAllEdit extends Component
 
     public function save()
     {
+        // Validasi: biarkan Livewire mengisi $errors agar tampil di bawah input
+        $this->validate();
+
+        // Cek keterhubungan profil masjid untuk user yang dipilih
+        $u = User::with('profil')->find($this->userId);
+        $masjidId = optional($u->profil)->id;
+        if (!$masjidId) {
+            $this->cannotSubmitReason = 'User yang dipilih belum terhubung ke Profil Masjid.';
+            return;
+        }
+
         try {
-            $this->validate();
-
-            $u = User::with('profil')->find($this->userId);
-            $masjidId = optional($u->profil)->id;
-            if (!$masjidId) {
-                $this->dispatch('error', 'User yang dipilih belum terhubung ke Profil Masjid.');
-                $this->cannotSubmitReason = 'User yang dipilih belum terhubung ke Profil Masjid.';
-                return;
-            }
-
             $agenda = Agenda::find($this->agendaId);
             if (!$agenda) {
                 $this->dispatch('error', 'Agenda tidak ditemukan');

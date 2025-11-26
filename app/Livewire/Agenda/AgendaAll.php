@@ -41,7 +41,7 @@ class AgendaAll extends Component
             ->orderBy('date', 'asc')
             ->orderBy('id', 'asc')
             ->with(['user', 'profilMasjid'])
-            ->paginate((int) $this->paginate);
+            ->paginate($this->paginate);
 
         $start = Carbon::now()->startOfWeek();
         $end = Carbon::now()->endOfWeek();
