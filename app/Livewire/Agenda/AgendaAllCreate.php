@@ -6,6 +6,8 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Agenda;
 use App\Models\User;
+use App\Models\Profil;
+use App\Events\ContentUpdatedEvent;
 
 #[Title('Buat Agenda Baru Untuk Masjid')]
 
@@ -79,6 +81,9 @@ class AgendaAllCreate extends Component
             $agenda->name = $this->name;
             $agenda->aktif = (bool) $this->aktif;
             $agenda->save();
+
+            $profil = Profil::find($masjidId);
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'agenda'));
 
             $this->dispatch('success', 'Agenda Baru berhasil ditambahkan');
             session()->flash('success', 'Agenda Baru berhasil ditambahkan');

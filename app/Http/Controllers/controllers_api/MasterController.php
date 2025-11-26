@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Jumbotron;
 use App\Models\Profil;
 use App\Models\JumbotronMasjid;
+use App\Models\Agenda;
 
 class MasterController extends Controller
 {
@@ -141,6 +142,59 @@ class MasterController extends Controller
                     'items' => $mergedItems,
                 ],
             ]);
+        } catch (\Exception $ex) {
+            return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
+        }
+    }
+
+    // GET AGENDA MASJID BY SLUG (CURRENT MONTH)
+    public function get_agenda($slug)
+    {
+        try {
+            $profil = Profil::where('slug', $slug)->firstOrFail();
+
+            $now = Carbon::now('Asia/Jakarta');
+            $start = $now->copy()->startOfMonth()->toDateString();
+            $end = $now->copy()->endOfMonth()->toDateString();
+
+            $agendas = Agenda::where('id_masjid', $profil->id)
+                ->whereBetween('date', [$start, $end])
+                ->orderBy('date', 'asc')
+                ->orderBy('id', 'asc')
+                ->select('id', 'date', 'name', 'aktif')
+                ->get();
+
+            $items = $agendas->map(function ($a) use ($now) {
+                $agendaDate = Carbon::parse($a->date, 'Asia/Jakarta')->startOfDay();
+                $today = $now->copy()->startOfDay();
+                $message = null;
+                if ($agendaDate->equalTo($today)) {
+                    $message = 'Sekarang : ' . $a->name;
+                } elseif ($agendaDate->gt($today)) {
+                    $days = $today->diffInDays($agendaDate);
+                    $message = $days . ' Hari Lagi Menuju ' . $a->name;
+                }
+
+                return [
+                    'id' => $a->id,
+                    'date' => $a->date,
+                    'name' => $a->name,
+                    'aktif' => (bool) $a->aktif,
+                    'message' => $message,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil get data agenda bulan ini!',
+                'data' => [
+                    'month' => (int) $now->format('n'),
+                    'year' => (int) $now->format('Y'),
+                    'items' => $items,
+                ],
+            ]);
+        } catch (ModelNotFoundException $ex) {
+            return response()->json(['success' => false, 'message' => 'Profil masjid tidak ditemukan!'], 404);
         } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }

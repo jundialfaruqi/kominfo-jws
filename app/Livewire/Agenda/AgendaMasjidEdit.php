@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Agenda;
 
+use App\Events\ContentUpdatedEvent;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Agenda;
+use App\Models\Profil;
 use Illuminate\Support\Facades\Auth;
 
 #[Title('Ubah Agenda Masjid')]
@@ -52,11 +54,16 @@ class AgendaMasjidEdit extends Component
             return $this->redirectRoute('agenda-masjid.index');
         }
 
+        $masjidId = (int) $agenda->id_masjid;
+
         try {
             $agenda->date = $this->date;
             $agenda->name = $this->name;
             $agenda->aktif = (bool) $this->aktif;
             $agenda->save();
+
+            $profil = Profil::find($masjidId);
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'agenda'));
 
             $this->dispatch('success', 'Agenda berhasil diperbarui');
             session()->flash('success', 'Agenda berhasil diperbarui');

@@ -44,6 +44,8 @@ Route::get('jumbotron', [API\MasterController::class, 'get_jumbotron'])->name('a
 // API route untuk mendapatkan data jumbotron masjid berdasarkan slug
 // Route::get('jumbotron-masjid/{slug}', [API\MasterController::class, 'get_jumbotron_masjid'])->name('api.jumbotron-masjid');
 Route::get('jumbotron-all/{slug}', [API\MasterController::class, 'get_jumbotron_all'])->name('api.jumbotron-all');
+// API route untuk mendapatkan data agenda masjid bulan ini berdasarkan slug
+Route::get('agenda/{slug}', [API\MasterController::class, 'get_agenda'])->name('api.agenda');
 
 // API route untuk mendapatkan server time
 Route::get('server-time', [API\MasterController::class, 'get_server_time'])->name('api.server-time');

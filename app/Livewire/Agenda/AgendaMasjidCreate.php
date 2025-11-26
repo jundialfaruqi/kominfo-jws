@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Agenda;
 
+use App\Events\ContentUpdatedEvent;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Agenda;
+use App\Models\Profil;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -71,6 +73,9 @@ class AgendaMasjidCreate extends Component
             $agenda->name = $this->name;
             $agenda->aktif = (bool) $this->aktif;
             $agenda->save();
+
+            $profil = Profil::find($masjidId);
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'agenda'));
 
             $this->dispatch('success', 'Agenda Baru berhasil ditambahkan');
             session()->flash('success', 'Agenda Baru berhasil ditambahkan');
