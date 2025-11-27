@@ -71,6 +71,20 @@ class AgendaMasjid extends Component
             ->with(['profilMasjid'])
             ->paginate($this->paginate);
 
+        $today = Carbon::now('Asia/Jakarta')->startOfDay();
+        $agendaMasjids->getCollection()->transform(function ($agenda) use ($today) {
+            $agendaDate = Carbon::parse($agenda->date, 'Asia/Jakarta')->startOfDay();
+            if ($agendaDate->isSameDay($today)) {
+                $agenda->days_label = 'Sekarang';
+            } elseif ($agendaDate->gt($today)) {
+                $days = $today->diffInDays($agendaDate);
+                $agenda->days_label = $days . ' Hari Lagi';
+            } else {
+                $agenda->days_label = 'Sudah lewat';
+            }
+            return $agenda;
+        });
+
         $start = Carbon::now()->startOfWeek();
         $end = Carbon::now()->endOfWeek();
         $baruMingguIniUser = Agenda::where('id_user', Auth::id())

@@ -152,6 +152,7 @@
                                                     class="badge rounded-3 {{ $agendaMasjid->aktif ? 'bg-success' : 'bg-danger' }} text-white">
                                                     {{ $agendaMasjid->aktif ? 'Aktif' : 'Tidak Aktif' }}
                                                 </span>
+                                                <div class="small text-muted mt-1">{{ $agendaMasjid->days_label }}</div>
                                             </td>
                                             <td class="text-end">
                                                 <a wire:navigate

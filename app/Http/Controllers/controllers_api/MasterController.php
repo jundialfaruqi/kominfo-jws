@@ -154,44 +154,52 @@ class MasterController extends Controller
             $profil = Profil::where('slug', $slug)->firstOrFail();
 
             $now = Carbon::now('Asia/Jakarta');
-            $start = $now->copy()->startOfMonth()->toDateString();
-            $end = $now->copy()->endOfMonth()->toDateString();
+            $start = $now->copy()->startOfDay()->toDateString();
+            $end = $now->copy()->addDays(365)->toDateString();
 
             $agendas = Agenda::where('id_masjid', $profil->id)
+                ->where('aktif', true)
                 ->whereBetween('date', [$start, $end])
                 ->orderBy('date', 'asc')
                 ->orderBy('id', 'asc')
                 ->select('id', 'date', 'name', 'aktif')
                 ->get();
 
-            $items = $agendas->map(function ($a) use ($now) {
-                $agendaDate = Carbon::parse($a->date, 'Asia/Jakarta')->startOfDay();
-                $today = $now->copy()->startOfDay();
-                $message = null;
-                if ($agendaDate->equalTo($today)) {
-                    $message = 'Sekarang : ' . $a->name;
-                } elseif ($agendaDate->gt($today)) {
-                    $days = $today->diffInDays($agendaDate);
-                    $message = $days . ' Hari Lagi Menuju ' . $a->name;
-                }
+            if ($agendas->isEmpty()) {
+                $items = collect([]);
+            } else {
+                $nearestDate = $agendas->first()->date;
+                $nearestAgendas = $agendas->filter(function ($a) use ($nearestDate) {
+                    return $a->date === $nearestDate;
+                });
 
-                return [
-                    'id' => $a->id,
-                    'date' => $a->date,
-                    'name' => $a->name,
-                    'aktif' => (bool) $a->aktif,
-                    'message' => $message,
-                ];
-            });
+                $items = $nearestAgendas->map(function ($a) use ($now) {
+                    $agendaDate = Carbon::parse($a->date, 'Asia/Jakarta')->startOfDay();
+                    $today = $now->copy()->startOfDay();
+                    $message = null;
+                    if ($agendaDate->equalTo($today)) {
+                        $message = 'Sekarang : ' . $a->name;
+                    } elseif ($agendaDate->gt($today)) {
+                        $days = $today->diffInDays($agendaDate);
+                        $message = $days . ' Hari Lagi Menuju ' . $a->name;
+                    }
+
+                    return [
+                        'id' => $a->id,
+                        'date' => $a->date,
+                        'name' => $a->name,
+                        'aktif' => (bool) $a->aktif,
+                        'message' => $message,
+                    ];
+                });
+            }
+
+            $responseMessage = ($items->isEmpty()) ? 'Tidak ada agenda aktif' : 'Berhasil get agenda terdekat';
 
             return response()->json([
                 'success' => true,
-                'message' => 'Berhasil get data agenda bulan ini!',
-                'data' => [
-                    'month' => (int) $now->format('n'),
-                    'year' => (int) $now->format('Y'),
-                    'items' => $items,
-                ],
+                'message' => $responseMessage,
+                'data' => $items,
             ]);
         } catch (ModelNotFoundException $ex) {
             return response()->json(['success' => false, 'message' => 'Profil masjid tidak ditemukan!'], 404);

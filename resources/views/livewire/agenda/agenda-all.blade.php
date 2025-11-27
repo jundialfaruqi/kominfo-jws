@@ -207,6 +207,7 @@
                                                     class="badge rounded-3 {{ $agenda->aktif ? 'bg-success' : 'bg-danger' }} text-white">
                                                     {{ $agenda->aktif ? 'Aktif' : 'Tidak Aktif' }}
                                                 </span>
+                                                <div class="small text-muted mt-1">{{ $agenda->days_label }}</div>
                                             </td>
                                             <td class="text-end">
                                                 <button wire:click="edit('{{ $agenda->id }}')"
