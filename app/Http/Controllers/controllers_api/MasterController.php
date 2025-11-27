@@ -185,10 +185,7 @@ class MasterController extends Controller
                     }
 
                     return [
-                        'id' => $a->id,
-                        'date' => $a->date,
                         'name' => $a->name,
-                        'aktif' => (bool) $a->aktif,
                         'message' => $message,
                     ];
                 });
