@@ -220,11 +220,66 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        function loadAgenda() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) return;
+            $.ajax({
+                url: `/api/agenda/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    const items = (res && res.data) ? res.data : [];
+                    if (items.length > 0) {
+                        const it = items[0];
+                        $('#agenda-message').text(it.message || '');
+                        agendaNames = items.map(function(i) {
+                            return i && i.name ? i.name : '';
+                        }).filter(function(n) {
+                            return n && n.length > 0;
+                        });
+                        updateAgendaTitleByServerTime();
+                        if (agendaRotateTimer) {
+                            clearInterval(agendaRotateTimer);
+                        }
+                        agendaRotateTimer = setInterval(updateAgendaTitleByServerTime, 1000);
+                        $('#floating-agenda').show();
+                        lastAgendaDay = getCurrentTimeFromServer().toDateString();
+                    } else {
+                        if (agendaRotateTimer) {
+                            clearInterval(agendaRotateTimer);
+                            agendaRotateTimer = null;
+                        }
+                        agendaNames = [];
+                        $('#floating-agenda').hide();
+                    }
+                },
+                error: function() {
+                    if (agendaRotateTimer) {
+                        clearInterval(agendaRotateTimer);
+                        agendaRotateTimer = null;
+                    }
+                    agendaNames = [];
+                    $('#floating-agenda').hide();
+                }
+            });
+        }
+
+        function updateAgendaTitleByServerTime() {
+            if (!agendaNames || agendaNames.length === 0) return;
+            const t = getCurrentTimeFromServer().getTime();
+            const idx = Math.floor(t / 7000) % agendaNames.length;
+            $('#agenda-title').text(agendaNames[idx] || '');
+        }
+
         // Variabel untuk menyimpan timestamp terakhir pembaruan audio
         let lastAudioUpdateTimestamp = 0;
         let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
         window.newAudioAvailable = false;
+        $('#floating-agenda').hide();
+        let lastAgendaDay = null;
+        let agendaNames = [];
+        let agendaRotateTimer = null;
 
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
@@ -392,6 +447,24 @@
                 },
                 timeout: 15000 // Timeout setelah 15 detik
             });
+
+            loadAgenda();
+            try {
+                if (window.Echo) {
+                    window.Echo.channel(`masjid-${slug}`).listen('.App\\Events\\ContentUpdatedEvent', (e) => {
+                        if (e && e.type === 'agenda') loadAgenda();
+                    });
+                }
+            } catch (err) {}
+
+            setInterval(function() {
+                const d = getCurrentTimeFromServer().toDateString();
+                if (lastAgendaDay && d !== lastAgendaDay) {
+                    loadAgenda();
+                    lastAgendaDay = d;
+                }
+            }, 60000);
+
         }
 
         // Fungsi untuk memutar audio dari cache saat offline

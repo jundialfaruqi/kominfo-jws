@@ -178,10 +178,10 @@ class MasterController extends Controller
                     $today = $now->copy()->startOfDay();
                     $message = null;
                     if ($agendaDate->equalTo($today)) {
-                        $message = 'Sekarang : ' . $a->name;
+                        $message = 'Hari ini';
                     } elseif ($agendaDate->gt($today)) {
                         $days = $today->diffInDays($agendaDate);
-                        $message = $days . ' Hari Lagi Menuju ' . $a->name;
+                        $message = $days . ' Hari Lagi';
                     }
 
                     return [
