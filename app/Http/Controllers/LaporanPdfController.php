@@ -42,7 +42,7 @@ class LaporanPdfController extends Controller
 
         // Range 7 hari terakhir (hari ini sampai 6 hari ke belakang)
         $endDate = Carbon::today('Asia/Jakarta')->format('Y-m-d');
-        $periodStartDate = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+        $periodStartDate = Carbon::today('Asia/Jakarta')->subDays(7)->format('Y-m-d');
 
         $categories = GroupCategory::where('id_masjid', $idMasjid)->orderBy('name')->get();
 

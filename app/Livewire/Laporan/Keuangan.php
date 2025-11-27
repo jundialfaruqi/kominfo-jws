@@ -328,7 +328,7 @@ class Keuangan extends Component
                 Carbon::parse($this->filterEndDate)->format('Y-m-d'),
             ]);
         } elseif ($this->filterDateMode === '7hari') {
-            $start = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+            $start = Carbon::today('Asia/Jakarta')->subDays(7)->format('Y-m-d');
             $end = Carbon::today('Asia/Jakarta')->format('Y-m-d');
             $baseQuery->whereBetween('tanggal', [$start, $end]);
         }
@@ -373,7 +373,7 @@ class Keuangan extends Component
         } elseif ($this->filterDateMode === 'rentang' && !empty($this->filterStartDate)) {
             $periodStartDate = Carbon::parse($this->filterStartDate)->format('Y-m-d');
         } elseif ($this->filterDateMode === '7hari') {
-            $periodStartDate = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+            $periodStartDate = Carbon::today('Asia/Jakarta')->subDays(7)->format('Y-m-d');
         }
 
         // Ringkasan per kategori dan total keseluruhan (mengikuti filter tanggal)
@@ -402,7 +402,7 @@ class Keuangan extends Component
                         Carbon::parse($this->filterEndDate)->format('Y-m-d'),
                     ]);
                 } elseif ($this->filterDateMode === '7hari') {
-                    $start = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+                    $start = Carbon::today('Asia/Jakarta')->subDays(7)->format('Y-m-d');
                     $end = Carbon::today('Asia/Jakarta')->format('Y-m-d');
                     $aggQuery->whereBetween('tanggal', [$start, $end]);
                 }
@@ -520,7 +520,7 @@ class Keuangan extends Component
                             Carbon::parse($this->filterEndDate)->format('Y-m-d'),
                         ]);
                     } elseif ($this->filterDateMode === '7hari') {
-                        $start = Carbon::today('Asia/Jakarta')->subDays(6)->format('Y-m-d');
+                        $start = Carbon::today('Asia/Jakarta')->subDays(7)->format('Y-m-d');
                         $end = Carbon::today('Asia/Jakarta')->format('Y-m-d');
                         $aggQuery->whereBetween('tanggal', [$start, $end]);
                     }

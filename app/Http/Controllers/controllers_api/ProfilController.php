@@ -707,7 +707,7 @@ class ProfilController extends Controller
             }
 
             // Periode 7 hari terakhir (timezone Asia/Jakarta)
-            $start7 = \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->toDateString();
+            $start7 = \Carbon\Carbon::today('Asia/Jakarta')->subDays(7)->toDateString();
             $end7 = \Carbon\Carbon::today('Asia/Jakarta')->toDateString();
             $startDisplay = \Carbon\Carbon::parse($start7)->format('d-m-Y');
             $endDisplay = \Carbon\Carbon::parse($end7)->format('d-m-Y');

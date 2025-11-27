@@ -674,7 +674,7 @@
                             } elseif ($filterDateMode === '7hari') {
                                 $filterLabel =
                                     'Pekan Lalu ' .
-                                    \Carbon\Carbon::today('Asia/Jakarta')->subDays(6)->translatedFormat('d F Y') .
+                                    \Carbon\Carbon::today('Asia/Jakarta')->subDays(7)->translatedFormat('d F Y') .
                                     ' s.d. ' .
                                     \Carbon\Carbon::today('Asia/Jakarta')->translatedFormat('d F Y');
                             } elseif ($filterDateMode === 'semua') {
