@@ -48,6 +48,16 @@
 
             @include('livewire.agenda.agenda-masjid-statistic')
 
+            <div class="alert alert-danger rounded-4 bg-red-lt" role="alert">
+                <div>
+                    <h4 class="alert-heading mb-1">Mohon maaf&hellip;</h4>
+                    <div class="alert-description">
+                        Fitur ini masih dalam proses pengembangan, untuk menggunakan fitur agenda saat ini hanya
+                        mendukung untuk Tema 4
+                    </div>
+                </div>
+            </div>
+
             <div class="row row-deck row-cards">
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm border-0">
@@ -152,7 +162,8 @@
                                                     class="badge rounded-3 {{ $agendaMasjid->aktif ? 'bg-success' : 'bg-danger' }} text-white">
                                                     {{ $agendaMasjid->aktif ? 'Aktif' : 'Tidak Aktif' }}
                                                 </span>
-                                                <div class="small text-muted mt-1">{{ $agendaMasjid->days_label }}</div>
+                                                <div class="small text-muted mt-1">{{ $agendaMasjid->days_label }}
+                                                </div>
                                             </td>
                                             <td class="text-end">
                                                 <a wire:navigate
