@@ -48,12 +48,30 @@
 
             @include('livewire.agenda.agenda-masjid-statistic')
 
-            <div class="alert alert-danger rounded-4 bg-red-lt" role="alert">
+            <div class="alert alert-danger rounded-4 bg-red-lt border-0 shadow-sm" role="alert">
                 <div>
-                    <h4 class="alert-heading mb-1">Mohon maaf&hellip;</h4>
+                    <h4 class="alert-heading mb-1">⚠️ Mohon maaf&hellip;</h4>
                     <div class="alert-description">
                         Fitur ini masih dalam proses pengembangan, untuk menggunakan fitur agenda saat ini hanya
-                        mendukung untuk Tema 4
+                        mendukung di <a href="{{ route('tema.index') }}" class="fw-bold underline">Tema 4</a>.
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-primary rounded-4 bg-blue-lt border-0 shadow-sm" role="alert">
+                <div>
+                    <h4 class="alert-heading mb-1">ℹ️ Informasi&hellip;</h4>
+                    <div class="alert-description">
+                        Fitur Agenda menampilkan agenda terdekat di halaman
+                        utama JWS, disertai keterangan penanda jumlah hari menuju agenda atau penanda bahwa agenda
+                        sedang berlangsung. Fitur ini dibuat dinamis, agar pengguna dapat menambahkan agenda yang ada di
+                        masjid atau menambahkan hari besar islam, contoh Maulid Nabi Muhammad, Kajian Rutin Mingguan,
+                        dll sesuai kebutuhan.
+                        <a href="/demo" class="badge text-red fw-bold">Lihat Demo</a> atau <a
+                            href="{{ route('agenda-masjid.panduan') }}" class="badge badge-blink text-red fw-bold">
+                            Lihat Panduan Agenda
+                        </a>
                     </div>
                 </div>
             </div>

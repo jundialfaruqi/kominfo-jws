@@ -10,6 +10,7 @@ use App\Livewire\Agenda\AgendaAllEdit;
 use App\Livewire\Agenda\AgendaMasjid;
 use App\Livewire\Agenda\AgendaMasjidCreate;
 use App\Livewire\Agenda\AgendaMasjidEdit;
+use App\Livewire\Agenda\AgendaPanduan;
 use App\Livewire\Inactive\Inactive;
 use App\Livewire\Petugas\Petugas;
 use App\Livewire\Profil\ProfilMasjid;
@@ -170,6 +171,10 @@ Route::middleware('auth', 'ensure-user-is-active')->group(function () {
     Route::get('/agenda-masjid/{id}/edit', AgendaMasjidEdit::class)
         ->name('agenda-masjid.edit')
         ->middleware('can:edit-agenda-masjid');
+
+    // Panduan Agenda
+    Route::get('/agenda-masjid/panduan', AgendaPanduan::class)
+        ->name('agenda-masjid.panduan');
 
     // Balance API Docs
     Route::get('/api-docs/balance', \App\Livewire\ApiDocs\Balance::class)
