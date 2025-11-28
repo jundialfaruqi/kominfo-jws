@@ -1,7 +1,7 @@
 <div>
     <div class="page-body">
         <div class="container-xl">
-            <div class="card rounded-4">
+            <div class="card rounded-4 shadow-sm border-0">
                 <div class="card-header">
                     <a wire:navigate href="{{ route('agenda-masjid.index') }}"
                         class="btn btn-outline-secondary rounded-4">
@@ -18,7 +18,7 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <div class="px-8">
+                    <div class="px-2 px-md-8">
                         <div class="d-flex align-items-center">
                             <h1 class="mb-5 flex-grow-1 text-center">Tutorial Menggunakan Fitur Agenda di Aplikasi JWS
                             </h1>
@@ -73,7 +73,8 @@
 
                             <h2 class="fw-bold text-center pt-4">Agenda Siap Ditampilkan</h2>
                             <div class="mb-4">
-                                <img src="{{ asset('welcome/assets/img/agenda/agenda-siap-ditampilkan.webp') }}"
+                                <img class="rounded-4 shadow-sm"
+                                    src="{{ asset('welcome/assets/img/agenda/agenda-siap-ditampilkan.webp') }}"
                                     alt="Langkah 2 Mengisi Form Agenda">
                             </div>
 
