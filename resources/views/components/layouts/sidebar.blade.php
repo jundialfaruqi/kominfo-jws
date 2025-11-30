@@ -69,7 +69,8 @@
                             <div class="text-muted small fw-bold ms-2">MENU</div>
                         </div>
                     </div>
-                    <li class="nav-item mx-2 {{ request()->routeIs('dashboard.index') ? 'bg-azure rounded-4' : '' }}">
+                    <li class="nav-item mx-2 {{ request()->routeIs('dashboard.index') ? 'rounded-4 text-white' : '' }}"
+                        style="{{ request()->routeIs('dashboard.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('dashboard.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -92,8 +93,8 @@
                             </span>
                         </a>
                     </li>
-                    <li
-                        class="nav-item mx-2 {{ request()->routeIs('profilmasjid.index') ? 'bg-azure rounded-4' : '' }}">
+                    <li class="nav-item mx-2 {{ request()->routeIs('profilmasjid.index') ? 'rounded-4 text-white' : '' }}"
+                        style="{{ request()->routeIs('profilmasjid.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('profilmasjid.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -119,7 +120,8 @@
                             </span>
                         </a>
                     </li>
-                    <li class="nav-item mx-2 {{ request()->routeIs('tema.index') ? 'bg-azure rounded-4' : '' }}">
+                    <li class="nav-item mx-2 {{ request()->routeIs('tema.index') ? 'rounded-4 text-white' : '' }}"
+                        style="{{ request()->routeIs('tema.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -142,8 +144,8 @@
                         </a>
                     </li>
                     @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('tema.set-tema') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('tema.set-tema') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('tema.set-tema') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('tema.set-tema') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -173,8 +175,8 @@
                                         <div class="text-muted small fw-bold ms-2">MANAJEMEN USER</div>
                                     </div>
                                 </div>
-                                <li
-                                    class="nav-item mx-2 {{ request()->routeIs('admin.user.index') ? 'bg-azure rounded-4 shadow-sm' : '' }}">
+                                <li class="nav-item mx-2 {{ request()->routeIs('admin.user.index') ? 'rounded-4 text-white shadow-sm' : '' }}"
+                                    style="{{ request()->routeIs('admin.user.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                     <a wire:navigate class="nav-link" href="{{ route('admin.user.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -196,8 +198,8 @@
                             @endcan
 
                             @can('view-roles')
-                                <li
-                                    class="nav-item mx-2 {{ request()->routeIs('admin.role.index') ? 'bg-azure rounded-4' : '' }}">
+                                <li class="nav-item mx-2 {{ request()->routeIs('admin.role.index') ? 'rounded-4 text-white' : '' }}"
+                                    style="{{ request()->routeIs('admin.role.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                     <a wire:navigate class="nav-link" href="{{ route('admin.role.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -224,8 +226,8 @@
                             @endcan
 
                             @can('view-permissions')
-                                <li
-                                    class="nav-item mx-2 {{ request()->routeIs('admin.permission.index') ? 'bg-azure rounded-4' : '' }}">
+                                <li class="nav-item mx-2 {{ request()->routeIs('admin.permission.index') ? 'rounded-4 text-white' : '' }}"
+                                    style="{{ request()->routeIs('admin.permission.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                     <a wire:navigate class="nav-link" href="{{ route('admin.permission.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -247,8 +249,8 @@
                             @endcan
 
                             @can('view-user-role-assignment')
-                                <li
-                                    class="nav-item mx-2 {{ request()->routeIs('admin.user-role-assignment.index') ? 'bg-azure rounded-4' : '' }}">
+                                <li class="nav-item mx-2 {{ request()->routeIs('admin.user-role-assignment.index') ? 'rounded-4 text-white' : '' }}"
+                                    style="{{ request()->routeIs('admin.user-role-assignment.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                     <a wire:navigate class="nav-link"
                                         href="{{ route('admin.user-role-assignment.index') }}">
                                         <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
@@ -284,8 +286,8 @@
                                 <div class="text-muted small fw-bold ms-2">KEUANGAN</div>
                             </div>
                         </div>
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('group-category.index') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('group-category.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('group-category.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('group-category.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -304,8 +306,8 @@
                                 </span>
                             </a>
                         </li>
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('laporan-keuangan.index') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('laporan-keuangan.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('laporan-keuangan.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('laporan-keuangan.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -333,7 +335,8 @@
                                 <div class="text-muted small fw-bold ms-2">AUDIO</div>
                             </div>
                         </div>
-                        <li class="nav-item mx-2 {{ request()->routeIs('audios') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('audios') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('audios') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('audios') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -352,8 +355,8 @@
                                 </span>
                             </a>
                         </li>
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('adzan-audio.index') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('adzan-audio.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('adzan-audio.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('adzan-audio.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -382,8 +385,8 @@
                             </div>
                         </div>
                         @if (Auth::check() && (in_array(Auth::user()->role, ['Super Admin', 'Admin']) || Auth::user()->can('view-jumbotron')))
-                            <li
-                                class="nav-item mx-2 {{ request()->routeIs('jumbotron.index') ? 'bg-azure rounded-4' : '' }}">
+                            <li class="nav-item mx-2 {{ request()->routeIs('jumbotron.index') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('jumbotron.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('jumbotron.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -406,7 +409,8 @@
                                 </a>
                             </li>
                         @endif
-                        <li class="nav-item mx-2 {{ request()->routeIs('slide.index') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('slide.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('slide.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('slide.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -430,8 +434,8 @@
                             </a>
                         </li>
                         @can('view-data-jumbotron-semua-masjid')
-                            <li
-                                class="nav-item mx-2 {{ request()->routeIs('data-jumbotron-semua-masjid.*') ? 'bg-azure rounded-4' : '' }}">
+                            <li class="nav-item mx-2 {{ request()->routeIs('data-jumbotron-semua-masjid.*') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('data-jumbotron-semua-masjid.*') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                 <a wire:navigate class="nav-link"
                                     href="{{ route('data-jumbotron-semua-masjid.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
@@ -457,8 +461,8 @@
                             </li>
                         @endcan
                         @can('view-jumbotron-masjid')
-                            <li
-                                class="nav-item mx-2 {{ request()->routeIs('jumbotron-masjid.*') ? 'bg-azure rounded-4' : '' }}">
+                            <li class="nav-item mx-2 {{ request()->routeIs('jumbotron-masjid.*') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('jumbotron-masjid.*') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('jumbotron-masjid.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -482,8 +486,8 @@
                                 </a>
                             </li>
                         @endcan
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('adzan.index') ? 'bg-azure rounded-4' : '' }} ">
+                        <li class="nav-item mx-2 {{ request()->routeIs('adzan.index') ? 'rounded-4 text-white' : '' }} "
+                            style="{{ request()->routeIs('adzan.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('adzan.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -513,8 +517,8 @@
                                 <div class="text-muted small fw-bold ms-2">MENU LAINNYA</div>
                             </div>
                         </div>
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('petugas.index') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('petugas.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('petugas.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('petugas.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -537,8 +541,8 @@
                         </li>
 
                         @can('view-agenda-all')
-                            <li
-                                class="nav-item mx-2 {{ request()->routeIs('agenda-all.*') ? 'bg-azure rounded-4' : '' }}">
+                            <li class="nav-item mx-2 {{ request()->routeIs('agenda-all.*') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('agenda-all.*') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('agenda-all.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -562,8 +566,8 @@
                         @endcan
 
                         @can('view-agenda-masjid')
-                            <li
-                                class="nav-item mx-2 {{ request()->routeIs('agenda-masjid.*') ? 'bg-azure rounded-4' : '' }}">
+                            <li class="nav-item mx-2 {{ request()->routeIs('agenda-masjid.*') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('agenda-masjid.*') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                                 <a wire:navigate class="nav-link" href="{{ route('agenda-masjid.index') }}">
                                     <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -586,8 +590,8 @@
                                 </a>
                             </li>
                         @endcan
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('marquee.index') ? 'bg-azure rounded-4' : '' }}">
+                        <li class="nav-item mx-2 {{ request()->routeIs('marquee.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('marquee.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('marquee.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -609,8 +613,8 @@
                                 </span>
                             </a>
                         </li>
-                        <li
-                            class="nav-item mx-2 {{ request()->routeIs('durasi.index') ? 'bg-azure rounded-4' : '' }} ">
+                        <li class="nav-item mx-2 {{ request()->routeIs('durasi.index') ? 'rounded-4 text-white' : '' }} "
+                            style="{{ request()->routeIs('durasi.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                             <a wire:navigate class="nav-link" href="{{ route('durasi.index') }}">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
