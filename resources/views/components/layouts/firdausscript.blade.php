@@ -264,11 +264,78 @@
             });
         }
 
+        function loadAgenda1() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) return;
+            $.ajax({
+                url: `/api/agenda/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    const items = (res && res.data) ? res.data : [];
+                    if (items.length > 0) {
+                        const it = items[0];
+                        $('#agenda1-message').text(it.message || '');
+                        agendaNames1 = items.map(function(i) {
+                            return i && i.name ? i.name : '';
+                        }).filter(function(n) {
+                            return n && n.length > 0;
+                        });
+                        updateAgendaTitleByServerTime1();
+                        if (agendaRotateTimer1) {
+                            clearInterval(agendaRotateTimer1);
+                        }
+                        agendaRotateTimer1 = setInterval(updateAgendaTitleByServerTime1, 1000);
+                        $('#floating-agenda-1').show();
+                    } else {
+                        if (agendaRotateTimer1) {
+                            clearInterval(agendaRotateTimer1);
+                            agendaRotateTimer1 = null;
+                        }
+                        agendaNames1 = [];
+                        $('#floating-agenda-1').hide();
+                    }
+                },
+                error: function() {
+                    if (agendaRotateTimer1) {
+                        clearInterval(agendaRotateTimer1);
+                        agendaRotateTimer1 = null;
+                    }
+                    agendaNames1 = [];
+                    $('#floating-agenda-1').hide();
+                }
+            });
+        }
+
+        function updateAgendaTitleByServerTime1() {
+            if (!agendaNames1 || agendaNames1.length === 0) return;
+            const t = getCurrentTimeFromServer().getTime();
+            const rotateMs = 5000;
+            const pauseMs = 10000;
+            const displayWindow = agendaNames1.length * rotateMs;
+            const cycleMs = displayWindow + pauseMs;
+            const phase = t % cycleMs;
+            if (phase >= displayWindow) {
+                $('#floating-agenda-1').hide();
+                return;
+            } else {
+                $('#floating-agenda-1').show();
+            }
+            const idx = Math.floor(phase / rotateMs);
+            const txt1 = agendaNames1[idx] || '';
+            const max1 = 34;
+            const out1 = txt1.length > max1 ? (txt1.slice(0, max1 - 3) + '...') : txt1;
+            $('#agenda1-title').text(out1);
+        }
+
         function updateAgendaTitleByServerTime() {
             if (!agendaNames || agendaNames.length === 0) return;
             const t = getCurrentTimeFromServer().getTime();
             const idx = Math.floor(t / 7000) % agendaNames.length;
-            $('#agenda-title').text(agendaNames[idx] || '');
+            const txt = agendaNames[idx] || '';
+            const max = 34;
+            const out = txt.length > max ? (txt.slice(0, max - 3) + '...') : txt;
+            $('#agenda-title').text(out);
         }
 
         // Variabel untuk menyimpan timestamp terakhir pembaruan audio
@@ -277,9 +344,12 @@
 
         window.newAudioAvailable = false;
         $('#floating-agenda').hide();
+        $('#floating-agenda-1').hide();
         let lastAgendaDay = null;
         let agendaNames = [];
         let agendaRotateTimer = null;
+        let agendaNames1 = [];
+        let agendaRotateTimer1 = null;
 
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
@@ -453,6 +523,7 @@
                 if (window.Echo) {
                     window.Echo.channel(`masjid-${slug}`).listen('.App\\Events\\ContentUpdatedEvent', (e) => {
                         if (e && e.type === 'agenda') loadAgenda();
+                        if (e && e.type === 'agenda') loadAgenda1();
                     });
                 }
             } catch (err) {}
@@ -464,6 +535,8 @@
                     lastAgendaDay = d;
                 }
             }, 60000);
+
+            loadAgenda1();
 
         }
 
