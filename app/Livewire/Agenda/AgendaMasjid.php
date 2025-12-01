@@ -66,7 +66,7 @@ class AgendaMasjid extends Component
                     ;
                 });
             })
-            ->orderBy('date', 'desc')
+            ->orderBy('date', 'asc')
             ->orderBy('id', 'asc')
             ->with(['profilMasjid'])
             ->paginate($this->paginate);
