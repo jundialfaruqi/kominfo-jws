@@ -504,7 +504,7 @@ body {
   position:absolute;
   right:clamp(1%, 1%, 4%);
   bottom:clamp(1%, 2%, 9%);
-  z-index:2147483647;
+  z-index:30;
   border-radius: clamp(0.2rem, 1.2vw, 2rem);
   background-color: rgba(30, 94, 163, 0.719);
   color:#ffffff;
