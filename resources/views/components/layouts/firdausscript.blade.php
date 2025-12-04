@@ -3540,7 +3540,7 @@
                 // Judul menampilkan periode 7 hari (start s/d end)
                 if (data.period && data.period.type === 'last_7_days' && data.period.start && data.period.end) {
                     const title = `${data.period.start} s/d ${data.period.end}`;
-                    $('#financePeriodTitle').text(title);
+                    $('#financePeriodTitle').html('PERIODE<br>' + title);
                 } else {
                     $('#financePeriodTitle').text('Keuangan');
                 }
