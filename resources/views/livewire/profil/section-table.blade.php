@@ -2,11 +2,27 @@
     @if ($showTable)
         {{-- Pagination & Search Controls --}}
         <div class="card-body border-bottom py-3">
-            <div class="d-flex">
-                <div class="text-secondary">
-                    Lihat
-                    <div class="mx-2 d-inline-block">
-                        <select wire:model.live="paginate" class="form-select form-select rounded-4">
+            <div class="row g-2 align-items-center">
+                <div class="col-12 col-md-auto">
+                    <div class="input-group align-items-center rounded-4 w-100 w-md-auto">
+                        <span class="input-group-text rounded-start-4 gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-table-row">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z" />
+                                <path d="M9 3l-6 6" />
+                                <path d="M14 3l-7 7" />
+                                <path d="M19 3l-7 7" />
+                                <path d="M21 6l-4 4" />
+                                <path d="M3 10h18" />
+                                <path d="M10 10v11" />
+                            </svg>
+                            Tampilkan Baris
+                        </span>
+                        <select wire:model.live="paginate" class="form-select form-select rounded-end-4">
                             <option>5</option>
                             <option>10</option>
                             <option>25</option>
@@ -15,22 +31,26 @@
                         </select>
                     </div>
                 </div>
-                <div class="input-group align-items-center rounded-4 w-auto ms-auto">
-                    <span class="input-group-text rounded-start-4 gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-search">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                            <path d="M21 21l-6 -6" />
-                        </svg>
-                        Cari
-                    </span>
-                    <input wire:model.live="search" type="text" class="form-control rounded-end-4"
-                        placeholder="Ketik disini" autocomplete="off" />
+                <div class="col-12 col-md-auto ms-md-auto">
+                    <div class="input-group align-items-center rounded-4 w-100 w-md-auto">
+                        <span class="input-group-text rounded-start-4 gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                <path d="M21 21l-6 -6" />
+                            </svg>
+                            Cari
+                        </span>
+                        <input wire:model.live="search" type="text" class="form-control rounded-end-4"
+                            placeholder="Ketik disini" autocomplete="off" />
+                    </div>
                 </div>
             </div>
         </div>
+
         {{-- Table of mosque profiles --}}
         <div class="table-responsive">
             <table class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
@@ -124,8 +144,8 @@
                                     data-bs-target="#deleteModal">
                                     <span wire:loading.remove wire:target="delete('{{ $profil->id }}')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                             class="icon icon-tabler icons-tabler-outline icon-tabler-trash me-0">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                             <path d="M4 7l16 0" />

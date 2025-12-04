@@ -82,11 +82,28 @@
                             </div>
                         </div>
                         <div class="card-body border-bottom py-3">
-                            <div class="d-flex flex-column flex-md-row align-items-center gap-2">
-                                <div class="text-secondary d-flex align-items-center gap-2 flex-grow-1">
-                                    Lihat
-                                    <div class="mx-2 d-inline-block">
-                                        <select wire:model.live="paginate" class="form-select form-select rounded-4">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-12 col-md-auto d-flex gap-2">
+                                    <div class="input-group align-items-center rounded-4 w-100 w-md-auto">
+                                        <span class="input-group-text rounded-start-4 gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-table-row">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path
+                                                    d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z" />
+                                                <path d="M9 3l-6 6" />
+                                                <path d="M14 3l-7 7" />
+                                                <path d="M19 3l-7 7" />
+                                                <path d="M21 6l-4 4" />
+                                                <path d="M3 10h18" />
+                                                <path d="M10 10v11" />
+                                            </svg>
+                                            Tampilkan Baris
+                                        </span>
+                                        <select wire:model.live="paginate"
+                                            class="form-select form-select rounded-end-4">
                                             <option>5</option>
                                             <option>10</option>
                                             <option>25</option>
@@ -94,52 +111,78 @@
                                             <option>100</option>
                                         </select>
                                     </div>
-                                    <div class="d-flex align-items-center flex-wrap">
-                                        <a href="{{ route('admin.user.pdf', ['role' => 'Admin Masjid']) }}"
-                                            class="btn btn-warning rounded-4">
-                                            <span class="d-inline-flex align-items-center gap-1">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                                    <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
-                                                    <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
-                                                    <path d="M17 18h2" />
-                                                    <path d="M20 15h-3v6" />
-                                                    <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
-                                                </svg>
-                                                <span>Export PDF User</span>
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="input-group align-items-center rounded-4 w-auto">
-                                    <span class="input-group-text rounded-start-4 gap-1">
+
+                                    {{-- offcanvas --}}
+                                    <a class="btn btn-icon btn-danger btn-pill" data-bs-toggle="offcanvas"
+                                        href="#offcanvasEnd" role="button" aria-controls="offcanvasEnd">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-download">
                                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                                            <path d="M21 21l-6 -6" />
+                                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                                            <path d="M7 11l5 5l5 -5" />
+                                            <path d="M12 4l0 12" />
                                         </svg>
-                                        Cari
-                                    </span>
-                                    <input wire:model.live="search" type="text" class="form-control rounded-end-4"
-                                        placeholder="Ketik disini" autocomplete="off" />
+                                    </a>
+
+                                    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasEnd"
+                                        aria-labelledby="offcanvasEndLabel">
+                                        <div class="offcanvas-header">
+                                            <h2 class="offcanvas-title" id="offcanvasEndLabel">Pilihan Export Data
+                                            </h2>
+                                            <button type="button" class="btn-close text-reset"
+                                                data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                                        </div>
+                                        <div class="offcanvas-body">
+                                            <div>
+                                                <b>Export User</b>
+                                                <p><small class="mt-1">Export data pengguna admin masjid</small></p>
+                                            </div>
+                                            <div class="mt-1">
+                                                <a href="{{ route('admin.user.pdf', ['role' => 'Admin Masjid']) }}"
+                                                    class="btn btn-warning rounded-4">
+                                                    <span class="d-inline-flex align-items-center gap-1">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                            height="24" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf">
+                                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                                            <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                                            <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                                            <path d="M17 18h2" />
+                                                            <path d="M20 15h-3v6" />
+                                                            <path
+                                                                d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                                        </svg>
+                                                        <span>Export PDF User</span>
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                {{-- <div class="text-secondary d-flex align-items-center ms-md-auto">
-                                    <span>Cari</span>
-                                    <div class="ms-2 d-inline-block">
-                                        <input wire:model.live="search" type="search" name="q" id="q"
-                                            inputmode="search" autocapitalize="none" spellcheck="false"
-                                            class="form-control form-control py-1 rounded-3 w-auto" autocomplete="off"
-                                            placeholder="Ketik disini">
+                                <div class="col-12 col-md-auto ms-md-auto">
+                                    <div class="input-group align-items-center rounded-4 w-100 w-md-auto">
+                                        <span class="input-group-text rounded-start-4 gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                                <path d="M21 21l-6 -6" />
+                                            </svg>
+                                            Cari
+                                        </span>
+                                        <input wire:model.live="search" type="text"
+                                            class="form-control rounded-end-4" placeholder="Ketik disini"
+                                            autocomplete="off" />
                                     </div>
-                                </div> --}}
+                                </div>
                             </div>
                         </div>
 

@@ -13,14 +13,6 @@
 
 <script>
     $(document).ready(function() {
-        // Tambahkan di awal script
-        // let userHasInteracted = false;
-
-        // Event listener untuk mendeteksi interaksi user
-        // $(document).one('click touchstart keydown', function() {
-        //     userHasInteracted = true;
-        //     console.log('User interaction detected - audio autoplay enabled');
-        // });
 
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
@@ -5578,15 +5570,6 @@
                 console.warn('initFinanceRealtimeUpdates error:', err);
             }
         })();
-
-        // Event handler untuk menghentikan audio adzan saat halaman di-refresh atau ditutup
-        // $(window).on('beforeunload', function() {
-        //     // Hentikan audio adzan jika sedang diputar
-        //     if (window.adzanAudioPlayer) {
-        //         window.adzanAudioPlayer.pause();
-        //         window.adzanAudioPlayer.currentTime = 0;
-        //     }
-        // });
 
         // Tambahkan popup izin audio di bagian atas agar pemutaran sesuai kebijakan browser
         (function setupAudioPermissionPopup() {
