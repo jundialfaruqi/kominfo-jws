@@ -16,7 +16,7 @@ class Permission extends Component
     #[Title('Manajemen Permission')]
 
     public $search = '';
-    public $paginate = 10;
+    public $paginate = 4;
     protected $paginationTheme = 'bootstrap';
 
     // Form properties

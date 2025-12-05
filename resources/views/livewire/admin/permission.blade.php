@@ -83,7 +83,7 @@
                     @if (count($groupedPermissions))
                         <div class="row row-cards">
                             @foreach ($groupedPermissions as $groupKey => $items)
-                                <div class="col-12 col-lg-6">
+                                <div class="col-12 col-lg-4">
                                     <div class="card rounded-4 shadow-sm">
                                         <div
                                             class="card-header bg-dark text-white rounded-top-4 d-flex justify-content-between align-items-center">
@@ -109,8 +109,8 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                                            {{ $groupPaginators[$groupKey]->links(data: ['scrollTo' => false]) }}
+                                        <div class="card-footer align-items-center rounded-bottom-4 shadow-sm">
+                                            {{ $groupPaginators[$groupKey]->links(view: 'custom-pagination-links', data: ['scrollTo' => false]) }}
                                         </div>
                                     </div>
                                 </div>
