@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Spatie\Permission\Models\Permission as PermissionModel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class Permission extends Component
 {
@@ -22,6 +23,7 @@ class Permission extends Component
     public $permissionId;
     public $name;
     public $guard_name = 'web';
+    public $group;
 
     // Modal states
     public $showCreateModal = false;
@@ -35,6 +37,7 @@ class Permission extends Component
     protected $rules = [
         'name' => 'required|string|max:255|unique:permissions,name',
         'guard_name' => 'required|string',
+        'group' => 'nullable|string|max:255',
     ];
 
     protected $messages = [
@@ -56,12 +59,63 @@ class Permission extends Component
             abort(403, 'Anda tidak memiliki akses ke halaman ini');
         }
 
-        $permissions = PermissionModel::where('name', 'like', '%' . $this->search . '%')
-            ->orderBy('name', 'asc')
-            ->paginate($this->paginate);
+        $groupsRaw = PermissionModel::select('group')->distinct()->orderBy('group', 'asc')->get();
+        $groupNames = [];
+        foreach ($groupsRaw as $gr) {
+            if (!empty($gr->group)) {
+                $groupNames[] = $gr->group;
+            }
+        }
+        $groupNames[] = 'Other Permission';
+
+        $groupedPermissions = [];
+        $groupPaginators = [];
+        $groupMeta = [];
+
+        foreach ($groupNames as $groupName) {
+            $key = Str::slug($groupName);
+            $perPage = $this->paginate;
+
+            $query = PermissionModel::where('name', 'like', '%' . $this->search . '%')
+                ->orderBy('name', 'asc');
+
+            if ($groupName === 'Other Permission') {
+                $query = $query->where(function ($q) {
+                    $q->whereNull('group')->orWhere('group', '');
+                });
+            } else {
+                $query = $query->where('group', $groupName);
+            }
+
+            $paginator = $query->paginate($perPage, ['*'], 'page_' . $key);
+
+            if ($paginator->total() === 0) {
+                continue;
+            }
+
+            $startIndex = ($paginator->currentPage() - 1) * $paginator->perPage();
+            $seq = 0;
+            $items = [];
+            foreach ($paginator->items() as $perm) {
+                $index = $startIndex + (++$seq);
+                $items[] = [
+                    'model' => $perm,
+                    'index' => $index,
+                ];
+            }
+
+            $groupedPermissions[$key] = $items;
+            $groupPaginators[$key] = $paginator;
+            $groupMeta[$key] = ['name' => $groupName];
+        }
+
+        $groups = PermissionModel::select('group')->distinct()->pluck('group')->filter()->values();
 
         return view('livewire.admin.permission', [
-            'permissions' => $permissions
+            'groups' => $groups,
+            'groupedPermissions' => $groupedPermissions,
+            'groupPaginators' => $groupPaginators,
+            'groupMeta' => $groupMeta,
         ]);
     }
 
@@ -80,6 +134,7 @@ class Permission extends Component
         $this->permissionId = $permission->id;
         $this->name = $permission->name;
         $this->guard_name = $permission->guard_name;
+        $this->group = $permission->group;
 
         $this->showEditModal = true;
     }
@@ -92,6 +147,7 @@ class Permission extends Component
             PermissionModel::create([
                 'name' => $this->name,
                 'guard_name' => $this->guard_name,
+                'group' => $this->group,
             ]);
 
             $this->dispatch('success', 'Permission berhasil ditambahkan!');
@@ -115,6 +171,7 @@ class Permission extends Component
             $permission->update([
                 'name' => $this->name,
                 'guard_name' => $this->guard_name,
+                'group' => $this->group,
             ]);
 
             $this->dispatch('success', 'Permission berhasil diperbarui!');
@@ -168,6 +225,7 @@ class Permission extends Component
             'permissionId',
             'name',
             'guard_name',
+            'group',
             'deletePermissionId',
             'deletePermissionName'
         ]);

@@ -14,7 +14,7 @@
                             </h3>
                             @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']) && !$showForm)
                                 <div class="card-actions">
-                                    <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    <button wire:click="showAddForm" class="btn btn-primary py-2 rounded-4 shadow-sm">
                                         <span wire:loading.remove wire:target="showAddForm">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"

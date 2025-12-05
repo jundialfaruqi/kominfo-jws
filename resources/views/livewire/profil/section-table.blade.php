@@ -140,7 +140,7 @@
                                     </span>
                                 </button>
                                 <button wire:click="delete('{{ $profil->id }}')"
-                                    class="btn py-2 px-2 rounded-4 shadow-sm " data-bs-toggle="modal"
+                                    class="btn py-2 px-2 rounded-4 shadow-sm" data-bs-toggle="modal"
                                     data-bs-target="#deleteModal">
                                     <span wire:loading.remove wire:target="delete('{{ $profil->id }}')">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"

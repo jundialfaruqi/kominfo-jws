@@ -373,40 +373,5 @@
             </script>
         @endscript
 
-
     </div>
-
-    {{-- Create Agenda Oleh Admin --}}
-    {{-- @include('livewire.agenda.agenda-all-create') --}}
-
-    {{-- Delete Modal --}}
-    {{-- @include('livewire.profil.delete') --}}
-
-    {{-- Close Modal --}}
-    {{-- @script
-            <script>
-                $wire.on('closeDeleteModal', () => {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-                });
-
-                $wire.on('success', message => {
-                    iziToast.success({
-                        title: 'Berhasil',
-                        message,
-                        position: 'topRight'
-                    });
-                });
-
-                $wire.on('error', message => {
-                    iziToast.error({
-                        title: 'Gagal',
-                        message,
-                        position: 'topRight'
-                    });
-                });
-            </script>
-        @endscript --}}
 </div>

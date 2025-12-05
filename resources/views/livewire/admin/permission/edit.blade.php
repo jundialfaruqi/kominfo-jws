@@ -35,6 +35,26 @@
                         <span class="text-danger small">{{ $message }}</span>
                     @enderror
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Grup Permission</label>
+                    <input list="permission-groups" wire:model="group" type="text"
+                        class="form-control rounded-3 @error('group') is-invalid @enderror"
+                        placeholder="Masukkan nama grup atau pilih dari daftar">
+                    <datalist id="permission-groups">
+                        @foreach ($groups as $g)
+                            @if (!empty($g))
+                                <option value="{{ $g }}"></option>
+                            @endif
+                        @endforeach
+                    </datalist>
+                    <div class="form-text">
+                        <small class="text-muted">Buat grup baru atau pilih grup yang sudah ada</small>
+                    </div>
+                    @error('group')
+                        <span class="text-danger small">{{ $message }}</span>
+                    @enderror
+                </div>
             </div>
             <div class="modal-footer">
                 <a wire:click="cancel" href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
