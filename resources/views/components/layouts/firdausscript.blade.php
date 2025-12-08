@@ -3684,7 +3684,7 @@
                 return;
             }
             // Spacer sebagai margin antar putaran (sedikit lebih kecil)
-            const gapPx = Math.max(16, Math.round(container.clientHeight * 0.03));
+            const gapPx = 0;
             const spacer = document.createElement('div');
             spacer.setAttribute('data-loop-spacer', 'true');
             spacer.style.height = gapPx + 'px';
