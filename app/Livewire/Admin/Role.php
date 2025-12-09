@@ -64,16 +64,48 @@ class Role extends Component
             ->orderBy('name', 'asc')
             ->paginate($this->paginate);
 
-        // Filter permissions based on search
         $permissions = Permission::when($this->permissionSearch, function ($query) {
             return $query->where('name', 'like', '%' . $this->permissionSearch . '%');
         })
             ->orderBy('name', 'asc')
             ->get();
 
+        $groupsRaw = Permission::select('group')->distinct()->orderBy('group', 'asc')->get();
+        $groupNames = [];
+        foreach ($groupsRaw as $gr) {
+            if (!empty($gr->group)) {
+                $groupNames[] = $gr->group;
+            }
+        }
+        $groupNames[] = 'Other Permission';
+
+        $groupedPermissions = [];
+        foreach ($groupNames as $groupName) {
+            $query = Permission::when($this->permissionSearch, function ($query) {
+                return $query->where('name', 'like', '%' . $this->permissionSearch . '%');
+            })
+                ->orderBy('name', 'asc');
+            if ($groupName === 'Other Permission') {
+                $query = $query->where(function ($q) {
+                    $q->whereNull('group')->orWhere('group', '');
+                });
+            } else {
+                $query = $query->where('group', $groupName);
+            }
+            $items = $query->get();
+            if ($items->count() === 0) {
+                continue;
+            }
+            $groupedPermissions[$groupName] = $items;
+        }
+
+        $allPermissionIds = $permissions->pluck('id')->values();
+
         return view('livewire.admin.role', [
             'roles' => $roles,
-            'permissions' => $permissions
+            'permissions' => $permissions,
+            'groupedPermissions' => $groupedPermissions,
+            'allPermissionIds' => $allPermissionIds
         ]);
     }
 

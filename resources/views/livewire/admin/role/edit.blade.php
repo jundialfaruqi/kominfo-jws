@@ -78,7 +78,7 @@
                         <div class="mb-2">
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-primary"
-                                    wire:click="$set('selectedPermissions', {{ $permissions->pluck('id')->toJson() }})">
+                                    wire:click="$set('selectedPermissions', {{ $allPermissionIds->toJson() }})">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round"
@@ -108,13 +108,22 @@
                         </div>
 
                         <div class="row">
-                            @foreach ($permissions as $permission)
-                                <div class="col-md-6 col-lg-4 mb-2">
-                                    <label class="form-check">
-                                        <input wire:model="selectedPermissions" type="checkbox"
-                                            value="{{ $permission->id }}" class="form-check-input">
-                                        <span class="form-check-label">{{ $permission->name }}</span>
-                                    </label>
+                            @foreach ($groupedPermissions as $groupName => $items)
+                                <div class="col-12 col-md-4 mb-3">
+                                    <div class="card card-sm rounded-4 border-0 shadow-sm">
+                                        <div class="card-header py-2">
+                                            <span class="badge bg-dark-lt rounded-3">{{ $groupName }}</span>
+                                        </div>
+                                        <div class="card-body py-2">
+                                            @foreach ($items as $permission)
+                                                <label class="form-check mb-2">
+                                                    <input wire:model="selectedPermissions" type="checkbox"
+                                                        value="{{ $permission->id }}" class="form-check-input">
+                                                    <span class="form-check-label">{{ $permission->name }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
