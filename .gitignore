@@ -10,6 +10,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/tests
 .env
 .env.backup
 .env.production
