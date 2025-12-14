@@ -9,6 +9,7 @@ Route::get('profil/{slug}', [API\ProfilController::class, 'get_profil'])->name('
 
 // API route untuk mendapatkan theme pilihan
 Route::get('theme-check/{slug}', [API\ProfilController::class, 'get_theme'])->name('api.theme');
+// API route untuk mendapatkan daftar tema (my-theme) dipindah ke auth:sanctum
 
 // API route untuk mendapatkan data marquee
 Route::get('marquee1/{slug}', [API\ProfilController::class, 'get_marquee1'])->name('api.marquee1'); // API LAMA
@@ -81,4 +82,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-profil-masjid', [API\MyProfilMasjidController::class, 'show'])->name('api.my-profil-masjid.show');
     Route::post('my-profil-masjid', [API\MyProfilMasjidController::class, 'store'])->name('api.my-profil-masjid.store');
     Route::put('my-profil-masjid', [API\MyProfilMasjidController::class, 'update'])->name('api.my-profil-masjid.update');
+
+    // [ROUTE MY THEME]
+    Route::get('my-theme', [API\MyThemeController::class, 'list'])->name('api.my-theme.list');
+    Route::post('my-theme', [API\MyThemeController::class, 'set'])->name('api.my-theme.set');
 });
