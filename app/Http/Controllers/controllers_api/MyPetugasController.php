@@ -21,25 +21,33 @@ class MyPetugasController extends Controller
                 'message' => 'Unauthorized access',
             ], 403);
         }
-
-        $items = Petugas::where('user_id', $user->id)
+        $perPage = 10;
+        $paginator = Petugas::where('user_id', $user->id)
             ->select('id', 'hari', 'khatib', 'imam', 'muadzin')
             ->orderBy('hari', 'asc')
-            ->get()
-            ->map(function ($p) {
-                return [
-                    'id' => $p->id,
-                    'hari' => $p->hari,
-                    'khatib' => $p->khatib,
-                    'imam' => $p->imam,
-                    'muadzin' => $p->muadzin,
-                ];
-            });
+            ->paginate($perPage);
+
+        $transformed = $paginator->getCollection()->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'hari' => $p->hari,
+                'khatib' => $p->khatib,
+                'imam' => $p->imam,
+                'muadzin' => $p->muadzin,
+            ];
+        });
+        $paginator->setCollection($transformed);
 
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mengambil daftar petugas',
-            'data' => $items,
+            'data' => [
+                'items' => $paginator->items(),
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ],
         ]);
     }
 
