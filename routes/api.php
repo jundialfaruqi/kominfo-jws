@@ -86,4 +86,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // [ROUTE MY THEME]
     Route::get('my-theme', [API\MyThemeController::class, 'list'])->name('api.my-theme.list');
     Route::post('my-theme', [API\MyThemeController::class, 'set'])->name('api.my-theme.set');
+
+    // [ROUTE MY MARQUE]
+    Route::get('my-marque', [API\MyMarqueController::class, 'show'])->name('api.my-marque.show');
+    Route::post('my-marque', [API\MyMarqueController::class, 'store'])->name('api.my-marque.store');
+    Route::put('my-marque', [API\MyMarqueController::class, 'update'])->name('api.my-marque.update');
 });
