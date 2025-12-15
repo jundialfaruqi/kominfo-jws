@@ -91,4 +91,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-marque', [API\MyMarqueController::class, 'show'])->name('api.my-marque.show');
     Route::post('my-marque', [API\MyMarqueController::class, 'store'])->name('api.my-marque.store');
     Route::put('my-marque', [API\MyMarqueController::class, 'update'])->name('api.my-marque.update');
+
+    // [ROUTE MY PETUGAS]
+    Route::get('my-petugas', [API\MyPetugasController::class, 'list'])->name('api.my-petugas.list');
+    Route::post('my-petugas', [API\MyPetugasController::class, 'store'])->name('api.my-petugas.store');
+    Route::put('my-petugas/{id}', [API\MyPetugasController::class, 'update'])->name('api.my-petugas.update');
+    Route::delete('my-petugas/{id}', [API\MyPetugasController::class, 'destroy'])->name('api.my-petugas.destroy');
 });
