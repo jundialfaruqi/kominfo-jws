@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\Marquee;
+use App\Models\Profil;
+use App\Events\ContentUpdatedEvent;
 
 class MyMarqueController extends Controller
 {
@@ -105,6 +107,9 @@ class MyMarqueController extends Controller
         $marquee->marquee_speed = $speed;
         $marquee->save();
 
+        $profil = Profil::where('user_id', $user->id)->first();
+        if ($profil) event(new ContentUpdatedEvent($profil->slug, 'marquee'));
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil membuat data teks berjalan',
@@ -161,6 +166,9 @@ class MyMarqueController extends Controller
             $marquee->marquee6 = $items[5] ?? null;
             $marquee->marquee_speed = $speed;
             $marquee->save();
+
+            $profil = Profil::where('user_id', $user->id)->first();
+            if ($profil) event(new ContentUpdatedEvent($profil->slug, 'marquee'));
 
             return response()->json([
                 'success' => true,
