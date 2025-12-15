@@ -72,14 +72,14 @@ class MyMarqueController extends Controller
 
         $rules = [
             'items' => 'nullable|array|max:6',
-            'items.*' => 'nullable|string|max:255',
+            'items.*' => 'nullable|string|max:350',
             'speed' => 'nullable|numeric|min:0.1|max:10',
         ];
         $messages = [
             'items.array' => 'Format teks berjalan tidak valid',
             'items.max' => 'Maksimal 6 teks berjalan',
             'items.*.string' => 'Teks berjalan harus berupa string',
-            'items.*.max' => 'Teks berjalan maksimal 255 karakter',
+            'items.*.max' => 'Teks berjalan maksimal 350 karakter',
             'speed.numeric' => 'Kecepatan harus angka',
             'speed.min' => 'Kecepatan minimal 0.1',
             'speed.max' => 'Kecepatan maksimal 10',
@@ -134,14 +134,14 @@ class MyMarqueController extends Controller
             $marquee = Marquee::where('user_id', $user->id)->firstOrFail();
             $rules = [
                 'items' => 'nullable|array|max:6',
-                'items.*' => 'nullable|string|max:255',
+                'items.*' => 'nullable|string|max:350',
                 'speed' => 'nullable|numeric|min:0.1|max:10',
             ];
             $messages = [
                 'items.array' => 'Format teks berjalan tidak valid',
                 'items.max' => 'Maksimal 6 teks berjalan',
                 'items.*.string' => 'Teks berjalan harus berupa string',
-                'items.*.max' => 'Teks berjalan maksimal 255 karakter',
+                'items.*.max' => 'Teks berjalan maksimal 350 karakter',
                 'speed.numeric' => 'Kecepatan harus angka',
                 'speed.min' => 'Kecepatan minimal 0.1',
                 'speed.max' => 'Kecepatan maksimal 10',
