@@ -167,6 +167,7 @@ class MyLaporanKeuanganController extends Controller
                     'total_masuk' => 0,
                     'total_keluar' => 0,
                     'net_total' => 0,
+                    'categories' => [],
                 ],
             ]);
         }
@@ -178,6 +179,7 @@ class MyLaporanKeuanganController extends Controller
         if ($month < 1 || $month > 12) {
             $month = $now->month;
         }
+        $group = $request->query('group', 'date'); // 'date' or 'category'
 
         $startDate = null;
         $endDate = null;
@@ -195,12 +197,71 @@ class MyLaporanKeuanganController extends Controller
             ->whereDate('tanggal', '>=', $startDate->toDateString())
             ->whereDate('tanggal', '<=', $endDate->toDateString())
             ->orderBy('tanggal', 'asc')
-            ->get(['tanggal', 'jenis', 'saldo', 'is_opening']);
+            ->get(['tanggal', 'jenis', 'saldo', 'is_opening', 'id_group_category']);
 
+        if ($group === 'category') {
+            $sumByCatMasuk = [];
+            $sumByCatKeluar = [];
+            $catNames = [];
+            foreach ($rows as $r) {
+                $gcId = (int) ($r->id_group_category ?? 0);
+                if (!array_key_exists($gcId, $catNames)) {
+                    $gc = $gcId ? GroupCategory::find($gcId) : null;
+                    $catNames[$gcId] = $gc?->name ?? '-';
+                }
+                $jenisNormalized = ($r->is_opening == 1 || $r->jenis === 'masuk') ? 'masuk' : 'keluar';
+                if (!isset($sumByCatMasuk[$gcId])) $sumByCatMasuk[$gcId] = 0;
+                if (!isset($sumByCatKeluar[$gcId])) $sumByCatKeluar[$gcId] = 0;
+                if ($jenisNormalized === 'masuk') {
+                    $sumByCatMasuk[$gcId] += (int) $r->saldo;
+                } else {
+                    $sumByCatKeluar[$gcId] += (int) $r->saldo;
+                }
+            }
+            // Order categories by name asc
+            $ids = array_keys($catNames);
+            usort($ids, function ($a, $b) use ($catNames) {
+                return strcmp($catNames[$a], $catNames[$b]);
+            });
+            $labels = [];
+            $masukSeries = [];
+            $keluarSeries = [];
+            $categoriesMeta = [];
+            $totalMasuk = 0;
+            $totalKeluar = 0;
+            foreach ($ids as $gcId) {
+                $labels[] = $catNames[$gcId];
+                $m = (int) ($sumByCatMasuk[$gcId] ?? 0);
+                $k = (int) ($sumByCatKeluar[$gcId] ?? 0);
+                $masukSeries[] = $m;
+                $keluarSeries[] = $k;
+                $totalMasuk += $m;
+                $totalKeluar += $k;
+                $categoriesMeta[] = ['id' => (int) $gcId, 'name' => $catNames[$gcId]];
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil mengambil data grafik per kategori',
+                'data' => [
+                    'labels' => $labels,
+                    'masuk' => $masukSeries,
+                    'keluar' => $keluarSeries,
+                    'total_masuk' => (int) $totalMasuk,
+                    'total_keluar' => (int) $totalKeluar,
+                    'net_total' => (int) ($totalMasuk - $totalKeluar),
+                    'mode' => $mode,
+                    'recent_days' => $recentDays > 0 ? $recentDays : null,
+                    'year' => $recentDays > 0 ? null : $year,
+                    'month' => $recentDays > 0 ? null : $month,
+                    'categories' => $categoriesMeta,
+                ],
+            ]);
+        }
+
+        // Default: group by date
         $labels = [];
         $sumMasuk = [];
         $sumKeluar = [];
-
         $cursor = $startDate->copy();
         while ($cursor <= $endDate) {
             $key = $cursor->toDateString();
