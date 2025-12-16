@@ -141,4 +141,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // [ROUTE MY DURASI]
     Route::get('my-durasi', [API\MyDurasiController::class, 'index'])->name('api.my-durasi.index');
     Route::post('my-durasi', [API\MyDurasiController::class, 'update'])->name('api.my-durasi.update');
+
+    // [ROUTE MY MUROTTAL]
+    Route::get('my-murottal', [API\MyMurottalController::class, 'show'])->name('api.my-murottal.show');
+    Route::post('my-murottal/{slot}', [API\MyMurottalController::class, 'upload'])->name('api.my-murottal.upload');
+    Route::delete('my-murottal/{slot}', [API\MyMurottalController::class, 'destroy'])->name('api.my-murottal.destroy');
+    Route::put('my-murottal/status', [API\MyMurottalController::class, 'updateStatus'])->name('api.my-murottal.update-status');
 });
