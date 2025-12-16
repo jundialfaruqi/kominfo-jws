@@ -106,6 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // [ROUTE MY LAPORAN KEUANGAN]
     Route::get('my-laporan-keuangan', [API\MyLaporanKeuanganController::class, 'list'])->name('api.my-laporan-keuangan.list');
+    Route::get('my-laporan-keuangan/graph', [API\MyLaporanKeuanganController::class, 'graph'])->name('api.my-laporan-keuangan.graph');
     Route::post('my-laporan-keuangan', [API\MyLaporanKeuanganController::class, 'store'])->name('api.my-laporan-keuangan.store');
     Route::put('my-laporan-keuangan/{id}', [API\MyLaporanKeuanganController::class, 'update'])->name('api.my-laporan-keuangan.update');
     Route::delete('my-laporan-keuangan/{id}', [API\MyLaporanKeuanganController::class, 'destroy'])->name('api.my-laporan-keuangan.destroy');

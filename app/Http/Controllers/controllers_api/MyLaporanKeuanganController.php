@@ -145,6 +145,118 @@ class MyLaporanKeuanganController extends Controller
         ]);
     }
 
+    public function graph(Request $request)
+    {
+        $user = $request->user();
+        if (!$user || in_array($user->role, ['Admin', 'Super Admin'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access',
+            ], 403);
+        }
+
+        $profil = Profil::where('user_id', $user->id)->first();
+        if (!$profil) {
+            return response()->json([
+                'success' => true,
+                'message' => 'User belum memiliki profil masjid',
+                'data' => [
+                    'labels' => [],
+                    'masuk' => [],
+                    'keluar' => [],
+                    'total_masuk' => 0,
+                    'total_keluar' => 0,
+                    'net_total' => 0,
+                ],
+            ]);
+        }
+
+        $now = Carbon::now();
+        $recentDays = (int) ($request->query('recent_days', 0));
+        $year = (int) ($request->query('year', $now->year));
+        $month = (int) ($request->query('month', $now->month));
+        if ($month < 1 || $month > 12) {
+            $month = $now->month;
+        }
+
+        $startDate = null;
+        $endDate = null;
+        $mode = 'month';
+        if ($recentDays > 0) {
+            $mode = 'recent';
+            $startDate = $now->copy()->subDays($recentDays - 1)->startOfDay();
+            $endDate = $now->copy()->endOfDay();
+        } else {
+            $startDate = Carbon::create($year, $month, 1)->startOfDay();
+            $endDate = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay();
+        }
+
+        $rows = Laporan::where('id_masjid', $profil->id)
+            ->whereDate('tanggal', '>=', $startDate->toDateString())
+            ->whereDate('tanggal', '<=', $endDate->toDateString())
+            ->orderBy('tanggal', 'asc')
+            ->get(['tanggal', 'jenis', 'saldo', 'is_opening']);
+
+        $labels = [];
+        $sumMasuk = [];
+        $sumKeluar = [];
+
+        $cursor = $startDate->copy();
+        while ($cursor <= $endDate) {
+            $key = $cursor->toDateString();
+            $labels[] = $key;
+            $sumMasuk[$key] = 0;
+            $sumKeluar[$key] = 0;
+            $cursor->addDay();
+        }
+
+        foreach ($rows as $r) {
+            $key = Carbon::parse($r->tanggal)->toDateString();
+            $jenisNormalized = ($r->is_opening == 1 || $r->jenis === 'masuk') ? 'masuk' : 'keluar';
+            if (!isset($sumMasuk[$key])) {
+                $sumMasuk[$key] = 0;
+            }
+            if (!isset($sumKeluar[$key])) {
+                $sumKeluar[$key] = 0;
+            }
+            if ($jenisNormalized === 'masuk') {
+                $sumMasuk[$key] += (int) $r->saldo;
+            } else {
+                $sumKeluar[$key] += (int) $r->saldo;
+            }
+        }
+
+        $masukSeries = [];
+        $keluarSeries = [];
+        $totalMasuk = 0;
+        $totalKeluar = 0;
+        foreach ($labels as $d) {
+            $m = (int) ($sumMasuk[$d] ?? 0);
+            $k = (int) ($sumKeluar[$d] ?? 0);
+            $masukSeries[] = $m;
+            $keluarSeries[] = $k;
+            $totalMasuk += $m;
+            $totalKeluar += $k;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil mengambil data grafik laporan keuangan',
+            'data' => [
+                'labels' => $labels,
+                'masuk' => $masukSeries,
+                'keluar' => $keluarSeries,
+                'total_masuk' => (int) $totalMasuk,
+                'total_keluar' => (int) $totalKeluar,
+                'net_total' => (int) ($totalMasuk - $totalKeluar),
+                'mode' => $mode,
+                'recent_days' => $recentDays > 0 ? $recentDays : null,
+                'year' => $recentDays > 0 ? null : $year,
+                'month' => $recentDays > 0 ? null : $month,
+            ],
+        ]);
+    }
+
     public function store(Request $request)
     {
         $user = $request->user();
