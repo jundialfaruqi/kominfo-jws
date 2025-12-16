@@ -99,6 +99,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('my-petugas/{id}', [API\MyPetugasController::class, 'update'])->name('api.my-petugas.update');
     Route::delete('my-petugas/{id}', [API\MyPetugasController::class, 'destroy'])->name('api.my-petugas.destroy');
 
+    // [ROUTE USER STATUS]
+    Route::get('statuses', [API\UserStatusController::class, 'index'])->name('api.statuses.index');
+    Route::post('statuses', [API\UserStatusController::class, 'store'])->name('api.statuses.store');
+
     // [ROUTE MY AGENDA]
     Route::get('my-agenda', [API\MyAgendaController::class, 'list'])->name('api.my-agenda.list');
     Route::post('my-agenda', [API\MyAgendaController::class, 'store'])->name('api.my-agenda.store');
