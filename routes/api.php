@@ -137,4 +137,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('my-slide-iqomah-jumat/{slot}', [API\MySlideIqomahJumatController::class, 'upload'])->name('api.my-slide-iqomah-jumat.upload');
     Route::put('my-slide-iqomah-jumat/{slot}', [API\MySlideIqomahJumatController::class, 'upload'])->name('api.my-slide-iqomah-jumat.update');
     Route::delete('my-slide-iqomah-jumat/{slot}', [API\MySlideIqomahJumatController::class, 'destroy'])->name('api.my-slide-iqomah-jumat.destroy');
+
+    // [ROUTE MY DURASI]
+    Route::get('my-durasi', [API\MyDurasiController::class, 'index'])->name('api.my-durasi.index');
+    Route::post('my-durasi', [API\MyDurasiController::class, 'update'])->name('api.my-durasi.update');
 });
