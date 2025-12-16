@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // You can schedule backfill if desired, e.g. daily:
         // $schedule->command('users:backfill-last-activity')->dailyAt('02:00');
+        $schedule->command('statuses:clean')->hourly();
     }
 
     /**

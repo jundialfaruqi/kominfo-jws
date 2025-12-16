@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class UserStatus extends Model
 {
@@ -17,6 +18,17 @@ class UserStatus extends Model
     protected $casts = [
         'expires_at' => 'datetime',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($status) {
+            if ($status->media_url) {
+                // Remove /storage/ prefix if present to get relative path in public disk
+                $path = str_replace('/storage/', '', $status->media_url);
+                Storage::disk('public')->delete($path);
+            }
+        });
+    }
 
     public function user()
     {

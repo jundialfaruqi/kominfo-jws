@@ -69,12 +69,6 @@ class UserStatusController extends Controller
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        // Delete media file if exists
-        if ($status->media_url) {
-            $path = str_replace('/storage/', '', $status->media_url);
-            Storage::disk('public')->delete($path);
-        }
-
         $status->delete();
 
         return response()->json(['success' => true, 'message' => 'Status deleted']);
