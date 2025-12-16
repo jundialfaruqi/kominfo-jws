@@ -147,4 +147,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('my-murottal/{slot}', [API\MyMurottalController::class, 'upload'])->name('api.my-murottal.upload');
     Route::delete('my-murottal/{slot}', [API\MyMurottalController::class, 'destroy'])->name('api.my-murottal.destroy');
     Route::put('my-murottal/status', [API\MyMurottalController::class, 'updateStatus'])->name('api.my-murottal.update-status');
+
+    // [ROUTE MY ADZAN AUDIO]
+    Route::get('my-audio-adzan', [API\MyAdzanAudioController::class, 'show'])->name('api.my-audio-adzan.show');
+    Route::post('my-audio-adzan/{slot}', [API\MyAdzanAudioController::class, 'upload'])->name('api.my-audio-adzan.upload');
+    Route::delete('my-audio-adzan/{slot}', [API\MyAdzanAudioController::class, 'destroy'])->name('api.my-audio-adzan.destroy');
+    Route::put('my-audio-adzan/status', [API\MyAdzanAudioController::class, 'updateStatus'])->name('api.my-audio-adzan.update-status');
 });
