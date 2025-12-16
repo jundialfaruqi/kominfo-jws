@@ -67,6 +67,61 @@ class MyJumbotronMasjidController extends Controller
         }
     }
 
+    public function setAktif(Request $request)
+    {
+        try {
+            $user = $request->user();
+            if (!$user || in_array($user->role, ['Admin', 'Super Admin'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access',
+                ], 403);
+            }
+            $validator = Validator::make($request->all(), [
+                'aktif' => 'required|boolean',
+            ], [
+                'aktif.required' => 'Status aktif wajib diisi',
+                'aktif.boolean' => 'Status aktif harus bernilai true/false',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi input gagal.',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+            $profil = Profil::where('user_id', $user->id)->firstOrFail();
+            $jm = JumbotronMasjid::firstOrCreate([
+                'masjid_id' => $profil->id,
+                'created_by' => $user->id,
+            ], [
+                'aktif' => false,
+            ]);
+            $jm->aktif = (bool) $request->boolean('aktif');
+            $jm->save();
+
+            event(new ContentUpdatedEvent($profil->slug, 'jumbotron_masjid'));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status jumbotron berhasil diperbarui',
+                'data' => [
+                    'aktif' => (bool) $jm->aktif,
+                ],
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Profil masjid belum ada untuk user ini',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui status jumbotron: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function upload(Request $request, int $slot)
     {
         $user = $request->user();

@@ -119,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // [ROUTE MY JUMBOTRON MASJID]
     Route::get('my-jumbotron-masjid', [API\MyJumbotronMasjidController::class, 'show'])->name('api.my-jumbotron-masjid.show');
+    Route::put('my-jumbotron-masjid', [API\MyJumbotronMasjidController::class, 'setAktif'])->name('api.my-jumbotron-masjid.set-aktif');
     Route::post('my-jumbotron-masjid/{slot}', [API\MyJumbotronMasjidController::class, 'upload'])->name('api.my-jumbotron-masjid.upload');
     Route::put('my-jumbotron-masjid/{slot}', [API\MyJumbotronMasjidController::class, 'upload'])->name('api.my-jumbotron-masjid.update');
     Route::delete('my-jumbotron-masjid/{slot}', [API\MyJumbotronMasjidController::class, 'destroy'])->name('api.my-jumbotron-masjid.destroy');
