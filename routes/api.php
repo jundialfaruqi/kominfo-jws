@@ -123,4 +123,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('my-jumbotron-masjid/{slot}', [API\MyJumbotronMasjidController::class, 'upload'])->name('api.my-jumbotron-masjid.upload');
     Route::put('my-jumbotron-masjid/{slot}', [API\MyJumbotronMasjidController::class, 'upload'])->name('api.my-jumbotron-masjid.update');
     Route::delete('my-jumbotron-masjid/{slot}', [API\MyJumbotronMasjidController::class, 'destroy'])->name('api.my-jumbotron-masjid.destroy');
+    Route::post('my-jumbotron-masjid/toggle', [API\MyJumbotronMasjidController::class, 'toggleAktif'])->name('api.my-jumbotron-masjid.toggle');
+
+    // [ROUTE MY SLIDE IQOMAH JUMAT]
+    Route::get('my-slide-iqomah-jumat', [API\MySlideIqomahJumatController::class, 'show'])->name('api.my-slide-iqomah-jumat.show');
+    Route::post('my-slide-iqomah-jumat/{slot}', [API\MySlideIqomahJumatController::class, 'upload'])->name('api.my-slide-iqomah-jumat.upload');
+    Route::put('my-slide-iqomah-jumat/{slot}', [API\MySlideIqomahJumatController::class, 'upload'])->name('api.my-slide-iqomah-jumat.update');
+    Route::delete('my-slide-iqomah-jumat/{slot}', [API\MySlideIqomahJumatController::class, 'destroy'])->name('api.my-slide-iqomah-jumat.destroy');
 });
