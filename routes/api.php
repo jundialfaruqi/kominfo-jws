@@ -66,6 +66,7 @@ Route::post('login', [API\AuthController::class, 'login'])->name('api.auth.login
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', [API\AuthController::class, 'user'])->name('api.auth.user');
+    Route::post('user/update', [API\AuthController::class, 'update'])->name('api.auth.update');
     Route::post('logout', [API\AuthController::class, 'logout'])->name('api.auth.logout');
 
     // [ROUTE PROFIL MASJID]
