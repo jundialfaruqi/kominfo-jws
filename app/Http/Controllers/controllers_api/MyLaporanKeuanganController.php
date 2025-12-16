@@ -39,12 +39,8 @@ class MyLaporanKeuanganController extends Controller
         }
 
         $perPage = 10;
-        $today = Carbon::today();
-        $fromDate = $today->copy()->subDays(7);
 
         $paginator = Laporan::where('id_masjid', $profil->id)
-            ->whereDate('tanggal', '>=', $fromDate->format('Y-m-d'))
-            ->whereDate('tanggal', '<=', $today->format('Y-m-d'))
             ->orderBy('tanggal', 'desc')
             ->orderBy('id', 'desc')
             ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
@@ -66,8 +62,6 @@ class MyLaporanKeuanganController extends Controller
         $paginator->setCollection($transformed);
 
         $allItems = Laporan::where('id_masjid', $profil->id)
-            ->whereDate('tanggal', '>=', $fromDate->format('Y-m-d'))
-            ->whereDate('tanggal', '<=', $today->format('Y-m-d'))
             ->orderBy('tanggal', 'desc')
             ->orderBy('id', 'desc')
             ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
@@ -97,7 +91,7 @@ class MyLaporanKeuanganController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Berhasil mengambil daftar laporan keuangan 8 hari terakhir',
+            'message' => 'Berhasil mengambil daftar laporan keuangan',
             'data' => [
                 'items' => $paginator->items(),
                 'current_page' => $paginator->currentPage(),
