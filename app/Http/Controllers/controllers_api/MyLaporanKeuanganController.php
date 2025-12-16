@@ -67,9 +67,14 @@ class MyLaporanKeuanganController extends Controller
             ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
             ->get();
 
+        $groupPerPage = max(1, (int) ($request->query('group_per_page', 5)));
+        $groupPage = max(1, (int) ($request->query('group_page', 1)));
+
         $grouped = $allItems->groupBy('id_group_category');
-        $groups = $grouped->map(function ($items, $gcId) {
+        $groupsArray = [];
+        foreach ($grouped as $gcId => $items) {
             $gc = $gcId ? GroupCategory::find($gcId) : null;
+            // Sort items by tanggal desc, id desc already applied at query level
             $mappedItems = collect($items)->map(function ($l) use ($gc, $gcId) {
                 return [
                     'id' => (int) $l->id,
@@ -81,13 +86,27 @@ class MyLaporanKeuanganController extends Controller
                     'group_category_id' => (int) ($gcId ?? 0),
                     'group_category_name' => $gc?->name ?? '-',
                 ];
-            })->values()->all();
-            return [
+            })->values();
+            // Limit 10 items per category
+            $limitedItems = $mappedItems->take(10)->values()->all();
+            $groupsArray[] = [
                 'group_category_id' => (int) ($gcId ?? 0),
                 'group_category_name' => $gc?->name ?? '-',
-                'items' => $mappedItems,
+                'items' => $limitedItems,
+                'items_total' => $mappedItems->count(),
             ];
-        })->values()->all();
+        }
+        // Sort groups by name asc
+        usort($groupsArray, function ($a, $b) {
+            return strcmp($a['group_category_name'], $b['group_category_name']);
+        });
+        $groupTotal = count($groupsArray);
+        $groupLastPage = max(1, (int) ceil($groupTotal / $groupPerPage));
+        if ($groupPage > $groupLastPage) {
+            $groupPage = $groupLastPage;
+        }
+        $offset = ($groupPage - 1) * $groupPerPage;
+        $groups = array_slice($groupsArray, $offset, $groupPerPage);
 
         return response()->json([
             'success' => true,
@@ -99,6 +118,10 @@ class MyLaporanKeuanganController extends Controller
                 'total' => $paginator->total(),
                 'last_page' => $paginator->lastPage(),
                 'groups' => $groups,
+                'group_current_page' => $groupPage,
+                'group_per_page' => $groupPerPage,
+                'group_total' => $groupTotal,
+                'group_last_page' => $groupLastPage,
             ],
         ]);
     }
