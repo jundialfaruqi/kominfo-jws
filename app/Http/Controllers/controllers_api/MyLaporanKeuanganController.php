@@ -65,6 +65,36 @@ class MyLaporanKeuanganController extends Controller
         });
         $paginator->setCollection($transformed);
 
+        $allItems = Laporan::where('id_masjid', $profil->id)
+            ->whereDate('tanggal', '>=', $fromDate->format('Y-m-d'))
+            ->whereDate('tanggal', '<=', $today->format('Y-m-d'))
+            ->orderBy('tanggal', 'desc')
+            ->orderBy('id', 'desc')
+            ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
+            ->get();
+
+        $grouped = $allItems->groupBy('id_group_category');
+        $groups = $grouped->map(function ($items, $gcId) {
+            $gc = $gcId ? GroupCategory::find($gcId) : null;
+            $mappedItems = collect($items)->map(function ($l) use ($gc, $gcId) {
+                return [
+                    'id' => (int) $l->id,
+                    'tanggal' => $l->tanggal,
+                    'uraian' => $l->uraian,
+                    'jenis' => $l->is_opening ? 'masuk' : ($l->jenis ?? 'masuk'),
+                    'is_opening' => (bool) $l->is_opening,
+                    'saldo' => (int) $l->saldo,
+                    'group_category_id' => (int) ($gcId ?? 0),
+                    'group_category_name' => $gc?->name ?? '-',
+                ];
+            })->values()->all();
+            return [
+                'group_category_id' => (int) ($gcId ?? 0),
+                'group_category_name' => $gc?->name ?? '-',
+                'items' => $mappedItems,
+            ];
+        })->values()->all();
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mengambil daftar laporan keuangan 8 hari terakhir',
@@ -74,6 +104,7 @@ class MyLaporanKeuanganController extends Controller
                 'per_page' => $paginator->perPage(),
                 'total' => $paginator->total(),
                 'last_page' => $paginator->lastPage(),
+                'groups' => $groups,
             ],
         ]);
     }
@@ -269,4 +300,3 @@ class MyLaporanKeuanganController extends Controller
         }
     }
 }
-
