@@ -75,7 +75,20 @@ class AuthController extends Controller
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
+            'current_password' => 'nullable|required_with:password|string',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
+
+        // Handle Password Update
+        if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Password lama tidak sesuai',
+                ], 422);
+            }
+            $user->password = Hash::make($request->password);
+        }
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
@@ -85,7 +98,7 @@ class AuthController extends Controller
             if ($user->photo && file_exists(public_path($user->photo))) {
                 // Optional: delete old photo
             }
-            
+
             // Store directly to public/storage/photos
             // Note: In Laravel default storage link, storage/app/public is linked to public/storage
             $path = $request->file('photo')->store('photos', 'public');
