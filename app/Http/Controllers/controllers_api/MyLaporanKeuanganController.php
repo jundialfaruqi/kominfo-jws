@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Laporan;
 use App\Models\Profil;
 use App\Models\GroupCategory;
+use App\Events\ContentUpdatedEvent;
 
 class MyLaporanKeuanganController extends Controller
 {
@@ -207,6 +208,10 @@ class MyLaporanKeuanganController extends Controller
 
         $gc = GroupCategory::find($lap->id_group_category);
 
+        if (!empty($profil->slug)) {
+            event(new ContentUpdatedEvent($profil->slug, 'laporan'));
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Berhasil membuat laporan keuangan',
@@ -283,6 +288,10 @@ class MyLaporanKeuanganController extends Controller
 
             $gc = GroupCategory::find($lap->id_group_category);
 
+            if (!empty($profil->slug)) {
+                event(new ContentUpdatedEvent($profil->slug, 'laporan'));
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil mengupdate laporan keuangan',
@@ -319,6 +328,10 @@ class MyLaporanKeuanganController extends Controller
             $profil = Profil::where('user_id', $user->id)->firstOrFail();
             $lap = Laporan::where('id_masjid', $profil->id)->findOrFail($id);
             $lap->delete();
+
+            if (!empty($profil->slug)) {
+                event(new ContentUpdatedEvent($profil->slug, 'laporan'));
+            }
 
             return response()->json([
                 'success' => true,
