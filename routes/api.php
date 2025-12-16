@@ -103,4 +103,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('my-group-category', [API\MyGroupCategoryController::class, 'store'])->name('api.my-group-category.store');
     Route::put('my-group-category/{id}', [API\MyGroupCategoryController::class, 'update'])->name('api.my-group-category.update');
     Route::delete('my-group-category/{id}', [API\MyGroupCategoryController::class, 'destroy'])->name('api.my-group-category.destroy');
+
+    // [ROUTE MY LAPORAN KEUANGAN]
+    Route::get('my-laporan-keuangan', [API\MyLaporanKeuanganController::class, 'list'])->name('api.my-laporan-keuangan.list');
+    Route::post('my-laporan-keuangan', [API\MyLaporanKeuanganController::class, 'store'])->name('api.my-laporan-keuangan.store');
+    Route::put('my-laporan-keuangan/{id}', [API\MyLaporanKeuanganController::class, 'update'])->name('api.my-laporan-keuangan.update');
+    Route::delete('my-laporan-keuangan/{id}', [API\MyLaporanKeuanganController::class, 'destroy'])->name('api.my-laporan-keuangan.destroy');
 });
