@@ -38,15 +38,21 @@ class MyLaporanKeuanganController extends Controller
             ]);
         }
 
-        $perPage = 10;
-
-        $paginator = Laporan::where('id_masjid', $profil->id)
+        $now = Carbon::now();
+        $year = (int) ($request->query('year', $now->year));
+        $month = (int) ($request->query('month', $now->month));
+        if ($month < 1 || $month > 12) {
+            $month = $now->month;
+        }
+        // Ambil semua item untuk bulan yang dipilih, tanpa paginate
+        $itemsRaw = Laporan::where('id_masjid', $profil->id)
+            ->whereYear('tanggal', $year)
+            ->whereMonth('tanggal', $month)
             ->orderBy('tanggal', 'desc')
             ->orderBy('id', 'desc')
             ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
-            ->paginate($perPage);
-
-        $transformed = $paginator->getCollection()->map(function ($l) {
+            ->get();
+        $items = $itemsRaw->map(function ($l) {
             $gc = $l->id_group_category ? GroupCategory::find($l->id_group_category) : null;
             return [
                 'id' => (int) $l->id,
@@ -58,17 +64,15 @@ class MyLaporanKeuanganController extends Controller
                 'group_category_id' => (int) ($l->id_group_category ?? 0),
                 'group_category_name' => $gc?->name ?? '-',
             ];
-        });
-        $paginator->setCollection($transformed);
+        })->values()->all();
 
         $allItems = Laporan::where('id_masjid', $profil->id)
+            ->whereYear('tanggal', $year)
+            ->whereMonth('tanggal', $month)
             ->orderBy('tanggal', 'desc')
             ->orderBy('id', 'desc')
             ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
             ->get();
-
-        $groupPerPage = max(1, (int) ($request->query('group_per_page', 5)));
-        $groupPage = max(1, (int) ($request->query('group_page', 1)));
 
         $grouped = $allItems->groupBy('id_group_category');
         $groupsArray = [];
@@ -87,12 +91,10 @@ class MyLaporanKeuanganController extends Controller
                     'group_category_name' => $gc?->name ?? '-',
                 ];
             })->values();
-            // Limit 10 items per category
-            $limitedItems = $mappedItems->take(10)->values()->all();
             $groupsArray[] = [
                 'group_category_id' => (int) ($gcId ?? 0),
                 'group_category_name' => $gc?->name ?? '-',
-                'items' => $limitedItems,
+                'items' => $mappedItems->values()->all(),
                 'items_total' => $mappedItems->count(),
             ];
         }
@@ -100,28 +102,16 @@ class MyLaporanKeuanganController extends Controller
         usort($groupsArray, function ($a, $b) {
             return strcmp($a['group_category_name'], $b['group_category_name']);
         });
-        $groupTotal = count($groupsArray);
-        $groupLastPage = max(1, (int) ceil($groupTotal / $groupPerPage));
-        if ($groupPage > $groupLastPage) {
-            $groupPage = $groupLastPage;
-        }
-        $offset = ($groupPage - 1) * $groupPerPage;
-        $groups = array_slice($groupsArray, $offset, $groupPerPage);
+        $groups = $groupsArray;
 
         return response()->json([
             'success' => true,
             'message' => 'Berhasil mengambil daftar laporan keuangan',
             'data' => [
-                'items' => $paginator->items(),
-                'current_page' => $paginator->currentPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
-                'last_page' => $paginator->lastPage(),
+                'items' => $items,
                 'groups' => $groups,
-                'group_current_page' => $groupPage,
-                'group_per_page' => $groupPerPage,
-                'group_total' => $groupTotal,
-                'group_last_page' => $groupLastPage,
+                'year' => $year,
+                'month' => $month,
             ],
         ]);
     }
