@@ -102,6 +102,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // [ROUTE USER STATUS]
     Route::get('statuses', [API\UserStatusController::class, 'index'])->name('api.statuses.index');
     Route::post('statuses', [API\UserStatusController::class, 'store'])->name('api.statuses.store');
+    Route::delete('statuses/{id}', [API\UserStatusController::class, 'destroy'])->name('api.statuses.destroy');
+    Route::post('statuses/{id}/view', [API\UserStatusController::class, 'view'])->name('api.statuses.view');
+    Route::get('statuses/{id}/viewers', [API\UserStatusController::class, 'viewers'])->name('api.statuses.viewers');
 
     // [ROUTE MY AGENDA]
     Route::get('my-agenda', [API\MyAgendaController::class, 'list'])->name('api.my-agenda.list');

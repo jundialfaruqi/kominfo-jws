@@ -14,12 +14,6 @@ class UserStatusController extends Controller
     public function index()
     {
         // Return active statuses (not expired)
-        // Grouped by User, or just a list? WhatsApp Status is grouped by user.
-        // But for simplicity in Flutter, let's return a flat list ordered by time,
-        // and we can group in Flutter or just show a feed.
-        // Or better: distinct users who have active statuses.
-
-        // Let's return all active statuses ordered by created_at desc.
         // Active means expires_at > now.
         $statuses = UserStatus::with('user')
             ->where('expires_at', '>', Carbon::now())
@@ -65,5 +59,50 @@ class UserStatusController extends Controller
             'success' => true,
             'data' => $status->load('user'),
         ]);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $status = UserStatus::findOrFail($id);
+
+        if ($status->user_id !== $request->user()->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        // Delete media file if exists
+        if ($status->media_url) {
+            $path = str_replace('/storage/', '', $status->media_url);
+            Storage::disk('public')->delete($path);
+        }
+
+        $status->delete();
+
+        return response()->json(['success' => true, 'message' => 'Status deleted']);
+    }
+
+    public function view(Request $request, $id)
+    {
+        $status = UserStatus::findOrFail($id);
+
+        // Record view if not own status (optional, usually own views don't count or do?)
+        // WhatsApp doesn't count your own view, but it doesn't hurt.
+        // Let's record everyone.
+
+        $status->viewers()->syncWithoutDetaching([$request->user()->id => ['viewed_at' => now()]]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function viewers(Request $request, $id)
+    {
+        $status = UserStatus::findOrFail($id);
+
+        if ($status->user_id !== $request->user()->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $viewers = $status->viewers()->orderBy('status_views.viewed_at', 'desc')->get();
+
+        return response()->json(['success' => true, 'data' => $viewers]);
     }
 }

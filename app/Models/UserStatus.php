@@ -22,4 +22,10 @@ class UserStatus extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function viewers()
+    {
+        return $this->belongsToMany(User::class, 'status_views', 'user_status_id', 'user_id')
+            ->withPivot('viewed_at');
+    }
 }
