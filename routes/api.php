@@ -110,4 +110,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('my-laporan-keuangan', [API\MyLaporanKeuanganController::class, 'store'])->name('api.my-laporan-keuangan.store');
     Route::put('my-laporan-keuangan/{id}', [API\MyLaporanKeuanganController::class, 'update'])->name('api.my-laporan-keuangan.update');
     Route::delete('my-laporan-keuangan/{id}', [API\MyLaporanKeuanganController::class, 'destroy'])->name('api.my-laporan-keuangan.destroy');
+
+    // [ROUTE MY SLIDE]
+    Route::get('my-slide', [API\MySlideController::class, 'show'])->name('api.my-slide.show');
+    Route::post('my-slide/{slot}', [API\MySlideController::class, 'upload'])->name('api.my-slide.upload');
+    Route::put('my-slide/{slot}', [API\MySlideController::class, 'upload'])->name('api.my-slide.update');
+    Route::delete('my-slide/{slot}', [API\MySlideController::class, 'destroy'])->name('api.my-slide.destroy');
 });
