@@ -97,4 +97,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('my-petugas', [API\MyPetugasController::class, 'store'])->name('api.my-petugas.store');
     Route::put('my-petugas/{id}', [API\MyPetugasController::class, 'update'])->name('api.my-petugas.update');
     Route::delete('my-petugas/{id}', [API\MyPetugasController::class, 'destroy'])->name('api.my-petugas.destroy');
+
+    // [ROUTE MY GROUP CATEGORY]
+    Route::get('my-group-category', [API\MyGroupCategoryController::class, 'list'])->name('api.my-group-category.list');
+    Route::post('my-group-category', [API\MyGroupCategoryController::class, 'store'])->name('api.my-group-category.store');
+    Route::put('my-group-category/{id}', [API\MyGroupCategoryController::class, 'update'])->name('api.my-group-category.update');
+    Route::delete('my-group-category/{id}', [API\MyGroupCategoryController::class, 'destroy'])->name('api.my-group-category.destroy');
 });
