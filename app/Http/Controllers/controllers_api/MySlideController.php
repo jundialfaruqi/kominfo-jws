@@ -81,12 +81,12 @@ class MySlideController extends Controller
             ], 422);
         }
         $rules = [
-            'image' => 'required|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+            'image' => 'required|image|mimes:jpg,png,jpeg,webp|max:800',
         ];
         $messages = [
             'image.required' => 'File gambar wajib diunggah',
             'image.image' => 'File harus berupa gambar',
-            'image.mimes' => 'Format gambar harus jpg,png,jpeg,webp,gif',
+            'image.mimes' => 'Format gambar harus jpg,png,jpeg,webp',
             'image.max' => 'Ukuran gambar maksimal 800KB',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
