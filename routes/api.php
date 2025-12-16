@@ -99,6 +99,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('my-petugas/{id}', [API\MyPetugasController::class, 'update'])->name('api.my-petugas.update');
     Route::delete('my-petugas/{id}', [API\MyPetugasController::class, 'destroy'])->name('api.my-petugas.destroy');
 
+    // [ROUTE MY AGENDA]
+    Route::get('my-agenda', [API\MyAgendaController::class, 'list'])->name('api.my-agenda.list');
+    Route::post('my-agenda', [API\MyAgendaController::class, 'store'])->name('api.my-agenda.store');
+    Route::put('my-agenda/{id}', [API\MyAgendaController::class, 'update'])->name('api.my-agenda.update');
+    Route::delete('my-agenda/{id}', [API\MyAgendaController::class, 'destroy'])->name('api.my-agenda.destroy');
+
     // [ROUTE MY GROUP CATEGORY]
     Route::get('my-group-category', [API\MyGroupCategoryController::class, 'list'])->name('api.my-group-category.list');
     Route::post('my-group-category', [API\MyGroupCategoryController::class, 'store'])->name('api.my-group-category.store');
