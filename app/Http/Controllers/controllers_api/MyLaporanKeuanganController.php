@@ -40,19 +40,25 @@ class MyLaporanKeuanganController extends Controller
         }
 
         $now = Carbon::now();
+        $recentDays = (int) ($request->query('recent_days', 0));
         $year = (int) ($request->query('year', $now->year));
         $month = (int) ($request->query('month', $now->month));
         if ($month < 1 || $month > 12) {
             $month = $now->month;
         }
-        // Ambil semua item untuk bulan yang dipilih, tanpa paginate
-        $itemsRaw = Laporan::where('id_masjid', $profil->id)
-            ->whereYear('tanggal', $year)
-            ->whereMonth('tanggal', $month)
+        // Ambil semua item berdasarkan mode: recent atau bulan berjalan
+        $queryBase = Laporan::where('id_masjid', $profil->id)
             ->orderBy('tanggal', 'desc')
             ->orderBy('id', 'desc')
-            ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
-            ->get();
+            ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening');
+        if ($recentDays > 0) {
+            $start = $now->copy()->subDays($recentDays)->toDateString();
+            $end = $now->toDateString();
+            $queryBase->whereDate('tanggal', '>=', $start)->whereDate('tanggal', '<=', $end);
+        } else {
+            $queryBase->whereYear('tanggal', $year)->whereMonth('tanggal', $month);
+        }
+        $itemsRaw = $queryBase->get();
         $items = $itemsRaw->map(function ($l) {
             $gc = $l->id_group_category ? GroupCategory::find($l->id_group_category) : null;
             return [
@@ -67,13 +73,8 @@ class MyLaporanKeuanganController extends Controller
             ];
         })->values()->all();
 
-        $allItems = Laporan::where('id_masjid', $profil->id)
-            ->whereYear('tanggal', $year)
-            ->whereMonth('tanggal', $month)
-            ->orderBy('tanggal', 'desc')
-            ->orderBy('id', 'desc')
-            ->select('id', 'id_group_category', 'tanggal', 'uraian', 'jenis', 'saldo', 'is_opening')
-            ->get();
+        $allItems = clone $queryBase;
+        $allItems = $allItems->get();
 
         $grouped = $allItems->groupBy('id_group_category');
         $groupsArray = [];
@@ -136,8 +137,10 @@ class MyLaporanKeuanganController extends Controller
             'data' => [
                 'items' => $items,
                 'groups' => $groups,
-                'year' => $year,
-                'month' => $month,
+                'mode' => $recentDays > 0 ? 'recent' : 'month',
+                'recent_days' => $recentDays > 0 ? $recentDays : null,
+                'year' => $recentDays > 0 ? null : $year,
+                'month' => $recentDays > 0 ? null : $month,
             ],
         ]);
     }
