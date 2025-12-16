@@ -83,13 +83,13 @@ class MyJumbotronMasjidController extends Controller
             ], 422);
         }
         $rules = [
-            'image' => 'required|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'image' => 'required|image|mimes:jpg,png,jpeg,webp|max:800',
         ];
         $messages = [
             'image.required' => 'File gambar wajib diunggah',
             'image.image' => 'File harus berupa gambar',
             'image.mimes' => 'Format gambar harus jpg,png,jpeg,webp',
-            'image.max' => 'Ukuran gambar maksimal 1000KB',
+            'image.max' => 'Ukuran gambar maksimal 800KB',
         ];
         $validator = Validator::make($request->all(), $rules, $messages);
         if ($validator->fails()) {
@@ -118,9 +118,9 @@ class MyJumbotronMasjidController extends Controller
                 }
             }
 
-            $processedImage = $this->resizeImageToLimit($uploadedFile, 1000);
+            $processedImage = $this->resizeImageToLimit($uploadedFile, 800);
             $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $fileName = time() . '_jumbo' . $slot . '_' . $originalName . '.jpg';
+            $fileName = time() . '_jumbo' . $slot . '_' . $originalName . '.webp';
             $relativePath = '/images/jumbotrons/' . $fileName;
             $absolutePath = public_path('images/jumbotrons/' . $fileName);
 
@@ -129,16 +129,16 @@ class MyJumbotronMasjidController extends Controller
                 mkdir($dir, 0755, true);
             }
 
-            $maxSizeBytes = 1000 * 1024;
+            $maxSizeBytes = 800 * 1024;
             $quality = 95;
             do {
-                $encoded = $processedImage->toJpeg($quality);
+                $encoded = $processedImage->toWebp($quality);
                 if (strlen($encoded) <= $maxSizeBytes) {
                     break;
                 }
                 $quality -= 1;
             } while ($quality >= 60);
-            $processedImage->toJpeg($quality)->save($absolutePath);
+            $processedImage->toWebp($quality)->save($absolutePath);
             $finalSize = filesize($absolutePath);
             if ($finalSize > $maxSizeBytes) {
                 return response()->json([
@@ -216,7 +216,7 @@ class MyJumbotronMasjidController extends Controller
         }
     }
 
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 1000)
+    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 800)
     {
         try {
             $maxSizeBytes = $maxSizeKB * 1024;
@@ -240,24 +240,18 @@ class MyJumbotronMasjidController extends Controller
             }
             $image->resize($targetWidth, $targetHeight);
             $quality = 95;
-            $minQuality = 20;
+            $minQuality = 60;
             do {
-                $encoded = $image->toJpeg($quality);
+                $encoded = $image->toWebp($quality);
                 $currentSize = strlen($encoded);
                 if ($currentSize <= $maxSizeBytes) {
                     break;
                 }
-                if ($currentSize > $maxSizeBytes * 1.5) {
-                    $quality -= 10;
-                } elseif ($currentSize > $maxSizeBytes * 1.2) {
-                    $quality -= 5;
-                } else {
-                    $quality -= 2;
-                }
+                $quality -= 2;
             } while ($quality >= $minQuality);
-            if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
+            if (strlen($image->toWebp($minQuality)) > $maxSizeBytes) {
                 $scaleFactor = 0.9;
-                while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
+                while (strlen($image->toWebp($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
                     $newWidth = (int)($targetWidth * $scaleFactor);
                     $newHeight = (int)($targetHeight * $scaleFactor);
                     $image->resize($newWidth, $newHeight);
