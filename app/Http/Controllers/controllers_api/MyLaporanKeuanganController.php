@@ -91,11 +91,36 @@ class MyLaporanKeuanganController extends Controller
                     'group_category_name' => $gc?->name ?? '-',
                 ];
             })->values();
+            // Monthly sums (opening treated as 'masuk')
+            $sumMasukMonth = $mappedItems->reduce(function ($carry, $row) {
+                $jenisNormalized = ($row['is_opening'] === true || $row['jenis'] === 'masuk') ? 'masuk' : 'keluar';
+                return $carry + ($jenisNormalized === 'masuk' ? (int) $row['saldo'] : 0);
+            }, 0);
+            $sumKeluarMonth = $mappedItems->reduce(function ($carry, $row) {
+                $jenisNormalized = ($row['is_opening'] === true || $row['jenis'] === 'masuk') ? 'masuk' : 'keluar';
+                return $carry + ($jenisNormalized === 'keluar' ? (int) $row['saldo'] : 0);
+            }, 0);
+            // Total saldo all-time for this group category (masuk - keluar)
+            $sumAllMasuk = Laporan::where('id_masjid', $profil->id)
+                ->where('id_group_category', $gcId)
+                ->where(function ($q) {
+                    $q->where('is_opening', 1)->orWhere('jenis', 'masuk');
+                })
+                ->sum('saldo');
+            $sumAllKeluar = Laporan::where('id_masjid', $profil->id)
+                ->where('id_group_category', $gcId)
+                ->where('is_opening', '!=', 1)
+                ->where('jenis', 'keluar')
+                ->sum('saldo');
+            $totalSaldoAll = (int) $sumAllMasuk - (int) $sumAllKeluar;
             $groupsArray[] = [
                 'group_category_id' => (int) ($gcId ?? 0),
                 'group_category_name' => $gc?->name ?? '-',
                 'items' => $mappedItems->values()->all(),
                 'items_total' => $mappedItems->count(),
+                'sum_masuk_month' => (int) $sumMasukMonth,
+                'sum_keluar_month' => (int) $sumKeluarMonth,
+                'total_saldo_all' => (int) $totalSaldoAll,
             ];
         }
         // Sort groups by name asc
