@@ -110,9 +110,9 @@ class MySlideController extends Controller
                 }
             }
 
-            $processedImage = $this->resizeImageToLimit($uploadedFile, 800);
             $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $fileName = time() . '_slide' . $slot . '_' . $originalName . '.jpg';
+            $ext = strtolower($uploadedFile->getClientOriginalExtension());
+            $fileName = time() . '_slide' . $slot . '_' . $originalName . '.webp';
             $relativePath = '/images/slides/' . $fileName;
             $absolutePath = public_path('images/slides/' . $fileName);
 
@@ -122,15 +122,36 @@ class MySlideController extends Controller
             }
 
             $maxSizeBytes = 800 * 1024;
-            $quality = 95;
-            do {
-                $encoded = $processedImage->toJpeg($quality);
-                if (strlen($encoded) <= $maxSizeBytes) {
-                    break;
+
+            if ($ext === 'webp') {
+                $size = $uploadedFile->getSize();
+                if ($size !== null && $size <= $maxSizeBytes) {
+                    $uploadedFile->move($dir, $fileName);
+                } else {
+                    $image = Image::read($uploadedFile->getRealPath());
+                    $quality = 95;
+                    $scaleFactor = 1.0;
+                    while (strlen($image->toWebp($quality)) > $maxSizeBytes && $scaleFactor > 0.5) {
+                        $scaleFactor -= 0.05;
+                        $newWidth = (int)($image->width() * $scaleFactor);
+                        $newHeight = (int)($image->height() * $scaleFactor);
+                        $image->resize($newWidth, $newHeight);
+                    }
+                    $image->toWebp($quality)->save($absolutePath);
                 }
-                $quality -= 1;
-            } while ($quality >= 60);
-            $processedImage->toJpeg($quality)->save($absolutePath);
+            } else {
+                $processedImage = $this->resizeImageToLimit($uploadedFile, 800);
+                $quality = 95;
+                do {
+                    $encoded = $processedImage->toWebp($quality);
+                    if (strlen($encoded) <= $maxSizeBytes) {
+                        break;
+                    }
+                    $quality -= 1;
+                } while ($quality >= 60);
+                $processedImage->toWebp($quality)->save($absolutePath);
+            }
+
             $finalSize = filesize($absolutePath);
             if ($finalSize > $maxSizeBytes) {
                 return response()->json([
@@ -215,15 +236,15 @@ class MySlideController extends Controller
             $quality = 95;
             $minQuality = 60;
             do {
-                $encoded = $image->toJpeg($quality);
+                $encoded = $image->toWebp($quality);
                 if (strlen($encoded) <= $maxSizeBytes) {
                     break;
                 }
                 $quality -= 2;
             } while ($quality >= $minQuality);
-            if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
+            if (strlen($image->toWebp($minQuality)) > $maxSizeBytes) {
                 $scaleFactor = 0.9;
-                while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
+                while (strlen($image->toWebp($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
                     $newWidth = (int)($image->width() * $scaleFactor);
                     $newHeight = (int)($image->height() * $scaleFactor);
                     $image->resize($newWidth, $newHeight);
