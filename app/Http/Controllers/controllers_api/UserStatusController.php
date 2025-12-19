@@ -77,12 +77,16 @@ class UserStatusController extends Controller
     public function view(Request $request, $id)
     {
         $status = UserStatus::findOrFail($id);
+        $userId = $request->user()->id;
 
-        // Record view if not own status (optional, usually own views don't count or do?)
-        // WhatsApp doesn't count your own view, but it doesn't hurt.
-        // Let's record everyone.
+        // Check if already viewed
+        $alreadyViewed = $status->viewers()
+            ->where('user_id', $userId)
+            ->exists();
 
-        $status->viewers()->syncWithoutDetaching([$request->user()->id => ['viewed_at' => now()]]);
+        if (!$alreadyViewed) {
+            $status->viewers()->attach($userId, ['viewed_at' => now()]);
+        }
 
         return response()->json(['success' => true]);
     }
