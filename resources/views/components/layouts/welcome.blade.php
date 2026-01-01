@@ -39,7 +39,7 @@
                     <div class="d-flex flex-wrap align-items-center">
                         @if (!empty($showScheduleBtn) && !empty($scheduleUrl))
                             <a class="btn btn-gov-blue btn-lg rounded-4 me-3 mb-2" href="{{ $scheduleUrl }}">Lihat
-                                JWS</a>
+                                JWS Saya</a>
                         @endif
                         <a class="btn btn-outline-light btn-lg rounded-4 mb-2"
                             href="https://www.youtube.com/c/InfoPemkoPekanbaru"><i class="fab fa-youtube me-2"></i>Info
@@ -381,12 +381,14 @@
                     <div>© {{ date('Y') }} Diskominfo Pekanbaru</div>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a class="btn btn-outline-light m-1" href="https://www.youtube.com/c/InfoPemkoPekanbaru"><i
-                            class="fab fa-youtube"></i></a>
+                    <a class="btn btn-outline-light rounded-circle"
+                        href="https://www.youtube.com/c/InfoPemkoPekanbaru"><i class="fab fa-youtube"></i></a>
                     <a class="btn btn-outline-light m-1" href="https://www.pekanbaru.go.id/"><i
                             class="fa-solid fa-arrow-up-right-from-square"></i></a>
                     <a class="btn btn-outline-light m-1" href="https://www.instagram.com/diskominfopku/"><i
                             class="fab fa-instagram"></i></a>
+                    <a class="btn btn-outline-light m-1" href="https://www.instagram.com/diskominfopku/"><i
+                            class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
         </div>
