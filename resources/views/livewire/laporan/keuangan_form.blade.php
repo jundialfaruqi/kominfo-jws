@@ -87,7 +87,8 @@
                     <div class="input-group">
                         <span class="input-group-text" id="visible-addon">Rp</span>
                         <input type="text" inputmode="numeric" wire:model.live="saldoInput"
-                             class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal" style="letter-spacing: 0.06em; font-variant-numeric: tabular-nums;">
+                            class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal"
+                            style="letter-spacing: 0.06em; font-variant-numeric: tabular-nums;">
                         @error('saldo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -97,14 +98,14 @@
         </div>
 
         <div class="d-flex">
-            <button wire:loading.attr="disabled" wire:click="save" class="btn btn-primary me-2">
+            <button wire:loading.attr="disabled" wire:click="save" class="btn btn-primary me-2 rounded-3">
                 <span wire:loading.remove wire:target="save">Simpan</span>
                 <span wire:loading wire:target="save">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     Menyimpan...
                 </span>
             </button>
-            <button wire:click="cancelForm" class="btn btn-outline-secondary">Batal</button>
+            <button wire:click="cancelForm" class="btn btn-outline-secondary rounded-3">Batal</button>
         </div>
     </div>
 @endif

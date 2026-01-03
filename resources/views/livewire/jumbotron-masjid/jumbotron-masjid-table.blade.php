@@ -1,7 +1,7 @@
 <div class="row row-deck pt-3 pe-3 ps-3">
     @if ($jumbotronMasjidsData->count() > 0)
         @foreach ($jumbotronMasjidsData as $jm)
-            <div>
+            <div class="p-2">
                 <p class="text-sm">Status:
                     <span class="badge badge-sm bg-{{ $jm->aktif ? 'success' : 'danger' }} text-white">
                         {{ $jm->aktif ? 'Aktif' : 'Tidak Aktif' }}</span>
@@ -9,8 +9,8 @@
             </div>
 
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                <div class="card rounded-4">
+                    <div class="img-responsive img-responsive-21x9 card-img-top rounded-top-4"
                         style="background-image: url('{{ $jm->jumbotron_masjid_1 ? asset($jm->jumbotron_masjid_1) : asset('theme/static/belum-ada-gambar.webp') }}')">
                     </div>
                     <div class="card-body">
@@ -28,8 +28,8 @@
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                <div class="card rounded-4">
+                    <div class="img-responsive img-responsive-21x9 card-img-top rounded-top-4"
                         style="background-image: url('{{ $jm->jumbotron_masjid_2 ? asset($jm->jumbotron_masjid_2) : asset('theme/static/belum-ada-gambar.webp') }}')">
                     </div>
                     <div class="card-body">
@@ -47,8 +47,8 @@
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                <div class="card rounded-4">
+                    <div class="img-responsive img-responsive-21x9 card-img-top rounded-top-4"
                         style="background-image: url('{{ $jm->jumbotron_masjid_3 ? asset($jm->jumbotron_masjid_3) : asset('theme/static/belum-ada-gambar.webp') }}')">
                     </div>
                     <div class="card-body">
@@ -66,8 +66,8 @@
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                <div class="card rounded-4">
+                    <div class="img-responsive img-responsive-21x9 card-img-top rounded-top-4"
                         style="background-image: url('{{ $jm->jumbotron_masjid_4 ? asset($jm->jumbotron_masjid_4) : asset('theme/static/belum-ada-gambar.webp') }}')">
                     </div>
                     <div class="card-body">
@@ -85,8 +85,8 @@
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                <div class="card rounded-4">
+                    <div class="img-responsive img-responsive-21x9 card-img-top rounded-top-4"
                         style="background-image: url('{{ $jm->jumbotron_masjid_5 ? asset($jm->jumbotron_masjid_5) : asset('theme/static/belum-ada-gambar.webp') }}')">
                     </div>
                     <div class="card-body">
@@ -104,8 +104,8 @@
                 </div>
             </div>
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="img-responsive img-responsive-21x9 card-img-top"
+                <div class="card rounded-4">
+                    <div class="img-responsive img-responsive-21x9 card-img-top rounded-top-4"
                         style="background-image: url('{{ $jm->jumbotron_masjid_6 ? asset($jm->jumbotron_masjid_6) : asset('theme/static/belum-ada-gambar.webp') }}')">
                     </div>
                     <div class="card-body">

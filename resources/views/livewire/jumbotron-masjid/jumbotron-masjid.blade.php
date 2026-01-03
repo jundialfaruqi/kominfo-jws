@@ -4,13 +4,14 @@
             <div class="row row-cards">
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
+                        <div class="card-header bg-dark text-white rounded-top-4">
                             <h3 class="card-title d-none d-md-block">
                                 Gambar Jumbotron Masjid
                             </h3>
                             <div class="card-actions">
                                 @can('create-jumbotron-masjid')
-                                    <a href="{{ route('jumbotron-masjid.edit') }}" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    <a href="{{ route('jumbotron-masjid.edit') }}"
+                                        class="btn btn-primary py-2 rounded-4 shadow-sm">
                                         <span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -33,9 +34,9 @@
                         @include('livewire.jumbotron-masjid.jumbotron-masjid-table')
 
                         {{-- Pagination --}}
-                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
+                        {{-- <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
                             {{ $jumbotronMasjidsData->links() }}
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
@@ -44,19 +45,27 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         var success = {!! json_encode(session('success')) !!};
         var error = {!! json_encode(session('error')) !!};
         if (success) {
             if (window.iziToast) {
-                iziToast.success({ title: 'Berhasil', message: success, position: 'topRight' });
+                iziToast.success({
+                    title: 'Berhasil',
+                    message: success,
+                    position: 'topRight'
+                });
             } else {
                 alert(success);
             }
         }
         if (error) {
             if (window.iziToast) {
-                iziToast.error({ title: 'Gagal', message: error, position: 'topRight' });
+                iziToast.error({
+                    title: 'Gagal',
+                    message: error,
+                    position: 'topRight'
+                });
             } else {
                 alert(error);
             }

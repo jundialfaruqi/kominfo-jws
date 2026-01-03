@@ -4,7 +4,7 @@
             <div class="row row-cards">
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
+                        <div class="card-header bg-dark text-white rounded-top-4">
                             <h3 class="card-title d-none d-md-block">
                                 Daftar Jumbotron
                             </h3>
@@ -466,24 +466,24 @@
     });
 </script>
 @script
-<script>
-    $wire.on('reset_success', message => {
-        if (window.iziToast) {
-            iziToast.success({
-                title: 'Berhasil',
-                message,
-                position: 'topRight'
-            });
-        }
-    });
-    $wire.on('reset_error', message => {
-        if (window.iziToast) {
-            iziToast.error({
-                title: 'Gagal',
-                message,
-                position: 'topRight'
-            });
-        }
-    });
-</script>
+    <script>
+        $wire.on('reset_success', message => {
+            if (window.iziToast) {
+                iziToast.success({
+                    title: 'Berhasil',
+                    message,
+                    position: 'topRight'
+                });
+            }
+        });
+        $wire.on('reset_error', message => {
+            if (window.iziToast) {
+                iziToast.error({
+                    title: 'Gagal',
+                    message,
+                    position: 'topRight'
+                });
+            }
+        });
+    </script>
 @endscript

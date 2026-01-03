@@ -1,4 +1,4 @@
-<div class="card-header">
+<div class="card-header bg-dark text-white rounded-top-4">
     <h3 class="card-title d-none d-md-block">
         @if ($showForm)
             {{ $isEdit ? 'Ubah Pengaturan Audio Masjid' : 'Tambah Audio Masjid Baru' }}
