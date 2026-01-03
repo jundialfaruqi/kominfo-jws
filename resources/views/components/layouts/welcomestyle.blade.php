@@ -373,8 +373,19 @@
         color: #ffffff;
     }
 
-    .footer a.btn {
+    .footer a.btn:not(.rounded-circle) {
         border-radius: 999px;
+    }
+
+    .footer a.btn.rounded-circle {
+        border-radius: 50% !important;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        line-height: 1 !important;
     }
 </style>
 <style>

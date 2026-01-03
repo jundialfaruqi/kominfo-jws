@@ -382,13 +382,18 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <a class="btn btn-outline-light rounded-circle"
-                        href="https://www.youtube.com/c/InfoPemkoPekanbaru"><i class="fab fa-youtube"></i></a>
-                    <a class="btn btn-outline-light m-1" href="https://www.pekanbaru.go.id/"><i
-                            class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    <a class="btn btn-outline-light m-1" href="https://www.instagram.com/diskominfopku/"><i
-                            class="fab fa-instagram"></i></a>
-                    <a class="btn btn-outline-light m-1" href="https://www.instagram.com/diskominfopku/"><i
-                            class="fab fa-whatsapp"></i></a>
+                        href="https://www.youtube.com/c/InfoPemkoPekanbaru">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.pekanbaru.go.id/">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.instagram.com/diskominfopku/">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.instagram.com/diskominfopku/">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
                 </div>
             </div>
         </div>
