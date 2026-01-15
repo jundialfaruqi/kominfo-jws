@@ -381,18 +381,23 @@
                     <div>© {{ date('Y') }} Diskominfo Pekanbaru</div>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a class="btn btn-outline-light rounded-circle"
+                    <a class="btn btn-outline-light rounded-circle m-1"
                         href="https://www.youtube.com/c/InfoPemkoPekanbaru">
                         <i class="fab fa-youtube"></i>
                     </a>
                     <a class="btn btn-outline-light rounded-circle m-1" href="https://www.pekanbaru.go.id/">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.instagram.com/diskominfopku/">
+                    <a class="btn btn-outline-light rounded-circle m-1"
+                        href="https://www.instagram.com/diskominfopku/">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.instagram.com/diskominfopku/">
+                    <a class="btn btn-outline-light rounded-circle m-1"
+                        href="https://www.instagram.com/diskominfopku/">
                         <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a class="btn btn-outline-light rounded-circle m-1" href="https://bit.ly/apkjwskominfo">
+                        <i class="fab fa-android"></i>
                     </a>
                 </div>
             </div>
