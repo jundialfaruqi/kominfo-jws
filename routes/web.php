@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Protected Routes (require authentication)
-Route::middleware('auth', 'ensure-user-is-active')->group(function () {
+Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(function () {
     // Dashboard Route
     Route::get('/dashboard', DashboardIndex::class)->name('dashboard.index');
 

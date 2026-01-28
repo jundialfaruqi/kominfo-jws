@@ -316,6 +316,7 @@ class Updateprofile extends Component
 
             $this->dispatch('success', 'Email berhasil diubah');
             $this->show_email_confirmation = false;
+            Auth::logoutOtherDevices($this->email_confirmation_password);
             // Logout user setelah 2 detik
             // $this->dispatch('logout-user');
         } catch (\Exception $e) {
@@ -353,6 +354,10 @@ class Updateprofile extends Component
             $user->save();
 
             DB::commit();
+
+            if ($this->password_old && $this->password_new) {
+                Auth::logoutOtherDevices($this->password_new);
+            }
 
             $this->dispatch('success', 'Profil berhasil diperbarui.');
         } catch (\Exception $e) {
