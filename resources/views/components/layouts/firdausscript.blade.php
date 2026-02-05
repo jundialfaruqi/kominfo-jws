@@ -1684,6 +1684,22 @@
                     new Date(serverNow.getTime() + 86400000) :
                     serverNow;
 
+                // FIX: Gunakan moment-hijri agar konsisten di semua device/browser
+                if (typeof moment !== 'undefined' && typeof moment().iDate === 'function') {
+                    const m = moment(baseDate);
+                    // Array bulan Hijriah Indonesia
+                    const bulanHijriyahID = [
+                        'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
+                        'Rajab', 'Syakban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
+                    ];
+
+                    const d = m.iDate();
+                    const mn = bulanHijriyahID[m.iMonth()];
+                    const y = m.iYear();
+
+                    return `${d} ${mn} ${y} H`;
+                }
+
                 const options = {
                     year: "numeric",
                     month: "long",
