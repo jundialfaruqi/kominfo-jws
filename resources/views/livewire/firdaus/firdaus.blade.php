@@ -352,6 +352,7 @@
     </div>
 
     {{-- Adzan Popup --}}
+    {{-- style="display: none;" --}}
     <div id="adzanPopup" class="adzan-popup" style="display: none;">
         <div class="adzan-popup-content">
             <div id="adzanLabel" class="adzan">Waktunya Adzan</div>
