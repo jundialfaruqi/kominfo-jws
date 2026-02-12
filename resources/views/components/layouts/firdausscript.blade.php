@@ -212,6 +212,8 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        let agendaItems = []; // Menyimpan objek {name, message}
+
         function loadAgenda() {
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) return;
@@ -222,13 +224,7 @@
                 success: function(res) {
                     const items = (res && res.data) ? res.data : [];
                     if (items.length > 0) {
-                        const it = items[0];
-                        $('#agenda-message').text(it.message || '');
-                        agendaNames = items.map(function(i) {
-                            return i && i.name ? i.name : '';
-                        }).filter(function(n) {
-                            return n && n.length > 0;
-                        });
+                        agendaItems = items; // Simpan semua item agenda (name & message)
                         updateAgendaTitleByServerTime();
                         if (agendaRotateTimer) {
                             clearInterval(agendaRotateTimer);
@@ -241,7 +237,7 @@
                             clearInterval(agendaRotateTimer);
                             agendaRotateTimer = null;
                         }
-                        agendaNames = [];
+                        agendaItems = [];
                         $('#floating-agenda').hide();
                     }
                 },
@@ -250,11 +246,13 @@
                         clearInterval(agendaRotateTimer);
                         agendaRotateTimer = null;
                     }
-                    agendaNames = [];
+                    agendaItems = [];
                     $('#floating-agenda').hide();
                 }
             });
         }
+
+        let agendaItems1 = []; // Menyimpan objek {name, message} untuk agenda 1
 
         function loadAgenda1() {
             const slug = window.location.pathname.replace(/^\//, '');
@@ -266,13 +264,7 @@
                 success: function(res) {
                     const items = (res && res.data) ? res.data : [];
                     if (items.length > 0) {
-                        const it = items[0];
-                        $('#agenda1-message').text(it.message || '');
-                        agendaNames1 = items.map(function(i) {
-                            return i && i.name ? i.name : '';
-                        }).filter(function(n) {
-                            return n && n.length > 0;
-                        });
+                        agendaItems1 = items; // Simpan semua item agenda (name & message)
                         updateAgendaTitleByServerTime1();
                         if (agendaRotateTimer1) {
                             clearInterval(agendaRotateTimer1);
@@ -284,7 +276,7 @@
                             clearInterval(agendaRotateTimer1);
                             agendaRotateTimer1 = null;
                         }
-                        agendaNames1 = [];
+                        agendaItems1 = [];
                         $('#floating-agenda-1').hide();
                     }
                 },
@@ -293,18 +285,18 @@
                         clearInterval(agendaRotateTimer1);
                         agendaRotateTimer1 = null;
                     }
-                    agendaNames1 = [];
+                    agendaItems1 = [];
                     $('#floating-agenda-1').hide();
                 }
             });
         }
 
         function updateAgendaTitleByServerTime1() {
-            if (!agendaNames1 || agendaNames1.length === 0) return;
+            if (!agendaItems1 || agendaItems1.length === 0) return;
             const t = getCurrentTimeFromServer().getTime();
             const rotateMs = 5000;
             const pauseMs = 10000;
-            const displayWindow = agendaNames1.length * rotateMs;
+            const displayWindow = agendaItems1.length * rotateMs;
             const cycleMs = displayWindow + pauseMs;
             const phase = t % cycleMs;
             if (phase >= displayWindow) {
@@ -314,20 +306,32 @@
                 $('#floating-agenda-1').show();
             }
             const idx = Math.floor(phase / rotateMs);
-            const txt1 = agendaNames1[idx] || '';
+            const currentAgenda = agendaItems1[idx];
+
+            const txt1 = currentAgenda.name || '';
+            const msg1 = currentAgenda.message || '';
+
             const max1 = 34;
             const out1 = txt1.length > max1 ? (txt1.slice(0, max1 - 3) + '...') : txt1;
+
             $('#agenda1-title').text(out1);
+            $('#agenda1-message').text(msg1);
         }
 
         function updateAgendaTitleByServerTime() {
-            if (!agendaNames || agendaNames.length === 0) return;
+            if (!agendaItems || agendaItems.length === 0) return;
             const t = getCurrentTimeFromServer().getTime();
-            const idx = Math.floor(t / 7000) % agendaNames.length;
-            const txt = agendaNames[idx] || '';
+            const idx = Math.floor(t / 7000) % agendaItems.length;
+            const currentAgenda = agendaItems[idx];
+
+            const txt = currentAgenda.name || '';
+            const msg = currentAgenda.message || '';
+
             const max = 34;
             const out = txt.length > max ? (txt.slice(0, max - 3) + '...') : txt;
+
             $('#agenda-title').text(out);
+            $('#agenda-message').text(msg);
         }
 
         // Variabel untuk menyimpan timestamp terakhir pembaruan audio
@@ -338,9 +342,7 @@
         $('#floating-agenda').hide();
         $('#floating-agenda-1').hide();
         let lastAgendaDay = null;
-        let agendaNames = [];
         let agendaRotateTimer = null;
-        let agendaNames1 = [];
         let agendaRotateTimer1 = null;
 
         // Fungsi untuk memperbarui dan memutar audio

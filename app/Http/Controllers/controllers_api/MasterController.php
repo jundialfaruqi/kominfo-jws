@@ -155,7 +155,7 @@ class MasterController extends Controller
 
             $now = Carbon::now('Asia/Jakarta');
             $start = $now->copy()->startOfDay()->toDateString();
-            $end = $now->copy()->addDays(365)->toDateString();
+            $end = $now->copy()->addDays(30)->toDateString();
 
             $agendas = Agenda::where('id_masjid', $profil->id)
                 ->where('aktif', true)
@@ -168,17 +168,15 @@ class MasterController extends Controller
             if ($agendas->isEmpty()) {
                 $items = collect([]);
             } else {
-                $nearestDate = $agendas->first()->date;
-                $nearestAgendas = $agendas->filter(function ($a) use ($nearestDate) {
-                    return $a->date === $nearestDate;
-                });
-
-                $items = $nearestAgendas->map(function ($a) use ($now) {
+                $items = $agendas->map(function ($a) use ($now) {
                     $agendaDate = Carbon::parse($a->date, 'Asia/Jakarta')->startOfDay();
                     $today = $now->copy()->startOfDay();
                     $message = null;
+
                     if ($agendaDate->equalTo($today)) {
                         $message = 'Hari ini';
+                    } elseif ($agendaDate->isTomorrow()) {
+                        $message = 'Besok';
                     } elseif ($agendaDate->gt($today)) {
                         $days = $today->diffInDays($agendaDate);
                         $message = $days . ' Hari Lagi';
