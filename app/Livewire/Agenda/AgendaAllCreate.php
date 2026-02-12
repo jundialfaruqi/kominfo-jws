@@ -24,7 +24,7 @@ class AgendaAllCreate extends Component
     protected $rules = [
         'userId' => 'required|exists:users,id',
         'date' => 'required|date',
-        'name' => 'required|string|max:255',
+        'name' => 'required|string|max:23',
         'aktif' => 'boolean',
     ];
 
@@ -34,7 +34,7 @@ class AgendaAllCreate extends Component
         'date.required' => 'Tanggal agenda wajib diisi',
         'date.date' => 'Format tanggal tidak valid',
         'name.required' => 'Nama agenda wajib diisi',
-        'name.max' => 'Nama agenda terlalu panjang',
+        'name.max' => 'Nama agenda terlalu panjang hanya boleh 23 Karakter',
     ];
 
     public function updatedUserId()

@@ -67,12 +67,27 @@
                             <div class="col-md-3">
                                 <label class="form-label required">Nama Agenda</label>
                             </div>
+
                             <div class="col-md-9">
                                 <input type="text" class="form-control rounded-3 @error('name') is-invalid @enderror"
-                                    wire:model="name" placeholder="Masukkan nama agenda" />
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                    wire:model.live="name" maxlength="23" placeholder="Masukkan nama agenda" />
+
+                                @php
+                                    $length = strlen($name ?? '');
+                                    $isMax = $length >= 23;
+                                @endphp
+
+                                <div class="text-end mt-1">
+                                    <small class="{{ $isMax ? 'text-danger fw-semibold' : 'text-muted' }}">
+                                        {{ $length }} / 23 karakter
+                                    </small>
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-1">
+                                    @error('name')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 
