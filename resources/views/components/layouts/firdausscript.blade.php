@@ -1682,9 +1682,16 @@
                 } = compareWithMaghrib(serverNow);
 
                 // Jika sudah lewat Maghrib → Hijriah +1 hari
-                const baseDate = isAfterMaghrib ?
-                    new Date(serverNow.getTime() + 86400000) :
-                    serverNow;
+                let baseDate = serverNow;
+                if (isAfterMaghrib) {
+                    if (typeof moment !== 'undefined' && typeof moment().iDate === 'function') {
+                        // Gunakan moment-hijri untuk menambahkan 1 hari Hijriah
+                        baseDate = moment(serverNow).add(1, 'iDay').toDate();
+                    } else {
+                        // Fallback jika moment-hijri tidak tersedia
+                        baseDate = new Date(serverNow.getTime() + 86400000);
+                    }
+                }
 
                 // FIX: Gunakan moment-hijri agar konsisten di semua device/browser
                 if (typeof moment !== 'undefined' && typeof moment().iDate === 'function') {
