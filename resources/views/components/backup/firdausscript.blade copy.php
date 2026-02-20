@@ -1,3 +1,4 @@
+<!-- Ini adalah script JWS perhitungan tnggal hijriah + 1 hari -->
 {{-- Moment.js core --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
 
@@ -13,14 +14,6 @@
 
 <script>
     $(document).ready(function() {
-        // Tambahkan di awal script
-        // let userHasInteracted = false;
-
-        // Event listener untuk mendeteksi interaksi user
-        // $(document).one('click touchstart keydown', function() {
-        //     userHasInteracted = true;
-        //     console.log('User interaction detected - audio autoplay enabled');
-        // });
 
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
@@ -220,11 +213,138 @@
             return new Date(serverTimestamp + elapsed);
         }
 
+        let agendaItems = []; // Menyimpan objek {name, message}
+
+        function loadAgenda() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) return;
+            $.ajax({
+                url: `/api/agenda/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    const items = (res && res.data) ? res.data : [];
+                    if (items.length > 0) {
+                        agendaItems = items; // Simpan semua item agenda (name & message)
+                        updateAgendaTitleByServerTime();
+                        if (agendaRotateTimer) {
+                            clearInterval(agendaRotateTimer);
+                        }
+                        agendaRotateTimer = setInterval(updateAgendaTitleByServerTime, 1000);
+                        $('#floating-agenda').show();
+                        lastAgendaDay = getCurrentTimeFromServer().toDateString();
+                    } else {
+                        if (agendaRotateTimer) {
+                            clearInterval(agendaRotateTimer);
+                            agendaRotateTimer = null;
+                        }
+                        agendaItems = [];
+                        $('#floating-agenda').hide();
+                    }
+                },
+                error: function() {
+                    if (agendaRotateTimer) {
+                        clearInterval(agendaRotateTimer);
+                        agendaRotateTimer = null;
+                    }
+                    agendaItems = [];
+                    $('#floating-agenda').hide();
+                }
+            });
+        }
+
+        let agendaItems1 = []; // Menyimpan objek {name, message} untuk agenda 1
+
+        function loadAgenda1() {
+            const slug = window.location.pathname.replace(/^\//, '');
+            if (!slug) return;
+            $.ajax({
+                url: `/api/agenda/${slug}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    const items = (res && res.data) ? res.data : [];
+                    if (items.length > 0) {
+                        agendaItems1 = items; // Simpan semua item agenda (name & message)
+                        updateAgendaTitleByServerTime1();
+                        if (agendaRotateTimer1) {
+                            clearInterval(agendaRotateTimer1);
+                        }
+                        agendaRotateTimer1 = setInterval(updateAgendaTitleByServerTime1, 1000);
+                        $('#floating-agenda-1').show();
+                    } else {
+                        if (agendaRotateTimer1) {
+                            clearInterval(agendaRotateTimer1);
+                            agendaRotateTimer1 = null;
+                        }
+                        agendaItems1 = [];
+                        $('#floating-agenda-1').hide();
+                    }
+                },
+                error: function() {
+                    if (agendaRotateTimer1) {
+                        clearInterval(agendaRotateTimer1);
+                        agendaRotateTimer1 = null;
+                    }
+                    agendaItems1 = [];
+                    $('#floating-agenda-1').hide();
+                }
+            });
+        }
+
+        function updateAgendaTitleByServerTime1() {
+            if (!agendaItems1 || agendaItems1.length === 0) return;
+            const t = getCurrentTimeFromServer().getTime();
+            const rotateMs = 5000;
+            const pauseMs = 10000;
+            const displayWindow = agendaItems1.length * rotateMs;
+            const cycleMs = displayWindow + pauseMs;
+            const phase = t % cycleMs;
+            if (phase >= displayWindow) {
+                $('#floating-agenda-1').hide();
+                return;
+            } else {
+                $('#floating-agenda-1').show();
+            }
+            const idx = Math.floor(phase / rotateMs);
+            const currentAgenda = agendaItems1[idx];
+
+            const txt1 = currentAgenda.name || '';
+            const msg1 = currentAgenda.message || '';
+
+            const max1 = 34;
+            const out1 = txt1.length > max1 ? (txt1.slice(0, max1 - 3) + '...') : txt1;
+
+            $('#agenda1-title').text(out1);
+            $('#agenda1-message').text(msg1);
+        }
+
+        function updateAgendaTitleByServerTime() {
+            if (!agendaItems || agendaItems.length === 0) return;
+            const t = getCurrentTimeFromServer().getTime();
+            const idx = Math.floor(t / 7000) % agendaItems.length;
+            const currentAgenda = agendaItems[idx];
+
+            const txt = currentAgenda.name || '';
+            const msg = currentAgenda.message || '';
+
+            const max = 34;
+            const out = txt.length > max ? (txt.slice(0, max - 3) + '...') : txt;
+
+            $('#agenda-title').text(out);
+            $('#agenda-message').text(msg);
+        }
+
         // Variabel untuk menyimpan timestamp terakhir pembaruan audio
         let lastAudioUpdateTimestamp = 0;
         let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
         window.newAudioAvailable = false;
+        $('#floating-agenda').hide();
+        $('#floating-agenda-1').hide();
+        let lastAgendaDay = null;
+        let agendaRotateTimer = null;
+        let agendaRotateTimer1 = null;
 
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
@@ -392,6 +512,27 @@
                 },
                 timeout: 15000 // Timeout setelah 15 detik
             });
+
+            loadAgenda();
+            try {
+                if (window.Echo) {
+                    window.Echo.channel(`masjid-${slug}`).listen('.App\\Events\\ContentUpdatedEvent', (e) => {
+                        if (e && e.type === 'agenda') loadAgenda();
+                        if (e && e.type === 'agenda') loadAgenda1();
+                    });
+                }
+            } catch (err) {}
+
+            setInterval(function() {
+                const d = getCurrentTimeFromServer().toDateString();
+                if (lastAgendaDay && d !== lastAgendaDay) {
+                    loadAgenda();
+                    lastAgendaDay = d;
+                }
+            }, 60000);
+
+            loadAgenda1();
+
         }
 
         // Fungsi untuk memutar audio dari cache saat offline
@@ -1040,8 +1181,16 @@
                 const dzuhurLabel = isFriday ? "Jum'at" : "Dzuhur";
 
                 const prayerTimes = [{
+                        name: 'Imsak',
+                        time: jadwalHariIni.imsak
+                    },
+                    {
                         name: 'Subuh',
                         time: jadwalHariIni.subuh
+                    },
+                    {
+                        name: 'Dhuha',
+                        time: jadwalHariIni.dhuha
                     },
                     {
                         name: 'Syuruq',
@@ -1425,7 +1574,6 @@
             });
         }
 
-
         function updateMosqueInfo() {
             const slug = window.location.pathname.replace(/^\//, '');
 
@@ -1494,47 +1642,166 @@
 
         function updateDate() {
             const $dateElement = $('.date-item');
-            const now = getCurrentTimeFromServer();
+            if (!$dateElement.length) return;
 
-            if (typeof moment !== 'undefined') {
-                moment.locale('id');
-                let hari = moment(now).format('dddd');
-                if (hari === 'Minggu') {
-                    hari = 'Ahad';
-                }
-                const tanggalMasehi = moment(now).format('D MMMM YYYY');
-                const masehi = `<span class="day-name">${hari}</span>, ${tanggalMasehi}`;
+            const serverNow = getCurrentTimeFromServer();
 
-
-
-                let hijri = '';
-                if (typeof moment().iDate === 'function') {
-                    const hijriBaseMoment = moment(now);
-                    const hijriDate = hijriBaseMoment.iDate();
-                    const hijriMonth = hijriBaseMoment.iMonth();
-                    const hijriYear = hijriBaseMoment.iYear();
-                    const bulanHijriyahID = [
-                        'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
-                        'Rajab', 'Syaban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
-                    ];
-                    hijri = `${hijriDate} ${bulanHijriyahID[hijriMonth]} ${hijriYear}H`;
-                } else {
-                    console.warn("moment-hijri tidak tersedia");
-                }
-
-                if ($dateElement.length) {
-                    $dateElement.html(hijri ? `${masehi} / ${hijri}` : masehi);
-                }
-            } else {
+            if (typeof moment === 'undefined') {
                 console.warn("moment.js tidak tersedia");
+                return;
             }
 
-            if (now.getHours() === 0 && now.getMinutes() <= 5) {
-                const currentMonthNow = now.getMonth() + 1;
-                const storedMonth = parseInt(localStorage.getItem('lastCheckedMonth') || '0');
-                if (currentMonthNow !== storedMonth) {
-                    console.log("Bulan berubah, memperbarui jadwal sholat");
-                    localStorage.setItem('lastCheckedMonth', currentMonthNow);
+            const masehiText = formatMasehi(serverNow);
+            const hijriText = calculateHijriFromServer(serverNow);
+
+            $dateElement.html(hijriText ? `${masehiText} / ${hijriText}` : masehiText);
+
+            checkMonthChange(serverNow);
+        }
+
+        /* --------------------------------------------------------------------------
+         * 1. Format Tanggal Masehi
+         * -------------------------------------------------------------------------- */
+        function formatMasehi(date) {
+            moment.locale('id');
+
+            let hari = moment(date).format('dddd');
+            if (hari === 'Minggu') hari = 'Ahad';
+
+            const tanggal = moment(date).format('D MMMM YYYY');
+            return `<span class="day-name">${hari}</span>, ${tanggal}`;
+        }
+
+        /* --------------------------------------------------------------------------
+         * 2. Hitung Hijriah berdasarkan serverNow
+         * -------------------------------------------------------------------------- */
+        function calculateHijriFromServer(serverNow) {
+            try {
+                const {
+                    currentMinutes,
+                    isAfterMaghrib
+                } = compareWithMaghrib(serverNow);
+
+                // Jika sudah lewat Maghrib → Hijriah +1 hari
+                const baseDate = isAfterMaghrib ?
+                    new Date(serverNow.getTime() + 86400000) :
+                    serverNow;
+
+                // FIX: Gunakan moment-hijri agar konsisten di semua device/browser
+                if (typeof moment !== 'undefined' && typeof moment().iDate === 'function') {
+                    const m = moment(baseDate);
+                    // Array bulan Hijriah Indonesia
+                    const bulanHijriyahID = [
+                        'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
+                        'Rajab', 'Syakban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
+                    ];
+
+                    const d = m.iDate();
+                    const mn = bulanHijriyahID[m.iMonth()];
+                    const y = m.iYear();
+
+                    return `${d} ${mn} ${y} H`;
+                }
+
+                const options = {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    timeZone: "Asia/Jakarta",
+                };
+
+                try {
+                    return new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura", options)
+                        .format(baseDate);
+                } catch (_) {
+                    // fallback islamic biasa
+                    return new Intl.DateTimeFormat("id-ID-u-ca-islamic", options)
+                        .format(baseDate);
+                }
+
+            } catch (err) {
+                console.warn("Gagal menghitung Hijriah:", err);
+                return "";
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+         * 3. Hitung apakah sudah lewat Maghrib berdasarkan waktu server
+         * -------------------------------------------------------------------------- */
+        function compareWithMaghrib(serverNow) {
+            const {
+                hour: curH,
+                minute: curM
+            } = getJakartaTimeFromServer(serverNow);
+            const currentMinutes = curH * 60 + curM;
+
+            const maghribMinutes = getMaghribFromDOM();
+            const fallbackMaghrib = curH >= 18;
+
+            const isAfterMaghrib = (maghribMinutes !== null) ?
+                currentMinutes >= maghribMinutes :
+                fallbackMaghrib;
+
+            return {
+                currentMinutes,
+                isAfterMaghrib
+            };
+        }
+
+        /* --------------------------------------------------------------------------
+         * Ambil Jam-Menit Jakarta dari waktu server
+         * -------------------------------------------------------------------------- */
+        function getJakartaTimeFromServer(serverNow) {
+            const hm = new Intl.DateTimeFormat("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "Asia/Jakarta",
+                hour12: false,
+            }).format(serverNow);
+
+            const [h, m] = hm.replace('.', ':').split(':').map(n => parseInt(n, 10));
+            return {
+                hour: h,
+                minute: m
+            };
+        }
+
+        /* --------------------------------------------------------------------------
+         * Ambil Waktu Maghrib dari DOM
+         * -------------------------------------------------------------------------- */
+        function getMaghribFromDOM() {
+            let maghribMinutes = null;
+
+            $(".prayer-time").each(function() {
+                const name = ($(this).find('.prayer-name').text() || "").trim().toLowerCase();
+                if (name !== "maghrib") return;
+
+                const val = ($(this).find('.prayer-time-value').text() || "").trim();
+                if (!val) return;
+
+                const [h, m] = val.replace('.', ':').split(':').map(n => parseInt(n, 10));
+                if (!isNaN(h) && !isNaN(m)) {
+                    maghribMinutes = h * 60 + m;
+                }
+            });
+
+            return maghribMinutes;
+        }
+
+        /* --------------------------------------------------------------------------
+         * 4. Cek Pergantian Bulan untuk update jadwal sholat
+         * -------------------------------------------------------------------------- */
+        function checkMonthChange(serverNow) {
+            const hour = serverNow.getHours();
+            const minute = serverNow.getMinutes();
+
+            if (hour === 0 && minute <= 5) {
+                const currentMonth = serverNow.getMonth() + 1;
+                const lastMonth = parseInt(localStorage.getItem("lastCheckedMonth") || "0");
+
+                if (currentMonth !== lastMonth) {
+                    console.log("Bulan berubah → update jadwal sholat");
+                    localStorage.setItem("lastCheckedMonth", currentMonth);
                     fetchPrayerTimes();
                 }
             }
@@ -1569,10 +1836,16 @@
 
             const combinedText = marqueeTexts.join(' <span class="separator">•</span> ');
 
-            // Hitung durasi animasi
+            // Hitung durasi animasi dengan kecepatan dinamis
             const textLength = combinedText.length;
             const baseDuration = 240;
-            const calculatedDuration = Math.max(baseDuration, textLength / 20);
+            const speedRaw = marqueeData && typeof marqueeData.speed !== 'undefined' ? marqueeData.speed : ($(
+                '#marquee-speed').val() || '1');
+            let speedMultiplier = parseFloat(speedRaw);
+            if (!isFinite(speedMultiplier)) speedMultiplier = 1;
+            // Clamp 0.1..10 agar aman
+            speedMultiplier = Math.max(0.1, Math.min(speedMultiplier, 10));
+            const calculatedDuration = Math.max(baseDuration, textLength / 20) / speedMultiplier;
 
             // Gunakan waktu server untuk sinkronisasi
             const now = getCurrentTimeFromServer().getTime();
@@ -1623,6 +1896,9 @@
                         $('#marquee4').val(response.data.marquee4);
                         $('#marquee5').val(response.data.marquee5);
                         $('#marquee6').val(response.data.marquee6);
+                        if (typeof response.data.speed !== 'undefined') {
+                            $('#marquee-speed').val(response.data.speed);
+                        }
 
                         updateScrollingText(response.data);
                         // console.log('Teks marquee diperbarui');
@@ -1672,7 +1948,9 @@
                     remainingSeconds,
                     progress,
                     isFriday,
-                    isSyuruq
+                    isSyuruq,
+                    isDhuha,
+                    isImsak
                 } = activePrayerStatus;
 
                 if (phase === 'adzan') {
@@ -1685,6 +1963,10 @@
 
                     if (isSyuruq) {
                         showSyuruqPopup(prayerName, prayerTime, true);
+                    } else if (isDhuha) {
+                        showDhuhaPopup(prayerName, prayerTime, true);
+                    } else if (isImsak || prayerName.toLowerCase().includes('imsak')) {
+                        showImsakPopup(prayerName, prayerTime, true);
                     } else {
                         showAdzanPopup(prayerName, prayerTime, true);
                     }
@@ -1815,15 +2097,23 @@
                         currentPrayerName = prayerToRestore.name;
                         currentPrayerTime = prayerToRestore.time;
 
-                        if (prayerToRestore.name.toLowerCase().includes('syuruq')) {
+                        if (prayerToRestore.name.toLowerCase().includes('syuruq') ||
+                            prayerToRestore.name.toLowerCase().includes('shuruq') ||
+                            prayerToRestore.name.toLowerCase().includes('terbit')) {
                             showSyuruqPopup(prayerToRestore.name, prayerToRestore.time, true);
+                        } else if (prayerToRestore.name.toLowerCase().includes('dhuha')) {
+                            showDhuhaPopup(prayerToRestore.name, prayerToRestore.time, true);
+                        } else if (prayerToRestore.name.toLowerCase().includes('imsak')) {
+                            showImsakPopup(prayerToRestore.name, prayerToRestore.time, true);
                         } else {
                             showAdzanPopup(prayerToRestore.name, prayerToRestore.time, true);
                         }
                     } else if (prayerToRestore.name !== "Jum'at" || now.getDay() !== 5) {
-                        // Syuruq hanya memiliki fase adzan, tidak ada iqomah dan final
-                        if (prayerToRestore.name.toLowerCase().includes('syuruq')) {
-                            // Untuk Syuruq, langsung clear state setelah adzan selesai
+                        // Imsak/Syuruq/Dhuha hanya memiliki fase adzan, tidak ada iqomah dan final
+                        if (prayerToRestore.name.toLowerCase().includes('imsak') ||
+                            prayerToRestore.name.toLowerCase().includes('syuruq') ||
+                            prayerToRestore.name.toLowerCase().includes('dhuha')) {
+                            // Untuk Imsak/Syuruq/Dhuha, langsung clear state setelah adzan selesai
                             clearAdzanState();
                         } else {
                             if (timeDiffSeconds < adzanDuration + iqomahDuration) {
@@ -2000,13 +2290,13 @@
                 fetchPrayerTimes();
 
                 // Update informasi masjid
-                updateMosqueInfo();
+                // updateMosqueInfo();
 
                 // Update teks marquee
                 updateScrollingText();
 
                 // Update tema jika ada perubahan
-                checkThemeUpdate();
+                // checkThemeUpdate();
 
                 // Update slides
                 updateSlides();
@@ -2016,7 +2306,7 @@
 
                 // Update audio dan gambar
                 updateAndPlayAudio();
-                updateFridayImages();
+                // updateFridayImages();
                 updateIqomahImages();
                 updateAdzanImages();
                 updateFridayOfficials();
@@ -2061,8 +2351,6 @@
                 updateDailyPrayerTimes();
             }
         });
-
-
 
         function playBeepSound(times = 1) {
             let count = 0;
@@ -2219,6 +2507,34 @@
             return durasiData.adzan_shuruq * 60; // Konversi menit ke detik
         }
 
+        // Fungsi untuk mendapatkan durasi imsak (dalam detik)
+        function getImsakDuration() {
+            const durasiData = getDurasiData();
+
+            // Default durasi jika data tidak tersedia (dalam detik)
+            const defaultDuration = 1 * 60; // 1 menit
+
+            if (!durasiData || !durasiData.adzan_imsak) {
+                return defaultDuration;
+            }
+
+            return durasiData.adzan_imsak * 60; // Konversi menit ke detik
+        }
+
+        // Fungsi untuk mendapatkan durasi dhuha (dalam detik)
+        function getDhuhaDuration() {
+            const durasiData = getDurasiData();
+
+            // Default durasi jika data tidak tersedia (dalam detik)
+            const defaultDuration = 1 * 60; // 3 menit
+
+            if (!durasiData || !durasiData.adzan_dhuha) {
+                return defaultDuration;
+            }
+
+            return durasiData.adzan_dhuha * 60; // Konversi menit ke detik
+        }
+
         function showAdzanPopup(prayerName, prayerTimeStr, isRestored = false) {
             // Pastikan audio dijeda saat adzan dimulai
             pauseAudio();
@@ -2300,7 +2616,8 @@
                                 console.log('Memutar audio adzan subuh');
                             }
                         } else if (prayerLower !== 'syuruq' && prayerLower !== 'shuruq' &&
-                            prayerLower !== 'terbit') {
+                            prayerLower !== 'terbit' && prayerLower !== 'dhuha' && prayerLower !==
+                            'imsak') {
                             // Gunakan adzan_audio untuk waktu dzuhur, ashar, maghrib, isya dan jumat
                             const adzanAudioUrl = $('#adzan_audio').val();
                             if (adzanAudioUrl && adzanAudioUrl.trim() !== '') {
@@ -2492,8 +2809,9 @@
                 currentPrayerTime = prayerTimeStr;
             }
 
-            // Gunakan durasi dinamis untuk syuruq
-            const duration = getSyuruqDuration(); // dalam detik
+            // Gunakan durasi dinamis untuk syuruq/dhuha
+            const isDhuha = prayerName.toLowerCase().includes('dhuha');
+            const duration = isDhuha ? getDhuhaDuration() : getSyuruqDuration(); // dalam detik
             let lastCountdownUpdate = 0;
             let hasPlayedFinalBeep = false;
             isAdzanPlaying = true;
@@ -2558,6 +2876,189 @@
 
             // Return function untuk cleanup jika diperlukan
             return function stopSyuruq() {
+                isAdzanPlaying = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            };
+        }
+
+        function showDhuhaPopup(prayerName, prayerTimeStr, isRestored = false) {
+            pauseAudio();
+            const now = getCurrentTimeFromServer();
+            const serverMonth = now.getMonth() + 1;
+            const serverYear = now.getFullYear();
+            const scheduleMonth = parseInt($('#current-month').val());
+            const scheduleYear = parseInt($('#current-year').val());
+            if (scheduleMonth !== serverMonth || scheduleYear !== serverYear) {
+                $('#current-month').val(serverMonth);
+                $('#current-year').val(serverYear);
+                fetchPrayerTimes().catch(() => {});
+                return;
+            }
+            const $popup = $('#adzanPopup');
+            const $title = $('#adzanTitle');
+            const $progress = $('#adzanProgress');
+            const $countdown = $('#adzanCountdown');
+            const $label = $('#adzanLabel');
+            $label.text('waktu');
+            $title.text(`${prayerName}`);
+            $popup.css('display', 'flex');
+            if (!isRestored) {
+                playBeepSound(1);
+                $progress.css('width', '0%');
+            } else if (activePrayerStatus && activePrayerStatus.phase === 'adzan') {
+                $progress.css('width', `${activePrayerStatus.progress}%`);
+            }
+            if (!adzanStartTime) {
+                if (isRestored && activePrayerStatus && activePrayerStatus.phase === 'adzan') {
+                    const nowMs = getCurrentTimeFromServer().getTime();
+                    adzanStartTime = nowMs - (activePrayerStatus.elapsedSeconds * 1000);
+                } else {
+                    adzanStartTime = calculateSyncStartTime(prayerTimeStr);
+                }
+                localStorage.setItem('adzanStartTime', adzanStartTime);
+                localStorage.setItem('currentPrayerName', prayerName);
+                localStorage.setItem('currentPrayerTime', prayerTimeStr);
+                currentPrayerName = prayerName;
+                currentPrayerTime = prayerTimeStr;
+            }
+            const duration = getDhuhaDuration();
+            let lastCountdownUpdate = 0;
+            let hasPlayedFinalBeep = false;
+            isAdzanPlaying = true;
+            let animationId;
+
+            function updateDhuhaAnimation(timestamp) {
+                if (!isAdzanPlaying) {
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    return;
+                }
+                const currentTime = getCurrentTimeFromServer().getTime();
+                const elapsedSeconds = (currentTime - adzanStartTime) / 1000;
+                const timeLeft = duration - elapsedSeconds;
+                if (timeLeft <= 5 && !hasPlayedFinalBeep) {
+                    playBeepSound(1);
+                    hasPlayedFinalBeep = true;
+                }
+                if (timeLeft <= 0) {
+                    $popup.css('display', 'none');
+                    isAdzanPlaying = false;
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    clearAdzanState();
+                    return;
+                }
+                $progress.css({
+                    'animation': `progressAnimation ${duration}s linear forwards`
+                });
+                if (currentTime - lastCountdownUpdate >= 1000) {
+                    const minutes = Math.floor((timeLeft % 3600) / 60);
+                    const seconds = Math.floor(timeLeft % 60);
+                    $countdown.text(
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                    );
+                    lastCountdownUpdate = currentTime;
+                }
+                animationId = requestAnimationFrame(updateDhuhaAnimation);
+            }
+            animationId = requestAnimationFrame(updateDhuhaAnimation);
+            return function stopDhuha() {
+                isAdzanPlaying = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            };
+        }
+
+        function showImsakPopup(prayerName, prayerTimeStr, isRestored = false) {
+            // Mirip Dhuha/Syuruq: hanya fase adzan dengan beep
+            pauseAudio();
+            const now = getCurrentTimeFromServer();
+            const serverMonth = now.getMonth() + 1;
+            const serverYear = now.getFullYear();
+            const scheduleMonth = parseInt($('#current-month').val());
+            const scheduleYear = parseInt($('#current-year').val());
+            if (scheduleMonth !== serverMonth || scheduleYear !== serverYear) {
+                $('#current-month').val(serverMonth);
+                $('#current-year').val(serverYear);
+                fetchPrayerTimes().catch(() => {});
+                return;
+            }
+            const $popup = $('#adzanPopup');
+            const $title = $('#adzanTitle');
+            const $progress = $('#adzanProgress');
+            const $countdown = $('#adzanCountdown');
+            const $label = $('#adzanLabel');
+            $label.text('waktu');
+            $title.text(`${prayerName}`);
+            $popup.css('display', 'flex');
+            if (!isRestored) {
+                playBeepSound(1);
+                $progress.css('width', '0%');
+            } else if (activePrayerStatus && activePrayerStatus.phase === 'adzan') {
+                $progress.css('width', `${activePrayerStatus.progress}%`);
+            }
+            if (!adzanStartTime) {
+                if (isRestored && activePrayerStatus && activePrayerStatus.phase === 'adzan') {
+                    const nowMs = getCurrentTimeFromServer().getTime();
+                    adzanStartTime = nowMs - (activePrayerStatus.elapsedSeconds * 1000);
+                } else {
+                    adzanStartTime = calculateSyncStartTime(prayerTimeStr);
+                }
+                localStorage.setItem('adzanStartTime', adzanStartTime);
+                localStorage.setItem('currentPrayerName', prayerName);
+                localStorage.setItem('currentPrayerTime', prayerTimeStr);
+                currentPrayerName = prayerName;
+                currentPrayerTime = prayerTimeStr;
+            }
+            const duration = getImsakDuration();
+            let lastCountdownUpdate = 0;
+            let hasPlayedFinalBeep = false;
+            isAdzanPlaying = true;
+            let animationId;
+
+            function updateImsakAnimation(timestamp) {
+                if (!isAdzanPlaying) {
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    return;
+                }
+                const currentTime = getCurrentTimeFromServer().getTime();
+                const elapsedSeconds = (currentTime - adzanStartTime) / 1000;
+                const timeLeft = duration - elapsedSeconds;
+                if (timeLeft <= 5 && !hasPlayedFinalBeep) {
+                    playBeepSound(1);
+                    hasPlayedFinalBeep = true;
+                }
+                if (timeLeft <= 0) {
+                    $popup.css('display', 'none');
+                    isAdzanPlaying = false;
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    clearAdzanState();
+                    return;
+                }
+                $progress.css({
+                    'animation': `progressAnimation ${duration}s linear forwards`
+                });
+                if (currentTime - lastCountdownUpdate >= 1000) {
+                    const minutes = Math.floor((timeLeft % 3600) / 60);
+                    const seconds = Math.floor(timeLeft % 60);
+                    $countdown.text(
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                    );
+                    lastCountdownUpdate = currentTime;
+                }
+                animationId = requestAnimationFrame(updateImsakAnimation);
+            }
+            animationId = requestAnimationFrame(updateImsakAnimation);
+            return function stopImsak() {
                 isAdzanPlaying = false;
                 if (animationId) {
                     cancelAnimationFrame(animationId);
@@ -3015,8 +3516,6 @@
 
         function initFinanceOverlay() {
             fetchFinanceData();
-            // Refresh data setiap 1 menit
-            setInterval(fetchFinanceData, 60000);
             // Tidak lagi alternating; kita pakai satu scroll untuk seluruh konten
         }
 
@@ -3028,7 +3527,7 @@
                 return;
             }
             $.ajax({
-                url: `/api/balance-summary/${encodeURIComponent(slug)}?details=full&full_month=true&recent_limit=3`,
+                url: `/api/balance-summary-7hari/${encodeURIComponent(slug)}?details=full&hide_empty=true`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(resp) {
@@ -3057,36 +3556,65 @@
 
         function renderFinanceOverlay(data) {
             try {
-                // Judul menampilkan bulan dan tahun saja (tanpa rentang tanggal)
-                if (data.period && data.period.month && data.period.year) {
-                    const title = `Keuangan Masjid ${data.period.month} ${data.period.year}`;
-                    $('#financePeriodTitle').text(title);
+                // Judul menampilkan periode 7 hari (start s/d end)
+                if (data.period && data.period.type === 'last_7_days' && data.period.start && data.period.end) {
+                    const title = `${data.period.start} s/d ${data.period.end}`;
+                    $('#financePeriodTitle').html('PERIODE<br>' + title);
                 } else {
                     $('#financePeriodTitle').text('Keuangan');
                 }
 
                 // Totals
                 if (data.grandTotals) {
-                    $('#financeTotalMasukValue').text(data.grandTotals.sumMasukDisplay || '-');
-                    $('#financeTotalKeluarValue').text(data.grandTotals.sumKeluarDisplay || '-');
-                    $('#financeEndingBalanceValue').text(data.grandTotals.endingDisplay || '-');
+                    const masukDisplay = data.grandTotals.cumulativeMasukDisplay || data.grandTotals
+                        .sumMasukDisplay || '-';
+                    const keluarDisplay = data.grandTotals.cumulativeKeluarDisplay || data.grandTotals
+                        .sumKeluarDisplay || '-';
+                    const endingDisplay = data.grandTotals.totalSaldoDisplay || data.grandTotals
+                        .endingDisplay || '-';
+                    $('#financeTotalMasukValue').text(masukDisplay);
+                    $('#financeTotalKeluarValue').text(keluarDisplay);
+                    $('#financeEndingBalanceValue').text(endingDisplay);
                 }
 
                 // Top kategori (ambil 3 terbesar berdasarkan ending)
-                const categories = Array.isArray(data.categories) ? data.categories.slice() : [];
+                let categories = Array.isArray(data.categories) ? data.categories.slice() : [];
                 categories.sort((a, b) => (b.ending || 0) - (a.ending || 0));
+
+                // Frontend guard: sembunyikan kategori kosong (items kosong & semua total 0)
+                // Menggunakan totals numerik dari backend bila tersedia
+                if (Array.isArray(data.categoriesWithItems)) {
+                    const byName = new Map();
+                    data.categoriesWithItems.forEach(b => {
+                        byName.set((b.categoryName || ''), b);
+                    });
+                    categories = categories.filter(cat => {
+                        const block = byName.get(cat.categoryName || '');
+                        if (!block) return true; // jika tidak ada blok, jangan sembunyikan di sini
+                        const totals = block.totals || {};
+                        const allZero =
+                            (totals.previousBalance || 0) === 0 &&
+                            (totals.totalMasuk || 0) === 0 &&
+                            (totals.totalKeluar || 0) === 0 &&
+                            (totals.endingBalance || 0) === 0 &&
+                            (totals.totalSaldo || 0) === 0;
+                        const hasItems = Array.isArray(block.items) && block.items.length > 0;
+                        return !(allZero && !hasItems);
+                    });
+                }
                 const $topList = $('#financeTopCategoriesList');
                 $topList.empty();
                 categories.forEach(cat => {
                     // Ambil aktivitas dari backend (dibatasi recent_limit=3)
                     let itemsHtml = '';
+                    let prevDisplay = null;
+                    let totalSaldoDisplay = null;
                     if (Array.isArray(data.categoriesWithItems)) {
                         const block = data.categoriesWithItems.find(b => (b.categoryName || '') === (cat
                             .categoryName || ''));
-                        const itemsForCat = Array.isArray(block && block.items) ? block.items.slice() : [];
-                        itemsForCat.sort((a, b) => (b.id || 0) - (a.id || 0));
-                        const recent = itemsForCat; // backend sudah batasi ke 3 item terbaru
-                        itemsHtml = recent.map(it => {
+                        const itemsForCat = Array.isArray(block && block.items) ? block.items : [];
+                        // Tampilkan sesuai urutan dari backend (tanggal desc, id desc)
+                        itemsHtml = itemsForCat.map(it => {
                             const nilaiMasuk = it.masukDisplay && it.masukDisplay !== '-';
                             const nilaiKeluar = it.keluarDisplay && it.keluarDisplay !== '-';
                             const nilaiClass = nilaiMasuk ? 'masuk' : (nilaiKeluar ? 'keluar' :
@@ -3101,6 +3629,12 @@
                                 <span class="activity-line nominal ${nilaiClass}">${nilai}</span>
                             </div>`;
                         }).join('');
+
+                        // Ambil totals tambahan: saldo sebelumnya & total saldo
+                        if (block && block.totals) {
+                            prevDisplay = block.totals.previousBalanceDisplay || null;
+                            totalSaldoDisplay = block.totals.totalSaldoDisplay || null;
+                        }
                     }
                     const row = `<div class="finance-row">
                         <div class="finance-chip kategori">
@@ -3115,9 +3649,19 @@
                                     <span class="value">${cat.sumKeluarDisplay || '-'}</span>
                                 </div>
                                 <div class="finance-pill saldo">
-                                    <span class="label">Saldo</span>
+                                    <span class="label">Total</span>
                                     <span class="value">${cat.endingDisplay || '-'}</span>
                                 </div>
+                                ${prevDisplay ? `
+                                <div class="finance-pill saldobefore">
+                                    <span class="label">Saldo Sebelumnya</span>
+                                    <span class="value">${prevDisplay}</span>
+                                </div>` : ''}
+                                ${totalSaldoDisplay ? `
+                                <div class="finance-pill totalsaldo">
+                                    <span class="label">Saldo</span>
+                                    <span class="value">${totalSaldoDisplay}</span>
+                                </div>` : ''}
                             </div>
                             ${itemsHtml ? `<div class="activity-pill-container">${itemsHtml}</div>` : ''}
                         </div>
@@ -3137,77 +3681,87 @@
             }
         }
 
-        // Auto-scroll util: scroll vertikal bolak-balik dengan jeda 2 detik di atas & bawah
+        // Auto-scroll util: loop turun tanpa henti, wrap mulus di atas
         function startVerticalScroll($container, $content) {
             stopVerticalScroll();
             if (!$container || !$content || $content.children().length === 0) return;
 
             const container = $container[0];
             const content = $content[0];
+
+            // Bersihkan clone loop sebelumnya agar tidak menumpuk
+            const prevClones = container.querySelectorAll('[data-loop-clone="true"]');
+            prevClones.forEach(n => n.remove());
+            // Bersihkan spacer sebelumnya bila ada
+            const prevSpacers = container.querySelectorAll('[data-loop-spacer="true"]');
+            prevSpacers.forEach(n => n.remove());
+
+            // Clone satu kali untuk membuat efek seamless saat wrap
+            const baseHeight = content.scrollHeight;
+            if (baseHeight <= container.clientHeight) {
+                // Tidak perlu scroll jika konten tidak melebihi kontainer
+                return;
+            }
+            // Spacer sebagai margin antar putaran (sedikit lebih kecil)
+            const gapPx = 0;
+            const spacer = document.createElement('div');
+            spacer.setAttribute('data-loop-spacer', 'true');
+            spacer.style.height = gapPx + 'px';
+            spacer.style.minHeight = gapPx + 'px';
+            spacer.style.width = '100%';
+            spacer.style.flex = '0 0 ' + gapPx + 'px';
+            spacer.style.pointerEvents = 'none';
+            spacer.style.background = 'transparent';
+
+            const clone = content.cloneNode(true);
+            if (clone.id) clone.id = '';
+            clone.setAttribute('data-loop-clone', 'true');
+            // Susun: konten asli -> spacer -> clone
+            container.appendChild(spacer);
+            container.appendChild(clone);
+
             let offset = container.scrollTop || 0;
-            const vwPerSec = 2; // kecepatan dalam vw per detik (konsisten lintas layar)
+            let vwPerSec = 2; // default
+            try {
+                const durasiRaw = $('#durasi-data').val();
+                if (durasiRaw) {
+                    const d = JSON.parse(durasiRaw);
+                    if (typeof d.finance_scroll_speed !== 'undefined') {
+                        const s = parseFloat(d.finance_scroll_speed);
+                        if (isFinite(s)) {
+                            vwPerSec = Math.max(0.1, Math.min(s, 10));
+                        }
+                    }
+                }
+            } catch (e) {}
             let speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
 
-            // Update saat ukuran layar berubah
-            window.addEventListener('resize', () => {
+            // Update kecepatan saat ukuran layar berubah
+            const onResize = () => {
                 speedPxPerSec = (vwPerSec / 100) * window.innerWidth;
-            });
+            };
+            window.addEventListener('resize', onResize);
+
             let lastTs = null;
-            let direction = 1; // 1: turun, -1: naik
-            let pauseUntil = null; // timestamp (ms) sampai kapan jeda berlangsung
+            const loopLength = baseHeight + gapPx; // panjang satu putaran termasuk margin
 
             function loop(ts) {
                 if (lastTs === null) lastTs = ts;
-                const dt = Math.min(0.033, (ts - lastTs) / 1000); // batasi dt ke ~33ms
+                const dt = Math.min(0.033, (ts - lastTs) / 1000);
                 lastTs = ts;
 
-                const maxScroll = Math.max(0, content.scrollHeight - container.clientHeight);
-                if (maxScroll <= 0) {
-                    // tidak ada yang bisa di-scroll
+                // Jika karena perubahan layout tinggi dasar jadi tidak valid, hentikan
+                if (baseHeight <= container.clientHeight) {
                     stopVerticalScroll();
                     return;
                 }
 
-                // Kelola jeda: tahan posisi, dan setelah jeda bawah selesai loncat ke atas
-                if (pauseUntil) {
-                    if (ts < pauseUntil) {
-                        // masih dalam jeda, tahan posisi sekarang
-                        container.scrollTop = offset;
-                        financeScrollRaf = requestAnimationFrame(loop);
-                        return;
-                    } else {
-                        // jeda selesai
-                        pauseUntil = null;
-                        if (offset >= maxScroll) {
-                            // selesai jeda di bawah: reset ke atas tanpa menyembunyikan overlay
-                            container.scrollTop = 0; // mulai dari atas
-                            offset = 0;
-                            direction = 1; // lanjut turun lagi
-                            // jeda 2 detik di atas sebelum mulai turun lagi
-                            pauseUntil = ts + 2000;
-                        }
-                        if (offset <= 0) {
-                            // selesai jeda di atas: lanjut turun
-                            direction = 1;
-                        }
-                    }
-                }
+                // Gerak turun terus
+                offset += speedPxPerSec * dt;
 
-                // Bergerak sesuai arah saat ini
-                offset += direction * speedPxPerSec * dt;
-
-                // Jika melewati batas bawah
-                if (offset >= maxScroll) {
-                    offset = maxScroll; // clamp ke bawah
-                    pauseUntil = ts + 2000; // jeda 2 detik
-                    direction = 0; // jangan naik; tunggu loncat ke atas setelah jeda
-                }
-
-                // Jika melewati batas atas
-                if (offset <= 0) {
-                    offset = 0; // clamp ke atas
-                    pauseUntil = ts + 2000; // jeda 2 detik
-                    direction = 1; // balik arah: turun
+                // Wrap mulus saat melewati panjang putaran (konten + spacer)
+                if (offset >= loopLength) {
+                    offset -= loopLength;
                 }
 
                 container.scrollTop = offset;
@@ -3306,47 +3860,41 @@
                 dataType: 'json',
                 success: async function(response) {
                     if (response.success && response.data) {
-                        const previousAdzan = [];
-                        for (let i = 7; i <= 12; i++) {
-                            previousAdzan.push($(`#adzan${i}`).val() || '');
-                        }
-
-                        const adzanKeys = ['adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11',
+                        // Bangun daftar gambar langsung dari respons API
+                        const keys = ['adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11',
                             'adzan12'
                         ];
-                        adzanKeys.forEach(key => {
-                            $(`#${key}`).val(response.data[key] || '');
+                        const imagesFromApi = [];
+                        keys.forEach((key) => {
+                            const val = response.data[key];
+                            if (val) imagesFromApi.push(val);
                         });
 
-                        window.fridayImages = [];
-                        for (let i = 7; i <= 12; i++) {
-                            const adzanValue = $(`#adzan${i}`).val();
-                            if (adzanValue) {
-                                window.fridayImages.push(adzanValue);
-                            }
-                        }
-
-                        if (window.fridayImages.length === 0) {
-                            window.fridayImages = [
-                                '/images/other/doa-setelah-adzan-default.webp',
-                                '/images/other/doa-masuk-masjid-default.webp',
-                                '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
-                                '/images/other/non-silent-hp-default.webp'
-                            ];
+                        const prevImages = Array.isArray(window.fridayImages) ? window.fridayImages
+                            .slice() : [];
+                        window.fridayImages = imagesFromApi.length > 0 ? imagesFromApi : [
+                            '/images/other/doa-setelah-adzan-default.webp',
+                            '/images/other/doa-masuk-masjid-default.webp',
+                            '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
+                            '/images/other/non-silent-hp-default.webp'
+                        ];
+                        if (imagesFromApi.length === 0) {
                             console.log('Menggunakan gambar default karena respons API kosong:',
                                 window.fridayImages);
                         }
 
-                        // Preload gambar baru jika belum ada di cache
-                        const urlsToPreload = window.fridayImages.filter(url => !window.imageCache[
-                            url] || !window.imageCache[url].complete);
-                        if (urlsToPreload.length > 0) {
-                            await preloadImages(urlsToPreload);
-                        }
-                        // Bersihkan cache yang tidak digunakan
+                        // Preload semua gambar Friday yang baru
+                        await preloadImages(window.fridayImages);
                         clearUnusedCache(window.fridayImages);
-                        // Restart slider jika popup aktif
-                        if ($('#fridayInfoPopup').is(':visible') && !fridayImageSliderInterval) {
+
+                        // Jika daftar gambar berubah, restart slider agar memakai gambar terbaru
+                        const changed = prevImages.length !== window.fridayImages.length ||
+                            prevImages.some((v, i) => v !== window.fridayImages[i]);
+                        if (changed) {
+                            if (fridayImageSliderInterval) {
+                                clearInterval(fridayImageSliderInterval);
+                                fridayImageSliderInterval = null;
+                            }
                             startFridayImageSlider();
                         }
                     }
@@ -3358,13 +3906,7 @@
         }
 
         function startFridayImageSlider() {
-            window.fridayImages = [];
-            for (let i = 7; i <= 12; i++) {
-                const adzanElement = $(`#adzan${i}`);
-                if (adzanElement.val()) {
-                    window.fridayImages.push(adzanElement.val());
-                }
-            }
+            let images = Array.isArray(window.fridayImages) ? window.fridayImages.slice() : [];
 
             const $fridayImageElement = $('#currentFridayImage');
             if (!$fridayImageElement.length) {
@@ -3372,14 +3914,14 @@
                 return;
             }
 
-            if (window.fridayImages.length === 0) {
-                window.fridayImages = [
+            if (images.length === 0) {
+                images = [
                     '/images/other/doa-setelah-adzan-default.webp',
                     '/images/other/doa-masuk-masjid-default.webp',
                     '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
                     '/images/other/non-silent-hp-default.webp'
                 ];
-                console.log('Menggunakan 4 gambar default untuk slider Friday:', window.fridayImages);
+                console.log('Menggunakan 4 gambar default untuk slider Friday:', images);
             }
 
             if (!fridaySliderStartTime) {
@@ -3389,32 +3931,31 @@
 
             async function initFridaySlider() {
                 try {
-                    await preloadImages(window.fridayImages);
+                    await preloadImages(images);
                     console.log('Semua gambar Friday telah dimuat, memulai slider');
 
                     let lastIndex = -1;
 
                     function updateFridayImage() {
-                        if (!window.fridayImages || window.fridayImages.length === 0) {
-                            window.fridayImages = [
+                        if (!images || images.length === 0) {
+                            images = [
                                 '/images/other/doa-setelah-adzan-default.webp',
                                 '/images/other/doa-masuk-masjid-default.webp',
                                 '/images/other/dilarang-bicara-saat-sholat-jumat-default.webp',
                                 '/images/other/non-silent-hp-default.webp'
                             ];
-                            console.log('Menggunakan 4 gambar default dalam updateFridayImage:', window
-                                .fridayImages);
+                            console.log('Menggunakan 4 gambar default dalam updateFridayImage:', images);
                         }
 
                         const now = getCurrentTimeFromServer().getTime();
                         const elapsedMs = now - fridaySliderStartTime;
                         const elapsedSeconds = Math.floor(elapsedMs / 1000);
-                        const currentIndex = Math.floor(elapsedSeconds / 20) % window.fridayImages.length;
+                        const currentIndex = Math.floor(elapsedSeconds / 20) % images.length;
 
                         if (currentIndex !== lastIndex) {
                             lastIndex = currentIndex;
 
-                            const currentUrl = window.imageCache[window.fridayImages[currentIndex]]?.src ||
+                            const currentUrl = window.imageCache[images[currentIndex]]?.src ||
                                 '/images/other/doa-masuk-masjid-default.webp';
 
                             $fridayImageElement.css({
@@ -3423,7 +3964,7 @@
                             });
                             console.log('Gambar Friday diperbarui ke:', currentUrl);
 
-                            clearUnusedCache(window.fridayImages);
+                            clearUnusedCache(images);
                         }
                     }
 
@@ -3709,8 +4250,11 @@
                     !isAdzanPlaying && !adzanStartTime) {
                     if (prayer.name.toLowerCase().includes('syuruq') || prayer.name.toLowerCase()
                         .includes('shuruq') || prayer.name.toLowerCase().includes('terbit')) {
-                        // Syuruq sekarang menggunakan sistem yang sama dengan waktu sholat lainnya
                         showSyuruqPopup(prayer.name, prayer.time);
+                    } else if (prayer.name.toLowerCase().includes('dhuha')) {
+                        showDhuhaPopup(prayer.name, prayer.time);
+                    } else if (prayer.name.toLowerCase().includes('imsak')) {
+                        showImsakPopup(prayer.name, prayer.time);
                     } else if (prayer.name === "Jum'at" && fridayInfoStartTime && now.getTime() <
                         fridayInfoEndTime) {
                         // Jangan memulai adzan Jumat jika popup Friday Info aktif
@@ -3824,7 +4368,7 @@
             const slideUrls = window.slideUrls || [];
             const iqomahImages = window.iqomahImages || [];
             const fridayImages = window.fridayImages || [];
-            const jumbotronUrls = window.jumbotronUrls || [];
+            const jumbotronUrls = Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [];
             const adzan15 = $('#adzan15').val() || '/images/other/lurus-rapat-shaf-default.webp';
             return [...new Set([...slideUrls, ...iqomahImages, ...fridayImages, ...jumbotronUrls, adzan15])]
                 .filter(url => url.trim() !== '');
@@ -3898,16 +4442,18 @@
                 $('#jumbotron-clock-time').text(`${hours}:${minutes}:${seconds}`);
 
                 // Lanjutkan animasi
-                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0 && $(
-                        '#jumbotronImage').is(':visible')) {
+                const isActive = ($('#jumbotron_is_active').val() === 'true') && Array.isArray(window
+                    .jumbotronSequence) && window.jumbotronSequence.length > 0;
+                if (isActive && $('#jumbotronImage').is(':visible')) {
                     animationFrameId = requestAnimationFrame(updateContent);
                 }
             }
 
             // Mulai pembaruan jika jumbotron aktif
             function startJumbotronUpdates() {
-                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0 && $(
-                        '#jumbotronImage').is(':visible')) {
+                const isActive = ($('#jumbotron_is_active').val() === 'true') && Array.isArray(window
+                    .jumbotronSequence) && window.jumbotronSequence.length > 0;
+                if (isActive && $('#jumbotronImage').is(':visible')) {
                     if (!animationFrameId) {
                         updateContent(); // Perbarui segera
                         console.log('Jumbotron countdown updates started with requestAnimationFrame');
@@ -3929,7 +4475,9 @@
 
             // Pantau perubahan status jumbotron
             $(document).on('jumbotronUpdated', function() {
-                if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0) {
+                const isActive = ($('#jumbotron_is_active').val() === 'true') && Array.isArray(window
+                    .jumbotronSequence) && window.jumbotronSequence.length > 0;
+                if (isActive) {
                     startJumbotronUpdates();
                 } else {
                     stopJumbotronUpdates();
@@ -3951,48 +4499,44 @@
 
         // Panggil fungsi ini saat jumbotron ditampilkan
         $(document).on('jumbotronUpdated', function() {
-            if ($('#jumbo_is_active').val() === 'true' && window.jumbotronUrls.length > 0) {
-                updateJumbotronContent();
-            }
+            const isActive = $('#jumbotron_is_active').val() === 'true' && Array.isArray(window
+                .jumbotronSequence) && window.jumbotronSequence.length > 0;
+            if (isActive) updateJumbotronContent();
         });
 
         function updateJumbotronData() {
+            const parts = window.location.pathname.split('/').filter(Boolean);
+            const slug = parts[parts.length - 1] || '';
+            if (!slug) return;
             $.ajax({
-                url: '/api/jumbotron1',
+                url: `/api/jumbotron-all/${slug}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Respons API jumbotron:', response);
                     if (response.success && response.data) {
-                        const data = response.data;
-                        if (Array.isArray(data)) {
-                            // API lama mengembalikan array URL
-                            $('#jumbo1').val(data[0] || '');
-                            $('#jumbo2').val(data[1] || '');
-                            $('#jumbo3').val(data[2] || '');
-                            $('#jumbo4').val(data[3] || '');
-                            $('#jumbo5').val(data[4] || '');
-                            $('#jumbo6').val(data[5] || '');
-                            $('#jumbo_is_active').val(data.length > 0 ? 'true' : 'false');
-                        } else {
-                            // API baru/object dengan key jumbo1..jumbo6 dan is_active
-                            $('#jumbo1').val(data.jumbo1 || '');
-                            $('#jumbo2').val(data.jumbo2 || '');
-                            $('#jumbo3').val(data.jumbo3 || '');
-                            $('#jumbo4').val(data.jumbo4 || '');
-                            $('#jumbo5').val(data.jumbo5 || '');
-                            $('#jumbo6').val(data.jumbo6 || '');
-                            $('#jumbo_is_active').val(data.is_active ? 'true' : 'false');
+                        const d = response.data;
+                        $('#jumbotron_is_active').val(d.is_active ? 'true' : 'false');
+                        try {
+                            const seq = Array.isArray(d.items) ? d.items : [];
+                            window.jumbotronSequence = seq.filter(u => typeof u === 'string' && u
+                                .trim() !== '');
+                            $('#jumbotron-sequence').val(JSON.stringify(window.jumbotronSequence));
+                        } catch (e) {
+                            window.jumbotronSequence = [];
+                            $('#jumbotron-sequence').val('[]');
                         }
                         $(document).trigger('jumbotronUpdated');
                     } else {
-                        $('#jumbo_is_active').val('false');
-                        console.log('Tidak ada data jumbotron aktif');
+                        $('#jumbotron_is_active').val('false');
+                        window.jumbotronSequence = [];
+                        $('#jumbotron-sequence').val('[]');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error('Error saat mengambil data jumbotron:', error, xhr.responseText);
-                    $('#jumbo_is_active').val('false');
+                error: function(xhr) {
+                    console.error('Error saat mengambil jumbotron-all:', xhr.responseText);
+                    $('#jumbotron_is_active').val('false');
+                    window.jumbotronSequence = [];
+                    $('#jumbotron-sequence').val('[]');
                 }
             });
         }
@@ -4016,33 +4560,33 @@
             ].filter(url => url.trim() !== '');
 
             if (window.slideUrls.length === 0) {
-                console.warn('Tidak ada slide mosque-image yang valid, menggunakan gambar default');
+                // console.warn('Tidak ada slide mosque-image yang valid, menggunakan gambar default');
                 window.slideUrls = ['/images/other/slide-jws-default.jpg'];
             }
 
-            // Inisialisasi jumbotronUrls
-            window.jumbotronUrls = [
-                $('#jumbo1').val() || '',
-                $('#jumbo2').val() || '',
-                $('#jumbo3').val() || '',
-                $('#jumbo4').val() || '',
-                $('#jumbo5').val() || '',
-                $('#jumbo6').val() || ''
-            ].filter(url => url.trim() !== '');
+            // Inisialisasi jumbotron sequence dari hidden input
+            try {
+                const rawSeq = $('#jumbotron-sequence').val();
+                window.jumbotronSequence = JSON.parse(rawSeq || '[]').filter(u => typeof u === 'string' && u
+                    .trim() !== '');
+            } catch (e) {
+                window.jumbotronSequence = [];
+            }
 
             async function initSlider() {
                 try {
-                    const allUrls = [...window.slideUrls, ...window.jumbotronUrls];
+                    const allUrls = [...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
+                        window.jumbotronSequence : [])];
                     await preloadImages(allUrls);
                     // console.log('Semua gambar telah dimuat, memulai slider', allUrls);
 
                     const slideDuration = 20000; // 20 detik per gambar
 
                     function updateSlide() {
-                        const isJumbotronActive = $('#jumbo_is_active').val() === 'true' && window
-                            .jumbotronUrls.length > 0;
-                        if (!isJumbotronActive) {
-                            window.jumbotronUrls = [];
+                        const isSequenceActive = $('#jumbotron_is_active').val() === 'true' && Array
+                            .isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
+                        if (!isSequenceActive) {
+                            window.jumbotronSequence = [];
                             $jumbotronImageElement.css('display', 'none');
                         }
 
@@ -4056,7 +4600,7 @@
                             .getSeconds();
                         const slideCycleDuration = slideDuration * window.slideUrls
                             .length; // Durasi siklus penuh mosque-image
-                        const totalCycleDuration = isJumbotronActive ? slideCycleDuration + slideDuration :
+                        const totalCycleDuration = isSequenceActive ? slideCycleDuration + slideDuration :
                             slideCycleDuration;
 
                         const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
@@ -4064,16 +4608,19 @@
                         const imageIndex = Math.floor(cyclePosition / slideDuration);
 
                         let currentUrl;
-                        if (isJumbotronActive && imageIndex === window.slideUrls.length) {
-                            // Hitung currentJumboIndex berdasarkan waktu server
-                            const totalJumboCycle = totalCycleDuration * window.jumbotronUrls.length;
-                            const jumboCyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
-                                totalJumboCycle;
-                            const currentJumboIndex = Math.floor(jumboCyclePosition / totalCycleDuration) %
-                                window.jumbotronUrls.length;
-
-                            currentUrl = window.imageCache[window.jumbotronUrls[currentJumboIndex]]?.src ||
-                                window.jumbotronUrls[currentJumboIndex] ||
+                        if (isSequenceActive && imageIndex === window.slideUrls.length) {
+                            if (!window.inJumbotronPhase) {
+                                window.inJumbotronPhase = true;
+                                window.jsIndex = typeof window.jsIndex === 'number' ? window.jsIndex : 0;
+                                const seqLen = window.jumbotronSequence.length;
+                                const nextIndex = seqLen > 0 ? (window.jsIndex % seqLen) : 0;
+                                window.jsIndex++;
+                                window.currentJumbotronUrl = window.imageCache[window.jumbotronSequence[
+                                        nextIndex]]?.src ||
+                                    window.jumbotronSequence[nextIndex] ||
+                                    '/images/other/slide-jws-default.jpg';
+                            }
+                            currentUrl = window.currentJumbotronUrl ||
                                 '/images/other/slide-jws-default.jpg';
                             $mosqueImageElement.css('display', 'none');
                             $jumbotronImageElement.css({
@@ -4081,10 +4628,16 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
-                            // Animasi progress bar jumbotron dihapus
+                            // Reset dan jalankan animasi progress bar
+                            // const $progressBar = $('.jumbotron-progress-bar');
+                            // $progressBar.css('width', '0%');
+                            // $progressBar.css('animation',
+                            //     `progressAnimation ${slideDuration}ms linear forwards`);
                             // console.log(
                             // `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
                         } else {
+                            window.inJumbotronPhase = false;
+                            window.currentJumbotronUrl = null;
                             const slideIndex = imageIndex % window.slideUrls.length;
                             currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
                                 window.slideUrls[slideIndex] ||
@@ -4095,11 +4648,13 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
-                            // Animasi progress bar jumbotron dihapus
+                            // Hentikan animasi progress bar saat jumbotron tidak ditampilkan
+                            // $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                             // console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
-                        clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
+                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
+                            window.jumbotronSequence : [])]);
                         $(document).trigger('slideUpdated'); // Picu event slideUpdated
                     }
 
@@ -4126,30 +4681,37 @@
                         }
 
                         // console.log('slideUrls diperbarui:', window.slideUrls);
-                        clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
+                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window
+                            .jumbotronSequence) ? window.jumbotronSequence : [])]);
                     });
 
                     $(document).on('jumbotronUpdated', async function() {
-                        console.log('Event jumbotronUpdated diterima, memperbarui jumbotron');
-                        window.jumbotronUrls = [
-                            $('#jumbo1').val() || '',
-                            $('#jumbo2').val() || '',
-                            $('#jumbo3').val() || '',
-                            $('#jumbo4').val() || '',
-                            $('#jumbo5').val() || '',
-                            $('#jumbo6').val() || ''
-                        ].filter(url => url.trim() !== '');
-
-                        const urlsToPreload = window.jumbotronUrls.filter(url => !window
+                        try {
+                            const seqRaw = $('#jumbotron-sequence').val();
+                            window.jumbotronSequence = JSON.parse(seqRaw || '[]').filter(u =>
+                                typeof u === 'string' && u.trim() !== '');
+                        } catch (e) {
+                            window.jumbotronSequence = [];
+                        }
+                        const urlsToPreload = window.jumbotronSequence.filter(url => !window
                             .imageCache[url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
-                            console.log(`Preload gambar jumbotron baru: ${urlsToPreload}`);
                             await preloadImages(urlsToPreload);
                         }
-
-                        console.log('jumbotronUrls diperbarui:', window.jumbotronUrls);
-                        clearUnusedCache([...window.slideUrls, ...window.jumbotronUrls]);
+                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window
+                            .jumbotronSequence) ? window.jumbotronSequence : [])]);
+                        try {
+                            const newHash = JSON.stringify(window.jumbotronSequence);
+                            if (newHash !== window.jumbotronSequenceHash) {
+                                window.jumbotronSequenceHash = newHash;
+                                window.jsIndex = 0;
+                                window.inJumbotronPhase = false;
+                                window.currentJumbotronUrl = null;
+                            }
+                        } catch (e) {}
                     });
+
+                    // jumbotronMasjidUpdated deprecated; use jumbotronUpdated
                 } catch (error) {
                     console.error('Error saat menginisialisasi slider:', error);
                     // Fallback: Gunakan gambar default jika preload gagal
@@ -4162,7 +4724,7 @@
                     });
                     $jumbotronImageElement.css('display', 'none');
                     // Hentikan animasi progress bar pada fallback
-                    $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
+                    // $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                     $(document).trigger('slideUpdated');
                 }
             }
@@ -4182,6 +4744,77 @@
 
         handlePrayerTimes();
         setInterval(handlePrayerTimes, 1000);
+
+        (function initSyuruqDhuhaToggle() {
+            try {
+                const period = 5000;
+
+                function apply() {
+                    const $items = $('.prayer-time');
+                    const $syuruq = $items.eq(2);
+                    const $dhuha = $items.eq(3);
+                    if (!$syuruq.length || !$dhuha.length) return;
+
+                    const syuIsActive = $syuruq.hasClass('active');
+                    const syuIsNext = $syuruq.hasClass('next-prayer');
+                    const dhuIsActive = $dhuha.hasClass('active');
+                    const dhuIsNext = $dhuha.hasClass('next-prayer');
+
+                    if (syuIsActive) {
+                        $dhuha.removeClass('active');
+                        if (!$dhuha.hasClass('next-prayer')) $dhuha.addClass('next-prayer');
+                    } else if (syuIsNext) {
+                        $dhuha.removeClass('active next-prayer');
+                    } else if (dhuIsActive) {
+                        $syuruq.removeClass('active next-prayer');
+                    }
+
+                    // Sinkronkan toggle dengan waktu server
+                    const now = getCurrentTimeFromServer().getTime();
+                    const showSyuruqState = Math.floor(now / period) % 2 === 0;
+                    $syuruq.toggle(showSyuruqState);
+                    $dhuha.toggle(!showSyuruqState);
+                }
+                apply();
+                setInterval(apply, 1000);
+            } catch (e) {}
+        })();
+
+        // Toggle tampilan gabungan Imsak–Subuh seperti Syuruq–Dhuha
+        (function initImsakSubuhToggle() {
+            try {
+                const period = 5000;
+
+                function apply() {
+                    const $items = $('.prayer-time');
+                    const $imsak = $items.eq(0);
+                    const $subuh = $items.eq(1);
+                    if (!$imsak.length || !$subuh.length) return;
+
+                    const imsakIsActive = $imsak.hasClass('active');
+                    const imsakIsNext = $imsak.hasClass('next-prayer');
+                    const subuhIsActive = $subuh.hasClass('active');
+                    const subuhIsNext = $subuh.hasClass('next-prayer');
+
+                    if (imsakIsActive) {
+                        $subuh.removeClass('active');
+                        if (!$subuh.hasClass('next-prayer')) $subuh.addClass('next-prayer');
+                    } else if (imsakIsNext) {
+                        $subuh.removeClass('active next-prayer');
+                    } else if (subuhIsActive) {
+                        $imsak.removeClass('active next-prayer');
+                    }
+
+                    // Sinkronkan toggle dengan waktu server
+                    const now = getCurrentTimeFromServer().getTime();
+                    const showImsakState = Math.floor(now / period) % 2 === 0;
+                    $imsak.toggle(showImsakState);
+                    $subuh.toggle(!showImsakState);
+                }
+                apply();
+                setInterval(apply, 1000);
+            } catch (e) {}
+        })();
 
         // Update tanggal awal dengan waktu lokal, akan diperbarui setelah sinkronisasi server
         updateDate();
@@ -4236,8 +4869,8 @@
                             const data = response.data;
 
                             if (Array.isArray(data)) {
-                                console.log(
-                                    `Menerima array petugas dengan panjang: ${data.length}`);
+                                // console.log(
+                                // `Menerima array petugas dengan panjang: ${data.length}`);
                                 for (let i = 0; i < data.length; i++) {
                                     const item = data[i];
                                     const d = new Date(item.hari);
@@ -4424,7 +5057,7 @@
         // Perbarui dan putar audio setiap 30 menit
         setInterval(function() {
             updateAndPlayAudio();
-            updateFridayImages();
+            // updateFridayImages();
             updateIqomahImages();
             updateAdzanImages();
             // updateFridayOfficials();
@@ -4433,17 +5066,17 @@
         updateJumbotronData();
 
         setInterval(function() {
-            updateMosqueInfo();
-            updateJumbotronData();
-            updateMarqueeText();
-            checkThemeUpdate();
-            updateSlides();
+            // updateMosqueInfo();
+            // updateJumbotronData();
+            // updateMarqueeText();
+            // checkThemeUpdate();
+            // updateSlides();
             updateDailyPrayerTimes();
         }, 120000); // 120000 milidetik = 2 menit
 
-        setInterval(function() {
-            updateFridayOfficials();
-        }, 300000); // 300000 milidetik = 5 menit
+        // setInterval(function() {
+        //     updateFridayOfficials();
+        // }, 300000);
 
         // Fungsi untuk toggle full screen
         function toggleFullScreen() {
@@ -4463,14 +5096,499 @@
             toggleFullScreen();
         });
 
-        // Event handler untuk menghentikan audio adzan saat halaman di-refresh atau ditutup
-        // $(window).on('beforeunload', function() {
-        //     // Hentikan audio adzan jika sedang diputar
-        //     if (window.adzanAudioPlayer) {
-        //         window.adzanAudioPlayer.pause();
-        //         window.adzanAudioPlayer.currentTime = 0;
-        //     }
-        // });
+        // ===================== Realtime Profil Updates via Echo =====================
+        (function initProfileRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime profil updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Hanya tangani event untuk profil
+                                if (e && e.type === 'profil') {
+                                    console.log('Menerima event profil; memperbarui info masjid');
+                                    // Ambil data terbaru dari API dan render ke UI
+                                    updateMosqueInfo();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk profil`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime profil updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initProfileRealtimeUpdates error:', err);
+            }
+        })();
+
+        (function initJumbotronRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) return;
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                if (e && e.type === 'jumbotron_masjid') {
+                                    updateJumbotronData();
+                                }
+                            });
+                    } catch (err) {}
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                        }
+                    }, 500);
+                }
+            } catch (err) {}
+        })();
+
+        (function initJumbotronGlobalRealtimeUpdates() {
+            try {
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel('global-masjid')
+                            .listen('GlobalUpdatedEvent', (e) => {
+                                if (e && e.type === 'jumbotron') {
+                                    updateJumbotronData();
+                                }
+                            });
+                    } catch (err) {}
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                        }
+                    }, 500);
+                }
+            } catch (err) {}
+        })();
+
+        // ===================== Realtime Slides Updates via Echo =====================
+        (function initSlidesRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime slides updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                if (e && e.type === 'slide') {
+                                    console.log('Menerima event slide; memperbarui slides utama');
+                                    try {
+                                        updateSlides();
+                                    } catch (err) {
+                                        console.warn('Gagal menjalankan updateSlides():', err);
+                                    }
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk slides utama`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel (slides):', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime slides updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initSlidesRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Petugas Updates via Echo =====================
+        (function initPetugasRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime petugas updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk petugas Jumat
+                                if (e && e.type === 'petugas') {
+                                    console.log(
+                                        'Menerima event petugas; memperbarui data petugas Jumat'
+                                    );
+                                    // Ambil data terbaru dari API dan render ke UI
+                                    updateFridayOfficials();
+                                }
+                            });
+                        // console.log(`Subscribed ke channel masjid-${slug} untuk petugas`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime petugas updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initPetugasRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Marquee Updates via Echo =====================
+        (function initMarqueeRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime marquee updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk marquee
+                                if (e && e.type === 'marquee') {
+                                    console.log(
+                                        'Menerima event marquee; memperbarui teks berjalan');
+                                    // Ambil data marquee terbaru dari API dan render ke UI
+                                    updateMarqueeText();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk marquee`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime marquee updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initMarqueeRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Slides (Friday Images) Updates via Echo =====================
+        (function initFridayImagesRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime slides updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk update gambar Friday
+                                // Komponen Adzan mem-broadcast dengan type 'adzan'
+                                if (e && e.type === 'adzan') {
+                                    console.log('Menerima event slide; memperbarui gambar Friday');
+                                    // Ambil data terbaru dari API dan render ke UI
+                                    updateFridayImages();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk slides friday`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime slides updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initFridayImagesRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Durasi Updates via Echo =====================
+        (function initDurasiRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime durasi updates dinonaktifkan');
+                    return;
+                }
+
+                function applyDurasiData(d) {
+                    try {
+                        $('#durasi-data').val(JSON.stringify(d));
+                        // Jika finance overlay sedang tampil, restart scroll dengan kecepatan baru
+                        const overlayVisible = $('#financeOverlay').is(':visible');
+                        if (overlayVisible) {
+                            try {
+                                stopVerticalScroll();
+                            } catch (e) {}
+                            const $containerAll = $('#financeScrollContainerAll');
+                            const $contentAll = $('#financeScrollContentAll');
+                            startVerticalScroll($containerAll, $contentAll);
+                        }
+                    } catch (err) {
+                        console.warn('Gagal menerapkan data durasi:', err);
+                    }
+                }
+
+                function fetchDurasiData() {
+                    return $.ajax({
+                        url: `/api/durasi/${slug}`,
+                        method: 'GET',
+                        dataType: 'json'
+                    }).then(function(response) {
+                        if (response && response.success && response.data) {
+                            applyDurasiData(response.data);
+                        }
+                    }).catch(function(err) {
+                        console.warn('Gagal mengambil data durasi:', err);
+                    });
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Komponen Durasi membroadcast dengan type 'adzan'
+                                if (e && e.type === 'adzan') {
+                                    console.log('Menerima event durasi; memperbarui durasi-data');
+                                    fetchDurasiData();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk durasi`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel (durasi):', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime durasi updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initDurasiRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Theme Updates via Echo =====================
+        (function initThemeRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime tema updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk perubahan tema
+                                if (e && e.type === 'theme') {
+                                    console.log('Menerima event tema; memeriksa pembaruan tema');
+                                    // Cek API tema dan reload bila perlu
+                                    checkThemeUpdate();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk tema`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel:', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime tema updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initThemeRealtimeUpdates error:', err);
+            }
+        })();
+
+        // ===================== Realtime Finance Overlay Updates via Echo =====================
+        (function initFinanceRealtimeUpdates() {
+            try {
+                const slug = window.location.pathname.replace(/^\//, '');
+                if (!slug) {
+                    console.warn('Slug tidak ditemukan; realtime finance updates dinonaktifkan');
+                    return;
+                }
+
+                const subscribe = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                // Tangani event untuk pembaruan laporan keuangan
+                                if (e && e.type === 'laporan') {
+                                    console.log(
+                                        'Menerima event laporan; memuat ulang data finance overlay'
+                                    );
+                                    // Ambil data finance terbaru dari API dan render ke UI
+                                    fetchFinanceData();
+                                }
+                            });
+                        console.log(`Subscribed ke channel masjid-${slug} untuk finance overlay`);
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo channel (finance):', err);
+                    }
+                };
+
+                if (window.Echo) {
+                    subscribe();
+                } else {
+                    // Tunggu Echo terinisialisasi oleh Vite (resources/js/app.js)
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const interval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(interval);
+                            subscribe();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            console.warn(
+                                'Echo belum tersedia; realtime finance updates dinonaktifkan');
+                        }
+                    }, 500);
+                }
+            } catch (err) {
+                console.warn('initFinanceRealtimeUpdates error:', err);
+            }
+        })();
 
         // Tambahkan popup izin audio di bagian atas agar pemutaran sesuai kebijakan browser
         (function setupAudioPermissionPopup() {

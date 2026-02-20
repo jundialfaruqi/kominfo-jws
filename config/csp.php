@@ -61,6 +61,7 @@ return [
             'ws:',
             'wss:',
             'https://cdn.jsdelivr.net',
+            'https://api.myquran.com',
         ]],
 
         // Allow media (audio) from self

@@ -1,3 +1,4 @@
+// Script JS Setelah menggunakan API https://api.myquran.com/v2/cal/hijr/?adj=-1
 {{-- Moment.js core --}}
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
 
@@ -1644,31 +1645,18 @@
             if (!$dateElement.length) return;
 
             const serverNow = getCurrentTimeFromServer();
-            const masehiText = formatMasehi(serverNow);
 
-            // Ambil tanggal Hijriah dari API
-            $.ajax({
-                url: 'https://api.myquran.com/v2/cal/hijr/?adj=-1',
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    let hijriText = '';
-                    if (response.status && response.data && response.data.date && response.data
-                        .date[1]) {
-                        hijriText = response.data.date[1];
-                    }
-                    $dateElement.html(hijriText ? `${masehiText} / ${hijriText}` : masehiText);
-                },
-                error: function() {
-                    console.warn(
-                        "Gagal mengambil tanggal Hijriah dari API, menggunakan tanggal Masehi saja."
-                    );
-                    $dateElement.html(masehiText);
-                },
-                complete: function() {
-                    checkMonthChange(serverNow);
-                }
-            });
+            if (typeof moment === 'undefined') {
+                console.warn("moment.js tidak tersedia");
+                return;
+            }
+
+            const masehiText = formatMasehi(serverNow);
+            const hijriText = calculateHijriFromServer(serverNow);
+
+            $dateElement.html(hijriText ? `${masehiText} / ${hijriText}` : masehiText);
+
+            checkMonthChange(serverNow);
         }
 
         /* --------------------------------------------------------------------------
@@ -1682,6 +1670,129 @@
 
             const tanggal = moment(date).format('D MMMM YYYY');
             return `<span class="day-name">${hari}</span>, ${tanggal}`;
+        }
+
+        /* --------------------------------------------------------------------------
+         * 2. Hitung Hijriah berdasarkan serverNow
+         * -------------------------------------------------------------------------- */
+        function calculateHijriFromServer(serverNow) {
+            try {
+                const {
+                    currentMinutes,
+                    isAfterMaghrib
+                } = compareWithMaghrib(serverNow);
+
+                // Jika sudah lewat Maghrib → Hijriah +1 hari
+                let baseDate = serverNow;
+                if (isAfterMaghrib) {
+                    if (typeof moment !== 'undefined' && typeof moment().iDate === 'function') {
+                        // Gunakan moment-hijri untuk menambahkan 1 hari Hijriah
+                        baseDate = moment(serverNow).add(1, 'iDay').toDate();
+                    } else {
+                        // Fallback jika moment-hijri tidak tersedia
+                        baseDate = new Date(serverNow.getTime() + 86400000);
+                    }
+                }
+
+                // FIX: Gunakan moment-hijri agar konsisten di semua device/browser
+                if (typeof moment !== 'undefined' && typeof moment().iDate === 'function') {
+                    const m = moment(baseDate);
+                    // Array bulan Hijriah Indonesia
+                    const bulanHijriyahID = [
+                        'Muharam', 'Safar', 'Rabiulawal', 'Rabiulakhir', 'Jumadilawal', 'Jumadilakhir',
+                        'Rajab', 'Syakban', 'Ramadhan', 'Syawal', 'Zulkaidah', 'Zulhijah'
+                    ];
+
+                    const d = m.iDate();
+                    const mn = bulanHijriyahID[m.iMonth()];
+                    const y = m.iYear();
+
+                    return `${d} ${mn} ${y} H`;
+                }
+
+                const options = {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    timeZone: "Asia/Jakarta",
+                };
+
+                try {
+                    return new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura", options)
+                        .format(baseDate);
+                } catch (_) {
+                    // fallback islamic biasa
+                    return new Intl.DateTimeFormat("id-ID-u-ca-islamic", options)
+                        .format(baseDate);
+                }
+
+            } catch (err) {
+                console.warn("Gagal menghitung Hijriah:", err);
+                return "";
+            }
+        }
+
+        /* --------------------------------------------------------------------------
+         * 3. Hitung apakah sudah lewat Maghrib berdasarkan waktu server
+         * -------------------------------------------------------------------------- */
+        function compareWithMaghrib(serverNow) {
+            const {
+                hour: curH,
+                minute: curM
+            } = getJakartaTimeFromServer(serverNow);
+            const currentMinutes = curH * 60 + curM;
+
+            const maghribMinutes = getMaghribFromDOM();
+            const fallbackMaghrib = curH >= 18;
+
+            const isAfterMaghrib = (maghribMinutes !== null) ?
+                currentMinutes >= maghribMinutes :
+                fallbackMaghrib;
+
+            return {
+                currentMinutes,
+                isAfterMaghrib
+            };
+        }
+
+        /* --------------------------------------------------------------------------
+         * Ambil Jam-Menit Jakarta dari waktu server
+         * -------------------------------------------------------------------------- */
+        function getJakartaTimeFromServer(serverNow) {
+            const hm = new Intl.DateTimeFormat("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+                timeZone: "Asia/Jakarta",
+                hour12: false,
+            }).format(serverNow);
+
+            const [h, m] = hm.replace('.', ':').split(':').map(n => parseInt(n, 10));
+            return {
+                hour: h,
+                minute: m
+            };
+        }
+
+        /* --------------------------------------------------------------------------
+         * Ambil Waktu Maghrib dari DOM
+         * -------------------------------------------------------------------------- */
+        function getMaghribFromDOM() {
+            let maghribMinutes = null;
+
+            $(".prayer-time").each(function() {
+                const name = ($(this).find('.prayer-name').text() || "").trim().toLowerCase();
+                if (name !== "maghrib") return;
+
+                const val = ($(this).find('.prayer-time-value').text() || "").trim();
+                if (!val) return;
+
+                const [h, m] = val.replace('.', ':').split(':').map(n => parseInt(n, 10));
+                if (!isNaN(h) && !isNaN(m)) {
+                    maghribMinutes = h * 60 + m;
+                }
+            });
+
+            return maghribMinutes;
         }
 
         /* --------------------------------------------------------------------------

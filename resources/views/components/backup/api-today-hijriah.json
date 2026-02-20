@@ -1,0 +1,50 @@
+https://api.myquran.com/v2/cal/hijr/?adj=-1
+
+adj=-1 adalah Kueri Key dan Value yg menjelaskan bahwa : (option) untuk melakukan adjustment. Tipe: integer (sign). Default adalah -1.ini adalah bentuk respond nya : jika adj di input adalah -1,
+{        "status": true,
+    "request": {
+        "path": "/cal/hijr",
+        "date": "2026-02-20",
+        "adj": -1
+    },
+    "data": {
+        "date": [
+            "Jum'at",
+            "3 Ramadhan 1447 H",
+            "20-02-2026"
+        ],
+        "num": [
+            6,
+            20,
+            2,
+            2026,
+            3,
+            9,
+            1447
+        ]
+    }
+}
+kalau adj nya = -2 jadi nya
+{    "status": true,
+    "request": {
+        "path": "/cal/hijr",
+        "date": "2026-02-20",
+        "adj": -2
+    },
+    "data": {
+        "date": [
+            "Jum'at",
+            "2 Ramadhan 1447 H",
+            "20-02-2026"
+        ],
+        "num": [
+            6,
+            20,
+            2,
+            2026,
+            2,
+            9,
+            1447
+        ]
+    }
+}
