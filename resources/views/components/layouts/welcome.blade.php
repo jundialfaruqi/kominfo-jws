@@ -396,7 +396,8 @@
                         href="https://www.instagram.com/diskominfopku/">
                         <i class="fab fa-whatsapp"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1" href="https://bit.ly/apkjwskominfo">
+                    <a class="btn btn-outline-light rounded-circle m-1"
+                        href="https://drive.google.com/file/d/1mMzPuusjmtdTJPmWIEXOdKyxnFMKzWdV/view?usp=sharing">
                         <i class="fab fa-android"></i>
                     </a>
                 </div>
