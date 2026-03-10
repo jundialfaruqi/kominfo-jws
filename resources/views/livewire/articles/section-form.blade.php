@@ -35,8 +35,7 @@
 
                     <div class="mb-3">
                         <label class="form-label required">Status</label>
-                        <select class="form-select rounded-3 @error('status') is-invalid @enderror"
-                            wire:model="status">
+                        <select class="form-select rounded-3 @error('status') is-invalid @enderror" wire:model="status">
                             <option value="Draft">Draft</option>
                             <option value="Published">Published</option>
                         </select>
@@ -47,7 +46,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">Tanggal Publikasi</label>
-                        <input type="datetime-local" class="form-control rounded-3 @error('published_at') is-invalid @enderror"
+                        <input type="datetime-local"
+                            class="form-control rounded-3 @error('published_at') is-invalid @enderror"
                             wire:model="published_at">
                         <div class="form-text">Biarkan kosong untuk langsung publikasi saat status 'Published'</div>
                         @error('published_at')
@@ -57,8 +57,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">Deskripsi Singkat</label>
-                        <textarea class="form-control rounded-3 @error('description') is-invalid @enderror" 
-                            wire:model="description" rows="2" placeholder="Masukkan deskripsi singkat"></textarea>
+                        <textarea class="form-control rounded-3 @error('description') is-invalid @enderror" wire:model="description"
+                            rows="8" placeholder="Masukkan deskripsi singkat"></textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -70,10 +70,9 @@
             <div class="d-flex justify-content-end gap-2">
                 <button type="button" wire:click="cancelForm" class="btn py-2 px-2 rounded-3 shadow-sm">
                     <span wire:loading.remove wire:target="cancelForm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-copy-x">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-copy-x">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path
                                 d="M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />

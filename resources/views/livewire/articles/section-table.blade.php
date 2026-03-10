@@ -73,7 +73,7 @@
                                     </div>
 
                                     <div class="d-flex flex-wrap gap-2 align-items-center mt-1">
-                                        <span class="badge bg-blue-lt px-2 py-1">
+                                        <span class="badge bg-blue-lt px-2 py-1 d-flex align-items-center gap-1">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -88,7 +88,7 @@
                                         </span>
 
                                         @if ($article->status === 'Published')
-                                            <span class="badge bg-success-lt px-2 py-1">
+                                            <span class="badge bg-success-lt px-2 py-1 d-flex align-items-center gap-1">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
