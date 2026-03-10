@@ -16,17 +16,35 @@
 <style>
     .article-content img {
         display: block;
-        margin-left: auto;
-        margin-right: auto;
+        margin: 1rem auto;
         max-width: 100%;
         height: auto;
         border-radius: 10px;
     }
+
+    .article-content {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    .article-content table {
+        width: 100% !important;
+        height: auto !important;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .article-content iframe,
+    .article-content video {
+        max-width: 100% !important;
+    }
 </style>
 
-<div class="py-2 bg-white" style="margin-top: 70px;">
+<div class="py-2 bg-white" style="margin-top: 70px; overflow-x: hidden;">
     <div class="container py-lg-5">
-        <div class="row g-5">
+        <div class="row g-4 g-lg-5">
             {{-- Left Column: Article Content & Related --}}
             <div class="col-lg-8">
                 <nav aria-label="breadcrumb" class="mb-4">
