@@ -8,6 +8,7 @@
     <title>JWS - {{ $title }}</title>
     {{-- CSS files --}}
     @include('components.layouts.style')
+    @stack('styles')
     @livewireStyles
 
 </head>
@@ -32,6 +33,7 @@
     </div>
     {{-- Script files --}}
     @include('components.layouts.script')
+    @stack('scripts')
     @livewireScripts
 </body>
 

@@ -105,6 +105,14 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     Route::get('/laporan/keuangan/pdf-7hari', [\App\Http\Controllers\LaporanPdfController::class, 'downloadPdf7Hari'])
         ->name('laporan.pdf.7hari');
 
+    // Article Category Routes
+    Route::get('/kategori-berita', \App\Livewire\ArticleCategories\ArticleCategoryIndex::class)
+        ->name('article-category.index')
+        ->middleware('can:view-kategori-berita');
+    Route::get('/berita', \App\Livewire\Articles\ArticleIndex::class)
+        ->name('articles.index')
+        ->middleware('can:view-berita');
+
     // Group Category Routes
     Route::get('/group-category', GroupCategoryGroup::class)
         ->name('group-category.index')
@@ -215,6 +223,7 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     })->name('logout');
 });
 
+Route::get('/artikel/{date}/{slug}', \App\Livewire\Articles\ArticleShow::class)->name('articles.show');
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
 
 // TESTING WEB SOCKET

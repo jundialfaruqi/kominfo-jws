@@ -387,6 +387,46 @@
         padding: 0 !important;
         line-height: 1 !important;
     }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .article-card {
+        transition: transform .2s ease, box-shadow .2s ease;
+        border: 1px solid #eef0f3 !important;
+        overflow: hidden;
+    }
+
+    .article-card .ratio img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, .08) !important;
+    }
+
+    .text-gov-blue {
+        color: #0154a6;
+    }
+
+    .bg-blue-lt {
+        background-color: #eaf3ff;
+        color: #0154a6;
+    }
 </style>
 <style>
     .schedule-table .table-responsive {

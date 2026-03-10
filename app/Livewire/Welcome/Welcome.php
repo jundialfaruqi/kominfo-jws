@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Welcome;
 
+use App\Models\Article;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
@@ -47,6 +48,12 @@ class Welcome extends Component
             $this->showScheduleBtn = false;
         }
 
+        $latestArticles = Article::with('category', 'user')
+            ->where('status', 'Published')
+            ->orderBy('published_at', 'desc')
+            ->take(3)
+            ->get();
+
         view()->share('scheduleUrl', $this->scheduleUrl);
         view()->share('showScheduleBtn', $this->showScheduleBtn);
         view()->share('jadwalSholat', $this->jadwal);
@@ -54,6 +61,7 @@ class Welcome extends Component
         view()->share('activePrayer', $this->activePrayer);
         view()->share('nextPrayer', $this->nextPrayer);
         view()->share('nextPrayerAtIso', $this->nextPrayerAtIso);
+        view()->share('latestArticles', $latestArticles);
         $monthName = \Carbon\Carbon::create($this->year, $this->month, 1, 0, 0, 0, $this->timezone)
             ->locale('id')
             ->translatedFormat('F');

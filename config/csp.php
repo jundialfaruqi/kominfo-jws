@@ -45,6 +45,8 @@ return [
             'https://fonts.gstatic.com',
             'https://use.fontawesome.com',
             'https://rsms.me',
+            'https://cdnjs.cloudflare.com',
+            'https://cdn.jsdelivr.net',
             'data:',
         ]],
 
@@ -62,6 +64,7 @@ return [
             'wss:',
             'https://cdn.jsdelivr.net',
             'https://api.myquran.com',
+            'https://code.jquery.com',
         ]],
 
         // Allow media (audio) from self

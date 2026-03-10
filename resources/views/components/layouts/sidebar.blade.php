@@ -510,6 +510,60 @@
                         </li>
                     </div>
 
+                    {{-- Menu Berita --}}
+                    @can('view-berita')
+                        <div>
+                            <div class="mt-3 mb-1 px-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="text-muted small fw-bold ms-2">BERITA</div>
+                                </div>
+                            </div>
+                            <li class="nav-item mx-2 {{ request()->routeIs('article-category.index') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('article-category.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
+                                <a wire:navigate class="nav-link" href="{{ route('article-category.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-category-2">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M14 4h6v6h-6z" />
+                                            <path d="M4 14h6v6h-6z" />
+                                            <path d="M17 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                            <path
+                                                d="M4 4m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title text-white">
+                                        Kategori Berita
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item mx-2 {{ request()->routeIs('articles.index') ? 'rounded-4 text-white' : '' }}"
+                                style="{{ request()->routeIs('articles.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
+                                <a wire:navigate class="nav-link" href="{{ route('articles.index') }}">
+                                    <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-news">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path
+                                                d="M16 6h3a1 1 0 0 1 1 1v11a2 2 0 0 1 -4 0v-13a1 1 0 0 0 -1 -1h-10a1 1 0 0 0 -1 1v12a3 3 0 0 0 3 3h11" />
+                                            <path d="M8 8l4 0" />
+                                            <path d="M8 12l4 0" />
+                                            <path d="M8 16l4 0" />
+                                        </svg>
+                                    </span>
+                                    <span class="nav-link-title text-white">
+                                        Daftar Berita
+                                    </span>
+                                </a>
+                            </li>
+                        </div>
+                    @endcan
+
+
                     {{-- Menu lainnya --}}
                     <div>
                         <div class="mt-3 mb-1 px-3">
