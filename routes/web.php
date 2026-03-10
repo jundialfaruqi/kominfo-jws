@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Auth\Login;
+use App\Livewire\Auth\ForgotPassword;
+use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Dashboard\Index as DashboardIndex;
 use App\Livewire\Admin\User\Index as UserIndex;
 use App\Livewire\Agenda\AgendaAll;
@@ -35,6 +37,8 @@ Route::get('/', Welcome::class)->name('welcome.index');
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
+    Route::get('/forgot-password', ForgotPassword::class)->name('password.request');
+    Route::get('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 });
 
 // Register Routes
