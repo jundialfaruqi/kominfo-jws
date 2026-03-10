@@ -10,26 +10,26 @@
 </head>
 
 <body>
-@php
-    $getFirstImage = function ($content) {
-        if (empty($content)) {
-            return asset('nav-brand.png');
-        }
-        $doc = new DOMDocument();
-        @$doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
-        $images = $doc->getElementsByTagName('img');
-        if ($images->length > 0) {
-            return $images->item(0)->getAttribute('src');
-        }
-        return asset('nav-brand.png'); // Fallback image
-    };
-@endphp
+    @php
+        $getFirstImage = function ($content) {
+            if (empty($content)) {
+                return asset('nav-brand.png');
+            }
+            $doc = new DOMDocument();
+            @$doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
+            $images = $doc->getElementsByTagName('img');
+            if ($images->length > 0) {
+                return $images->item(0)->getAttribute('src');
+            }
+            return asset('nav-brand.png'); // Fallback image
+        };
+    @endphp
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
                     class="navbar-brand-image me-1">
-                <span class="fw-bold">Jadwal Waktu Sholat</span>
+                <span class="fw-bold">JWS Diskominfo</span>
             </a>
             <div class="ms-auto d-none d-lg-block">
                 <a class="btn btn-gov-blue rounded-4" href="https://www.pekanbaru.go.id/">Website
@@ -315,10 +315,9 @@
                         <div class="col-md-4">
                             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden article-card">
                                 <div class="ratio ratio-16x9">
-                                    <img src="{{ $getFirstImage($article->content) }}" 
-                                         class="card-img-top object-fit-cover" 
-                                         alt="{{ $article->title }}"
-                                         onerror="this.src='{{ asset('nav-brand.png') }}'">
+                                    <img src="{{ $getFirstImage($article->content) }}"
+                                        class="card-img-top object-fit-cover" alt="{{ $article->title }}"
+                                        onerror="this.src='{{ asset('nav-brand.png') }}'">
                                 </div>
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center gap-2 mb-3">
@@ -337,14 +336,16 @@
                                     </p>
                                     <div class="mt-auto">
                                         @php
-                                            $date = $article->published_at ? $article->published_at->format('d-m-Y') : $article->created_at->format('d-m-Y');
+                                            $date = $article->published_at
+                                                ? $article->published_at->format('d-m-Y')
+                                                : $article->created_at->format('d-m-Y');
                                         @endphp
                                         <a href="{{ route('articles.show', ['date' => $date, 'slug' => $article->slug]) }}"
                                             class="btn btn-link p-0 text-gov-blue fw-semibold d-flex align-items-center gap-1">
                                             Baca Selengkapnya
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                 class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right">
                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                 <path d="M9 6l6 6l-6 6" />

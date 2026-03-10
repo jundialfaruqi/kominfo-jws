@@ -15,7 +15,7 @@
             <a class="navbar-brand d-flex align-items-center" href="{{ route('welcome.index') }}">
                 <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
                     class="navbar-brand-image me-1">
-                <span class="fw-bold">Jadwal Waktu Sholat</span>
+                <span class="fw-bold">JWS Diskominfo</span>
             </a>
         </div>
     </nav>
