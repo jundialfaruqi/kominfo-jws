@@ -223,7 +223,7 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     })->name('logout');
 });
 
-Route::get('/artikel/{date}/{slug}', \App\Livewire\Articles\ArticleShow::class)->name('articles.show');
+Route::get('/berita/{date}/{slug}', \App\Livewire\Articles\ArticleShow::class)->name('articles.show');
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
 
 // TESTING WEB SOCKET
