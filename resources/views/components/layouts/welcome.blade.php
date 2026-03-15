@@ -472,7 +472,7 @@
                         <i class="fab fa-whatsapp"></i>
                     </a>
                     <a class="btn btn-outline-light rounded-circle m-1"
-                        href="{{ asset('download/jws-web.apk') }}" download>
+                        href="{{ asset('download/JWS Web V-1.0.apk') }}" download>
                         <i class="fab fa-android"></i>
                     </a>
                 </div>
