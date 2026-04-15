@@ -207,115 +207,61 @@ class MasterController extends Controller
     public function get_server_time()
     {
         try {
-            // Gunakan waktu server langsung dengan Carbon
-            $serverDateTime = Carbon::now('Asia/Jakarta');
+            // Ambil waktu dari time.now API
+            $timeResponse = Http::timeout(5)->get('https://time.now/developer/api/timezone/Asia/Jakarta');
+            if ($timeResponse->successful()) {
+                $timeData = $timeResponse->json();
+                $serverDateTime = Carbon::createFromTimestamp($timeData['unixtime'], 'Asia/Jakarta');
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Server Asia/Jakarta',
-                'data' => [
-                    'timestamp' => $serverDateTime->timestamp * 1000, // dalam milidetik
-                    'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
-                    'source' => 'server'
-                ]
-            ]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Server time.now',
+                    'data' => [
+                        'timestamp'  => $serverDateTime->timestamp * 1000,
+                        'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                        'source'     => 'time.now'
+                    ]
+                ]);
+            } else {
+                throw new \Exception('API time.now gagal');
+            }
         } catch (\Exception $e) {
             try {
-                // Coba API utama (Pekanbaru)
-                $response = Http::timeout(5)->get('https://superapp.pekanbaru.go.id/api/server-time');
-
-                if ($response->successful()) {
-                    $serverTime = $response['serverTime'];
-                    $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('UTC'));
-                    $serverDateTime->setTimezone(new \DateTimeZone('Asia/Jakarta'));
-                    // $serverDateTime->modify('+23 hour 28 minutes'); // Tambah 1 jam 20 menit
-                    // $serverDateTime->modify('+2 hour 6 minutes'); // Tambah 1 jam 20 menit
-                    // $serverDateTime->modify('-8 hour 43 minutes'); // Tambah 1 jam 20 menit
-
-                    // untuk testing hari jumat
-                    // $currentDay = (int)$serverDateTime->format('w');
-                    // $daysToFriday = 5 - $currentDay;
-                    // if ($daysToFriday < 0) {
-                    //     $daysToFriday += 7;
-                    // }
-                    // $serverDateTime->modify("+{$daysToFriday} days");
-                    // $serverDateTime->setTime(12, 17, 40);
+                // Fallback 1: timeapi.io
+                $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+                if ($fallbackResponse->successful()) {
+                    $serverDateTime = new \DateTime($fallbackResponse['dateTime'], new \DateTimeZone('Asia/Jakarta'));
 
                     return response()->json([
                         'success' => true,
-                        'message' => 'Server Super App',
+                        'message' => 'Server Timeapi',
                         'data' => [
-                            'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
+                            'timestamp'  => $serverDateTime->getTimestamp() * 1000,
                             'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
-                            'source' => 'pekanbaru'
+                            'source'     => 'timeapi'
                         ]
                     ]);
                 } else {
-                    throw new \Exception('API utama gagal');
+                    throw new \Exception('API timeapi.io gagal');
                 }
             } catch (\Exception $e) {
-                try {
-                    // Fallback ke timeapi.io
-                    $fallbackResponse = Http::timeout(5)->get('https://timeapi.io/api/time/current/zone?timeZone=Asia%2FJakarta');
+                // Fallback 2: waktu lokal server (Carbon)
+                $serverDateTime = Carbon::now('Asia/Jakarta');
 
-                    if ($fallbackResponse->successful()) {
-                        $serverTime = $fallbackResponse['dateTime'];
-                        $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
-                        // $serverDateTime->modify('+2 hour 33 minutes'); // Tambah 1 jam 20 menit
-                        return response()->json([
-                            'success' => true,
-                            'message' => 'Server Timeapi',
-                            'data' => [
-                                'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
-                                'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
-                                'source' => 'timeapi'
-                            ]
-                        ]);
-                    } else {
-                        throw new \Exception('API timeapi.io gagal');
-                    }
-                } catch (\Exception $e) {
-                    try {
-                        // Fallback ke API Google Script
-                        $newApiResponse = Http::timeout(5)->get('https://script.google.com/macros/s/AKfycbyd5AcbAnWi2Yn0xhFRbyzS4qMq1VucMVgVvhul5XqS9HkAyJY/exec?tz=Asia/Jakarta');
-
-                        if ($newApiResponse->successful() && $newApiResponse['status'] === 'ok') {
-                            $serverTime = $newApiResponse['fulldate'];
-                            $serverDateTime = new \DateTime($serverTime, new \DateTimeZone('Asia/Jakarta'));
-
-                            return response()->json([
-                                'success' => true,
-                                'message' => 'Server Google',
-                                'data' => [
-                                    'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
-                                    'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
-                                    'source' => 'google-script'
-                                ]
-                            ]);
-                        } else {
-                            throw new \Exception('API Google Script gagal');
-                        }
-                    } catch (\Exception $e) {
-                        try {
-                            // Fallback ke waktu server lokal
-                            $serverDateTime = new \DateTime('now', new \DateTimeZone('Asia/Jakarta'));
-                            return response()->json([
-                                'success' => true,
-                                'message' => 'Server Local',
-                                'data' => [
-                                    'timestamp' => $serverDateTime->getTimestamp() * 1000, // dalam milidetik
-                                    'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
-                                    'source' => 'local'
-                                ]
-                            ]);
-                        } catch (\Exception $e) {
-                            return response()->json(['success' => false, 'message' => 'Gagal mengambil semua waktu !'], 500);
-                        }
-                    }
-                }
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Server Local',
+                    'data' => [
+                        'timestamp'  => $serverDateTime->timestamp * 1000,
+                        'serverTime' => $serverDateTime->format('Y-m-d H:i:s'),
+                        'source'     => 'local'
+                    ]
+                ]);
             }
         }
     }
+
+
 
     // GET REFRESH PRAYER TIME
     public function get_refresh_prayer_times()
