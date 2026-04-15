@@ -17,18 +17,39 @@
                 </h2>
             </div>
             <div class="col-auto ms-auto">
-                @php
-                    \Carbon\Carbon::setLocale('id');
-                    $now = \Carbon\Carbon::now('Asia/Jakarta');
-                @endphp
                 <div class="d-flex align-items-center">
                     <div class="pe-3" style="border-right: 1px dotted gray;">
-                        <span class="fw-bold" style="font-size: 1.25rem;">{{ $now->translatedFormat('H:i') }}</span>
+                        <span id="header-clock-time" class="fw-bold" style="font-size: 1.25rem;">--:--</span>
                     </div>
                     <div class="ps-3">
-                        <span class="small" style="color:#6b7280;">{{ $now->translatedFormat('l, j M Y') }}</span>
+                        <span id="header-clock-date" class="small" style="color:#6b7280;">--</span>
                     </div>
                 </div>
+                <script>
+                    (function () {
+                        var timeEl = document.getElementById('header-clock-time');
+                        var dateEl = document.getElementById('header-clock-date');
+
+                        var timeFmt = new Intl.DateTimeFormat('id-ID', {
+                            hour: '2-digit', minute: '2-digit',
+                            hour12: false, timeZone: 'Asia/Jakarta'
+                        });
+                        var dateFmt = new Intl.DateTimeFormat('id-ID', {
+                            weekday: 'long', day: 'numeric',
+                            month: 'short', year: 'numeric',
+                            timeZone: 'Asia/Jakarta'
+                        });
+
+                        function tick() {
+                            var now = new Date();
+                            timeEl.textContent = timeFmt.format(now);
+                            dateEl.textContent = dateFmt.format(now);
+                        }
+
+                        tick();
+                        setInterval(tick, 1000);
+                    })();
+                </script>
             </div>
         </div>
     </div>
