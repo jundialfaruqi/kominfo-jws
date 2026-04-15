@@ -7,18 +7,12 @@
             </p>
             <p x-text="formattedTime + ' WIB'" class="text-3xl font-medium text-gray-800 tracking-wide mb-0"></p>
             <i class="text-sm text-white font-semibold">
-                <?php if ($apiSource === 'server'): ?>
-                Sumber: <span class="font-medium text-gray-200">Server Lokal</span>
-                <?php elseif ($apiSource === 'pekanbaru'): ?>
-                Sumber: <span class="font-medium text-gray-200">Api Pekanbaru Super App</span>
+                <?php if ($apiSource === 'time.now'): ?>
+                Sumber: <span class="font-medium text-gray-200">Time.now API</span>
                 <?php elseif ($apiSource === 'timeapi'): ?>
                 Sumber: <span class="font-medium text-gray-200">TimeAPI.io</span>
-                <?php elseif ($apiSource === 'google-script'): ?>
-                Sumber: <span class="font-medium text-gray-200">Google Script API</span>
                 <?php else: ?>
-                Gagal menampilkan waktu, mengganti dengan waktu lokal
-                <a href="javascript:void(0)" @click="window.location.reload()"
-                    class="text-blue-400 hover:text-blue-300 font-medium">coba lagi</a>
+                Sumber: <span class="font-medium text-gray-200">Waktu Lokal Server</span>
                 <?php endif; ?>
             </i>
         </div>

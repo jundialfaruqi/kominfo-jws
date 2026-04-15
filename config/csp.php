@@ -65,6 +65,8 @@ return [
             'https://cdn.jsdelivr.net',
             'https://api.myquran.com',
             'https://code.jquery.com',
+            'https://time.now',
+            'https://timeapi.io',
         ]],
 
         // Allow media (audio) from self
