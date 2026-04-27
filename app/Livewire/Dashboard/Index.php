@@ -21,7 +21,9 @@ class Index extends Component
     public $prayerTimes = [];
     public $currentPrayer = null;
     public $serverTime;
+    public $serverTimestamp;
     public $apiSource;
+    public $isTimeSynced = false;
 
     public function mount()
     {
@@ -121,6 +123,13 @@ class Index extends Component
     private function getServerTime()
     {
         try {
+            // Priority 1: Local Server (Main Priority)
+            $this->serverTime = Carbon::now('Asia/Jakarta')->toDateTimeString();
+            $this->serverTimestamp = Carbon::now('Asia/Jakarta')->timestamp * 1000; // in milliseconds
+            $this->apiSource = 'server';
+            $this->isTimeSynced = true;
+            return;
+
             // Ambil waktu dari time.now API
             $timeResponse = Http::timeout(5)->get('https://time.now/developer/api/timezone/Asia/Jakarta');
             if ($timeResponse->successful()) {
