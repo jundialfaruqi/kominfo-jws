@@ -15,8 +15,14 @@ class ProfilController extends Controller
     public function getProfilMasjid(Request $request)
     {
         try {
-            // Hanya mengambil atribut 'name' dan 'slug'
-            $profils = Profil::select(['id', 'name', 'slug'])->paginate(10);
+            $query = Profil::select(['id', 'name', 'slug']);
+
+            if ($request->has('search') && $request->search != '') {
+                $search = $request->search;
+                $query->where('name', 'like', "%$search%");
+            }
+
+            $profils = $query->paginate(10);
             
             // Memastikan appends (logo_masjid_url dsb) dihapus agar response bersih dan tidak error 
             $profils->getCollection()->transform(function ($profil) {
@@ -29,7 +35,7 @@ class ProfilController extends Controller
                     'success' => true, // tetap true (karena request berhasil) atau Anda bisa ganti false
                     'message' => 'Data profil masjid belum tersedia.',
                     'data'    => $profils
-                ], 200); // Bisa juga diubah ke 404 jika dirasa perlu
+                ], 404);
             }
 
             return response()->json([
