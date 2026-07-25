@@ -36,6 +36,10 @@ class MyMasjidController extends Controller
 
             $userId = $profil->user_id;
             $marquee = \App\Models\Marquee::query()->where('user_id', $userId)->first();
+            
+            // Ambil theme_id dari tabel users
+            $user = \App\Models\User::query()->find($userId);
+            $themeId = $user ? $user->theme_id : null;
 
             return response()->json([
                 'code' => 200,
@@ -44,6 +48,7 @@ class MyMasjidController extends Controller
                 'data' => [
                     'current_time' => Carbon::now('Asia/Jakarta')->toDateTimeString(),
                     'timestamp' => Carbon::now('Asia/Jakarta')->timestamp,
+                    'theme_id' => $themeId,
                     'profil' => $profil,
                     'marquee' => $marquee,
                 ]
