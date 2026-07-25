@@ -161,3 +161,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('my-audio-adzan/{slot}', [API\MyAdzanAudioController::class, 'destroy'])->name('api.my-audio-adzan.destroy');
     Route::put('my-audio-adzan/status', [API\MyAdzanAudioController::class, 'updateStatus'])->name('api.my-audio-adzan.update-status');
 });
+
+
+
+use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
+
+// ==========================================
+// [ROUTE API VERSI 2]
+// ==========================================
+Route::prefix('v2')->group(function () {
+    
+    // API public untuk mengambil name dan slug masjid (pagination 10)
+    Route::get('profil-masjid', [ProfilControllerV2::class, 'getProfilMasjid'])->name('api.v2.profil-masjid');
+    
+});
+
