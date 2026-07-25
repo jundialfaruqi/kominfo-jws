@@ -24,7 +24,11 @@ class MyMasjidController extends Controller
                 ], 400);
             }
 
-            $profil = \App\Models\Profil::query()->where('slug', $slug)->first();
+            // Ambil data Profil hanya dengan kolom yang diperlukan, plus user_id untuk keperluan relasi
+            $profil = \App\Models\Profil::query()
+                ->select(['id', 'user_id', 'name', 'slug', 'address', 'phone', 'logo_masjid', 'logo_pemerintah'])
+                ->where('slug', $slug)
+                ->first();
 
             if (!$profil) {
                 return response()->json([
@@ -35,17 +39,19 @@ class MyMasjidController extends Controller
             }
 
             $userId = $profil->user_id;
-            $marquee = \App\Models\Marquee::query()->where('user_id', $userId)->first();
             
-            // Ambil theme_id dari tabel users
-            $user = \App\Models\User::query()->find($userId);
+            // Ambil data Marquee hanya dengan kolom yang diperlukan
+            $marquee = \App\Models\Marquee::query()
+                ->select(['id', 'marquee1', 'marquee2', 'marquee3', 'marquee4', 'marquee5', 'marquee6', 'marquee_speed'])
+                ->where('user_id', $userId)
+                ->first();
+            
+            // Ambil theme_id dari tabel users (select langsung)
+            $user = \App\Models\User::query()->select('theme_id')->find($userId);
             $themeId = $user ? $user->theme_id : null;
 
-            // Bersihkan data yang tidak diperlukan (filter)
-            $profil->makeHidden(['user_id', 'created_at', 'updated_at']);
-            if ($marquee) {
-                $marquee->makeHidden(['user_id', 'created_at', 'updated_at']);
-            }
+            // Sembunyikan user_id karena tidak diperlukan oleh Flutter
+            $profil->makeHidden(['user_id']);
 
             return response()->json([
                 'code' => 200,
