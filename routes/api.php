@@ -182,9 +182,9 @@ Route::prefix('v2')->group(function () {
     Route::get('my-masjid', [MyMasjidController::class, 'index'])
         ->name('api.v2.my-masjid');
         
-    // API untuk mendapatkan data theme berdasarkan id
-    Route::get('theme/{id}', [ThemeController::class, 'show'])
-        ->name('api.v2.theme.show');
+    // API untuk mendapatkan daftar seluruh theme
+    Route::get('themes', [ThemeController::class, 'index'])
+        ->name('api.v2.themes.index');
     
 });
 

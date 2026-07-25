@@ -3,32 +3,23 @@
 namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Theme;
 
 class ThemeController extends Controller
 {
     /**
-     * Mendapatkan data theme berdasarkan ID.
+     * Mendapatkan daftar seluruh theme.
      */
-    public function show(int $id)
+    public function index()
     {
         try {
-            $theme = Theme::query()->find($id);
-
-            if (!$theme) {
-                return response()->json([
-                    'code' => 404,
-                    'success' => false,
-                    'message' => 'Theme tidak ditemukan',
-                ], 404);
-            }
+            $themes = Theme::query()->select(['id', 'name'])->get();
 
             return response()->json([
                 'code' => 200,
                 'success' => true,
-                'message' => 'Data theme berhasil diambil',
-                'data' => $theme
+                'message' => 'Daftar theme berhasil diambil',
+                'data' => $themes
             ], 200);
 
         } catch (\Exception $e) {
