@@ -171,8 +171,10 @@ use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
 // ==========================================
 Route::prefix('v2')->group(function () {
     
-    // API public untuk mengambil name dan slug masjid (pagination 10)
-    Route::get('profil-masjid', [ProfilControllerV2::class, 'getProfilMasjid'])->name('api.v2.profil-masjid');
+    // API public untuk mengambil name dan slug masjid (pagination 10), dibatasi 60 request per menit
+    Route::get('profil-masjid', [ProfilControllerV2::class, 'getProfilMasjid'])
+        ->middleware('throttle:60,1')
+        ->name('api.v2.profil-masjid');
     
 });
 
