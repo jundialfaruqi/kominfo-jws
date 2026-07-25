@@ -166,6 +166,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
 use App\Http\Controllers\Api\V2\MyMasjidController;
+use App\Http\Controllers\Api\V2\ThemeController;
 
 // ==========================================
 // [ROUTE API VERSI 2]
@@ -180,6 +181,10 @@ Route::prefix('v2')->group(function () {
     // API untuk mendapatkan waktu saat ini (my-masjid)
     Route::get('my-masjid', [MyMasjidController::class, 'index'])
         ->name('api.v2.my-masjid');
+        
+    // API untuk mendapatkan data theme berdasarkan id
+    Route::get('theme/{id}', [ThemeController::class, 'show'])
+        ->name('api.v2.theme.show');
     
 });
 

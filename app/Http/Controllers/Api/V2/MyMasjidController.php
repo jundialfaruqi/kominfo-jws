@@ -41,6 +41,12 @@ class MyMasjidController extends Controller
             $user = \App\Models\User::query()->find($userId);
             $themeId = $user ? $user->theme_id : null;
 
+            // Bersihkan data yang tidak diperlukan (filter)
+            $profil->makeHidden(['user_id', 'created_at', 'updated_at']);
+            if ($marquee) {
+                $marquee->makeHidden(['user_id', 'created_at', 'updated_at']);
+            }
+
             return response()->json([
                 'code' => 200,
                 'success' => true,
