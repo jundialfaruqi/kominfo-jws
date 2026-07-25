@@ -165,6 +165,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
+use App\Http\Controllers\Api\V2\MyMasjidController;
 
 // ==========================================
 // [ROUTE API VERSI 2]
@@ -175,6 +176,10 @@ Route::prefix('v2')->group(function () {
     Route::get('profil-masjid', [ProfilControllerV2::class, 'getProfilMasjid'])
         ->middleware('throttle:60,1')
         ->name('api.v2.profil-masjid');
+        
+    // API untuk mendapatkan waktu saat ini (my-masjid)
+    Route::get('my-masjid', [MyMasjidController::class, 'index'])
+        ->name('api.v2.my-masjid');
     
 });
 
