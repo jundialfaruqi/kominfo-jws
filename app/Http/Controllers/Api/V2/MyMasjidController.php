@@ -26,7 +26,7 @@ class MyMasjidController extends Controller
 
             // Ambil data Profil hanya dengan kolom yang diperlukan, plus user_id untuk keperluan relasi
             $profil = \App\Models\Profil::query()
-                ->select(['id', 'user_id', 'name', 'slug', 'address', 'phone', 'logo_masjid', 'logo_pemerintah'])
+                ->select(['id', 'user_id', 'name', 'slug', 'address', 'logo_masjid', 'logo_pemerintah'])
                 ->where('slug', $slug)
                 ->first();
 
