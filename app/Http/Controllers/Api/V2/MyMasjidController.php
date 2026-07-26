@@ -103,6 +103,33 @@ class MyMasjidController extends Controller
                 $jadwalHariIni['tanggal_hijriah'] = $hijriData;
             }
 
+            // Ambil Agenda Masjid
+            $todayStart = Carbon::now('Asia/Jakarta')->startOfDay();
+            // Ambil hingga 30 hari ke depan
+            $thirtyDaysLater = $todayStart->copy()->addDays(30);
+
+            $agendaData = \App\Models\Agenda::where('id_masjid', $profil->id)
+                ->where('aktif', true)
+                ->whereBetween('date', [$todayStart->toDateString(), $thirtyDaysLater->toDateString()])
+                ->orderBy('date', 'asc')
+                ->orderBy('id', 'asc')
+                ->get()
+                ->map(function ($agenda) use ($todayStart) {
+                    $agendaDate = Carbon::parse($agenda->date, 'Asia/Jakarta')->startOfDay();
+                    if ($agendaDate->isSameDay($todayStart)) {
+                        $days_label = 'Hari ini';
+                    } else {
+                        $days = $todayStart->diffInDays($agendaDate);
+                        $days_label = $days . ' Hari Lagi';
+                    }
+                    return [
+                        'name' => $agenda->name,
+                        'date' => $agenda->date,
+                        'days_label' => $days_label,
+                        'aktif' => $agenda->aktif,
+                    ];
+                });
+
             return response()->json([
                 'code' => 200,
                 'success' => true,
@@ -115,6 +142,7 @@ class MyMasjidController extends Controller
                     'marquee'      => $marquee,
                     'slides'       => $slides,
                     'jadwal_sholat'=> $jadwalHariIni,
+                    'agenda'       => $agendaData,
                 ]
             ], 200);
 

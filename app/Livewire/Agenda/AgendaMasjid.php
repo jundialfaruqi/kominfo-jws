@@ -4,6 +4,8 @@ namespace App\Livewire\Agenda;
 
 use App\Models\Agenda;
 use Carbon\Carbon;
+use App\Models\Profil;
+use App\Events\ContentUpdatedEvent;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -45,6 +47,10 @@ class AgendaMasjid extends Component
                 return;
             }
             $agenda->delete();
+            $profil = Profil::find($agenda->id_masjid);
+            if ($profil) {
+                event(new ContentUpdatedEvent($profil->slug, 'agenda'));
+            }
             $this->dispatch('success', 'Agenda berhasil dihapus');
             session()->flash('success', 'Agenda berhasil dihapus');
             return redirect()->route('agenda-masjid.index');
