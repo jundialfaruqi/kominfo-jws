@@ -226,11 +226,12 @@ class MyMasjidController extends Controller
                 });
 
             // Ambil Jumbotron Pemko (Global)
-            $jumbotronPemko = \App\Models\Jumbotron::query()->where('is_active', true)->first();
+            $jumbotronPemko = \App\Models\Jumbotron::query()->first();
             $jumbotronPemkoData = null;
             if ($jumbotronPemko) {
                 $jumbotronPemkoData = [
                     'id' => $jumbotronPemko->id,
+                    'is_active' => (bool) $jumbotronPemko->is_active,
                     'slide1' => $jumbotronPemko->jumbo1,
                     'slide2' => $jumbotronPemko->jumbo2,
                     'slide3' => $jumbotronPemko->jumbo3,
@@ -241,11 +242,12 @@ class MyMasjidController extends Controller
             }
 
             // Ambil Jumbotron Masjid
-            $jumbotronMasjid = \App\Models\JumbotronMasjid::query()->where('masjid_id', $profil->id)->where('aktif', true)->first();
+            $jumbotronMasjid = \App\Models\JumbotronMasjid::query()->where('masjid_id', $profil->id)->first();
             $jumbotronMasjidData = null;
             if ($jumbotronMasjid) {
                 $jumbotronMasjidData = [
                     'id' => $jumbotronMasjid->id,
+                    'is_active' => (bool) $jumbotronMasjid->aktif,
                     'slide1' => $jumbotronMasjid->jumbotron_masjid_1,
                     'slide2' => $jumbotronMasjid->jumbotron_masjid_2,
                     'slide3' => $jumbotronMasjid->jumbotron_masjid_3,
