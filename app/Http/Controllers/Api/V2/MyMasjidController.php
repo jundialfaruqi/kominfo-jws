@@ -180,15 +180,42 @@ class MyMasjidController extends Controller
                 'success' => true,
                 'message' => 'Data my-masjid berhasil diambil',
                 'data' => [
-                    'current_time' => $now->toDateTimeString(),
-                    'timestamp'    => $now->timestamp,
-                    'theme_id'     => $themeId,
-                    'profil'       => $profil,
-                    'marquee'      => $marquee,
-                    'slides'       => $slides,
-                    'slide_iqomah' => $slideIqomah,
-                    'durasi'       => $durasi,
-                    'jadwal_sholat'=> $jadwalFinal,
+                    'current_time' => [
+                        'message' => 'Waktu server saat ini',
+                        'data'    => $now->toDateTimeString(),
+                    ],
+                    'timestamp'    => [
+                        'message' => 'Timestamp server saat ini (detik)',
+                        'data'    => $now->timestamp,
+                    ],
+                    'theme_id'     => [
+                        'message' => $themeId ? 'Tema pilihan pengguna' : 'Tema default belum diatur',
+                        'data'    => $themeId,
+                    ],
+                    'profil'       => [
+                        'message' => 'Profil masjid berhasil dimuat',
+                        'data'    => $profil,
+                    ],
+                    'marquee'      => [
+                        'message' => $marquee ? 'Data teks berjalan tersedia' : 'Tidak ada data teks berjalan',
+                        'data'    => $marquee,
+                    ],
+                    'slides'       => [
+                        'message' => $slides ? 'Data slide gambar tersedia' : 'Tidak ada data slide gambar',
+                        'data'    => $slides,
+                    ],
+                    'slide_iqomah' => [
+                        'message' => $slideIqomah ? 'Data gambar iqomah tersedia' : 'Tidak ada data gambar iqomah',
+                        'data'    => $slideIqomah,
+                    ],
+                    'durasi'       => [
+                        'message' => $durasi ? 'Pengaturan durasi khusus tersedia' : 'Tidak ada pengaturan durasi khusus (gunakan default)',
+                        'data'    => $durasi,
+                    ],
+                    'jadwal_sholat'=> [
+                        'message' => count($jadwalFinal) > 0 ? 'Jadwal sholat berhasil dimuat' : 'Jadwal sholat kosong atau gagal dimuat dari sumber',
+                        'data'    => $jadwalFinal,
+                    ],
                     'agenda'       => [
                         'message' => $agendaData->count() > 0 ? 'Data agenda tersedia' : 'Tidak ada data agenda saat ini',
                         'data'    => $agendaData,
