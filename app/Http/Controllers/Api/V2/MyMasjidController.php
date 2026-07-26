@@ -206,6 +206,55 @@ class MyMasjidController extends Controller
                     ];
                 });
 
+            // Ambil Petugas Jumat (upcoming)
+            $petugasData = \App\Models\Petugas::query()
+                ->where('user_id', $userId)
+                ->where('hari', '>=', $now->format('Y-m-d'))
+                ->orderBy('hari', 'asc')
+                ->get()
+                ->map(function ($petugas) {
+                    $date = Carbon::parse($petugas->hari, 'Asia/Jakarta');
+                    $formattedDate = 'Jumat, ' . $date->format('d/m/Y');
+                    return [
+                        'id' => $petugas->id,
+                        'hari' => $petugas->hari,
+                        'tanggal_format' => $formattedDate,
+                        'khatib' => $petugas->khatib,
+                        'imam' => $petugas->imam,
+                        'muadzin' => $petugas->muadzin,
+                    ];
+                });
+
+            // Ambil Jumbotron Pemko (Global)
+            $jumbotronPemko = \App\Models\Jumbotron::query()->where('is_active', true)->first();
+            $jumbotronPemkoData = null;
+            if ($jumbotronPemko) {
+                $jumbotronPemkoData = [
+                    'id' => $jumbotronPemko->id,
+                    'slide1' => $jumbotronPemko->jumbo1,
+                    'slide2' => $jumbotronPemko->jumbo2,
+                    'slide3' => $jumbotronPemko->jumbo3,
+                    'slide4' => $jumbotronPemko->jumbo4,
+                    'slide5' => $jumbotronPemko->jumbo5,
+                    'slide6' => $jumbotronPemko->jumbo6,
+                ];
+            }
+
+            // Ambil Jumbotron Masjid
+            $jumbotronMasjid = \App\Models\JumbotronMasjid::query()->where('masjid_id', $profil->id)->where('aktif', true)->first();
+            $jumbotronMasjidData = null;
+            if ($jumbotronMasjid) {
+                $jumbotronMasjidData = [
+                    'id' => $jumbotronMasjid->id,
+                    'slide1' => $jumbotronMasjid->jumbotron_masjid_1,
+                    'slide2' => $jumbotronMasjid->jumbotron_masjid_2,
+                    'slide3' => $jumbotronMasjid->jumbotron_masjid_3,
+                    'slide4' => $jumbotronMasjid->jumbotron_masjid_4,
+                    'slide5' => $jumbotronMasjid->jumbotron_masjid_5,
+                    'slide6' => $jumbotronMasjid->jumbotron_masjid_6,
+                ];
+            }
+
             return response()->json([
                 'code' => 200,
                 'success' => true,
@@ -254,6 +303,18 @@ class MyMasjidController extends Controller
                     'jadwal_sholat'=> [
                         'message' => count($jadwalFinal) > 0 ? 'Jadwal sholat berhasil dimuat' : 'Jadwal sholat kosong atau gagal dimuat dari sumber',
                         'data'    => $jadwalFinal,
+                    ],
+                    'jumbotron_pemko'=> [
+                        'message' => $jumbotronPemkoData ? 'Data jumbotron pemko tersedia' : 'Tidak ada data jumbotron pemko',
+                        'data'    => $jumbotronPemkoData,
+                    ],
+                    'jumbotron_masjid'=> [
+                        'message' => $jumbotronMasjidData ? 'Data jumbotron masjid tersedia' : 'Tidak ada data jumbotron masjid',
+                        'data'    => $jumbotronMasjidData,
+                    ],
+                    'petugas_jumat'=> [
+                        'message' => $petugasData->count() > 0 ? 'Data petugas jumat tersedia' : 'Tidak ada data petugas jumat',
+                        'data'    => $petugasData,
                     ],
                     'agenda'       => [
                         'message' => $agendaData->count() > 0 ? 'Data agenda tersedia' : 'Tidak ada data agenda saat ini',
