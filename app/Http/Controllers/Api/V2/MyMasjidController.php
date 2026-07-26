@@ -54,11 +54,42 @@ class MyMasjidController extends Controller
                 ->where('user_id', $userId)
                 ->first();
             
-            // Ambil data Slide Iqomah (dari tabel Adzan karena salah penamaan di backend)
-            $slideIqomah = \App\Models\Adzan::query()
+            // Ambil data Adzan (salah penamaan di backend, ini berisi gambar-gambar slide)
+            $adzanData = \App\Models\Adzan::query()
                 ->select(['id', 'adzan1', 'adzan2', 'adzan3', 'adzan4', 'adzan5', 'adzan6', 'adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11', 'adzan12', 'adzan13', 'adzan14', 'adzan15'])
                 ->where('user_id', $userId)
                 ->first();
+
+            $slideIqomah = null;
+            $slideJumat = null;
+            $slideFinal = null;
+
+            if ($adzanData) {
+                $slideIqomah = [
+                    'id' => $adzanData->id,
+                    'slide1' => $adzanData->adzan1,
+                    'slide2' => $adzanData->adzan2,
+                    'slide3' => $adzanData->adzan3,
+                    'slide4' => $adzanData->adzan4,
+                    'slide5' => $adzanData->adzan5,
+                    'slide6' => $adzanData->adzan6,
+                ];
+
+                $slideJumat = [
+                    'id' => $adzanData->id,
+                    'slide1' => $adzanData->adzan7,
+                    'slide2' => $adzanData->adzan8,
+                    'slide3' => $adzanData->adzan9,
+                    'slide4' => $adzanData->adzan10,
+                    'slide5' => $adzanData->adzan11,
+                    'slide6' => $adzanData->adzan12,
+                ];
+
+                $slideFinal = [
+                    'id' => $adzanData->id,
+                    'slide1' => $adzanData->adzan15,
+                ];
+            }
             
             // Ambil theme_id dari tabel users (select langsung)
             $user = \App\Models\User::query()->select('theme_id')->find($userId);
@@ -207,6 +238,14 @@ class MyMasjidController extends Controller
                     'slide_iqomah' => [
                         'message' => $slideIqomah ? 'Data gambar iqomah tersedia' : 'Tidak ada data gambar iqomah',
                         'data'    => $slideIqomah,
+                    ],
+                    'slide_jumat' => [
+                        'message' => $slideJumat ? 'Data gambar jumat tersedia' : 'Tidak ada data gambar jumat',
+                        'data'    => $slideJumat,
+                    ],
+                    'slide_final' => [
+                        'message' => $slideFinal ? 'Data gambar final tersedia' : 'Tidak ada data gambar final',
+                        'data'    => $slideFinal,
                     ],
                     'durasi'       => [
                         'message' => $durasi ? 'Pengaturan durasi khusus tersedia' : 'Tidak ada pengaturan durasi khusus (gunakan default)',
