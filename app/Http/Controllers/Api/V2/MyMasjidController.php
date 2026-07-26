@@ -54,6 +54,12 @@ class MyMasjidController extends Controller
                 ->where('user_id', $userId)
                 ->first();
             
+            // Ambil data Slide Iqomah (dari tabel Adzan karena salah penamaan di backend)
+            $slideIqomah = \App\Models\Adzan::query()
+                ->select(['id', 'adzan1', 'adzan2', 'adzan3', 'adzan4', 'adzan5', 'adzan6', 'adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11', 'adzan12', 'adzan13', 'adzan14', 'adzan15'])
+                ->where('user_id', $userId)
+                ->first();
+            
             // Ambil theme_id dari tabel users (select langsung)
             $user = \App\Models\User::query()->select('theme_id')->find($userId);
             $themeId = $user ? $user->theme_id : null;
@@ -180,6 +186,7 @@ class MyMasjidController extends Controller
                     'profil'       => $profil,
                     'marquee'      => $marquee,
                     'slides'       => $slides,
+                    'slide_iqomah' => $slideIqomah,
                     'durasi'       => $durasi,
                     'jadwal_sholat'=> $jadwalFinal,
                     'agenda'       => $agendaData,
