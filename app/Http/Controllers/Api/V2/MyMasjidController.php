@@ -87,6 +87,22 @@ class MyMasjidController extends Controller
                 $jadwalHariIni = collect($jadwalBulanIni)->firstWhere('date', $dateStr);
             }
 
+            // Ambil tanggal Hijriah dari API eksternal
+            $hijriCacheKey = "hijri_{$dateStr}";
+            $hijriData = Cache::remember($hijriCacheKey, now()->addDays(1), function () {
+                try {
+                    $response = Http::timeout(10)->get("https://api.myquran.com/v2/cal/hijr/?adj=-1");
+                    if ($response->successful()) {
+                        return $response->json('data.date.1');
+                    }
+                } catch (\Exception $e) {}
+                return null;
+            });
+
+            if (is_array($jadwalHariIni) && $hijriData) {
+                $jadwalHariIni['tanggal_hijriah'] = $hijriData;
+            }
+
             return response()->json([
                 'code' => 200,
                 'success' => true,
