@@ -189,7 +189,10 @@ class MyMasjidController extends Controller
                     'slide_iqomah' => $slideIqomah,
                     'durasi'       => $durasi,
                     'jadwal_sholat'=> $jadwalFinal,
-                    'agenda'       => $agendaData,
+                    'agenda'       => [
+                        'message' => $agendaData->count() > 0 ? 'Data agenda tersedia' : 'Tidak ada data agenda saat ini',
+                        'data'    => $agendaData,
+                    ],
                 ]
             ], 200);
 
