@@ -307,11 +307,11 @@ class MyMasjidController extends Controller
                         'data'    => $jadwalFinal,
                     ],
                     'jumbotron_pemko'=> [
-                        'message' => $jumbotronPemkoData ? 'Data jumbotron pemko tersedia' : 'Tidak ada data jumbotron pemko',
+                        'message' => $jumbotronPemkoData ? ($jumbotronPemkoData['is_active'] ? 'Data jumbotron pemko tersedia dan aktif' : 'Data jumbotron pemko sedang dinonaktifkan') : 'Tidak ada data jumbotron pemko',
                         'data'    => $jumbotronPemkoData,
                     ],
                     'jumbotron_masjid'=> [
-                        'message' => $jumbotronMasjidData ? 'Data jumbotron masjid tersedia' : 'Tidak ada data jumbotron masjid',
+                        'message' => $jumbotronMasjidData ? ($jumbotronMasjidData['is_active'] ? 'Data jumbotron masjid tersedia dan aktif' : 'Data jumbotron masjid sedang dinonaktifkan') : 'Tidak ada data jumbotron masjid',
                         'data'    => $jumbotronMasjidData,
                     ],
                     'petugas_jumat'=> [
