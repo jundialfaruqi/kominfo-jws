@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V2;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 class MyMasjidController extends Controller
 {
@@ -53,6 +55,32 @@ class MyMasjidController extends Controller
             // Sembunyikan user_id karena tidak diperlukan oleh Flutter
             $profil->makeHidden(['user_id']);
 
+            // Ambil jadwal sholat dari API eksternal (MyQuran) dengan caching
+            $now = Carbon::now('Asia/Jakarta');
+            $year = $now->format('Y');
+            $month = $now->format('m');
+            $dateStr = $now->format('Y-m-d');
+            $cityId = '0412'; // Default Kota Pekanbaru
+            $cacheKey = "jadwal_sholat_{$cityId}_{$year}_{$month}";
+
+            $jadwalBulanIni = Cache::remember($cacheKey, now()->addDays(7), function () use ($cityId, $year, $month) {
+                try {
+                    $response = Http::timeout(10)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$year}/{$month}");
+                    if ($response->successful()) {
+                        return $response->json('data.jadwal');
+                    }
+                } catch (\Exception $e) {
+                    // Jika API gagal, kembalikan null agar tidak disimpan dalam cache
+                }
+                return null;
+            });
+
+            // Filter jadwal spesifik untuk hari ini
+            $jadwalHariIni = null;
+            if (is_array($jadwalBulanIni)) {
+                $jadwalHariIni = collect($jadwalBulanIni)->firstWhere('date', $dateStr);
+            }
+
             return response()->json([
                 'code' => 200,
                 'success' => true,
@@ -63,6 +91,7 @@ class MyMasjidController extends Controller
                     'theme_id' => $themeId,
                     'profil' => $profil,
                     'marquee' => $marquee,
+                    'jadwal_sholat' => $jadwalHariIni,
                 ]
             ], 200);
 
