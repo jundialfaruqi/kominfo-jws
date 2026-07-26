@@ -58,6 +58,34 @@ class MyMasjidController extends Controller
             $user = \App\Models\User::query()->select('theme_id')->find($userId);
             $themeId = $user ? $user->theme_id : null;
 
+            // Ambil data Durasi
+            $durasiModel = \App\Models\Durasi::query()->where('user_id', $userId)->first();
+            $durasi = null;
+            if ($durasiModel) {
+                $durasi = [
+                    'adzan_imsak' => (int) $durasiModel->adzan_imsak,
+                    'adzan_shuruq' => (int) $durasiModel->adzan_shuruq,
+                    'adzan_dhuha' => (int) $durasiModel->adzan_dhuha,
+                    'adzan_shubuh' => (int) $durasiModel->adzan_shubuh,
+                    'iqomah_shubuh' => (int) $durasiModel->iqomah_shubuh,
+                    'final_shubuh' => (int) $durasiModel->final_shubuh,
+                    'adzan_dzuhur' => (int) $durasiModel->adzan_dzuhur,
+                    'iqomah_dzuhur' => (int) $durasiModel->iqomah_dzuhur,
+                    'final_dzuhur' => (int) $durasiModel->final_dzuhur,
+                    'jumat_slide' => (int) $durasiModel->jumat_slide,
+                    'adzan_ashar' => (int) $durasiModel->adzan_ashar,
+                    'iqomah_ashar' => (int) $durasiModel->iqomah_ashar,
+                    'final_ashar' => (int) $durasiModel->final_ashar,
+                    'adzan_maghrib' => (int) $durasiModel->adzan_maghrib,
+                    'iqomah_maghrib' => (int) $durasiModel->iqomah_maghrib,
+                    'final_maghrib' => (int) $durasiModel->final_maghrib,
+                    'adzan_isya' => (int) $durasiModel->adzan_isya,
+                    'iqomah_isya' => (int) $durasiModel->iqomah_isya,
+                    'final_isya' => (int) $durasiModel->final_isya,
+                    'finance_scroll_speed' => (int) $durasiModel->finance_scroll_speed,
+                ];
+            }
+
             // Sembunyikan user_id karena tidak diperlukan oleh Flutter
             $profil->makeHidden(['user_id']);
 
@@ -152,6 +180,7 @@ class MyMasjidController extends Controller
                     'profil'       => $profil,
                     'marquee'      => $marquee,
                     'slides'       => $slides,
+                    'durasi'       => $durasi,
                     'jadwal_sholat'=> $jadwalFinal,
                     'agenda'       => $agendaData,
                 ]
