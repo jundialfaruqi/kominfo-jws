@@ -48,6 +48,12 @@ class MyMasjidController extends Controller
                 ->where('user_id', $userId)
                 ->first();
             
+            // Ambil data Slides
+            $slides = \App\Models\Slides::query()
+                ->select(['id', 'slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slide6'])
+                ->where('user_id', $userId)
+                ->first();
+            
             // Ambil theme_id dari tabel users (select langsung)
             $user = \App\Models\User::query()->select('theme_id')->find($userId);
             $themeId = $user ? $user->theme_id : null;
@@ -86,12 +92,13 @@ class MyMasjidController extends Controller
                 'success' => true,
                 'message' => 'Data my-masjid berhasil diambil',
                 'data' => [
-                    'current_time' => Carbon::now('Asia/Jakarta')->toDateTimeString(),
-                    'timestamp' => Carbon::now('Asia/Jakarta')->timestamp,
-                    'theme_id' => $themeId,
-                    'profil' => $profil,
-                    'marquee' => $marquee,
-                    'jadwal_sholat' => $jadwalHariIni,
+                    'current_time' => $now->toDateTimeString(),
+                    'timestamp'    => $now->timestamp,
+                    'theme_id'     => $themeId,
+                    'profil'       => $profil,
+                    'marquee'      => $marquee,
+                    'slides'       => $slides,
+                    'jadwal_sholat'=> $jadwalHariIni,
                 ]
             ], 200);
 
