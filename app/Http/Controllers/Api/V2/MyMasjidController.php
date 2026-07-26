@@ -108,7 +108,7 @@ class MyMasjidController extends Controller
             // Ambil hingga 30 hari ke depan
             $thirtyDaysLater = $todayStart->copy()->addDays(30);
 
-            $agendaData = \App\Models\Agenda::where('id_masjid', $profil->id)
+            $agendaData = \App\Models\Agenda::query()->where('id_masjid', $profil->id)
                 ->where('aktif', true)
                 ->whereBetween('date', [$todayStart->toDateString(), $thirtyDaysLater->toDateString()])
                 ->orderBy('date', 'asc')
