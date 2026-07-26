@@ -257,6 +257,67 @@ class MyMasjidController extends Controller
                 ];
             }
 
+            // Ambil Laporan Keuangan
+            $laporanRaw = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
+                ->whereYear('tanggal', $now->year)
+                ->whereMonth('tanggal', $now->month)
+                ->orderBy('tanggal', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
+                
+            $grouped = $laporanRaw->groupBy('id_group_category');
+            $laporanGroups = [];
+            foreach ($grouped as $gcId => $items) {
+                $gc = $gcId ? \App\Models\GroupCategory::query()->find($gcId) : null;
+                $mappedItems = collect($items)->map(function ($l) use ($gc, $gcId) {
+                    return [
+                        'id' => (int) $l->id,
+                        'tanggal' => $l->tanggal,
+                        'uraian' => $l->uraian,
+                        'jenis' => $l->is_opening ? 'masuk' : ($l->jenis ?? 'masuk'),
+                        'is_opening' => (bool) $l->is_opening,
+                        'saldo' => (int) $l->saldo,
+                        'group_category_id' => (int) ($gcId ?? 0),
+                        'group_category_name' => $gc?->name ?? '-',
+                    ];
+                })->values();
+                
+                $sumMasukMonth = $mappedItems->reduce(function ($carry, $row) {
+                    $jenisNormalized = ($row['is_opening'] === true || $row['jenis'] === 'masuk') ? 'masuk' : 'keluar';
+                    return $carry + ($jenisNormalized === 'masuk' ? (int) $row['saldo'] : 0);
+                }, 0);
+                $sumKeluarMonth = $mappedItems->reduce(function ($carry, $row) {
+                    $jenisNormalized = ($row['is_opening'] === true || $row['jenis'] === 'masuk') ? 'masuk' : 'keluar';
+                    return $carry + ($jenisNormalized === 'keluar' ? (int) $row['saldo'] : 0);
+                }, 0);
+                
+                $sumAllMasuk = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
+                    ->where('id_group_category', $gcId)
+                    ->where(function ($q) {
+                        $q->where('is_opening', 1)->orWhere('jenis', 'masuk');
+                    })
+                    ->sum('saldo');
+                $sumAllKeluar = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
+                    ->where('id_group_category', $gcId)
+                    ->where('is_opening', '!=', 1)
+                    ->where('jenis', 'keluar')
+                    ->sum('saldo');
+                $totalSaldoAll = (int) $sumAllMasuk - (int) $sumAllKeluar;
+                
+                $laporanGroups[] = [
+                    'group_category_id' => (int) ($gcId ?? 0),
+                    'group_category_name' => $gc?->name ?? '-',
+                    'items' => $mappedItems->values()->all(),
+                    'items_total' => $mappedItems->count(),
+                    'sum_masuk_month' => (int) $sumMasukMonth,
+                    'sum_keluar_month' => (int) $sumKeluarMonth,
+                    'total_saldo_all' => (int) $totalSaldoAll,
+                ];
+            }
+            usort($laporanGroups, function ($a, $b) {
+                return strcmp($a['group_category_name'], $b['group_category_name']);
+            });
+
             return response()->json([
                 'code' => 200,
                 'success' => true,
@@ -321,6 +382,10 @@ class MyMasjidController extends Controller
                     'agenda'       => [
                         'message' => $agendaData->count() > 0 ? 'Data agenda tersedia' : 'Tidak ada data agenda saat ini',
                         'data'    => $agendaData,
+                    ],
+                    'laporan_keuangan' => [
+                        'message' => count($laporanGroups) > 0 ? 'Data laporan keuangan tersedia' : 'Tidak ada data laporan keuangan',
+                        'data'    => $laporanGroups,
                     ],
                 ]
             ], 200);
