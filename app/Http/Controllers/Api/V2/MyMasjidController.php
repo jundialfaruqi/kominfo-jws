@@ -61,47 +61,50 @@ class MyMasjidController extends Controller
             // Sembunyikan user_id karena tidak diperlukan oleh Flutter
             $profil->makeHidden(['user_id']);
 
-            // Ambil jadwal sholat dari API eksternal (MyQuran) dengan caching
+            // Ambil jadwal sholat dari API eksternal (MyQuran) dengan caching (Bulan Ini & Bulan Depan)
             $now = Carbon::now('Asia/Jakarta');
+            $cityId = '0412'; // Default Kota Pekanbaru
+
+            // Bulan Ini
             $year = $now->format('Y');
             $month = $now->format('m');
-            $dateStr = $now->format('Y-m-d');
-            $cityId = '0412'; // Default Kota Pekanbaru
             $cacheKey = "jadwal_sholat_{$cityId}_{$year}_{$month}";
-
             $jadwalBulanIni = Cache::remember($cacheKey, now()->addDays(7), function () use ($cityId, $year, $month) {
                 try {
                     $response = Http::timeout(10)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$year}/{$month}");
                     if ($response->successful()) {
                         return $response->json('data.jadwal');
                     }
-                } catch (\Exception $e) {
-                    // Jika API gagal, kembalikan null agar tidak disimpan dalam cache
-                }
-                return null;
+                } catch (\Exception $e) {}
+                return [];
             });
 
-            // Filter jadwal spesifik untuk hari ini
-            $jadwalHariIni = null;
-            if (is_array($jadwalBulanIni)) {
-                $jadwalHariIni = collect($jadwalBulanIni)->firstWhere('date', $dateStr);
-            }
-
-            // Ambil tanggal Hijriah dari API eksternal
-            $hijriCacheKey = "hijri_{$dateStr}";
-            $hijriData = Cache::remember($hijriCacheKey, now()->addDays(1), function () {
+            // Bulan Depan (Untuk jaga-jaga jika berganti bulan tanpa reload)
+            $nextMonthDate = $now->copy()->addMonth();
+            $nYear = $nextMonthDate->format('Y');
+            $nMonth = $nextMonthDate->format('m');
+            $nCacheKey = "jadwal_sholat_{$cityId}_{$nYear}_{$nMonth}";
+            $jadwalBulanDepan = Cache::remember($nCacheKey, now()->addDays(7), function () use ($cityId, $nYear, $nMonth) {
                 try {
-                    $response = Http::timeout(10)->get("https://api.myquran.com/v2/cal/hijr/?adj=-1");
+                    $response = Http::timeout(10)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$nYear}/{$nMonth}");
                     if ($response->successful()) {
-                        return $response->json('data.date.1');
+                        return $response->json('data.jadwal');
                     }
                 } catch (\Exception $e) {}
-                return null;
+                return [];
             });
 
-            if (is_array($jadwalHariIni) && $hijriData) {
-                $jadwalHariIni['tanggal_hijriah'] = $hijriData;
-            }
+            // Gabungkan menjadi satu array besar (sekitar 60 hari)
+            $jadwalGabungan = array_merge(
+                is_array($jadwalBulanIni) ? $jadwalBulanIni : [],
+                is_array($jadwalBulanDepan) ? $jadwalBulanDepan : []
+            );
+
+            // Filter agar hanya mengirim dari hari ini ke depan (opsional untuk menghemat payload)
+            $dateStr = $now->format('Y-m-d');
+            $jadwalFinal = collect($jadwalGabungan)->filter(function ($item) use ($dateStr) {
+                return isset($item['date']) && $item['date'] >= $dateStr;
+            })->values()->toArray();
 
             // Ambil Agenda Masjid
             $todayStart = Carbon::now('Asia/Jakarta')->startOfDay();
@@ -132,6 +135,7 @@ class MyMasjidController extends Controller
                     return [
                         'name' => $agenda->name,
                         'date' => $formattedDate,
+                        'date_raw' => $agendaDate->format('Y-m-d'),
                         'days_label' => $days_label,
                         'aktif' => $agenda->aktif,
                     ];
@@ -148,7 +152,7 @@ class MyMasjidController extends Controller
                     'profil'       => $profil,
                     'marquee'      => $marquee,
                     'slides'       => $slides,
-                    'jadwal_sholat'=> $jadwalHariIni,
+                    'jadwal_sholat'=> $jadwalFinal,
                     'agenda'       => $agendaData,
                 ]
             ], 200);
