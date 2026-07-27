@@ -261,19 +261,24 @@ class MyMasjidController extends Controller
             $start7 = \Carbon\Carbon::today('Asia/Jakarta')->subDays(7)->toDateString();
             $end7 = \Carbon\Carbon::today('Asia/Jakarta')->toDateString();
 
-            $laporanRaw = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
-                ->whereBetween('tanggal', [$start7, $end7])
-                ->orderBy('tanggal', 'desc')
-                ->orderBy('id', 'desc')
-                ->get();
-                
-            $grouped = $laporanRaw->groupBy('id_group_category');
+            $groupCategories = \App\Models\GroupCategory::query()->where('id_masjid', $profil->id)->get();
             $laporanGroups = [];
-            $grandTotals = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+            
+            $grandTotalMasuk = 0;
+            $grandTotalKeluar = 0;
+            $grandTotalSaldoSebelumnya = 0;
 
-            foreach ($grouped as $gcId => $items) {
-                $gc = $gcId ? \App\Models\GroupCategory::query()->find($gcId) : null;
-                $mappedItems = collect($items)->map(function ($l) use ($gc, $gcId) {
+            foreach ($groupCategories as $gc) {
+                $gcId = $gc->id;
+                
+                $items = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
+                    ->where('id_group_category', $gcId)
+                    ->whereBetween('tanggal', [$start7, $end7])
+                    ->orderBy('tanggal', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->get();
+                    
+                $mappedItems = $items->map(function ($l) use ($gc, $gcId) {
                     return [
                         'id' => (int) $l->id,
                         'tanggal' => $l->tanggal,
@@ -281,8 +286,8 @@ class MyMasjidController extends Controller
                         'jenis' => $l->is_opening ? 'masuk' : ($l->jenis ?? 'masuk'),
                         'is_opening' => (bool) $l->is_opening,
                         'saldo' => (int) $l->saldo,
-                        'group_category_id' => (int) ($gcId ?? 0),
-                        'group_category_name' => $gc?->name ?? '-',
+                        'group_category_id' => (int) ($gcId),
+                        'group_category_name' => $gc->name,
                     ];
                 })->values();
                 
@@ -297,41 +302,57 @@ class MyMasjidController extends Controller
                 
                 $ending = $sumMasukMonth - $sumKeluarMonth;
 
-                $grandTotals['sumMasuk'] += $sumMasukMonth;
-                $grandTotals['sumKeluar'] += $sumKeluarMonth;
-                $grandTotals['ending'] += $ending;
-                
-                $sumAllMasuk = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
+                $saldoSebelumnyaMasuk = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
                     ->where('id_group_category', $gcId)
-                    ->where(function ($q) {
-                        $q->where('is_opening', 1)->orWhere('jenis', 'masuk');
-                    })
+                    ->where('tanggal', '<', $start7)
+                    ->where(function($q) { $q->where('is_opening', 1)->orWhere('jenis', 'masuk'); })
                     ->sum('saldo');
-                $sumAllKeluar = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
+                $saldoSebelumnyaKeluar = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
                     ->where('id_group_category', $gcId)
+                    ->where('tanggal', '<', $start7)
                     ->where('is_opening', '!=', 1)
                     ->where('jenis', 'keluar')
                     ->sum('saldo');
-                $totalSaldoAll = (int) $sumAllMasuk - (int) $sumAllKeluar;
+                $saldoSebelumnya = (int) $saldoSebelumnyaMasuk - (int) $saldoSebelumnyaKeluar;
+                
+                $saldoAkhir = $saldoSebelumnya + $ending;
+                
+                if ($sumMasukMonth == 0 && $sumKeluarMonth == 0 && $saldoAkhir == 0) {
+                    continue;
+                }
+                
+                $grandTotalMasuk += $sumMasukMonth;
+                $grandTotalKeluar += $sumKeluarMonth;
+                $grandTotalSaldoSebelumnya += $saldoSebelumnya;
                 
                 $laporanGroups[] = [
-                    'categoryId' => (int) ($gcId ?? 0),
-                    'categoryName' => $gc?->name ?? '-',
+                    'categoryId' => (int) ($gcId),
+                    'categoryName' => $gc->name,
                     'items' => $mappedItems->values()->all(),
                     'items_total' => $mappedItems->count(),
                     'sumMasuk' => (int) $sumMasukMonth,
                     'sumKeluar' => (int) $sumKeluarMonth,
                     'ending' => (int) $ending,
-                    'total_saldo_all' => (int) $totalSaldoAll,
+                    'saldoSebelumnya' => (int) $saldoSebelumnya,
+                    'saldoAkhir' => (int) $saldoAkhir,
                 ];
             }
+            
             usort($laporanGroups, function ($a, $b) {
                 return strcmp($a['categoryName'], $b['categoryName']);
             });
+            
+            $startDisplay = \Carbon\Carbon::parse($start7)->format('d-m-Y');
+            $endDisplay = \Carbon\Carbon::parse($end7)->format('d-m-Y');
 
             $laporanKeuanganData = [
+                'periodeString' => "Tanggal $startDisplay s/d $endDisplay",
                 'categories' => $laporanGroups,
-                'grandTotals' => $grandTotals
+                'grandTotals' => [
+                    'sumMasuk' => $grandTotalMasuk,
+                    'sumKeluar' => $grandTotalKeluar,
+                    'ending' => $grandTotalSaldoSebelumnya + ($grandTotalMasuk - $grandTotalKeluar)
+                ]
             ];
 
             return response()->json([
