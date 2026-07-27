@@ -257,16 +257,20 @@ class MyMasjidController extends Controller
                 ];
             }
 
-            // Ambil Laporan Keuangan
+            // Ambil Laporan Keuangan (Filter 7 Hari Terakhir)
+            $start7 = \Carbon\Carbon::today('Asia/Jakarta')->subDays(7)->toDateString();
+            $end7 = \Carbon\Carbon::today('Asia/Jakarta')->toDateString();
+
             $laporanRaw = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
-                ->whereYear('tanggal', $now->year)
-                ->whereMonth('tanggal', $now->month)
+                ->whereBetween('tanggal', [$start7, $end7])
                 ->orderBy('tanggal', 'desc')
                 ->orderBy('id', 'desc')
                 ->get();
                 
             $grouped = $laporanRaw->groupBy('id_group_category');
             $laporanGroups = [];
+            $grandTotals = ['sumMasuk' => 0, 'sumKeluar' => 0, 'ending' => 0];
+
             foreach ($grouped as $gcId => $items) {
                 $gc = $gcId ? \App\Models\GroupCategory::query()->find($gcId) : null;
                 $mappedItems = collect($items)->map(function ($l) use ($gc, $gcId) {
@@ -291,6 +295,12 @@ class MyMasjidController extends Controller
                     return $carry + ($jenisNormalized === 'keluar' ? (int) $row['saldo'] : 0);
                 }, 0);
                 
+                $ending = $sumMasukMonth - $sumKeluarMonth;
+
+                $grandTotals['sumMasuk'] += $sumMasukMonth;
+                $grandTotals['sumKeluar'] += $sumKeluarMonth;
+                $grandTotals['ending'] += $ending;
+                
                 $sumAllMasuk = \App\Models\Laporan::query()->where('id_masjid', $profil->id)
                     ->where('id_group_category', $gcId)
                     ->where(function ($q) {
@@ -305,18 +315,24 @@ class MyMasjidController extends Controller
                 $totalSaldoAll = (int) $sumAllMasuk - (int) $sumAllKeluar;
                 
                 $laporanGroups[] = [
-                    'group_category_id' => (int) ($gcId ?? 0),
-                    'group_category_name' => $gc?->name ?? '-',
+                    'categoryId' => (int) ($gcId ?? 0),
+                    'categoryName' => $gc?->name ?? '-',
                     'items' => $mappedItems->values()->all(),
                     'items_total' => $mappedItems->count(),
-                    'sum_masuk_month' => (int) $sumMasukMonth,
-                    'sum_keluar_month' => (int) $sumKeluarMonth,
+                    'sumMasuk' => (int) $sumMasukMonth,
+                    'sumKeluar' => (int) $sumKeluarMonth,
+                    'ending' => (int) $ending,
                     'total_saldo_all' => (int) $totalSaldoAll,
                 ];
             }
             usort($laporanGroups, function ($a, $b) {
-                return strcmp($a['group_category_name'], $b['group_category_name']);
+                return strcmp($a['categoryName'], $b['categoryName']);
             });
+
+            $laporanKeuanganData = [
+                'categories' => $laporanGroups,
+                'grandTotals' => $grandTotals
+            ];
 
             return response()->json([
                 'code' => 200,
@@ -383,9 +399,9 @@ class MyMasjidController extends Controller
                         'message' => $agendaData->count() > 0 ? 'Data agenda tersedia' : 'Tidak ada data agenda saat ini',
                         'data'    => $agendaData,
                     ],
-                    'laporan_keuangan' => [
-                        'message' => count($laporanGroups) > 0 ? 'Data laporan keuangan tersedia' : 'Tidak ada data laporan keuangan',
-                        'data'    => $laporanGroups,
+                    'laporan_keuangan'=> [
+                        'message' => count($laporanGroups) > 0 ? 'Data laporan keuangan tersedia' : 'Data laporan keuangan kosong',
+                        'data'    => $laporanKeuanganData,
                     ],
                 ]
             ], 200);
