@@ -444,11 +444,19 @@ class MyMasjidController extends Controller
                         'data'    => $laporanKeuanganData,
                     ],
                     'audio_adzan'  => [
-                        'message' => $adzanAudio ? 'Data audio adzan tersedia' : 'Tidak ada data audio adzan',
+                        'message' => !$adzanAudio ? 'Tidak ada data audio adzan' : (
+                            !$adzanAudio->status ? 'Data audio adzan sedang dinonaktifkan' : (
+                                (is_null($adzanAudio->audioadzan) && is_null($adzanAudio->adzanshubuh)) ? 'Data audio adzan aktif namun file audio kosong' : 'Data audio adzan tersedia dan aktif'
+                            )
+                        ),
                         'data'    => $adzanAudio,
                     ],
                     'audio_murotal'=> [
-                        'message' => $audioMurotal ? 'Data audio murotal tersedia' : 'Tidak ada data audio murotal',
+                        'message' => !$audioMurotal ? 'Tidak ada data audio murotal' : (
+                            !$audioMurotal->status ? 'Data audio murotal sedang dinonaktifkan' : (
+                                (is_null($audioMurotal->audio1) && is_null($audioMurotal->audio2) && is_null($audioMurotal->audio3)) ? 'Data audio murotal aktif namun file audio kosong' : 'Data audio murotal tersedia dan aktif'
+                            )
+                        ),
                         'data'    => $audioMurotal,
                     ],
                 ]
