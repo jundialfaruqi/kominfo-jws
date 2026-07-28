@@ -130,6 +130,18 @@ class MyMasjidController extends Controller
                 ];
             }
 
+            // Ambil data Audio Adzan
+            $adzanAudio = \App\Models\AdzanAudio::query()
+                ->select(['id', 'audioadzan', 'adzanshubuh', 'status'])
+                ->where('user_id', $userId)
+                ->first();
+
+            // Ambil data Audio Murotal
+            $audioMurotal = \App\Models\Audios::query()
+                ->select(['id', 'audio1', 'audio2', 'audio3', 'status'])
+                ->where('user_id', $userId)
+                ->first();
+
             // Sembunyikan user_id karena tidak diperlukan oleh Flutter
             $profil->makeHidden(['user_id']);
 
@@ -430,6 +442,14 @@ class MyMasjidController extends Controller
                     'laporan_keuangan'=> [
                         'message' => count($laporanGroups) > 0 ? 'Data laporan keuangan tersedia' : 'Data laporan keuangan kosong',
                         'data'    => $laporanKeuanganData,
+                    ],
+                    'audio_adzan'  => [
+                        'message' => $adzanAudio ? 'Data audio adzan tersedia' : 'Tidak ada data audio adzan',
+                        'data'    => $adzanAudio,
+                    ],
+                    'audio_murotal'=> [
+                        'message' => $audioMurotal ? 'Data audio murotal tersedia' : 'Tidak ada data audio murotal',
+                        'data'    => $audioMurotal,
                     ],
                 ]
             ], 200);
