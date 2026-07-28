@@ -384,8 +384,8 @@ class MyMasjidController extends Controller
                         'data'    => $now->toDateTimeString(),
                     ],
                     'timestamp'    => [
-                        'message' => 'Timestamp server saat ini (detik)',
-                        'data'    => $now->timestamp,
+                        'message' => 'Timestamp server saat ini (milidetik)',
+                        'data'    => (int) round(microtime(true) * 1000),
                     ],
                     'theme_id'     => [
                         'message' => $themeId ? 'Tema pilihan pengguna' : 'Tema default belum diatur',
