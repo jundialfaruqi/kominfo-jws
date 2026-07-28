@@ -16,21 +16,28 @@ class MyMasjidController extends Controller
     public function index(Request $request)
     {
         try {
+            $id = $request->query('id');
             $slug = $request->query('slug');
 
-            if (!$slug) {
+            if (!$id && !$slug) {
                 return response()->json([
                     'code' => 400,
                     'success' => false,
-                    'message' => 'Parameter slug wajib diisi',
+                    'message' => 'Parameter id atau slug wajib diisi',
                 ], 400);
             }
 
             // Ambil data Profil hanya dengan kolom yang diperlukan, plus user_id untuk keperluan relasi
-            $profil = \App\Models\Profil::query()
-                ->select(['id', 'user_id', 'name', 'slug', 'address', 'logo_masjid', 'logo_pemerintah'])
-                ->where('slug', $slug)
-                ->first();
+            $query = \App\Models\Profil::query()
+                ->select(['id', 'user_id', 'name', 'slug', 'address', 'logo_masjid', 'logo_pemerintah']);
+            
+            if ($id) {
+                $query->where('id', $id);
+            } else {
+                $query->where('slug', $slug);
+            }
+
+            $profil = $query->first();
 
             if (!$profil) {
                 return response()->json([

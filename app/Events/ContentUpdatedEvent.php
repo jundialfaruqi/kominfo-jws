@@ -17,9 +17,15 @@ class ContentUpdatedEvent implements ShouldBroadcast
     private $slug;
     private $type;
 
-    public function __construct($slug, $type)
+    public function __construct($identifier, $type)
     {
-        $this->slug = $slug;
+        // Konversi identifier (slug) menjadi ID masjid agar WebSocket menggunakan ID
+        $profil = \App\Models\Profil::where('slug', $identifier)->first();
+        if ($profil) {
+            $this->slug = $profil->id;
+        } else {
+            $this->slug = $identifier;
+        }
         $this->type = $type;
     }
 
