@@ -14,17 +14,20 @@ class ContentUpdatedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private $slug;
+    private $slugChannel;
+    private $idChannel;
     private $type;
 
     public function __construct($identifier, $type)
     {
-        // Konversi identifier (slug) menjadi ID masjid agar WebSocket menggunakan ID
+        $this->slugChannel = $identifier; // Channel untuk Web (menggunakan slug asli)
+        
+        // Konversi identifier (slug) menjadi ID masjid agar WebSocket Flutter menggunakan ID
         $profil = \App\Models\Profil::where('slug', $identifier)->first();
         if ($profil) {
-            $this->slug = $profil->id;
+            $this->idChannel = $profil->id;
         } else {
-            $this->slug = $identifier;
+            $this->idChannel = $identifier;
         }
         $this->type = $type;
     }
@@ -32,9 +35,10 @@ class ContentUpdatedEvent implements ShouldBroadcast
     // public function broadcastOn()
     public function broadcastOn(): array
     {
-        // return new Channel("masjid-{$this->slug}");
+        // Dual-Broadcast: Kirim ke channel ID (untuk Flutter) dan channel slug (untuk Web)
         return [
-            new Channel("masjid-{$this->slug}"),
+            new Channel("masjid-{$this->idChannel}"),
+            new Channel("masjid-{$this->slugChannel}"),
         ];
     }
 
