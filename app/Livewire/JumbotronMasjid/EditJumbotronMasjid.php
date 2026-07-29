@@ -91,18 +91,6 @@ class EditJumbotronMasjid extends Component
         $targetHeight = 1080;
         $originalWidth = $image->width();
         $originalHeight = $image->height();
-        $originalRatio = $originalWidth / $originalHeight;
-        if (abs($originalRatio - $targetRatio) > 0.01) {
-            if ($originalRatio > $targetRatio) {
-                $newWidth = (int)($originalHeight * $targetRatio);
-                $x = (int)(($originalWidth - $newWidth) / 2);
-                $image->crop($newWidth, $originalHeight, $x, 0);
-            } else {
-                $newHeight = (int)($originalWidth / $targetRatio);
-                $y = (int)(($originalHeight - $newHeight) / 2);
-                $image->crop($originalWidth, $newHeight, 0, $y);
-            }
-        }
         $image->resize($targetWidth, $targetHeight);
         $quality = 95;
         $minQuality = 20;
