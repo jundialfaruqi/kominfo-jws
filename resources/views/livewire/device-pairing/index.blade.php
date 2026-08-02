@@ -63,6 +63,61 @@
                 </div>
             </div>
 
+            {{-- Tabel TV Terhubung --}}
+            <div class="card rounded-4 shadow-sm border-0 mt-4">
+                <div class="card-header">
+                    <h3 class="card-title">TV yang Terhubung</h3>
+                    <div class="card-options text-secondary small">
+                        Total: {{ $devices->count() }} TV
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Perangkat</th>
+                                <th>Kode Aktivasi</th>
+                                <th>Tanggal Taut</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($devices as $device)
+                                <tr>
+                                    <td>
+                                        @if ($device->device_brand || $device->device_model)
+                                            <div class="fw-bold text-capitalize">{{ $device->device_brand }} {{ $device->device_model }}</div>
+                                            <div class="text-secondary small">{{ $device->os_version ?? '-' }}</div>
+                                        @else
+                                            <span class="text-secondary">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-blue text-blue-fg fw-bold">{{ $device->pairing_code }}</span>
+                                    </td>
+                                    <td>
+                                        {{ $device->updated_at->format('d M Y, H:i') }}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger rounded-3"
+                                            wire:click="unlinkDevice({{ $device->id }})"
+                                            wire:confirm="Apakah Anda yakin ingin memutus TV ini?">
+                                            Putuskan
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-secondary">
+                                        Belum ada TV yang terhubung ke masjid Anda.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

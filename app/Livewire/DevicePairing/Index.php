@@ -5,6 +5,7 @@ namespace App\Livewire\DevicePairing;
 use Livewire\Component;
 use App\Models\DevicePairing;
 use App\Events\DevicePairedEvent;
+use App\Events\DeviceUnpairedEvent;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
 
@@ -50,8 +51,29 @@ class Index extends Component
         $this->pairingCode = '';
     }
 
+    public function unlinkDevice(int $id)
+    {
+        $user = Auth::user();
+        $pairing = DevicePairing::where('id', $id)
+            ->whereHas('profil', fn($q) => $q->where('user_id', $user->id))
+            ->firstOrFail();
+
+        broadcast(new DeviceUnpairedEvent($pairing->device_id));
+        $pairing->delete();
+
+        $this->message = 'TV berhasil diputus dari masjid.';
+        $this->messageType = 'success';
+    }
+
     public function render()
     {
-        return view('livewire.device-pairing.index');
+        $user = Auth::user();
+        $devices = DevicePairing::with('profil')
+            ->where('status', 'linked')
+            ->whereHas('profil', fn($q) => $q->where('user_id', $user->id))
+            ->latest()
+            ->get();
+
+        return view('livewire.device-pairing.index', compact('devices'));
     }
 }
