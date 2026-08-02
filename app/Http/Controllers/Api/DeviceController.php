@@ -13,7 +13,10 @@ class DeviceController extends Controller
     public function requestCode(Request $request)
     {
         $request->validate([
-            'device_id' => 'required|string',
+            'device_id'    => 'required|string',
+            'device_brand' => 'nullable|string|max:100',
+            'device_model' => 'nullable|string|max:100',
+            'os_version'   => 'nullable|string|max:100',
         ]);
 
         $deviceId = $request->device_id;
@@ -35,6 +38,11 @@ class DeviceController extends Controller
             $pairing = new DevicePairing();
             $pairing->device_id = $deviceId;
         }
+
+        // Update device info setiap kali request code (bisa ganti TV)
+        $pairing->device_brand = $request->device_brand;
+        $pairing->device_model = $request->device_model;
+        $pairing->os_version   = $request->os_version;
 
         // Generate unik 6 karakter alphanumeric kapital (hindari O dan 0 jika mau, tapi Str::upper(Str::random(6)) sudah cukup)
         $code = strtoupper(Str::random(6));

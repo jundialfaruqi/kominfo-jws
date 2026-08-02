@@ -11,6 +11,9 @@ class DevicePairing extends Model
 
     protected $fillable = [
         'device_id',
+        'device_brand',
+        'device_model',
+        'os_version',
         'pairing_code',
         'profil_id',
         'status',

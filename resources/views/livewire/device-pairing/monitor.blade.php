@@ -44,6 +44,7 @@
                             <tr>
                                 <th>Device ID</th>
                                 <th>Kode Aktivasi</th>
+                                <th>Perangkat</th>
                                 <th>Profil Masjid</th>
                                 <th>Tanggal Taut</th>
                                 <th>Aksi</th>
@@ -57,6 +58,14 @@
                                     </td>
                                     <td>
                                         <span class="badge bg-blue text-blue-fg fw-bold">{{ $device->pairing_code }}</span>
+                                    </td>
+                                    <td>
+                                        @if($device->device_brand || $device->device_model)
+                                            <div class="fw-bold text-capitalize">{{ $device->device_brand }} {{ $device->device_model }}</div>
+                                            <div class="text-secondary small">{{ $device->os_version ?? '-' }}</div>
+                                        @else
+                                            <span class="text-secondary">-</span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if($device->profil)
