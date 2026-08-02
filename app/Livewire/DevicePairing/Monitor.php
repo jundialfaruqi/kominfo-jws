@@ -21,7 +21,7 @@ class Monitor extends Component
         $this->resetPage();
     }
 
-    public function unlinkDevice($id)
+    public function unlinkDevice(int $id)
     {
         $pairing = DevicePairing::findOrFail($id);
         
