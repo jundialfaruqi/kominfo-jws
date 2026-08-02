@@ -13,8 +13,6 @@ class Index extends Component
 {
     #[Title('Tautkan TV')]
     public $pairingCode = '';
-    public $message = '';
-    public $messageType = ''; // 'success' or 'error'
 
     public function linkDevice()
     {
@@ -26,16 +24,14 @@ class Index extends Component
         $pairing = DevicePairing::where('pairing_code', $code)->where('status', 'pending')->first();
 
         if (!$pairing) {
-            $this->message = 'Kode tidak valid atau sudah kadaluarsa.';
-            $this->messageType = 'error';
+            $this->dispatch('error', message: 'Kode tidak valid atau sudah kadaluarsa.');
             return;
         }
 
         // Ambil masjid_id dari user yang login
         $user = Auth::user();
         if (!$user || !$user->profil) {
-            $this->message = 'Akun Anda belum memiliki profil masjid.';
-            $this->messageType = 'error';
+            $this->dispatch('error', message: 'Akun Anda belum memiliki profil masjid.');
             return;
         }
 
@@ -46,8 +42,7 @@ class Index extends Component
         // Broadcast event ke TV
         broadcast(new DevicePairedEvent($pairing));
 
-        $this->message = 'TV berhasil ditautkan ke Masjid Anda!';
-        $this->messageType = 'success';
+        $this->dispatch('success', message: 'TV berhasil ditautkan ke Masjid Anda!');
         $this->pairingCode = '';
     }
 
@@ -61,8 +56,7 @@ class Index extends Component
         broadcast(new DeviceUnpairedEvent($pairing->device_id));
         $pairing->delete();
 
-        $this->message = 'TV berhasil diputus dari masjid.';
-        $this->messageType = 'success';
+        $this->dispatch('success', message: 'TV berhasil diputus dari masjid.');
     }
 
     public function render()

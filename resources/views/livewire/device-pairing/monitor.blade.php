@@ -2,25 +2,6 @@
     <div class="page-body">
         <div class="container-xl">
 
-            @if (session()->has('success'))
-                <div class="alert alert-success alert-dismissible rounded-3" role="alert">
-                    <div class="d-flex">
-                        <div>
-                            <!-- Download SVG icon from http://tabler-icons.io/i/check -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24"
-                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M5 12l5 5l10 -10" />
-                            </svg>
-                        </div>
-                        <div>
-                            {{ session('success') }}
-                        </div>
-                    </div>
-                    <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
-                </div>
-            @endif
 
             <div class="card rounded-4 shadow-sm border-0">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -99,4 +80,16 @@
 
         </div>
     </div>
+
+    @script
+        <script>
+            $wire.on('success', message => {
+                iziToast.success({
+                    title: 'Berhasil',
+                    message,
+                    position: 'topRight'
+                });
+            });
+        </script>
+    @endscript
 </div>

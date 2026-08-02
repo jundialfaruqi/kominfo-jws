@@ -11,12 +11,6 @@
                         secara instan.
                     </p>
 
-                    @if ($message)
-                        <div class="alert {{ $messageType === 'success' ? 'alert-success' : 'alert-danger' }} rounded-3"
-                            role="alert">
-                            {{ $message }}
-                        </div>
-                    @endif
 
                     <form wire:submit.prevent="linkDevice">
                         <div class="row g-3 align-items-end">
@@ -101,4 +95,24 @@
 
         </div>
     </div>
+
+    @script
+        <script>
+            $wire.on('success', message => {
+                iziToast.success({
+                    title: 'Berhasil',
+                    message,
+                    position: 'topRight'
+                });
+            });
+
+            $wire.on('error', message => {
+                iziToast.error({
+                    title: 'Gagal',
+                    message,
+                    position: 'topRight'
+                });
+            });
+        </script>
+    @endscript
 </div>

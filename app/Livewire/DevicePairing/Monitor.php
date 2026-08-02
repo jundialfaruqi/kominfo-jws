@@ -31,7 +31,7 @@ class Monitor extends Component
         // Hapus data pairing
         $pairing->delete();
 
-        session()->flash('success', 'TV berhasil diputus dari masjid.');
+        $this->dispatch('success', message: 'TV berhasil diputus dari masjid.');
     }
 
     public function render()
