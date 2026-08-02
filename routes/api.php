@@ -167,6 +167,7 @@ Route::middleware('auth:sanctum')->group(function () {
 use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
 use App\Http\Controllers\Api\V2\MyMasjidController;
 use App\Http\Controllers\Api\V2\ThemeController;
+use App\Http\Controllers\Api\DeviceController;
 
 // ==========================================
 // [ROUTE API VERSI 2]
@@ -182,9 +183,14 @@ Route::prefix('v2')->group(function () {
     Route::get('my-masjid', [MyMasjidController::class, 'index'])
         ->name('api.v2.my-masjid');
         
+        
     // API untuk mendapatkan daftar seluruh theme
     Route::get('themes', [ThemeController::class, 'index'])
         ->name('api.v2.themes.index');
+
+    // API untuk Device Pairing (TV)
+    Route::post('device/request-code', [DeviceController::class, 'requestCode'])
+        ->name('api.v2.device.request-code');
     
 });
 

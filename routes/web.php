@@ -31,6 +31,8 @@ use App\Models\Theme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use App\Livewire\GroupCategory\Group as GroupCategoryGroup;
+use App\Livewire\DevicePairing\Index as DevicePairingIndex;
+use App\Livewire\DevicePairing\Monitor as DevicePairingMonitor;
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -56,6 +58,9 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     // Update Profile Route
     Route::get('/pengaturan', Updateprofile::class)->name('updateprofile.index');
 
+    // TV Pairing Route
+    Route::get('/tv-pairing', DevicePairingIndex::class)->name('tv-pairing.index');
+
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/user', UserIndex::class)->name('user.index')->middleware('can:view-users');
@@ -65,6 +70,9 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
         Route::get('/role', \App\Livewire\Admin\Role::class)->name('role.index')->middleware('can:view-roles');
         Route::get('/permission', \App\Livewire\Admin\Permission::class)->name('permission.index')->middleware('can:view-permissions');
         Route::get('/user-role-assignment', \App\Livewire\Admin\UserRoleAssignment::class)->name('user-role-assignment.index')->middleware('can:view-user-role-assignment');
+        
+        // TV Pairing Monitor Route (Hanya Super Admin / Admin dengan hak akses tertentu)
+        Route::get('/tv-monitor', DevicePairingMonitor::class)->name('tv-monitor.index')->middleware('can:view-tv-monitor'); // Assuming view-users implies high level admin
         // Add other admin routes here
     });
 

@@ -120,6 +120,26 @@
                             </span>
                         </a>
                     </li>
+                    @if(Auth::user()->profil_id)
+                        <li class="nav-item mx-2 {{ request()->routeIs('tv-pairing.index') ? 'rounded-4 text-white' : '' }}"
+                            style="{{ request()->routeIs('tv-pairing.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
+                            <a wire:navigate class="nav-link" href="{{ route('tv-pairing.index') }}">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-device-tv">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path d="M3 7m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
+                                        <path d="M16 3l-4 4l-4 -4" />
+                                    </svg>
+                                </span>
+                                <span class="nav-link-title text-white">
+                                    Tautkan TV
+                                </span>
+                            </a>
+                        </li>
+                    @endif
                     <li class="nav-item mx-2 {{ request()->routeIs('tema.index') ? 'rounded-4 text-white' : '' }}"
                         style="{{ request()->routeIs('tema.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
                         <a wire:navigate class="nav-link" href="{{ route('tema.index') }}">
@@ -276,6 +296,33 @@
                                     </a>
                                 </li>
                             @endcan
+                            @if(in_array(Auth::user()->role, ['Super Admin', 'Admin']))
+                                <li class="nav-item mx-2 {{ request()->routeIs('admin.tv-monitor.index') ? 'rounded-4 text-white' : '' }}"
+                                    style="{{ request()->routeIs('admin.tv-monitor.index') ? 'background-image: linear-gradient(135deg, #1e5fa3 0%, #7b2cbf 100%);' : '' }}">
+                                    <a wire:navigate class="nav-link"
+                                        href="{{ route('admin.tv-monitor.index') }}">
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon icon-tabler icons-tabler-outline icon-tabler-device-desktop-analytics">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M3 4m0 1a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1z" />
+                                                <path d="M7 20h10" />
+                                                <path d="M9 16v4" />
+                                                <path d="M15 16v4" />
+                                                <path d="M9 12v-4" />
+                                                <path d="M12 12v-1" />
+                                                <path d="M15 12v-2" />
+                                                <path d="M12 12v-1" />
+                                            </svg>
+                                        </span>
+                                        <span class="nav-link-title text-white">
+                                            Monitor TV
+                                        </span>
+                                    </a>
+                                </li>
+                            @endif
                         </div>
                     @endif
 
