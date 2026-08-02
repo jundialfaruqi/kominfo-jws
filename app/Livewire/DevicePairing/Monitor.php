@@ -39,7 +39,7 @@ class Monitor extends Component
                 if (!empty($this->search)) {
                     $query->where('pairing_code', 'like', '%' . $this->search . '%')
                           ->orWhereHas('profil', function ($q) {
-                              $q->where('nama_masjid', 'like', '%' . $this->search . '%');
+                              $q->where('name', 'like', '%' . $this->search . '%');
                           });
                 }
             })

@@ -60,8 +60,8 @@
                                     </td>
                                     <td>
                                         @if($device->profil)
-                                            <div class="fw-bold">{{ $device->profil->nama_masjid }}</div>
-                                            <div class="text-secondary small">{{ $device->profil->alamat }}</div>
+                                            <div class="fw-bold">{{ $device->profil->name }}</div>
+                                            <div class="text-secondary small">{{ $device->profil->address }}</div>
                                         @else
                                             <span class="text-danger">Profil Tidak Ditemukan</span>
                                         @endif
