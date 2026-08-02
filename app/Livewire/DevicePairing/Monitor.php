@@ -5,6 +5,7 @@ namespace App\Livewire\DevicePairing;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\DevicePairing;
+use App\Events\DeviceUnpairedEvent;
 use Livewire\Attributes\Title;
 
 class Monitor extends Component
@@ -24,8 +25,10 @@ class Monitor extends Component
     {
         $pairing = DevicePairing::findOrFail($id);
         
-        // Return status to pending or delete it? We'll just delete the pairing record
-        // so the TV is forced to request a new code if it reconnects.
+        // Broadcast event ke TV yang mungkin sedang menyala agar ia memutuskan koneksinya secara real-time
+        broadcast(new DeviceUnpairedEvent($pairing->device_id));
+
+        // Hapus data pairing
         $pairing->delete();
 
         session()->flash('success', 'TV berhasil diputus dari masjid.');
