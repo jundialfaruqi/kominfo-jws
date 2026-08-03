@@ -32,14 +32,15 @@
                                                 <i class="fas fa-mosque me-2"></i> Masjid: {{ $masjidName }}
                                             </div>
                                             @if ($groupedDevices->first()->profil && $groupedDevices->first()->profil->address)
-                                                <div class="text-secondary small mt-1" style="font-size: 0.75rem; margin-left: 1.5rem;">
-                                                    <i class="fas fa-map-marker-alt me-1"></i> {{ $groupedDevices->first()->profil->address }}
+                                                <div class="text-secondary small mt-1"
+                                                    style="font-size: 0.75rem; margin-left: 1.5rem;">
+                                                    {{ $groupedDevices->first()->profil->address }}
                                                 </div>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
-                                @foreach($groupedDevices as $device)
+                                @foreach ($groupedDevices as $device)
                                     <tr>
                                         <td>
                                             <span id="status-badge-{{ $device->device_id }}"
@@ -107,9 +108,10 @@
             });
 
             // ── Pusher Presence Channel: status online/offline real-time ──
-            const PUSHER_KEY    = '{{ config("broadcasting.connections.reverb.key") }}';
-            const PUSHER_HOST   = window.location.hostname;
-            const PUSHER_PORT   = window.location.protocol === 'https:' ? 443 : {{ config("broadcasting.connections.reverb.options.port", 8080) }};
+            const PUSHER_KEY = '{{ config('broadcasting.connections.reverb.key') }}';
+            const PUSHER_HOST = window.location.hostname;
+            const PUSHER_PORT = window.location.protocol === 'https:' ? 443 :
+                {{ config('broadcasting.connections.reverb.options.port', 8080) }};
             const PUSHER_SCHEME = window.location.protocol === 'https:' ? 'https' : 'http';
 
             // Collect all device IDs on the page
@@ -124,28 +126,30 @@
                     enabledTransports: ['ws', 'wss'],
                     cluster: 'mt1',
                     channelAuthorization: {
-                        customHandler: function (params, callback) {
+                        customHandler: function(params, callback) {
                             fetch('/broadcasting/auth/custom', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                                },
-                                body: 'socket_id=' + encodeURIComponent(params.socketId) + '&channel_name=' + encodeURIComponent(params.channelName),
-                                credentials: 'include'
-                            })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error('HTTP error ' + response.status);
-                                }
-                                return response.json();
-                            })
-                            .then(data => {
-                                callback(false, data);
-                            })
-                            .catch(error => {
-                                callback(true, error);
-                            });
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                            ?.getAttribute('content') || ''
+                                    },
+                                    body: 'socket_id=' + encodeURIComponent(params.socketId) +
+                                        '&channel_name=' + encodeURIComponent(params.channelName),
+                                    credentials: 'include'
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('HTTP error ' + response.status);
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    callback(false, data);
+                                })
+                                .catch(error => {
+                                    callback(true, error);
+                                });
                         }
                     }
                 });
