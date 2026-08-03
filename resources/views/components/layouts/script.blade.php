@@ -2,6 +2,7 @@
 <script data-navigate-once src="{{ asset('theme/dist/js/tabler.min.js') }}" defer></script>
 <script data-navigate-once src="{{ asset('theme/dist/js/demo.min.js') }}" defer></script>
 <script data-navigate-once src="https://cdn.jsdelivr.net/npm/izitoast/dist/js/iziToast.min.js"></script>
+<script data-navigate-once src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 {{-- Toggle Password Script --}}
 <script>
     function togglePassword(inputId, button) {

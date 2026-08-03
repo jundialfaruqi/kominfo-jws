@@ -168,6 +168,7 @@ use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
 use App\Http\Controllers\Api\V2\MyMasjidController;
 use App\Http\Controllers\Api\V2\ThemeController;
 use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\DeviceBroadcastAuthController;
 
 // ==========================================
 // [ROUTE API VERSI 2]
@@ -191,6 +192,10 @@ Route::prefix('v2')->group(function () {
     // API untuk Device Pairing (TV)
     Route::post('device/request-code', [DeviceController::class, 'requestCode'])
         ->name('api.v2.device.request-code');
-    
+
+    // Auth Pusher Presence Channel untuk TV (tanpa login)
+    Route::post('device/broadcasting/auth', [DeviceBroadcastAuthController::class, 'auth'])
+        ->name('api.v2.device.broadcasting.auth');
+
 });
 

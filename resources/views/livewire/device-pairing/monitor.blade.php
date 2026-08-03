@@ -15,6 +15,7 @@
                     <table class="table card-table table-vcenter text-nowrap datatable">
                         <thead>
                             <tr>
+                                <th>Status</th>
                                 <th>Device ID</th>
                                 <th>Kode Aktivasi</th>
                                 <th>Perangkat</th>
@@ -25,7 +26,13 @@
                         </thead>
                         <tbody>
                             @forelse ($devices as $device)
-                                <tr>
+                                <tr id="device-row-{{ $device->id }}">
+                                    <td>
+                                        <span id="status-badge-{{ $device->device_id }}"
+                                            class="badge bg-secondary text-secondary-fg">
+                                            <span class="status-dot me-1">●</span> Memeriksa...
+                                        </span>
+                                    </td>
                                     <td>
                                         <span class="text-secondary">{{ Str::limit($device->device_id, 15) }}</span>
                                     </td>
@@ -63,7 +70,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center py-4 text-secondary">
+                                    <td colspan="7" class="text-center py-4 text-secondary">
                                         Tidak ada TV yang sedang terhubung.
                                     </td>
                                 </tr>
@@ -90,6 +97,62 @@
                     position: 'topRight'
                 });
             });
+
+            // ── Pusher Presence Channel: status online/offline real-time ──
+            const PUSHER_KEY    = '{{ config("broadcasting.connections.reverb.key") }}';
+            const PUSHER_HOST   = '{{ config("reverb.servers.reverb.host") }}';
+            const PUSHER_PORT   = {{ config("reverb.servers.reverb.port") }};
+            const PUSHER_SCHEME = '{{ config("reverb.apps.apps.0.options.scheme", "http") }}';
+
+            // Collect all device IDs on the page
+            const deviceIds = @json($devices->pluck('device_id')->toArray());
+
+            if (typeof Pusher !== 'undefined' && deviceIds.length > 0) {
+                const pusher = new Pusher(PUSHER_KEY, {
+                    wsHost: PUSHER_HOST,
+                    wsPort: PUSHER_PORT,
+                    wssPort: PUSHER_PORT,
+                    forceTLS: PUSHER_SCHEME === 'https',
+                    enabledTransports: ['ws', 'wss'],
+                    disableStats: true,
+                    cluster: 'mt1',
+                });
+
+                function setBadge(deviceId, isOnline) {
+                    const badge = document.getElementById(`status-badge-${deviceId}`);
+                    if (!badge) return;
+                    if (isOnline) {
+                        badge.className = 'badge bg-success text-success-fg';
+                        badge.innerHTML = '<span class="status-dot me-1">●</span> Online';
+                    } else {
+                        badge.className = 'badge bg-danger text-danger-fg';
+                        badge.innerHTML = '<span class="status-dot me-1">●</span> Offline';
+                    }
+                }
+
+                deviceIds.forEach(deviceId => {
+                    const channel = pusher.subscribe(`presence-device-${deviceId}`);
+
+                    channel.bind('pusher:subscription_succeeded', members => {
+                        // Jika ada member lain (TV) selain admin browser ini
+                        const count = members.count;
+                        setBadge(deviceId, count > 1); // admin sendiri = 1
+                    });
+
+                    channel.bind('pusher:member_added', member => {
+                        setBadge(deviceId, true);
+                    });
+
+                    channel.bind('pusher:member_removed', member => {
+                        // Cek apakah masih ada member lain
+                        const count = channel.members.count;
+                        setBadge(deviceId, count > 1);
+                    });
+                });
+            } else {
+                // Pusher JS belum dimuat, set semua offline
+                deviceIds.forEach(deviceId => setBadge(deviceId, false));
+            }
         </script>
     @endscript
 </div>
