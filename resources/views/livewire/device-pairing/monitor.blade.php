@@ -29,7 +29,7 @@
                                     <td colspan="6" class="text-primary" style="background-color: #f4f6fa;">
                                         <div class="d-flex flex-column">
                                             <div class="fw-bold text-uppercase">
-                                                <i class="fas fa-mosque me-2"></i> Masjid: {{ $masjidName }}
+                                                Masjid: {{ $masjidName }}
                                             </div>
                                             @if ($groupedDevices->first()->profil && $groupedDevices->first()->profil->address)
                                                 <div class="text-secondary small mt-1" style="font-size: 0.75rem;">
