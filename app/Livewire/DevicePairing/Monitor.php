@@ -36,18 +36,19 @@ class Monitor extends Component
 
     public function render()
     {
-        $devices = DevicePairing::with('profil')
-            ->where('status', 'linked')
+        $devices = DevicePairing::select('device_pairings.*')
+            ->leftJoin('profils', 'device_pairings.profil_id', '=', 'profils.id')
+            ->with('profil')
+            ->where('device_pairings.status', 'linked')
             ->where(function ($query) {
                 if (!empty($this->search)) {
-                    $query->where('pairing_code', 'like', '%' . $this->search . '%')
-                          ->orWhereHas('profil', function ($q) {
-                              $q->where('name', 'like', '%' . $this->search . '%');
-                          });
+                    $query->where('device_pairings.pairing_code', 'like', '%' . $this->search . '%')
+                          ->orWhere('profils.name', 'like', '%' . $this->search . '%');
                 }
             })
-            ->latest()
-            ->paginate(15);
+            ->orderBy('profils.name', 'asc')
+            ->orderBy('device_pairings.created_at', 'desc')
+            ->paginate(10);
 
         return view('livewire.device-pairing.monitor', [
             'devices' => $devices

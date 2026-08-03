@@ -19,58 +19,56 @@
                                 <th>Device ID</th>
                                 <th>Kode Aktivasi</th>
                                 <th>Perangkat</th>
-                                <th>Profil Masjid</th>
-                                <th>Tanggal Taut</th>
+                                <th>Diaktifkan Pada</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($devices as $device)
-                                <tr id="device-row-{{ $device->id }}">
-                                    <td>
-                                        <span id="status-badge-{{ $device->device_id }}"
-                                            class="badge bg-secondary text-secondary-fg">
-                                            <span class="status-dot me-1">●</span> Memeriksa...
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="text-secondary">{{ Str::limit($device->device_id, 15) }}</span>
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="badge bg-blue text-blue-fg fw-bold">{{ $device->pairing_code }}</span>
-                                    </td>
-                                    <td>
-                                        @if ($device->device_brand || $device->device_model)
-                                            <div class="fw-bold text-capitalize">{{ $device->device_brand }}
-                                                {{ $device->device_model }}</div>
-                                            <div class="text-secondary small">{{ $device->os_version ?? '-' }}</div>
-                                        @else
-                                            <span class="text-secondary">-</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($device->profil)
-                                            <div class="fw-bold">{{ $device->profil->name }}</div>
-                                            <div class="text-secondary small">{{ $device->profil->address }}</div>
-                                        @else
-                                            <span class="text-danger">Profil Tidak Ditemukan</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        {{ $device->updated_at->format('d M Y, H:i') }}
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger rounded-3"
-                                            wire:click="unlinkDevice({{ $device->id }})"
-                                            wire:confirm="Apakah Anda yakin ingin memutus TV ini dari masjid tersebut?">
-                                            Putuskan TV
-                                        </button>
+                            @forelse ($devices->groupBy(fn($d) => $d->profil->name ?? 'Tanpa Profil Masjid') as $masjidName => $groupedDevices)
+                                <tr class="table-light">
+                                    <td colspan="6" class="fw-bold text-primary text-uppercase" style="background-color: #f4f6fa;">
+                                        <i class="fas fa-mosque me-2"></i> Masjid: {{ $masjidName }}
                                     </td>
                                 </tr>
+                                @foreach($groupedDevices as $device)
+                                    <tr>
+                                        <td>
+                                            <span id="status-badge-{{ $device->device_id }}"
+                                                class="badge bg-secondary text-secondary-fg">
+                                                <span class="status-dot me-1">●</span> Memeriksa...
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-secondary">{{ Str::limit($device->device_id, 15) }}</span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge bg-blue text-blue-fg fw-bold">{{ $device->pairing_code }}</span>
+                                        </td>
+                                        <td>
+                                            @if ($device->device_brand || $device->device_model)
+                                                <div class="fw-bold text-capitalize">{{ $device->device_brand }}
+                                                    {{ $device->device_model }}</div>
+                                                <div class="text-secondary small">{{ $device->os_version ?? '-' }}</div>
+                                            @else
+                                                <span class="text-secondary">-</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ $device->updated_at->format('d M Y, H:i') }}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger rounded-3"
+                                                wire:click="unlinkDevice({{ $device->id }})"
+                                                wire:confirm="Apakah Anda yakin ingin memutus TV ini dari masjid tersebut?">
+                                                Putuskan TV
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-secondary">
+                                    <td colspan="6" class="text-center py-4 text-secondary">
                                         Tidak ada TV yang sedang terhubung.
                                     </td>
                                 </tr>
@@ -80,7 +78,7 @@
                 </div>
                 @if ($devices->hasPages())
                     <div class="card-footer d-flex align-items-center border-top-0">
-                        {{ $devices->links() }}
+                        {{ $devices->links(data: ['scrollTo' => false]) }}
                     </div>
                 @endif
             </div>
