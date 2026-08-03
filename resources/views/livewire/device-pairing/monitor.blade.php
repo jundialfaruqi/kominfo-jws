@@ -100,9 +100,9 @@
 
             // ── Pusher Presence Channel: status online/offline real-time ──
             const PUSHER_KEY    = '{{ config("broadcasting.connections.reverb.key") }}';
-            const PUSHER_HOST   = '{{ config("reverb.servers.reverb.host") }}';
-            const PUSHER_PORT   = {{ config("reverb.servers.reverb.port") }};
-            const PUSHER_SCHEME = '{{ config("reverb.apps.apps.0.options.scheme", "http") }}';
+            const PUSHER_HOST   = '{{ config("broadcasting.connections.reverb.options.host") }}';
+            const PUSHER_PORT   = {{ config("broadcasting.connections.reverb.options.port") }};
+            const PUSHER_SCHEME = '{{ config("broadcasting.connections.reverb.options.scheme", "https") }}';
 
             // Collect all device IDs on the page
             const deviceIds = @json($devices->pluck('device_id')->toArray());

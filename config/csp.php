@@ -68,6 +68,7 @@ return [
             'https://code.jquery.com',
             'https://time.now',
             'https://timeapi.io',
+            'https://js.pusher.com',
         ]],
 
         // Allow media (audio) from self
