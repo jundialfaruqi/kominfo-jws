@@ -116,7 +116,7 @@
                     enabledTransports: ['ws', 'wss'],
                     disableStats: true,
                     cluster: 'mt1',
-                    authEndpoint: '/broadcasting/auth',
+                    authEndpoint: '/broadcasting/auth/custom',
                     auth: {
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
