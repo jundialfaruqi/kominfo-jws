@@ -90,10 +90,11 @@
 
     @script
         <script>
-            $wire.on('success', message => {
+            $wire.on('success', event => {
+                let msg = Array.isArray(event) ? (event[0].message || event[0]) : (event.message || event);
                 iziToast.success({
                     title: 'Berhasil',
-                    message,
+                    message: msg,
                     position: 'topRight'
                 });
             });
