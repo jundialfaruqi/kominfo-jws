@@ -32,8 +32,7 @@
                                                 <i class="fas fa-mosque me-2"></i> Masjid: {{ $masjidName }}
                                             </div>
                                             @if ($groupedDevices->first()->profil && $groupedDevices->first()->profil->address)
-                                                <div class="text-secondary small mt-1"
-                                                    style="font-size: 0.75rem; margin-left: 1.5rem;">
+                                                <div class="text-secondary small mt-1" style="font-size: 0.75rem;">
                                                     {{ $groupedDevices->first()->profil->address }}
                                                 </div>
                                             @endif
