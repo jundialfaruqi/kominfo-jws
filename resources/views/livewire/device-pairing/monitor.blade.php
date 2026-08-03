@@ -13,16 +13,7 @@
                 </div>
                 <div class="table-responsive">
                     <table class="table card-table table-vcenter text-nowrap datatable">
-                        <thead>
-                            <tr>
-                                <th>Status</th>
-                                <th>Device ID</th>
-                                <th>Kode Aktivasi</th>
-                                <th>Perangkat</th>
-                                <th>Diaktifkan Pada</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
+
                         <tbody>
                             @forelse ($devices->groupBy(fn($d) => $d->profil->name ?? 'Tanpa Profil Masjid') as $masjidName => $groupedDevices)
                                 <tr class="table-light">
@@ -38,6 +29,14 @@
                                             @endif
                                         </div>
                                     </td>
+                                </tr>
+                                <tr class="text-muted small" style="background-color: #fcfcfc;">
+                                    <th class="fw-bold">Status</th>
+                                    <th class="fw-bold">Device ID</th>
+                                    <th class="fw-bold">Kode Aktivasi</th>
+                                    <th class="fw-bold">Perangkat</th>
+                                    <th class="fw-bold">Diaktifkan Pada</th>
+                                    <th class="fw-bold">Aksi</th>
                                 </tr>
                                 @foreach ($groupedDevices as $device)
                                     <tr>
