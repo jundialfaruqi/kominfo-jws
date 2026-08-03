@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -31,7 +32,7 @@ class DevicePairedEvent implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new Channel('device-' . $this->devicePairing->device_id),
+            new PresenceChannel('device-' . $this->devicePairing->device_id),
         ];
     }
 
