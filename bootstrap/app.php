@@ -22,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'jumbotron.permission' => \App\Http\Middleware\JumbotronPermission::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            '/broadcasting/auth',
+            '/broadcasting/auth/custom',
+        ]);
+
         // Append CSP middleware to the global middleware stack
         $middleware->append(AddCspHeaders::class);
     })

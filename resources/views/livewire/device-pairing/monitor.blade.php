@@ -114,12 +114,30 @@
                     wssPort: PUSHER_PORT,
                     forceTLS: PUSHER_SCHEME === 'https',
                     enabledTransports: ['ws', 'wss'],
-                    disableStats: true,
                     cluster: 'mt1',
-                    authEndpoint: '/broadcasting/auth/custom',
-                    auth: {
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    channelAuthorization: {
+                        customHandler: function (params, callback) {
+                            fetch('/broadcasting/auth/custom', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                                },
+                                body: 'socket_id=' + encodeURIComponent(params.socketId) + '&channel_name=' + encodeURIComponent(params.channelName),
+                                credentials: 'include'
+                            })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('HTTP error ' + response.status);
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                callback(false, data);
+                            })
+                            .catch(error => {
+                                callback(true, error);
+                            });
                         }
                     }
                 });

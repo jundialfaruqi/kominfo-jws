@@ -36,7 +36,8 @@ use App\Livewire\DevicePairing\Monitor as DevicePairingMonitor;
 
 // Custom broadcasting auth for debugging
 Route::post('/broadcasting/auth/custom', function (Illuminate\Http\Request $request) {
-    \Illuminate\Support\Facades\Log::info('Custom auth hit. User is: ' . ($request->user() ? $request->user()->id : 'NULL'));
+    \Illuminate\Support\Facades\Log::info('Custom auth hit. Cookies: ' . json_encode($request->cookie()));
+    \Illuminate\Support\Facades\Log::info('User is: ' . ($request->user() ? $request->user()->id : 'NULL'));
     
     // Process broadcast auth manually
     try {
