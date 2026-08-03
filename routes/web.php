@@ -34,34 +34,7 @@ use App\Livewire\GroupCategory\Group as GroupCategoryGroup;
 use App\Livewire\DevicePairing\Index as DevicePairingIndex;
 use App\Livewire\DevicePairing\Monitor as DevicePairingMonitor;
 
-// Custom broadcasting auth for debugging
-Route::post('/broadcasting/auth/custom', function (Illuminate\Http\Request $request) {
-    $socketId = $request->input('socket_id');
-    $channelName = $request->input('channel_name');
-    
-    $user = $request->user();
-    
-    // Default presence data untuk admin yang belum terdeteksi (fallback)
-    // agar websocket tetap bisa nyambung meskipun cookie bermasalah
-    $channelData = [
-        'user_id' => $user ? 'admin-' . $user->id : 'admin-guest-' . rand(1000,9999),
-        'user_info' => [
-            'name' => $user ? $user->name : 'Admin Guest'
-        ]
-    ];
-    
-    $channelDataJson = json_encode($channelData);
-    $stringToSign = $socketId . ':' . $channelName . ':' . $channelDataJson;
-    $secret = config('broadcasting.connections.reverb.secret');
-    $key = config('broadcasting.connections.reverb.key');
-    
-    $signature = hash_hmac('sha256', $stringToSign, $secret);
-    
-    return response()->json([
-        'auth' => $key . ':' . $signature,
-        'channel_data' => $channelDataJson
-    ]);
-});
+
 
 Route::get('/', Welcome::class)->name('welcome.index');
 
@@ -89,6 +62,24 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
 
     // TV Pairing Route
     Route::get('/tv-pairing', DevicePairingIndex::class)->name('tv-pairing.index');
+
+    // TV Monitor Presence Auth
+    Route::post('/broadcasting/auth/custom', function (Illuminate\Http\Request $request) {
+        $user = $request->user();
+        
+        $channelData = [
+            'user_id' => 'admin-' . $user->id,
+            'user_info' => ['name' => $user->name]
+        ];
+        
+        $channelDataJson = json_encode($channelData);
+        $stringToSign = $request->input('socket_id') . ':' . $request->input('channel_name') . ':' . $channelDataJson;
+        
+        return response()->json([
+            'auth' => config('broadcasting.connections.reverb.key') . ':' . hash_hmac('sha256', $stringToSign, config('broadcasting.connections.reverb.secret')),
+            'channel_data' => $channelDataJson
+        ]);
+    });
 
     // Admin Routes
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
