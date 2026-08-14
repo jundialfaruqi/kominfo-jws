@@ -3,82 +3,80 @@
         <div class="container-xl">
 
             <!-- Form Card -->
-            <div class="card rounded-4 bg-transparent border-0 my-md-8">
+            <div class="card rounded-4 bg-transparent border-0 my-md-4">
                 <div class="card-body p-0">
                     <div class="row justify-content-center">
-                        <div class="col-md-10 col-lg-4">
-                            <p class="text-right text-secondary mb-4">
-                                Masukkan 6 digit kode yang tampil di layar TV untuk menyambungkan TV dengan profil
-                                masjid Anda
-                                secara instan.
-                            </p>
+                        {{-- <div class="col-md-10 col-lg-4"> --}}
+                        <p class="text-right text-secondary mb-4">
+                            Masukkan 6 digit kode yang tampil di layar TV untuk menyambungkan TV dengan profil
+                            masjid Anda
+                            secara instan.
+                        </p>
 
-                            <form wire:submit.prevent="linkDevice">
-                                <div class="row g-3 align-items-end">
-                                    <div class="col-md-8">
-                                        <div class="form-label">Masukkan Kode 6 Digit</div>
-                                        <input type="text" wire:model="pairingCode" placeholder="Contoh: X7B9KL"
-                                            class="form-control rounded-3 text-uppercase" maxlength="6" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <button type="submit" class="btn btn-primary rounded-3 w-100"
-                                            wire:loading.attr="disabled">
-                                            <span wire:loading.remove wire:target="linkDevice">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                    class="icon icon-tabler icon-tabler-link" width="24"
-                                                    height="24" viewBox="0 0 24 24" stroke-width="2"
-                                                    stroke="currentColor" fill="none" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                    <path d="M9 15l6 -6" />
-                                                    <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" />
-                                                    <path
-                                                        d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" />
-                                                </svg>
-                                                Tautkan TV
-                                            </span>
-                                            <span wire:loading wire:target="linkDevice">
-                                                <span class="spinner-border spinner-border-sm me-2"
-                                                    role="status"></span>
-                                                Menautkan...
-                                            </span>
-                                        </button>
-                                    </div>
+                        <form wire:submit.prevent="linkDevice">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-8">
+                                    <div class="form-label">Masukkan Kode 6 Digit</div>
+                                    <input type="text" wire:model="pairingCode" placeholder="Contoh: X7B9KL"
+                                        class="form-control rounded-3 text-uppercase" maxlength="6" required>
                                 </div>
-                            </form>
-
-                            <div class="hr-text my-4">Atau Scan QR Otomatis</div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <button type="button" class="btn btn-outline-primary rounded-3 w-100"
-                                        data-bs-toggle="modal" data-bs-target="#qrScannerModal">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="icon icon-tabler icon-tabler-qrcode" width="24" height="24"
-                                            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                            <path
-                                                d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                            <path d="M7 17l0 .01" />
-                                            <path
-                                                d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                            <path d="M7 7l0 .01" />
-                                            <path
-                                                d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                            <path d="M17 7l0 .01" />
-                                            <path d="M14 14l3 0" />
-                                            <path d="M17 14l0 3" />
-                                            <path d="M14 14l0 3" />
-                                            <path d="M14 17l3 0" />
-                                            <path d="M17 17l3 0" />
-                                            <path d="M20 14l0 3" />
-                                        </svg>
-                                        Scan QR Code TV
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary rounded-3 w-100"
+                                        wire:loading.attr="disabled">
+                                        <span wire:loading.remove wire:target="linkDevice">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="icon icon-tabler icon-tabler-link" width="24" height="24"
+                                                viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                                                fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M9 15l6 -6" />
+                                                <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" />
+                                                <path
+                                                    d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" />
+                                            </svg>
+                                            Tautkan TV
+                                        </span>
+                                        <span wire:loading wire:target="linkDevice">
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            Menautkan...
+                                        </span>
                                     </button>
                                 </div>
                             </div>
+                        </form>
+
+                        <div class="hr-text my-4">Atau Scan QR Otomatis</div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-outline-primary rounded-3 w-100"
+                                    data-bs-toggle="modal" data-bs-target="#qrScannerModal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-qrcode"
+                                        width="24" height="24" viewBox="0 0 24 24" stroke-width="2"
+                                        stroke="currentColor" fill="none" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path
+                                            d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                        <path d="M7 17l0 .01" />
+                                        <path
+                                            d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                        <path d="M7 7l0 .01" />
+                                        <path
+                                            d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+                                        <path d="M17 7l0 .01" />
+                                        <path d="M14 14l3 0" />
+                                        <path d="M17 14l0 3" />
+                                        <path d="M14 14l0 3" />
+                                        <path d="M14 17l3 0" />
+                                        <path d="M17 17l3 0" />
+                                        <path d="M20 14l0 3" />
+                                    </svg>
+                                    Scan QR Code TV
+                                </button>
+                            </div>
                         </div>
+                        {{-- </div> --}}
                     </div>
                 </div>
             </div>
