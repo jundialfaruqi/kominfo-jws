@@ -27,6 +27,7 @@ return [
             'https://code.jquery.com',
             'https://use.fontawesome.com',
             'https://js.pusher.com',
+            'https://unpkg.com',
         ]],
 
         // Allow external styles (e.g., Google Fonts) and inline styles for Blade
