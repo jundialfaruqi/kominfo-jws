@@ -8,11 +8,11 @@
             <a wire:navigate href="{{ route('dashboard.index') }}">
                 <span class="navbar-brand-image">
                     <a wire:navigate href="{{ route('dashboard.index') }}">
-                        <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
+                        <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Pekanbaru"
                             class="navbar-brand-image">
                     </a>
                 </span>
-                <span class="navbar-brand-text">JWS Diskominfo</span>
+                <span class="navbar-brand-text">JWS Pekanbaru</span>
             </a>
         </h1>
         <div class="navbar-nav flex-row d-lg-none">

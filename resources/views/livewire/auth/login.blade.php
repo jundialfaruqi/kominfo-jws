@@ -1,6 +1,6 @@
 <div class="card card-md shadow-sm rounded-4 border-0">
     <div class="card-body">
-        <h2 class="h2 text-center mb-1">JWS Diskominfo</h2>
+        <h2 class="h2 text-center mb-1">JWS Pekanbaru</h2>
         <div class="text-muted small text-center mb-5">Aplikasi Jadwal Waktu Sholat Pekanbaru</div>
 
         @if (session('status'))
