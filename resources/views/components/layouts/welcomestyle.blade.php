@@ -49,6 +49,12 @@
         color: #1d1d1f;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    main {
+        flex: 1 0 auto;
     }
 
     h1, h2, h3, h4, h5, h6, .navbar-brand, .font-display, .fw-bold {
@@ -61,7 +67,7 @@
 
     /* Color Utilities */
     .bg-gov { background-color: #0071e3; }
-    .bg-gov-dark { background-color: #fbfbfd; }
+    .bg-gov-dark { background-color: #1d1d1f; }
     .text-gov-dark { color: #1d1d1f; }
     .bg-soft { background-color: #ffffff; }
 

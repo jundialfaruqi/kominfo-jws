@@ -10,13 +10,24 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top border-bottom shadow-sm">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('welcome.index') }}">
                 <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
                     class="navbar-brand-image me-1">
                 <span class="fw-bold">JWS Diskominfo</span>
             </a>
+            <div class="ms-auto d-none d-lg-block">
+                @auth
+                    <a class="nav-ghost-btn" href="{{ route('dashboard.index') }}">
+                        <i class="fa-solid fa-gauge"></i> Dashboard
+                    </a>
+                @else
+                    <a class="nav-ghost-btn" href="{{ route('login') }}">
+                        <i class="fa-solid fa-right-to-bracket"></i> Login
+                    </a>
+                @endauth
+            </div>
         </div>
     </nav>
 
@@ -33,22 +44,22 @@
                     </div>
                     <div>© {{ date('Y') }} Diskominfo Pekanbaru</div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <a class="btn btn-outline-light rounded-circle m-1"
-                        href="https://www.youtube.com/c/InfoPemkoPekanbaru">
+                <div
+                    class="col-md-6 text-md-end mt-4 mt-md-0 d-flex justify-content-md-end justify-content-start align-items-center">
+                    <a class="footer-icon" href="https://www.youtube.com/c/InfoPemkoPekanbaru" aria-label="YouTube">
                         <i class="fab fa-youtube"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.pekanbaru.go.id/">
+                    <a class="footer-icon" href="https://www.pekanbaru.go.id/" aria-label="Website Pemko">
                         <i class="fa-solid fa-arrow-up-right-from-square"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.instagram.com/diskominfopku/">
+                    <a class="footer-icon" href="https://www.instagram.com/diskominfopku/" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1" href="https://www.instagram.com/diskominfopku/">
+                    <a class="footer-icon" href="https://www.instagram.com/diskominfopku/" aria-label="WhatsApp">
                         <i class="fab fa-whatsapp"></i>
                     </a>
-                    <a class="btn btn-outline-light rounded-circle m-1"
-                        href="https://drive.google.com/file/d/1Q1AwnytOJj_5id_6qzq_qtkuCzAsLNCt/view?usp=sharing">
+                    <a class="footer-icon" href="{{ asset('download/JWS Web V-1.0.apk') }}" download
+                        aria-label="Download APK">
                         <i class="fab fa-android"></i>
                     </a>
                 </div>

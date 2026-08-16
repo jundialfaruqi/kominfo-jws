@@ -44,7 +44,9 @@
             </div>
         </div>
     </nav>
-    <section class="hero">
+
+    <main>
+        <section class="hero">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4 mb-lg-0">
@@ -507,6 +509,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <footer class="footer py-5 bg-gov-dark text-white">
         <div class="container">
