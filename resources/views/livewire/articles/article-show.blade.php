@@ -47,8 +47,8 @@
         <div class="row g-4 g-lg-5">
             {{-- Left Column: Article Content & Related --}}
             <div class="col-lg-8">
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb">
+                <nav aria-label="breadcrumb" class="mt-4 mt-lg-0 mb-0">
+                    <ol class="breadcrumb mb-0">
                         <li class="breadcrumb-item"><a href="{{ route('welcome.index') }}"
                                 class="text-decoration-none">Beranda</a></li>
                         <li class="breadcrumb-item"><a href="#" class="text-decoration-none">Berita</a></li>
