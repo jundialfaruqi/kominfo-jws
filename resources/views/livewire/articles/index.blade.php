@@ -1,6 +1,6 @@
 <div>
     @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
         <style>
             .note-editor.note-frame {
                 border-radius: 12px;
@@ -56,6 +56,22 @@
                     });
                 });
 
+                // Script Loader untuk mencegah race condition di Livewire SPA
+                function loadScript(src) {
+                    return new Promise((resolve, reject) => {
+                        // Cek jika script sudah pernah ditambahkan
+                        if (document.querySelector(`script[src="${src}"]`)) {
+                            resolve();
+                            return;
+                        }
+                        const script = document.createElement('script');
+                        script.src = src;
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+
                 // Summernote Init
                 let isInitializing = false;
 
@@ -63,37 +79,49 @@
                     if (isInitializing) return;
                     isInitializing = true;
 
-                    setTimeout(() => {
-                        $('#summernote').summernote({
-                            placeholder: 'Tulis konten berita disini...',
-                            tabsize: 2,
-                            height: 1000,
-                            toolbar: [
-                                ['style', ['style']],
-                                ['font', ['bold', 'underline', 'clear']],
-                                ['color', ['color']],
-                                ['para', ['ul', 'ol', 'paragraph']],
-                                ['table', ['table']],
-                                ['insert', ['link', 'picture', 'video']],
-                                ['view', ['fullscreen', 'codeview', 'help']]
-                            ],
-                            callbacks: {
-                                onChange: function(contents, $editable) {
-                                    @this.set('content', contents);
-                                }
+                    loadScript('https://code.jquery.com/jquery-3.6.0.min.js')
+                        .then(() => loadScript('https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js'))
+                        .then(() => {
+                            // Pastikan elemen masih ada di DOM
+                            if ($('#summernote').length === 0) {
+                                isInitializing = false;
+                                return;
                             }
+
+                            $('#summernote').summernote({
+                                placeholder: 'Tulis konten berita disini...',
+                                tabsize: 2,
+                                height: 1000,
+                                toolbar: [
+                                    ['style', ['style']],
+                                    ['font', ['bold', 'underline', 'clear']],
+                                    ['color', ['color']],
+                                    ['para', ['ul', 'ol', 'paragraph']],
+                                    ['table', ['table']],
+                                    ['insert', ['link', 'picture', 'video']],
+                                    ['view', ['fullscreen', 'codeview', 'help']]
+                                ],
+                                callbacks: {
+                                    onChange: function(contents, $editable) {
+                                        $wire.content = contents;
+                                    }
+                                }
+                            });
+
+                            if (content) {
+                                $('#summernote').summernote('code', content);
+                            }
+
+                            isInitializing = false;
+                        })
+                        .catch(err => {
+                            console.error("Gagal memuat Summernote:", err);
+                            isInitializing = false;
                         });
-
-                        if (content) {
-                            $('#summernote').summernote('code', content);
-                        }
-
-                        isInitializing = false;
-                    }, 100);
                 }
 
                 $wire.on('initSummernote', (data) => {
-                    if ($('#summernote').data('summernote')) {
+                    if (typeof $ !== 'undefined' && $('#summernote').length && $('#summernote').data('summernote')) {
                         $('#summernote').summernote('destroy');
                     }
                     initSummernote(data.content || '');
@@ -101,16 +129,18 @@
 
                 // Cleanup on component removal
                 document.addEventListener('livewire:navigating', () => {
-                    if ($('#summernote').data('summernote')) {
+                    if (typeof $ !== 'undefined' && $('#summernote').length && $('#summernote').data('summernote')) {
                         $('#summernote').summernote('destroy');
                     }
                 });
+
+                // Jika halaman direload dalam state form terbuka, init otomatis
+                if ($wire.showForm) {
+                    initSummernote($wire.content || '');
+                }
             </script>
         @endscript
     </div>
 
-    @push('scripts')
-        <script data-navigate-once src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script data-navigate-once src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.js"></script>
-    @endpush
+
 </div>

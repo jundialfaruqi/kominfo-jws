@@ -7,6 +7,7 @@ use App\Models\ArticleCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -20,6 +21,7 @@ class ArticleIndex extends Component
     public $paginate = 10;
     protected $paginationTheme = 'bootstrap';
 
+    #[Url(as: 'id')]
     public $articleId;
     public $title;
     public $article_category_id;
@@ -28,6 +30,10 @@ class ArticleIndex extends Component
     public $status = 'Draft';
     public $published_at;
 
+    #[Url(as: 'berita')]
+    public $mode = 'index';
+
+    // Internal state (not in URL)
     public $isEdit = false;
     public $showForm = false;
     public $showTable = true;
@@ -54,6 +60,16 @@ class ArticleIndex extends Component
     public function mount()
     {
         $this->published_at = now()->format('Y-m-d\TH:i');
+
+        if ($this->mode === 'create') {
+            $this->showAddForm();
+        } elseif ($this->mode === 'edit' && $this->articleId) {
+            $this->edit($this->articleId);
+        } else {
+            $this->mode = 'index';
+            $this->showForm = false;
+            $this->showTable = true;
+        }
     }
 
     public function updatingSearch()
@@ -88,6 +104,7 @@ class ArticleIndex extends Component
 
     public function showAddForm()
     {
+        $this->mode = 'create';
         $this->resetValidation();
         $this->reset(['articleId', 'title', 'article_category_id', 'description', 'content', 'status']);
         $this->published_at = now()->format('Y-m-d\TH:i');
@@ -99,6 +116,7 @@ class ArticleIndex extends Component
 
     public function edit($id)
     {
+        $this->mode = 'edit';
         $this->resetValidation();
         $article = Article::findOrFail($id);
 
@@ -118,10 +136,12 @@ class ArticleIndex extends Component
 
     public function cancelForm()
     {
+        $this->mode = 'index';
+        $this->articleId = null;
         $this->showForm = false;
         $this->showTable = true;
         $this->resetValidation();
-        $this->reset(['articleId', 'title', 'article_category_id', 'description', 'content', 'status', 'published_at']);
+        $this->reset(['title', 'article_category_id', 'description', 'content', 'status', 'published_at']);
     }
 
     public function save()
