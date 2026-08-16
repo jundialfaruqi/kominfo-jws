@@ -152,5 +152,14 @@
         });
 
         renderTable();
+        
+        // Mobile Accordion Toggle
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    this.classList.toggle('expanded');
+                }
+            });
+        });
     })();
 </script>

@@ -420,6 +420,133 @@
         font-weight: 600;
     }
 
+    @media (max-width: 768px) {
+        .schedule-month-table, .schedule-month-table tbody, .schedule-month-table tr, .schedule-month-table td {
+            display: block;
+            width: 100%;
+        }
+        .schedule-month-table thead {
+            display: none;
+        }
+        .schedule-month-table tr {
+            background: #ffffff;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .schedule-month-table tr:hover {
+            background-color: #ffffff;
+            box-shadow: none;
+            border-color: rgba(0,0,0,0.05);
+        }
+        /* Override Bootstrap's table-hover which targets td */
+        .schedule-month-table tbody tr:hover td {
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+        .schedule-month-table tr.today {
+            border-color: #0071e3;
+            background-color: #0071e3;
+            color: #ffffff;
+        }
+        .schedule-month-table tr.today:hover {
+            background-color: #0071e3;
+            border-color: #0071e3;
+        }
+        .schedule-month-table tr.today td,
+        .schedule-month-table tr.today:hover td {
+            background-color: transparent !important;
+            color: #ffffff !important;
+            border-bottom-color: rgba(255,255,255,0.2);
+        }
+        .schedule-month-table tr.today td::before {
+            color: rgba(255,255,255,0.8);
+        }
+        .schedule-month-table tr.today td:nth-child(1),
+        .schedule-month-table tr.today td:nth-child(2) {
+            color: #ffffff !important;
+        }
+        .schedule-month-table tr.today.expanded td:nth-child(3) {
+            border-top-color: rgba(255,255,255,0.2);
+        }
+        .schedule-month-table td {
+            display: none;
+            text-align: right !important;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            font-size: 1rem;
+        }
+        .schedule-month-table td:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .schedule-month-table td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: 600;
+            color: #86868b;
+            font-family: 'PlusJakartaSansText', sans-serif;
+        }
+        
+        .schedule-month-table td:nth-child(1),
+        .schedule-month-table td:nth-child(2) {
+            display: inline-block;
+            width: auto;
+            border-bottom: none;
+            padding: 0;
+            text-align: left !important;
+        }
+        .schedule-month-table td:nth-child(1)::before,
+        .schedule-month-table td:nth-child(2)::before {
+            display: none;
+        }
+        .schedule-month-table td:nth-child(1) {
+            font-size: 1.1rem;
+            margin-right: 6px;
+            color: #1d1d1f;
+        }
+        .schedule-month-table td:nth-child(2) {
+            font-size: 1.1rem;
+            color: #86868b;
+            font-weight: 400;
+        }
+        
+        .mobile-expand-icon {
+            position: absolute;
+            right: 20px;
+            top: 18px;
+            color: #0071e3;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .schedule-month-table tr.today .mobile-expand-icon {
+            color: #ffffff;
+        }
+        
+        .schedule-month-table tr.expanded {
+            padding-bottom: 16px;
+        }
+        .schedule-month-table tr.expanded .mobile-expand-icon {
+            transform: rotate(180deg);
+        }
+        .schedule-month-table tr.expanded td {
+            display: block;
+        }
+        .schedule-month-table tr.expanded td:nth-child(1),
+        .schedule-month-table tr.expanded td:nth-child(2) {
+            display: inline-block;
+        }
+        .schedule-month-table tr.expanded td:nth-child(3) {
+            margin-top: 12px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+            padding-top: 16px;
+        }
+    }
+
     /* Features Grid */
     .features-section {
         background-color: #fbfbfd;

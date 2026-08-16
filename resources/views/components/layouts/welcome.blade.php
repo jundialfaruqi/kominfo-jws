@@ -172,7 +172,7 @@
                             <tbody>
                                 @foreach ($jadwalSholat as $row)
                                     @php $isToday = !empty($todayIsoDate) && ($row['date'] ?? '') === $todayIsoDate; @endphp
-                                    <tr class="{{ $isToday ? 'today' : '' }}">
+                                    <tr class="{{ $isToday ? 'today expanded' : '' }}">
                                         @php
                                             $iso = $row['date'] ?? null;
                                             if ($iso) {
@@ -186,16 +186,19 @@
                                                 $tgl = trim($parts[1] ?? '');
                                             }
                                         @endphp
-                                        <td class="fw-bold text-gov-dark">{{ $hari }}</td>
-                                        <td class="text-gov-dark">{{ $tgl }}</td>
-                                        <td class="text-center time-cell">{{ $row['imsak'] ?? '' }}</td>
-                                        <td class="text-center time-cell fardhu">{{ $row['subuh'] ?? '' }}</td>
-                                        <td class="text-center time-cell">{{ $row['terbit'] ?? '' }}</td>
-                                        <td class="text-center time-cell">{{ $row['dhuha'] ?? '' }}</td>
-                                        <td class="text-center time-cell fardhu">{{ $row['dzuhur'] ?? '' }}</td>
-                                        <td class="text-center time-cell fardhu">{{ $row['ashar'] ?? '' }}</td>
-                                        <td class="text-center time-cell fardhu">{{ $row['maghrib'] ?? '' }}</td>
-                                        <td class="text-center time-cell fardhu">{{ $row['isya'] ?? '' }}</td>
+                                        <td data-label="Hari" class="fw-bold text-gov-dark">{{ $hari }}</td>
+                                        <td data-label="Tanggal" class="text-gov-dark">
+                                            {{ $tgl }}
+                                            <i class="fa-solid fa-chevron-down mobile-expand-icon d-md-none"></i>
+                                        </td>
+                                        <td data-label="Imsak" class="text-center time-cell">{{ $row['imsak'] ?? '' }}</td>
+                                        <td data-label="Subuh" class="text-center time-cell fardhu">{{ $row['subuh'] ?? '' }}</td>
+                                        <td data-label="Terbit" class="text-center time-cell">{{ $row['terbit'] ?? '' }}</td>
+                                        <td data-label="Dhuha" class="text-center time-cell">{{ $row['dhuha'] ?? '' }}</td>
+                                        <td data-label="Dzuhur" class="text-center time-cell fardhu">{{ $row['dzuhur'] ?? '' }}</td>
+                                        <td data-label="Ashar" class="text-center time-cell fardhu">{{ $row['ashar'] ?? '' }}</td>
+                                        <td data-label="Maghrib" class="text-center time-cell fardhu">{{ $row['maghrib'] ?? '' }}</td>
+                                        <td data-label="Isya" class="text-center time-cell fardhu">{{ $row['isya'] ?? '' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
