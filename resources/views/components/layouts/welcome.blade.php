@@ -76,7 +76,8 @@
     {{-- Section Jadwal sholat hari ini (card + countdown) --}}
     <section class="py-5">
         <div class="container">
-            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-end mb-4 border-bottom pb-3">
+            <div
+                class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-end mb-4 border-bottom pb-3">
                 @php
                     $todayLabel = \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->translatedFormat('l, d F Y');
                 @endphp
@@ -97,10 +98,12 @@
 
                 @if (!empty($nextPrayer) && !empty($nextPrayerAtIso))
                     <div id="countdown" class="text-lg-end mt-4 mt-lg-0" data-next-iso="{{ $nextPrayerAtIso }}">
-                        <div class="text-muted text-uppercase fw-bold countdown-next-label" style="letter-spacing: 0.05em; font-family: 'PlusJakartaSansDisplay', sans-serif;">
+                        <div class="text-muted text-uppercase fw-bold countdown-next-label"
+                            style="letter-spacing: 0.05em; font-family: 'PlusJakartaSansDisplay', sans-serif;">
                             <i class="fa-regular fa-bell me-1"></i> Menuju {{ ucfirst($nextPrayer) }}
                         </div>
-                        <div class="font-led mt-1 countdown-next-time" id="countdown-text" style="color: #0071e3; line-height: 1;">--:--:--</div>
+                        <div class="font-led mt-1 countdown-next-time" id="countdown-text"
+                            style="color: #0071e3; line-height: 1;">--:--:--</div>
                     </div>
                 @endif
             </div>
@@ -191,14 +194,22 @@
                                             {{ $tgl }}
                                             <i class="fa-solid fa-chevron-down mobile-expand-icon d-md-none"></i>
                                         </td>
-                                        <td data-label="Imsak" class="text-center time-cell">{{ $row['imsak'] ?? '' }}</td>
-                                        <td data-label="Subuh" class="text-center time-cell fardhu">{{ $row['subuh'] ?? '' }}</td>
-                                        <td data-label="Terbit" class="text-center time-cell">{{ $row['terbit'] ?? '' }}</td>
-                                        <td data-label="Dhuha" class="text-center time-cell">{{ $row['dhuha'] ?? '' }}</td>
-                                        <td data-label="Dzuhur" class="text-center time-cell fardhu">{{ $row['dzuhur'] ?? '' }}</td>
-                                        <td data-label="Ashar" class="text-center time-cell fardhu">{{ $row['ashar'] ?? '' }}</td>
-                                        <td data-label="Maghrib" class="text-center time-cell fardhu">{{ $row['maghrib'] ?? '' }}</td>
-                                        <td data-label="Isya" class="text-center time-cell fardhu">{{ $row['isya'] ?? '' }}</td>
+                                        <td data-label="Imsak" class="text-center time-cell">{{ $row['imsak'] ?? '' }}
+                                        </td>
+                                        <td data-label="Subuh" class="text-center time-cell fardhu">
+                                            {{ $row['subuh'] ?? '' }}</td>
+                                        <td data-label="Terbit" class="text-center time-cell">
+                                            {{ $row['terbit'] ?? '' }}</td>
+                                        <td data-label="Dhuha" class="text-center time-cell">{{ $row['dhuha'] ?? '' }}
+                                        </td>
+                                        <td data-label="Dzuhur" class="text-center time-cell fardhu">
+                                            {{ $row['dzuhur'] ?? '' }}</td>
+                                        <td data-label="Ashar" class="text-center time-cell fardhu">
+                                            {{ $row['ashar'] ?? '' }}</td>
+                                        <td data-label="Maghrib" class="text-center time-cell fardhu">
+                                            {{ $row['maghrib'] ?? '' }}</td>
+                                        <td data-label="Isya" class="text-center time-cell fardhu">
+                                            {{ $row['isya'] ?? '' }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -206,17 +217,30 @@
                     </div>
 
                     <!-- Pagination Controls -->
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 px-1" id="paginationWrapper" style="display: none;">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 px-1"
+                        id="paginationWrapper" style="display: none;">
                         <div class="d-flex align-items-center mb-3 mb-md-0">
-                            <span class="text-muted me-2" style="font-size: 0.9rem; font-family: 'PlusJakartaSansText', sans-serif;">Tampilkan:</span>
-                            <select id="pageSizeSelect" class="form-select form-select-sm rounded-pill apple-select" style="width: auto;">
+                            <span class="text-muted me-2"
+                                style="font-size: 0.9rem; font-family: 'PlusJakartaSansText', sans-serif;">Tampilkan:</span>
+                            <select id="pageSizeSelect" class="form-select form-select-sm rounded-pill apple-select"
+                                style="width: auto;">
                                 <option value="10" selected>10</option>
                                 <option value="all">Semua</option>
                             </select>
-                            <span class="text-muted ms-3" id="pageInfo" style="font-size: 0.9rem; font-family: 'PlusJakartaSansText', sans-serif;">Menampilkan 0 data</span>
+                            <span class="text-muted ms-3" id="pageInfo"
+                                style="font-size: 0.9rem; font-family: 'PlusJakartaSansText', sans-serif;">Menampilkan
+                                0 data</span>
                         </div>
                         <div id="paginationControls"></div>
                     </div>
+                </div>
+
+                <!-- Data Source Info -->
+                <div class="mt-3 text-center text-md-center px-2">
+                    <small class="text-muted" style="font-size: 0.8rem;">
+                        <i class="fa-solid fa-circle-info me-1 opacity-75"></i> Data jadwal waktu sholat bersumber
+                        dari ketetapan resmi <strong>Kementerian Agama RI</strong> (via API MyQuran).
+                    </small>
                 </div>
             @else
                 <div class="text-muted">Data jadwal belum tersedia.</div>
@@ -230,8 +254,8 @@
             <p class="text-muted">Desain antarmuka eksklusif untuk Masjid Paripurna Kota Pekanbaru.</p>
         </div>
         <div class="container-fluid px-0">
-            <img src="{{ asset('welcome/assets/img/aplikasi-jws.webp') }}" class="img-fluid w-100" style="object-fit: cover; height: auto;"
-                alt="Aplikasi Jadwal Waktu Sholat" />
+            <img src="{{ asset('welcome/assets/img/aplikasi-jws.webp') }}" class="img-fluid w-100"
+                style="object-fit: cover; height: auto;" alt="Aplikasi Jadwal Waktu Sholat" />
         </div>
     </section>
 
@@ -243,19 +267,24 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="feature-card d-flex align-items-center text-start p-4">
                         <div class="text-gov-blue flex-shrink-0 me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
                                 <path d="M4 21v-10" />
                                 <path d="M20 21v-10" />
                                 <path d="M4 16h3v-3h10v3h3" />
                                 <path d="M17 13a5 5 0 0 0 -10 0" />
-                                <path d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
+                                <path
+                                    d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
                             </svg>
                         </div>
                         <div>
                             <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Jadwal Sholat</h3>
-                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Waktu sholat fardhu akurat harian khusus untuk area Kota Pekanbaru.</p>
+                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Waktu sholat fardhu akurat harian
+                                khusus untuk area Kota Pekanbaru.</p>
                         </div>
                     </div>
                 </div>
@@ -263,15 +292,20 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="feature-card d-flex align-items-center text-start p-4">
                         <div class="text-gov-blue flex-shrink-0 me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-bell">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-bell">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                                 <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                             </svg>
                         </div>
                         <div>
                             <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Pengingat Adzan</h3>
-                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Notifikasi dan hitung mundur presisi menuju waktu adzan & iqomah.</p>
+                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Notifikasi dan hitung mundur
+                                presisi menuju waktu adzan & iqomah.</p>
                         </div>
                     </div>
                 </div>
@@ -279,9 +313,13 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="feature-card d-flex align-items-center text-start p-4">
                         <div class="text-gov-blue flex-shrink-0 me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-month">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                                <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-month">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
                                 <path d="M16 3v4" />
                                 <path d="M8 3v4" />
                                 <path d="M4 11h16" />
@@ -292,7 +330,8 @@
                         </div>
                         <div>
                             <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Kalender Hijriah</h3>
-                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Konversi dan penanggalan tahun berjalan Hijriah terintegrasi.</p>
+                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Konversi dan penanggalan tahun
+                                berjalan Hijriah terintegrasi.</p>
                         </div>
                     </div>
                 </div>
@@ -300,8 +339,11 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="feature-card d-flex align-items-center text-start p-4">
                         <div class="text-gov-blue flex-shrink-0 me-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-microphone">
-                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-microphone">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                 <path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
                                 <path d="M5 10a7 7 0 0 0 14 0" />
                                 <path d="M8 21l8 0" />
@@ -310,7 +352,8 @@
                         </div>
                         <div>
                             <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Pesan Resmi</h3>
-                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Papan informasi digital penyampaian pesan Pemerintah Kota.</p>
+                            <p class="feature-desc mb-0" style="font-size: 0.9rem;">Papan informasi digital
+                                penyampaian pesan Pemerintah Kota.</p>
                         </div>
                     </div>
                 </div>
@@ -334,7 +377,8 @@
                             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden article-card">
                                 <div class="ratio ratio-16x9">
                                     <img src="{{ $getFirstImage($article->content) }}"
-                                        class="card-img-top object-fit-cover" style="object-fit: cover;" alt="{{ $article->title }}"
+                                        class="card-img-top object-fit-cover" style="object-fit: cover;"
+                                        alt="{{ $article->title }}"
                                         onerror="this.src='{{ asset('nav-brand.png') }}'">
                                 </div>
                                 <div class="card-body p-4">
@@ -473,7 +517,8 @@
                     </div>
                     <div>© {{ date('Y') }} Diskominfo Pekanbaru</div>
                 </div>
-                <div class="col-md-6 text-md-end mt-4 mt-md-0 d-flex justify-content-md-end justify-content-start align-items-center">
+                <div
+                    class="col-md-6 text-md-end mt-4 mt-md-0 d-flex justify-content-md-end justify-content-start align-items-center">
                     <a class="footer-icon" href="https://www.youtube.com/c/InfoPemkoPekanbaru" aria-label="YouTube">
                         <i class="fab fa-youtube"></i>
                     </a>
@@ -486,7 +531,8 @@
                     <a class="footer-icon" href="https://www.instagram.com/diskominfopku/" aria-label="WhatsApp">
                         <i class="fab fa-whatsapp"></i>
                     </a>
-                    <a class="footer-icon" href="{{ asset('download/JWS Web V-1.0.apk') }}" download aria-label="Download APK">
+                    <a class="footer-icon" href="{{ asset('download/JWS Web V-1.0.apk') }}" download
+                        aria-label="Download APK">
                         <i class="fab fa-android"></i>
                     </a>
                 </div>
