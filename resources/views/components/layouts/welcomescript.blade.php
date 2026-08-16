@@ -26,6 +26,13 @@
             tick();
             if (Date.now() >= target) {
                 clearInterval(timer);
+                setTimeout(function() {
+                    if (typeof Livewire !== 'undefined') {
+                        Livewire.navigate(window.location.pathname);
+                    } else {
+                        window.location.reload();
+                    }
+                }, 1000);
             }
         }, 1000);
     })();

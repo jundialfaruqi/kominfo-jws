@@ -291,13 +291,13 @@
 
     @media (max-width: 768px) {
         .header-date-time {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
         .header-date-time .clock-icon {
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
         .header-date-time .clock-text {
-            font-size: 1.15rem;
+            font-size: 0.95rem;
         }
         .countdown-next-label {
             font-size: 0.75rem;
