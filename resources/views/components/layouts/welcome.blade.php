@@ -24,7 +24,7 @@
             return asset('nav-brand.png'); // Fallback image
         };
     @endphp
-    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="#">
                 <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Diskominfo"
@@ -39,7 +39,7 @@
     </nav>
 
 
-    <section class="hero hero-gradient text-white py-5">
+    <section class="hero">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 mb-4 mb-lg-0">
@@ -69,34 +69,33 @@
     </section>
 
     {{-- Section Jadwal sholat hari ini (card + countdown) --}}
-    <section class="py-4 bg-white">
+    <section class="py-5">
         <div class="container">
-            <div class="d-flex flex-column flex-lg-row justify-content-lg-between align-items-stretch gap-2 mb-3">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-end mb-4 border-bottom pb-3">
                 @php
                     $todayLabel = \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->translatedFormat('l, d F Y');
                 @endphp
-                <div id="current-time-banner" class="countdown-banner">
-                    <div class="countdown-icon"><i class="fa-regular fa-clock"></i></div>
-                    <div class="flex-grow-1">
-                        <div class="countdown-label">{{ $todayLabel }}</div>
-                        <div class="countdown-time" id="current-time">--:--:--</div>
-                    </div>
-                </div>
-                <div class="countdown-banner header-title-banner">
-                    <div class="flex-grow-1 text-center">
-                        <div class="header-title">
-                            <i class="fa-solid fa-mosque"></i>
-                            Jadwal Sholat Hari Ini
+                <div>
+                    <h2 class="header-title mb-2" style="font-size: 2rem;">
+                        Jadwal Sholat Hari Ini
+                    </h2>
+                    <div class="header-date-time d-flex align-items-center gap-2 text-muted">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span>{{ $todayLabel }}</span>
+                        <span class="mx-2">|</span>
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="fa-regular fa-clock clock-icon"></i>
+                            <span class="font-led clock-text" id="current-time">--:--:--</span>
                         </div>
                     </div>
                 </div>
+
                 @if (!empty($nextPrayer) && !empty($nextPrayerAtIso))
-                    <div id="countdown" class="countdown-banner" data-next-iso="{{ $nextPrayerAtIso }}">
-                        <div class="flex-grow-1 countdown-content">
-                            <div class="countdown-label">Menuju {{ ucfirst($nextPrayer) }}</div>
-                            <div class="countdown-time" id="countdown-text">--:--:--</div>
+                    <div id="countdown" class="text-lg-end mt-4 mt-lg-0" data-next-iso="{{ $nextPrayerAtIso }}">
+                        <div class="text-muted text-uppercase fw-bold countdown-next-label" style="letter-spacing: 0.05em; font-family: 'PlusJakartaSansDisplay', sans-serif;">
+                            <i class="fa-regular fa-bell me-1"></i> Menuju {{ ucfirst($nextPrayer) }}
                         </div>
-                        <div class="countdown-icon"><i class="fa-regular fa-bell"></i></div>
+                        <div class="font-led mt-1 countdown-next-time" id="countdown-text" style="color: #0071e3; line-height: 1;">--:--:--</div>
                     </div>
                 @endif
             </div>
@@ -142,9 +141,9 @@
         </div>
     </section>
 
-    <section class="py-4 bg-white">
+    <section class="py-5">
         <div class="container">
-            <h2 class="mb-3 text-gov-dark">Jadwal Sholat Kota Pekanbaru - {{ $monthName ?? '' }}
+            <h2 class="mb-3 text-gov-dark fw-bold">Jadwal Sholat Kota Pekanbaru - {{ $monthName ?? '' }}
                 {{ $yearNumber ?? '' }}</h2>
             @if (!empty($jadwalSholat))
                 <div class="schedule-table">
@@ -204,108 +203,19 @@
         </div>
     </section>
 
-    <section class="content-section py-5 bg-soft">
-        <div class="container">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-6">
-                    <img src="{{ asset('welcome/assets/img/aplikasi-jws.webp') }}" class="img-fluid rounded-4 shadow"
-                        alt="Kantor Walikota Pekanbaru" />
-                </div>
-                <div class="col-lg-6">
-                    <h2 class="mb-3 text-gov-dark">
-                        Aplikasi Jadwal Waktu Sholat Pemerintah Kota Pekanbaru
-                    </h2>
-                    <li class="d-flex align-items-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque text-primary me-2">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
-                            <path d="M4 21v-10" />
-                            <path d="M20 21v-10" />
-                            <path d="M4 16h3v-3h10v3h3" />
-                            <path d="M17 13a5 5 0 0 0 -10 0" />
-                            <path
-                                d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
-                        </svg>
-                        <span>
-                            Jadwal sholat harian Pekanbaru
-                        </span>
-                    </li>
-                    <li class="d-flex align-items-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-bell text-primary me-2">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path
-                                d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                        </svg>
-                        <span>
-                            Pengingat adzan dan iqomah
-                        </span>
-                    </li>
-                    <li class="d-flex align-items-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-month text-primary me-2">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
-                            <path d="M16 3v4" />
-                            <path d="M8 3v4" />
-                            <path d="M4 11h16" />
-                            <path d="M8 14v4" />
-                            <path d="M12 14v4" />
-                            <path d="M16 14v4" />
-                        </svg>
-                        <span>Kalender hijriah</span>
-                    </li>
-                    <li class="d-flex align-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-microphone text-primary me-2">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
-                            <path d="M5 10a7 7 0 0 0 14 0" />
-                            <path d="M8 21l8 0" />
-                            <path d="M12 17l0 4" />
-                        </svg>
-                        <span>Pesan resmi
-                            Pemerintah
-                            Kota</span>
-                    </li>
-                    </ul>
-                    <a class="btn btn-gov-blue rounded-4 my-4" href="https://jadwalsholat.pekanbaru.go.id/demo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="icon icon-tabler icons-tabler-outline icon-tabler-hand-move">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5" />
-                            <path d="M11 11.5v-2a1.5 1.5 0 0 1 3 0v2.5" />
-                            <path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5" />
-                            <path
-                                d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" />
-                            <path d="M2.541 5.594a13.487 13.487 0 0 1 2.46 -1.427" />
-                            <path d="M14 3.458c1.32 .354 2.558 .902 3.685 1.612" />
-                        </svg>
-                        Lihat Demo
-                    </a>
-                </div>
-            </div>
+    <section class="content-section py-5">
+        <div class="container-fluid px-0">
+            <img src="{{ asset('welcome/assets/img/aplikasi-jws.webp') }}" class="img-fluid w-100" style="object-fit: cover; height: auto;"
+                alt="Aplikasi Jadwal Waktu Sholat" />
         </div>
     </section>
 
     @if (!empty($latestArticles) && $latestArticles->count() > 0)
-        <section class="py-5 bg-white">
+        <section class="py-5">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-end mb-4">
                     <div>
-                        <h2 class="mb-1 text-gov-dark">Berita Terbaru</h2>
+                        <h2 class="mb-1 text-gov-dark fw-bold">Berita Terbaru</h2>
                         <p class="text-muted mb-0">Informasi seputar kegiatan dan perkembangan JWS Kota Pekanbaru.</p>
                     </div>
                 </div>
@@ -316,19 +226,19 @@
                             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden article-card">
                                 <div class="ratio ratio-16x9">
                                     <img src="{{ $getFirstImage($article->content) }}"
-                                        class="card-img-top object-fit-cover" alt="{{ $article->title }}"
+                                        class="card-img-top object-fit-cover" style="object-fit: cover;" alt="{{ $article->title }}"
                                         onerror="this.src='{{ asset('nav-brand.png') }}'">
                                 </div>
                                 <div class="card-body p-4">
-                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-muted small fw-semibold" style="letter-spacing: 0.5px;">
+                                            {{ $article->published_at ? $article->published_at->format('d M Y') : $article->created_at->format('d M Y') }}
+                                        </span>
                                         <span class="badge bg-blue-lt px-2 py-1">
                                             {{ $article->category->name ?? 'Berita' }}
                                         </span>
-                                        <span class="text-muted small">
-                                            {{ $article->published_at ? $article->published_at->format('d M Y') : $article->created_at->format('d M Y') }}
-                                        </span>
                                     </div>
-                                    <h3 class="h4 fw-bold text-gov-dark mb-3 line-clamp-2">
+                                    <h3 class="article-title mb-3 line-clamp-2">
                                         {{ $article->title }}
                                     </h3>
                                     <p class="text-muted small mb-4 line-clamp-3">
@@ -361,10 +271,10 @@
         </section>
     @endif
 
-    <section class="py-5 bg-white">
+    <section class="py-5">
         <div class="container">
-            <h2 class="mb-3 text-gov-dark">Galeri Sosialisasi JWS</h2>
-            <p class="text-muted mb-4">Sosialisasi Aplikasi Jadwal Waktu Sholat (JWS) Berbasis Web di Masjid Paripurna
+            <h2 class="mb-3 text-gov-dark fw-bold">Galeri Sosialisasi JWS</h2>
+            <p class="text-muted mb-5">Sosialisasi Aplikasi Jadwal Waktu Sholat (JWS) Berbasis Web di Masjid Paripurna
                 Agung Ar-Rahman Pekanbaru Sabtu, 18 Oktober 2025.</p>
 
             <div id="galleryCarousel" class="carousel slide gallery-carousel" data-bs-ride="carousel">

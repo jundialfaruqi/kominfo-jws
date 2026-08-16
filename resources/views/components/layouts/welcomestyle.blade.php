@@ -1,511 +1,539 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    /* Font Faces */
+    @font-face {
+        font-family: 'PlusJakartaSansDisplay';
+        src: url('{{ asset('fonts/PlusJakartaSansDisplay/PlusJakartaSansDisplay-Bold.otf') }}') format('opentype');
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'PlusJakartaSansDisplay';
+        src: url('{{ asset('fonts/PlusJakartaSansDisplay/PlusJakartaSansDisplay-Regular.otf') }}') format('opentype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'PlusJakartaSansText';
+        src: url('{{ asset('fonts/PlusJakartaSansText/PlusJakartaSansText-Bold.otf') }}') format('opentype');
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'PlusJakartaSansText';
+        src: url('{{ asset('fonts/PlusJakartaSansText/PlusJakartaSansText-Regular.otf') }}') format('opentype');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'LedDot';
+        src: url('{{ asset('fonts/LedDot/LedDot.ttf') }}') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
 
+    /* Core Styling - Apple Light Aesthetic */
     body::before {
         display: none !important;
     }
 
     body {
         padding-top: 0;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: 'PlusJakartaSansText', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f5f5f7;
+        color: #1d1d1f;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
-    .bg-gov {
-        background-color: #172433;
+    h1, h2, h3, h4, h5, h6, .navbar-brand, .font-display, .fw-bold {
+        font-family: 'PlusJakartaSansDisplay', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    .bg-gov-dark {
-        background-color: #172433;
+    .font-led {
+        font-family: 'LedDot', monospace !important;
     }
 
-    .text-gov-dark {
-        color: #172433;
+    /* Color Utilities */
+    .bg-gov { background-color: #0071e3; }
+    .bg-gov-dark { background-color: #fbfbfd; }
+    .text-gov-dark { color: #1d1d1f; }
+    .bg-soft { background-color: #ffffff; }
+
+    .btn-gov-blue {
+        background-color: #0071e3;
+        color: #ffffff;
+        border: none;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .btn-gov-blue:hover {
+        background-color: #0077ed;
+        color: #ffffff;
+        transform: scale(1.02);
+    }
+    
+    .btn-outline-light {
+        color: #1d1d1f;
+        border-color: #d2d2d7;
+        background-color: transparent;
+        transition: all 0.2s ease;
+    }
+    .btn-outline-light:hover {
+        color: #0071e3;
+        border-color: #0071e3;
+        background-color: rgba(0, 113, 227, 0.05);
     }
 
-    .bg-soft {
-        background-color: #f7f8fb;
+    /* Navbar Glassmorphism */
+    .navbar {
+        background: rgba(255, 255, 255, 0.72) !important;
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: none;
+        padding-top: 14px;
+        padding-bottom: 14px;
+        transition: background 0.3s ease;
     }
 
-    .brand-mark {
-        width: 24px;
-        height: 24px;
-        display: inline-block;
-        background-image: linear-gradient(90deg, #0ea5a3 0%, #1f7ae0 60%, #3b82f6 100%);
-        border-radius: 6px;
-    }
-
-    .hero-gradient {
-        background-image: linear-gradient(90deg, #0ea5a3 0%, #1f7ae0 60%, #3b82f6 100%);
-    }
-
-    .hero {
-        padding-top: 6rem !important;
-        margin-top: 0 !important;
-    }
-
-    .leaders {
-        gap: 1rem;
-    }
-
-    .leaders-overlap {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        gap: 0;
-    }
-
-    .leader-card {
-        position: relative;
-        display: inline-block;
-    }
-
-    .leader-card.mayor {
-        z-index: 2;
-    }
-
-    .leader-card.deputy {
-        z-index: 1;
-        margin-left: -110px;
-        margin-top: 4px;
-    }
-
-    @media (min-width: 992px) {
-        .leader-card.deputy {
-            margin-left: -150px;
-        }
-    }
-
-    .leaders-meta {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin-top: -36px;
-        position: relative;
-        z-index: 3;
-    }
-
-    .leader-entry {
-        background-color: rgba(255, 255, 255, 0.94);
-        border: 1px solid #e2e6ee;
-        border-radius: 10px;
-        padding: 4px 10px;
-        max-width: 340px;
-    }
-
-    .leader-entry .leader-name {
-        color: #172433;
+    .navbar-brand-text {
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
         font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 2px;
-        line-height: 1.25;
-        min-height: calc(1.25em * 1.6);
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+        font-size: 1.2rem;
+        color: #1d1d1f;
+    }
+
+    /* Hero Section */
+    .hero {
+        padding-top: 9rem !important;
+        padding-bottom: 6rem !important;
+        background: #ffffff;
+        color: #1d1d1f !important;
         overflow: hidden;
+        position: relative;
     }
 
-    .leader-entry .leader-role {
-        color: #0154a6;
-        font-weight: 600;
-        font-size: 0.875rem;
-        letter-spacing: 0.02em;
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: -5%;
+        width: 50%;
+        height: 60%;
+        background: radial-gradient(circle, rgba(0,113,227,0.06) 0%, rgba(255,255,255,0) 70%);
+        z-index: 0;
     }
 
-    .leader-card {
-        max-width: 320px;
+    .hero .container {
+        position: relative;
+        z-index: 1;
     }
 
-    @media (min-width: 992px) {
-        .leader-card.portrait-card {
-            max-width: 360px;
-        }
-
-        .leaders-meta {
-            gap: 10px;
-            margin-top: -48px;
-        }
+    .hero h1 {
+        font-size: 3.5rem;
+        letter-spacing: -0.02em;
+        line-height: 1.05;
+        background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    @media (max-width: 768px) {
+        .hero h1 { font-size: 2.5rem; }
     }
 
-    .leaders-meta .leader-entry:first-child {
-        margin-right: -6px;
-    }
-
-    .leaders-meta .leader-entry:last-child {
-        margin-left: -6px;
-    }
-
-    .leader-card img {
-        width: 100%;
-        height: auto;
+    .hero p {
+        font-size: 1.15rem;
+        color: #86868b;
+        line-height: 1.6;
+        margin-bottom: 2rem !important;
     }
 
     .hero-composite {
-        width: 85%;
-        display: block;
+        width: 100%;
+        max-width: 480px;
         margin: 0 auto;
+        display: block;
+        filter: drop-shadow(0 20px 40px rgba(0,0,0,0.08));
+        transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
+    }
+    
+    .hero-composite:hover {
+        transform: translateY(-10px);
     }
 
-    @media (min-width: 992px) {
-        .hero-composite {
-            width: 75%;
-            margin-left: auto;
-            margin-right: 0;
-        }
-    }
-
+    /* Cards & Glass Containers */
     .prayer-card {
-        border: 1px solid #e6e8ef;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-        transition: transform .15s ease, box-shadow .15s ease;
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 20px !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        transition: all 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
+        padding: 16px;
+        min-height: 100px;
     }
-
+    
     .prayer-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
     }
 
     .prayer-card.active {
-        border-color: #1f7ae0;
-        box-shadow: 0 8px 18px rgba(31, 122, 224, 0.12);
+        background: #0071e3;
+        border-color: #0071e3;
+        box-shadow: 0 12px 32px rgba(0, 113, 227, 0.25);
     }
 
     .prayer-label {
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
+        font-size: 0.85rem;
+        color: #86868b;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         font-weight: 700;
-        color: #172433;
-        margin-bottom: 2px;
-        letter-spacing: .02em;
+    }
+    
+    .prayer-card.active .prayer-label {
+        color: rgba(255,255,255,0.8);
     }
 
     .prayer-time {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #172433;
+        font-family: 'LedDot', monospace;
+        font-size: 2.4rem;
+        color: #1d1d1f;
+        line-height: 1;
+        letter-spacing: 1px;
     }
-
-    .prayer-time.active {
-        color: #1f7ae0;
+    
+    .prayer-card.active .prayer-time {
+        color: #ffffff;
     }
 
     .prayer-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: rgba(31, 122, 224, .12);
-        color: #1f7ae0;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: #f5f5f7;
+        color: #1d1d1f;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-left: 12px;
-        flex: 0 0 auto;
-    }
-
-    .prayer-icon i {
         font-size: 1.25rem;
+        flex-shrink: 0;
+        margin-left: 12px;
     }
 
+    .prayer-card.active .prayer-icon {
+        background: rgba(255,255,255,0.2);
+        color: #ffffff;
+    }
+
+    @media (max-width: 768px) {
+        .prayer-card {
+            padding: 12px;
+            min-height: 80px;
+        }
+        .prayer-time {
+            font-size: 1.6rem;
+        }
+        .prayer-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-left: 8px;
+        }
+        .prayer-label {
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+    }
+
+    /* Header Info (Hari Ini & Countdown) */
+    .header-date-time {
+        font-size: 1.1rem;
+    }
+    .header-date-time .clock-icon {
+        font-size: 1.2rem;
+    }
+    .header-date-time .clock-text {
+        font-size: 1.4rem;
+        color: #1d1d1f;
+        position: relative;
+        top: 1px;
+    }
+    .countdown-next-label {
+        font-size: 0.85rem;
+    }
+    .countdown-next-time {
+        font-size: 2.8rem;
+    }
+
+    @media (max-width: 768px) {
+        .header-date-time {
+            font-size: 0.9rem;
+        }
+        .header-date-time .clock-icon {
+            font-size: 1rem;
+        }
+        .header-date-time .clock-text {
+            font-size: 1.15rem;
+        }
+        .countdown-next-label {
+            font-size: 0.75rem;
+        }
+        .countdown-next-time {
+            font-size: 2rem;
+        }
+    }
+
+    /* Countdown Banners */
     .countdown-banner {
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 24px;
+        padding: 12px 20px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        border-radius: 10px;
-        border: 1px solid #e2e6ee;
-        background: #f7fbff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        width: 100%;
-        min-height: 56px;
-    }
-
-    .countdown-content {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        text-align: right;
+        gap: 16px;
+        min-height: 70px;
     }
 
     .countdown-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: rgba(31, 122, 224, .12);
-        color: #1f7ae0;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: #f5f5f7;
+        color: #1d1d1f;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex: 0 0 auto;
-    }
-
-    .countdown-icon i {
-        font-size: 1.6rem;
+        font-size: 1.25rem;
+        flex-shrink: 0;
     }
 
     .countdown-label {
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
+        font-size: 0.85rem;
+        color: #86868b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         font-weight: 700;
-        color: #172433;
-        letter-spacing: .02em;
-        margin-bottom: 4px;
-        font-size: .85rem;
-        font-family: 'JetBrains Mono', monospace;
+        margin-bottom: 6px;
     }
 
     .countdown-time {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #1f7ae0;
+        font-family: 'LedDot', monospace;
+        font-size: 2.2rem;
+        color: #0071e3;
         line-height: 1;
-        font-variant-numeric: tabular-nums;
-        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 2px;
     }
-
-    @media (min-width: 992px) {
-        .countdown-time {
-            font-size: 1.4rem;
-        }
-
-        .countdown-banner {
-            width: auto;
-            min-width: 320px;
-        }
-
-        .countdown-label {
-            font-size: .9rem;
-        }
+    
+    #current-time {
+        color: #1d1d1f;
     }
 
     .header-title {
-        width: 100%;
-        font-weight: 800;
-        color: #172433;
-    }
-
-    @media (min-width: 992px) {
-        .header-title {
-            width: auto;
-            min-width: 220px;
-            font-size: 1.1rem;
-        }
-    }
-
-    .header-title-banner {
-        flex: 1 1 auto;
-        padding-left: 0;
-        padding-right: 0;
-        gap: 4px;
-        justify-content: center;
-    }
-
-    .header-title-banner .flex-grow-1 {
-        flex: 0 0 auto;
-    }
-
-    @media (min-width: 992px) {
-        .header-title-banner {
-            min-width: 0;
-        }
-    }
-
-    .portrait-badge {
-        padding: 0;
-        border-radius: 0;
-        background: none;
-    }
-
-    .portrait-img {
-        background: none;
-    }
-
-    .leader-meta {
-        display: inline-block;
-        padding: 8px 12px;
-        border-radius: 12px;
-        background-color: #ffffff;
-        border: 1px solid #e2e6ee;
-        width: 100%;
-        max-width: 360px;
-        margin-top: 0;
-    }
-
-    .leader-meta .leader-name {
-        color: #172433;
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
         font-weight: 700;
-        font-size: 1rem;
-        margin-bottom: 2px;
-        line-height: 1.25;
-        min-height: calc(1.25em * 2);
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        font-size: 1.25rem;
+        color: #1d1d1f;
     }
-
-    .leader-card img {
-        display: block;
-        margin-bottom: 0;
-    }
-
-    .leader-meta .leader-role {
-        display: block;
-        padding: 0;
-        border: none;
-        background: none;
-        color: #0154a6;
-        font-weight: 600;
-        font-size: 0.875rem;
-        letter-spacing: 0.02em;
-    }
-
-    .leader-name {
-        font-weight: 600;
-        color: #ffffff;
-    }
-
-    .btn-gov-blue {
-        background-color: #0154a6;
-        color: #ffffff;
-        border-color: #0154a6;
-    }
-
-    .btn-gov-blue:hover {
-        background-color: #084c8f;
-        border-color: #084c8f;
-        color: #ffffff;
-    }
-
-    .footer a.btn:not(.rounded-circle) {
-        border-radius: 999px;
-    }
-
-    .footer a.btn.rounded-circle {
-        border-radius: 50% !important;
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 0 !important;
-        line-height: 1 !important;
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .line-clamp-3 {
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .article-card {
-        transition: transform .2s ease, box-shadow .2s ease;
-        border: 1px solid #eef0f3 !important;
-        overflow: hidden;
-    }
-
-    .article-card .ratio img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .article-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, .08) !important;
-    }
-
-    .text-gov-blue {
-        color: #0154a6;
-    }
-
-    .bg-blue-lt {
-        background-color: #eaf3ff;
-        color: #0154a6;
-    }
-</style>
-<style>
-    .schedule-table .table-responsive {
-        max-height: none;
+    
+    /* Table & News Cards */
+    .schedule-table {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 12px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.02);
+        border: 1px solid rgba(0,0,0,0.04);
     }
 
     .schedule-table table {
-        border: 1px solid #e6e8ef;
-        box-shadow: none;
-    }
-
-    .schedule-month-table {
+        margin-bottom: 0;
         border-collapse: separate;
         border-spacing: 0;
+        border-radius: 16px;
+        overflow: hidden;
     }
-
+    
     .schedule-table thead th {
-        position: sticky;
-        top: 0;
-        background: #f7f8fb;
-        color: #172433;
+        background: #f5f5f7;
+        color: #86868b;
         font-weight: 700;
-        border-bottom: 1px solid #e6e8ef;
-        z-index: 1;
+        border-bottom: none;
+        padding: 16px;
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
     }
-
-    .schedule-table thead th,
+    
     .schedule-table tbody td {
-        padding: .5rem .75rem;
+        padding: 18px 16px;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        color: #1d1d1f;
+        font-family: 'LedDot', monospace;
+        font-size: 1.4rem;
+        letter-spacing: 1px;
+        vertical-align: middle;
     }
-
-    .schedule-table tbody tr.today {
-        background: #eaf3ff;
+    
+    .schedule-table tbody tr:last-child td {
+        border-bottom: none;
     }
 
     .schedule-table tbody tr.today td {
+        background-color: #0071e3;
+        color: #ffffff;
+        border-color: #0071e3;
+        font-weight: 700;
+    }
+    
+    .schedule-table tbody tr.today:hover td {
+        background-color: #0062c3;
+        color: #ffffff;
+    }
+
+    .schedule-table tbody td:first-child {
+        font-family: 'PlusJakartaSansText', sans-serif;
+        font-size: 1.05rem;
+        letter-spacing: normal;
         font-weight: 600;
     }
-
-    .schedule-month-table tbody tr:hover {
-        background: #f9fbff;
+    
+    .schedule-table tbody tr:hover {
+        background-color: #fbfbfd;
     }
 
-    .schedule-table .time-cell {
-        font-variant-numeric: tabular-nums;
-        font-weight: 600;
-        color: #172433;
-    }
-
-    .schedule-table .time-cell.fardhu {
-        color: #0154a6;
-    }
-</style>
-<style>
-    .gallery-carousel .carousel-item {
-        border: 1px solid #e6e8ef;
-        border-radius: 12px;
+    /* Article Cards */
+    .article-card {
+        border-radius: 24px;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        background: #ffffff;
         overflow: hidden;
-        background: #f7f8fb;
+        transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .article-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 40px rgba(0,0,0,0.08);
     }
 
-    .gallery-carousel img {
-        width: 100%;
-        height: 42vh;
-        max-height: 520px;
-        min-height: 220px;
-        display: block;
+    .article-card img {
+        border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .article-card .card-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .article-title {
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
+        font-weight: 700;
+        color: #1d1d1f;
+        font-size: 1.25rem;
+        line-height: 1.4;
+        margin-bottom: 12px;
+    }
+
+    .article-card p.text-muted {
+        color: #86868b !important;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: auto; /* push button to bottom */
+    }
+
+    .btn-outline-gov-blue {
+        color: #0071e3;
+        border-color: #0071e3;
+        border-radius: 20px;
+        padding: 8px 20px;
+        font-weight: 600;
+    }
+    
+    .btn-outline-gov-blue:hover {
+        background-color: #0071e3;
+        color: #ffffff;
+    }
+
+    /* Leaflet Map */
+    #map {
+        border-radius: 24px;
+        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
+
+    /* Gallery Carousel */
+    .gallery-carousel {
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 24px 48px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
+        transform: translateZ(0); /* Anti-aliasing pada sudut membulat */
+    }
+    
+    .gallery-carousel .carousel-item img {
+        height: 560px;
         object-fit: cover;
+        width: 100%;
     }
-
-    @media (min-width: 992px) {
-        .gallery-carousel img {
-            height: 420px;
+    
+    @media (max-width: 768px) {
+        .gallery-carousel .carousel-item img {
+            height: 300px;
         }
     }
 
-    @media (min-width: 1400px) {
-        .gallery-carousel img {
-            height: 520px;
-        }
+    /* Footer */
+    footer {
+        background: #1d1d1f !important;
+        color: #f5f5f7 !important;
+        padding: 5rem 0 3rem 0;
+    }
+    
+    footer .text-gov-dark {
+        color: #f5f5f7 !important;
+    }
+    
+    footer h5 {
+        color: #ffffff;
+        font-family: 'PlusJakartaSansDisplay', sans-serif;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    footer a {
+        color: #86868b !important;
+        transition: color 0.2s ease;
+        text-decoration: none;
+    }
+    
+    footer a:hover {
+        color: #ffffff !important;
+    }
+    
+    footer hr {
+        border-color: rgba(255,255,255,0.1);
+        margin: 2rem 0;
+    }
+
+    footer .small {
+        color: #86868b;
     }
 </style>
