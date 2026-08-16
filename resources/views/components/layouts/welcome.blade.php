@@ -30,7 +30,9 @@
                 <img src="{{ asset('nav-brand.png') }}" width="35" alt="JWS Pekanbaru" class="me-2">
                 <div class="d-flex flex-column justify-content-center align-items-start">
                     <span class="fw-bold lh-1" style="font-size: 1.1rem;">JWS Pekanbaru</span>
-                    <span class="text-muted lh-1 mt-1" style="font-size: 0.65rem; font-family: 'PlusJakartaSansText', sans-serif; letter-spacing: 0.2px;">Jadwal Waktu Sholat Kota Pekanbaru</span>
+                    <span class="text-muted lh-1 mt-1"
+                        style="font-size: 0.65rem; font-family: 'PlusJakartaSansText', sans-serif; letter-spacing: 0.2px;">Jadwal
+                        Waktu Sholat Kota Pekanbaru</span>
                 </div>
             </a>
             <div class="ms-auto d-none d-lg-block">
@@ -163,15 +165,20 @@
                 @endphp
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3">
                     <div>
-                        <h2 class="mb-1 text-gov-dark fw-bold">Jadwal Sholat Kota Pekanbaru - {{ $monthName ?? '' }} {{ $yearNumber ?? '' }}</h2>
+                        <h2 class="mb-1 text-gov-dark fw-bold">Jadwal Sholat Kota Pekanbaru - {{ $monthName ?? '' }}
+                            {{ $yearNumber ?? '' }}</h2>
                     </div>
                     <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center">
-                        <label for="filterDate" class="text-muted small fw-semibold mb-0" style="white-space: nowrap;">Cari Tanggal:</label>
-                        <input type="date" id="filterDate" class="form-control form-control-sm rounded-pill px-3" style="width: auto; border-color: #d2d2d7; font-family: 'PlusJakartaSansText', sans-serif;" min="{{ $minDate }}" max="{{ $maxDate }}">
-                        <button type="button" id="resetFilterBtn" class="btn btn-sm btn-outline-secondary rounded-pill" style="display: none;">Reset</button>
+                        <label for="filterDate" class="text-muted small fw-semibold mb-0"
+                            style="white-space: nowrap;">Cari Tanggal:</label>
+                        <input type="date" id="filterDate" class="form-control form-control-sm rounded-pill px-3"
+                            style="width: auto; border-color: #d2d2d7; font-family: 'PlusJakartaSansText', sans-serif;"
+                            min="{{ $minDate }}" max="{{ $maxDate }}">
+                        <button type="button" id="resetFilterBtn" class="btn btn-sm btn-outline-secondary rounded-pill"
+                            style="display: none;">Reset</button>
                     </div>
                 </div>
-                
+
                 @if (!empty($jadwalSholat))
                     <div class="schedule-table">
                         <div class="table-responsive">
@@ -207,7 +214,8 @@
                                                 $tgl = trim($parts[1] ?? '');
                                             }
                                         @endphp
-                                        <tr class="{{ $isToday ? 'today expanded' : '' }}" data-date="{{ $iso }}">
+                                        <tr class="{{ $isToday ? 'today expanded' : '' }}"
+                                            data-date="{{ $iso }}">
                                             <td data-label="Hari" class="fw-bold text-gov-dark">{{ $hari }}
                                             </td>
                                             <td data-label="Tanggal" class="text-gov-dark">
@@ -275,9 +283,144 @@
                 <h2 class="text-gov-dark fw-bold mb-2">Tampilan Layar Aplikasi JWS</h2>
                 <p class="text-muted">Desain antarmuka eksklusif untuk Masjid Paripurna Kota Pekanbaru.</p>
             </div>
-            <div class="container-fluid px-0">
-                <img src="{{ asset('welcome/assets/img/aplikasi-jws.webp') }}" class="img-fluid w-100"
-                    style="object-fit: cover; height: auto;" alt="Aplikasi Jadwal Waktu Sholat" />
+            <div class="container-fluid px-0 position-relative">
+                <div id="demoCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
+                    data-bs-interval="4000">
+                    <div class="carousel-indicators mb-2">
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="0" class="active"
+                            aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="1"
+                            aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="2"
+                            aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="3"
+                            aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="4"
+                            aria-label="Slide 5"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="5"
+                            aria-label="Slide 6"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="6"
+                            aria-label="Slide 7"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="7"
+                            aria-label="Slide 8"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="8"
+                            aria-label="Slide 9"></button>
+                        <button type="button" data-bs-target="#demoCarousel" data-bs-slide-to="9"
+                            aria-label="Slide 10"></button>
+                    </div>
+
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{{ asset('welcome/assets/img/aplikasi-jws.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Tampilan Layar Aplikasi">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Tampilan Layar
+                                    Utama</h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-2-layar-adzan.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Layar Adzan">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Layar Peringatan
+                                    Adzan</h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-3-layar-iqomah.webp') }}"
+                                class="d-block w-100" style="object-fit: cover; height: auto;" alt="Layar Iqomah">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Layar Hitung Mundur
+                                    Iqomah</h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-4-layar-sholat.webp') }}"
+                                class="d-block w-100" style="object-fit: cover; height: auto;"
+                                alt="Layar Saat Sholat">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Layar Gelap Saat
+                                    Sholat</h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-5-layar-jumat.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Layar Khutbah Jumat">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Layar Khutbah Jumat
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-6-tema-1.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Tema Klasik">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Pilihan Tema Klasik
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-7-tema-2.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Tema Modern">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Pilihan Tema Modern
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-8-tema-3.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Tema Minimalis">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Pilihan Tema
+                                    Minimalis</h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-9-tema-4.webp') }}" class="d-block w-100"
+                                style="object-fit: cover; height: auto;" alt="Tema Elegan">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Pilihan Tema Elegan
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <img src="{{ asset('section-features/slide-10-layar-jumbotron.webp') }}"
+                                class="d-block w-100" style="object-fit: cover; height: auto;"
+                                alt="Layar Standby Jumbotron">
+                            <div class="carousel-caption d-block"
+                                style="background: rgba(0,0,0,0.6); border-radius: 12px; padding: 8px 16px; bottom: 30px; backdrop-filter: blur(4px); width: max-content; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1);">
+                                <h6 class="mb-0 text-white fw-bold" style="letter-spacing: 0.5px;">Layar Mode Standby
+                                    (Jumbotron)</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#demoCarousel"
+                        data-bs-slide="prev" style="width: auto; left: 15px; opacity: 1;">
+                        <div class="d-flex align-items-center justify-content-center shadow-sm"
+                            style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); color: #1d1d1f;">
+                            <i class="fa-solid fa-chevron-left" style="font-size: 1.1rem; margin-right: 2px;"></i>
+                        </div>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#demoCarousel"
+                        data-bs-slide="next" style="width: auto; right: 15px; opacity: 1;">
+                        <div class="d-flex align-items-center justify-content-center shadow-sm"
+                            style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); color: #1d1d1f;">
+                            <i class="fa-solid fa-chevron-right" style="font-size: 1.1rem; margin-left: 2px;"></i>
+                        </div>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -540,7 +683,8 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <img src="{{ asset('theme/static/logo-pemko-kominfo.webp') }}" alt="Logo Pemko dan Kominfo" class="img-fluid mb-3" style="height: 45px; object-fit: contain; filter: grayscale(100%);">
+                    <img src="{{ asset('theme/static/logo-pemko-kominfo.webp') }}" alt="Logo Pemko dan Kominfo"
+                        class="img-fluid mb-3" style="height: 45px; object-fit: contain; filter: grayscale(100%);">
                     <div class="fw-semibold">
                         Jadwal Waktu Sholat Pemerintah Kota Pekanbaru
                     </div>
