@@ -74,10 +74,54 @@
 
                 // Summernote Init
                 let isInitializing = false;
+                let isDirty = false;
+
+                // Draft Key Generator (Bisa bedakan draft Tambah vs Edit)
+                const getDraftKey = () => 'article_draft_' + ($wire.articleId || 'create');
 
                 function initSummernote(content = '') {
                     if (isInitializing) return;
                     isInitializing = true;
+
+                    // Cek ketersediaan Draft di LocalStorage
+                    let savedDraft = localStorage.getItem(getDraftKey());
+                    if (savedDraft) {
+                        try {
+                            let draft = JSON.parse(savedDraft);
+                            if (draft && (draft.title || draft.content)) {
+                                if (confirm('Ada draf ketikan yang belum tersimpan. Apakah Anda ingin mengembalikannya?')) {
+                                    $wire.title = draft.title || '';
+                                    let titleEl = document.querySelector('[wire\\:model="title"]');
+                                    if (titleEl) titleEl.value = $wire.title;
+
+                                    $wire.article_category_id = draft.article_category_id || '';
+                                    let catEl = document.querySelector('[wire\\:model="article_category_id"]');
+                                    if (catEl) catEl.value = $wire.article_category_id;
+
+                                    $wire.description = draft.description || '';
+                                    let descEl = document.querySelector('[wire\\:model="description"]');
+                                    if (descEl) descEl.value = $wire.description;
+
+                                    if (draft.published_at) {
+                                        $wire.published_at = draft.published_at;
+                                        let pubEl = document.querySelector('[wire\\:model="published_at"]');
+                                        if (pubEl) pubEl.value = $wire.published_at;
+                                    }
+                                    
+                                    if (draft.status) {
+                                        $wire.status = draft.status;
+                                        let statusEl = document.querySelector('[wire\\:model="status"]');
+                                        if (statusEl) statusEl.value = $wire.status;
+                                    }
+                                    
+                                    content = draft.content || content;
+                                    $wire.content = content;
+                                } else {
+                                    localStorage.removeItem(getDraftKey()); // Hapus jika menolak
+                                }
+                            }
+                        } catch(e) {}
+                    }
 
                     loadScript('https://code.jquery.com/jquery-3.6.0.min.js')
                         .then(() => loadScript('https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js'))
@@ -104,6 +148,7 @@
                                 callbacks: {
                                     onChange: function(contents, $editable) {
                                         $wire.content = contents;
+                                        isDirty = true;
                                     }
                                 }
                             });
@@ -113,6 +158,7 @@
                             }
 
                             isInitializing = false;
+                            setTimeout(() => { isDirty = false; }, 100); // Reset isDirty yang mungkin terpicu saat load awal
                         })
                         .catch(err => {
                             console.error("Gagal memuat Summernote:", err);
@@ -138,6 +184,31 @@
                 if ($wire.showForm) {
                     initSummernote($wire.content || '');
                 }
+
+                // Tangkap event ketikan pada form input biasa
+                document.addEventListener('input', () => { isDirty = true; });
+
+                // Simpan Draft setiap 3 detik jika form sedang dibuka & isDirty
+                setInterval(() => {
+                    if ($wire.showForm && isDirty) {
+                        localStorage.setItem(getDraftKey(), JSON.stringify({
+                            title: document.querySelector('[wire\\:model="title"]')?.value || $wire.title,
+                            article_category_id: document.querySelector('[wire\\:model="article_category_id"]')?.value || $wire.article_category_id,
+                            description: document.querySelector('[wire\\:model="description"]')?.value || $wire.description,
+                            content: $wire.content,
+                            published_at: document.querySelector('[wire\\:model="published_at"]')?.value || $wire.published_at,
+                            status: document.querySelector('[wire\\:model="status"]')?.value || $wire.status
+                        }));
+                    }
+                }, 3000);
+
+                // Bersihkan draf setelah berhasil disimpan ke DB
+                $wire.on('success', () => {
+                    localStorage.removeItem('article_draft_create');
+                    if ($wire.articleId) {
+                        localStorage.removeItem('article_draft_' + $wire.articleId);
+                    }
+                });
             </script>
         @endscript
     </div>
