@@ -9,7 +9,7 @@
     @livewireStyles
 </head>
 
-<body>
+<body class="bg-white">
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('welcome.index') }}">
