@@ -818,4 +818,19 @@
     footer .small {
         color: #86868b;
     }
+
+    /* Features Section Overrides */
+    .features-main-title {
+        font-size: 3.5rem;
+        background: linear-gradient(135deg, #1d1d1f 0%, #434344 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1.5px;
+        line-height: 1.1;
+    }
+    @media (max-width: 768px) {
+        .features-main-title {
+            font-size: 2.5rem;
+        }
+    }
 </style>

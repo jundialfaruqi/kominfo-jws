@@ -453,6 +453,20 @@
         <!-- Features Grid Section -->
         <section class="features-section pb-5 pt-3">
             <div class="container py-2">
+                
+
+                <!-- Section Header (Text Left, Image Right) -->
+                <div class="row align-items-center mb-5">
+                    <div class="col-lg-6 mb-4 mb-lg-0 text-center text-lg-start">
+                        <h2 class="features-main-title fw-bold mb-0">
+                            Fitur-fitur Aplikasi<br>Jadwal Waktu Sholat Pekanbaru
+                        </h2>
+                    </div>
+                    <div class="col-lg-6 text-center text-lg-end">
+                        <img src="{{ asset('section-features/features-jws-kota-pekanbaru.webp') }}" alt="Fitur JWS Pekanbaru" class="img-fluid w-100" style="max-height: 450px; object-fit: contain;">
+                    </div>
+                </div>
+
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3">
                     
                     <!-- Row 1 -->
