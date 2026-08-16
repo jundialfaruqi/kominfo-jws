@@ -424,103 +424,262 @@
             </div>
         </section>
 
+        <style>
+            .feature-wide-lg {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            @media (min-width: 992px) {
+                .feature-wide-lg {
+                    flex: 0 0 40%;
+                    max-width: 40%;
+                }
+            }
+            .feature-card-new {
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .feature-card-new:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+            }
+            .icon-wrapper-new {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        </style>
         <!-- Features Grid Section -->
-        <section class="features-section py-5">
-            <div class="container py-4">
-                <div class="row g-4">
-                    <!-- Fitur 1 -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card d-flex align-items-center text-start p-4">
-                            <div class="text-gov-blue flex-shrink-0 me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-building-mosque">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M3 21h7v-2a2 2 0 1 1 4 0v2h7" />
-                                    <path d="M4 21v-10" />
-                                    <path d="M20 21v-10" />
-                                    <path d="M4 16h3v-3h10v3h3" />
-                                    <path d="M17 13a5 5 0 0 0 -10 0" />
-                                    <path
-                                        d="M21 10.5c0 -.329 -.077 -.653 -.224 -.947l-.776 -1.553l-.776 1.553a2.118 2.118 0 0 0 -.224 .947a.5 .5 0 0 0 .5 .5h1a.5 .5 0 0 0 .5 -.5z" />
-                                </svg>
+        <section class="features-section pb-5 pt-3">
+            <div class="container py-2">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3">
+                    
+                    <!-- Row 1 -->
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-wifi fs-4"></i>
                             </div>
                             <div>
-                                <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Jadwal Sholat</h3>
-                                <p class="feature-desc mb-0" style="font-size: 0.9rem;">Waktu sholat fardhu akurat
-                                    harian
-                                    khusus untuk area Kota Pekanbaru.</p>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Tanpa Internet</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Tetap berjalan tanpa koneksi internet</p>
                             </div>
                         </div>
                     </div>
-                    <!-- Fitur 2 -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card d-flex align-items-center text-start p-4">
-                            <div class="text-gov-blue flex-shrink-0 me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-bell">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                                    <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                                </svg>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-regular fa-clock fs-4"></i>
                             </div>
                             <div>
-                                <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Pengingat Adzan</h3>
-                                <p class="feature-desc mb-0" style="font-size: 0.9rem;">Notifikasi dan hitung mundur
-                                    presisi menuju waktu adzan & iqomah.</p>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Jadwal Sholat Lengkap</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">5 waktu sholat + Imsak, Syuruq & Dhuha</p>
                             </div>
                         </div>
                     </div>
-                    <!-- Fitur 3 -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card d-flex align-items-center text-start p-4">
-                            <div class="text-gov-blue flex-shrink-0 me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-calendar-month">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z" />
-                                    <path d="M16 3v4" />
-                                    <path d="M8 3v4" />
-                                    <path d="M4 11h16" />
-                                    <path d="M8 14v4" />
-                                    <path d="M12 14v4" />
-                                    <path d="M16 14v4" />
-                                </svg>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-clock fs-4"></i>
                             </div>
                             <div>
-                                <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Kalender Hijriah</h3>
-                                <p class="feature-desc mb-0" style="font-size: 0.9rem;">Konversi dan penanggalan tahun
-                                    berjalan Hijriah terintegrasi.</p>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Jam Digital</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Tampilan jam digital yang akurat</p>
                             </div>
                         </div>
                     </div>
-                    <!-- Fitur 4 -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="feature-card d-flex align-items-center text-start p-4">
-                            <div class="text-gov-blue flex-shrink-0 me-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-microphone">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M9 2m0 3a3 3 0 0 1 3 -3h0a3 3 0 0 1 3 3v5a3 3 0 0 1 -3 3h0a3 3 0 0 1 -3 -3z" />
-                                    <path d="M5 10a7 7 0 0 0 14 0" />
-                                    <path d="M8 21l8 0" />
-                                    <path d="M12 17l0 4" />
-                                </svg>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-regular fa-image fs-4"></i>
                             </div>
                             <div>
-                                <h3 class="feature-title mb-1" style="font-size: 1.1rem;">Pesan Resmi</h3>
-                                <p class="feature-desc mb-0" style="font-size: 0.9rem;">Papan informasi digital
-                                    penyampaian pesan Pemerintah Kota.</p>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Slider Gambar</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Tampilkan gambar menarik secara dinamis</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-regular fa-newspaper fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Jumbotron</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Informasi penting dalam sorotan</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-regular fa-bell fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Alarm Waktu Sholat</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Pengingat otomatis setiap waktu sholat</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-volume-high fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Layar Adzan & Iqomah</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Tampilan khusus untuk setiap momen ibadah</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-chart-column fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Laporan Keuangan</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Transparansi keuangan masjid</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-regular fa-calendar-days fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Agenda</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Jadwal kegiatan masjid</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-music fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Kostum Audio Adzan</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Pilih audio adzan sesuai selera</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-headphones fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Smart Audio Murottal</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Background murottal otomatis & menenangkan</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-font fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Teks Berjalan</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Informasi berjalan secara real-time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-desktop fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Sinkron Antar Device</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Konten tersinkron antar perangkat</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-mosque fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Kostum Logo Masjid</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Gunakan logo masjid sesuai identitas</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-moon fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Tanggal Hijriah</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Tampilkan tanggal Hijriah otomatis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-palette fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Tema</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Pilih tema warna sesuai kebutuhan</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-tv fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Multi Platform</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Support Android TV, Google TV, dll.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="feature-card-new d-flex align-items-center text-start p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <div class="icon-wrapper-new text-gov-blue flex-shrink-0 me-3">
+                                <i class="fa-solid fa-arrows-rotate fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-1 fw-bold text-gov-dark" style="font-size: 0.95rem;">Realtime Update</h3>
+                                <p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.3;">Update konten kapan saja secara real-time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col feature-wide-lg">
+                        <div class="feature-card-new d-flex flex-column justify-content-center p-3 shadow-sm rounded-4 border bg-white h-100">
+                            <h3 class="mb-2 fw-bold text-gov-dark text-center" style="font-size: 0.95rem;">Didukung di berbagai perangkat TV</h3>
+                            <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap mt-2">
+                                <div class="text-center">
+                                    <i class="fa-brands fa-android fs-2 text-success mb-1"></i><br>
+                                    <span style="font-size: 0.7rem;" class="text-muted fw-semibold">Android TV</span>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-brands fa-google fs-2 text-danger mb-1"></i><br>
+                                    <span style="font-size: 0.7rem;" class="text-muted fw-semibold">Google TV</span>
+                                </div>
+                                <div class="text-center">
+                                    <span class="fs-4 fw-bold text-dark lh-1" style="font-family: Arial, sans-serif;">SAMSUNG</span><br>
+                                    <span style="font-size: 0.7rem;" class="text-muted fw-semibold">Samsung Tizen OS</span>
+                                </div>
+                                <div class="text-center">
+                                    <span class="fs-4 fw-bold text-danger lh-1" style="font-family: Arial, sans-serif; letter-spacing: -1px;">LG</span><br>
+                                    <span style="font-size: 0.7rem;" class="text-muted fw-semibold">WebOS</span>
+                                </div>
                             </div>
                         </div>
                     </div>
