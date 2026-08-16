@@ -107,6 +107,23 @@
         font-size: 1.2rem;
         color: #1d1d1f;
     }
+    
+    .nav-ghost-btn {
+        color: #0071e3;
+        background-color: rgba(0, 113, 227, 0.08);
+        font-weight: 600;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .nav-ghost-btn:hover {
+        background-color: rgba(0, 113, 227, 0.15);
+        color: #005bb5;
+    }
 
     /* Hero Section */
     .hero {
@@ -217,22 +234,17 @@
     }
 
     .prayer-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: #f5f5f7;
-        color: #1d1d1f;
+        color: #d2d2d7;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
+        font-size: 2rem;
         flex-shrink: 0;
         margin-left: 12px;
     }
 
     .prayer-card.active .prayer-icon {
-        background: rgba(255,255,255,0.2);
-        color: #ffffff;
+        color: rgba(255, 255, 255, 0.7);
     }
 
     @media (max-width: 768px) {
@@ -244,10 +256,7 @@
             font-size: 1.6rem;
         }
         .prayer-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            font-size: 1rem;
+            font-size: 1.6rem;
             margin-left: 8px;
         }
         .prayer-label {
@@ -409,6 +418,79 @@
         font-size: 1.05rem;
         letter-spacing: normal;
         font-weight: 600;
+    }
+
+    /* Features Grid */
+    .features-section {
+        background-color: #fbfbfd;
+    }
+    .feature-card {
+        transition: all 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
+        height: 100%;
+    }
+    .feature-card:hover {
+        transform: translateY(-4px);
+    }
+    
+    .footer-icon {
+        color: #86868b;
+        font-size: 1.35rem;
+        margin-left: 1.2rem;
+        transition: color 0.2s ease;
+        text-decoration: none;
+    }
+    .footer-icon:hover {
+        color: #ffffff;
+    }
+
+    /* Apple Style Pagination */
+    .apple-pagination {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+    .apple-page-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: #1d1d1f;
+        font-weight: 600;
+        font-family: 'PlusJakartaSansText', sans-serif;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .apple-page-btn:hover:not(:disabled) {
+        background: #f5f5f7;
+    }
+    .apple-page-btn.active {
+        background: #0071e3;
+        color: #ffffff;
+    }
+    .apple-page-btn:disabled {
+        color: #d2d2d7;
+        cursor: not-allowed;
+        background: transparent;
+    }
+    .form-select.apple-select {
+        border: none;
+        background-color: #f5f5f7;
+        font-weight: 600;
+        cursor: pointer;
+        color: #1d1d1f;
+        box-shadow: none;
+        transition: all 0.2s ease;
+    }
+    .form-select.apple-select:hover {
+        background-color: #e8e8ed;
+    }
+    .form-select.apple-select:focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 113, 227, 0.25);
     }
     
     .schedule-table tbody tr:hover {
