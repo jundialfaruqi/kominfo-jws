@@ -8,6 +8,7 @@
         font-style: normal;
         font-display: swap;
     }
+
     @font-face {
         font-family: 'PlusJakartaSansDisplay';
         src: url('{{ asset('fonts/PlusJakartaSansDisplay/PlusJakartaSansDisplay-Regular.otf') }}') format('opentype');
@@ -15,6 +16,7 @@
         font-style: normal;
         font-display: swap;
     }
+
     @font-face {
         font-family: 'PlusJakartaSansText';
         src: url('{{ asset('fonts/PlusJakartaSansText/PlusJakartaSansText-Bold.otf') }}') format('opentype');
@@ -22,6 +24,7 @@
         font-style: normal;
         font-display: swap;
     }
+
     @font-face {
         font-family: 'PlusJakartaSansText';
         src: url('{{ asset('fonts/PlusJakartaSansText/PlusJakartaSansText-Regular.otf') }}') format('opentype');
@@ -29,6 +32,7 @@
         font-style: normal;
         font-display: swap;
     }
+
     @font-face {
         font-family: 'LedDot';
         src: url('{{ asset('fonts/LedDot/LedDot.ttf') }}') format('truetype');
@@ -53,11 +57,20 @@
         flex-direction: column;
         min-height: 100vh;
     }
+
     main {
         flex: 1 0 auto;
     }
 
-    h1, h2, h3, h4, h5, h6, .navbar-brand, .font-display, .fw-bold {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .navbar-brand,
+    .font-display,
+    .fw-bold {
         font-family: 'PlusJakartaSansDisplay', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
@@ -66,10 +79,21 @@
     }
 
     /* Color Utilities */
-    .bg-gov { background-color: #0071e3; }
-    .bg-gov-dark { background-color: #1d1d1f; }
-    .text-gov-dark { color: #1d1d1f; }
-    .bg-soft { background-color: #ffffff; }
+    .bg-gov {
+        background-color: #0071e3;
+    }
+
+    .bg-gov-dark {
+        background-color: #1d1d1f;
+    }
+
+    .text-gov-dark {
+        color: #1d1d1f;
+    }
+
+    .bg-soft {
+        background-color: #ffffff;
+    }
 
     .btn-gov-blue {
         background-color: #0071e3;
@@ -77,18 +101,20 @@
         border: none;
         transition: background-color 0.2s ease, transform 0.2s ease;
     }
+
     .btn-gov-blue:hover {
         background-color: #0077ed;
         color: #ffffff;
         transform: scale(1.02);
     }
-    
+
     .btn-outline-light {
         color: #1d1d1f;
         border-color: #d2d2d7;
         background-color: transparent;
         transition: all 0.2s ease;
     }
+
     .btn-outline-light:hover {
         color: #0071e3;
         border-color: #0071e3;
@@ -113,7 +139,7 @@
         font-size: 1.2rem;
         color: #1d1d1f;
     }
-    
+
     .nav-ghost-btn {
         color: #0071e3;
         background-color: rgba(0, 113, 227, 0.08);
@@ -126,6 +152,7 @@
         align-items: center;
         gap: 6px;
     }
+
     .nav-ghost-btn:hover {
         background-color: rgba(0, 113, 227, 0.15);
         color: #005bb5;
@@ -155,9 +182,11 @@
         -webkit-text-fill-color: transparent;
         margin-bottom: 1.5rem !important;
     }
-    
+
     @media (max-width: 768px) {
-        .hero h1 { font-size: 2.5rem; }
+        .hero h1 {
+            font-size: 2.5rem;
+        }
     }
 
     .hero p {
@@ -172,23 +201,23 @@
         max-width: 480px;
         margin: 0 auto;
         display: block;
-        filter: drop-shadow(0 20px 40px rgba(0,0,0,0.08));
+        filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.08));
     }
 
     /* Cards & Glass Containers */
     .prayer-card {
         background: #ffffff;
-        border: 1px solid rgba(0,0,0,0.04);
+        border: 1px solid rgba(0, 0, 0, 0.04);
         border-radius: 20px !important;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
         transition: all 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
         padding: 16px;
         min-height: 100px;
     }
-    
+
     .prayer-card:hover {
         transform: translateY(-4px) scale(1.01);
-        box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
     }
 
     .prayer-card.active {
@@ -206,9 +235,9 @@
         letter-spacing: 0.05em;
         font-weight: 700;
     }
-    
+
     .prayer-card.active .prayer-label {
-        color: rgba(255,255,255,0.8);
+        color: rgba(255, 255, 255, 0.8);
     }
 
     .prayer-time {
@@ -218,7 +247,7 @@
         line-height: 1;
         letter-spacing: 1px;
     }
-    
+
     .prayer-card.active .prayer-time {
         color: #ffffff;
     }
@@ -242,13 +271,16 @@
             padding: 12px;
             min-height: 80px;
         }
+
         .prayer-time {
             font-size: 1.6rem;
         }
+
         .prayer-icon {
             font-size: 1.6rem;
             margin-left: 8px;
         }
+
         .prayer-label {
             font-size: 0.75rem;
             margin-bottom: 2px;
@@ -259,18 +291,22 @@
     .header-date-time {
         font-size: 1.1rem;
     }
+
     .header-date-time .clock-icon {
         font-size: 1.2rem;
     }
+
     .header-date-time .clock-text {
         font-size: 1.4rem;
         color: #1d1d1f;
         position: relative;
         top: 1px;
     }
+
     .countdown-next-label {
         font-size: 0.85rem;
     }
+
     .countdown-next-time {
         font-size: 2.8rem;
     }
@@ -279,15 +315,19 @@
         .header-date-time {
             font-size: 0.8rem;
         }
+
         .header-date-time .clock-icon {
             font-size: 0.85rem;
         }
+
         .header-date-time .clock-text {
             font-size: 0.95rem;
         }
+
         .countdown-next-label {
             font-size: 0.75rem;
         }
+
         .countdown-next-time {
             font-size: 2rem;
         }
@@ -296,10 +336,10 @@
     /* Countdown Banners */
     .countdown-banner {
         background: #ffffff;
-        border: 1px solid rgba(0,0,0,0.04);
+        border: 1px solid rgba(0, 0, 0, 0.04);
         border-radius: 24px;
         padding: 12px 20px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
         display: flex;
         align-items: center;
         gap: 16px;
@@ -336,7 +376,7 @@
         line-height: 1;
         letter-spacing: 2px;
     }
-    
+
     #current-time {
         color: #1d1d1f;
     }
@@ -347,14 +387,14 @@
         font-size: 1.25rem;
         color: #1d1d1f;
     }
-    
+
     /* Table & News Cards */
     .schedule-table {
         background: #ffffff;
         border-radius: 24px;
         padding: 12px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.02);
-        border: 1px solid rgba(0,0,0,0.04);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.04);
     }
 
     .schedule-table table {
@@ -364,7 +404,7 @@
         border-radius: 16px;
         overflow: hidden;
     }
-    
+
     .schedule-table thead th {
         background: #f5f5f7;
         color: #86868b;
@@ -376,17 +416,17 @@
         font-size: 0.85rem;
         letter-spacing: 0.05em;
     }
-    
+
     .schedule-table tbody td {
         padding: 18px 16px;
-        border-bottom: 1px solid rgba(0,0,0,0.03);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.03);
         color: #1d1d1f;
         font-family: 'LedDot', monospace;
         font-size: 1.4rem;
         letter-spacing: 1px;
         vertical-align: middle;
     }
-    
+
     .schedule-table tbody tr:last-child td {
         border-bottom: none;
     }
@@ -397,7 +437,7 @@
         border-color: #0071e3;
         font-weight: 700;
     }
-    
+
     .schedule-table tbody tr.today:hover td {
         background-color: #0062c3;
         color: #ffffff;
@@ -410,21 +450,29 @@
         letter-spacing: normal;
         font-weight: 600;
     }
+
     .schedule-table tbody td:nth-child(2) {
-        font-weight: normal; /* Tanggal tidak usah ditebalkan (bold) seperti nama hari */
+        font-weight: normal;
+        /* Tanggal tidak usah ditebalkan (bold) seperti nama hari */
     }
 
     @media (max-width: 768px) {
-        .schedule-month-table, .schedule-month-table tbody, .schedule-month-table tr, .schedule-month-table td {
+
+        .schedule-month-table,
+        .schedule-month-table tbody,
+        .schedule-month-table tr,
+        .schedule-month-table td {
             display: block;
             width: 100%;
         }
+
         .schedule-month-table thead {
             display: none;
         }
+
         .schedule-month-table tr {
             background: #ffffff;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
             border-radius: 16px;
             margin-bottom: 12px;
             padding: 16px;
@@ -432,52 +480,63 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .schedule-month-table tr:hover {
             background-color: #ffffff;
             box-shadow: none;
-            border-color: rgba(0,0,0,0.05);
+            border-color: rgba(0, 0, 0, 0.05);
         }
+
         /* Override Bootstrap's table-hover which targets td */
         .schedule-month-table tbody tr:hover td {
             background-color: transparent !important;
             box-shadow: none !important;
         }
+
         .schedule-month-table tr.today {
             border-color: #0071e3;
             background-color: #0071e3;
             color: #ffffff;
         }
+
         .schedule-month-table tr.today:hover {
             background-color: #0071e3;
             border-color: #0071e3;
         }
+
         .schedule-month-table tr.today td,
         .schedule-month-table tr.today:hover td {
             background-color: transparent !important;
             color: #ffffff !important;
-            border-bottom-color: rgba(255,255,255,0.2);
+            border-bottom-color: rgba(255, 255, 255, 0.2);
         }
+
         .schedule-month-table tr.today td::before {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.8);
         }
+
         .schedule-month-table tr.today td:nth-child(1),
         .schedule-month-table tr.today td:nth-child(2) {
             color: #ffffff !important;
         }
+
         .schedule-month-table tr.today.expanded td:nth-child(3) {
-            border-top-color: rgba(255,255,255,0.2);
+            border-top-color: rgba(255, 255, 255, 0.2);
         }
+
         .schedule-month-table td {
             display: none;
             text-align: right !important;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
             font-size: 1rem;
         }
+
         .schedule-month-table td:last-child {
             border-bottom: none;
             padding-bottom: 0;
         }
+
         .schedule-month-table td::before {
             content: attr(data-label);
             float: left;
@@ -485,7 +544,7 @@
             color: #86868b;
             font-family: 'PlusJakartaSansText', sans-serif;
         }
-        
+
         .schedule-month-table td:nth-child(1),
         .schedule-month-table td:nth-child(2) {
             display: inline-block;
@@ -494,21 +553,24 @@
             padding: 0;
             text-align: left !important;
         }
+
         .schedule-month-table td:nth-child(1)::before,
         .schedule-month-table td:nth-child(2)::before {
             display: none;
         }
+
         .schedule-month-table td:nth-child(1) {
             font-size: 1.1rem;
             margin-right: 6px;
             color: #1d1d1f;
         }
+
         .schedule-month-table td:nth-child(2) {
             font-size: 1.1rem;
             color: #86868b;
             font-weight: 400;
         }
-        
+
         .mobile-expand-icon {
             position: absolute;
             right: 20px;
@@ -517,26 +579,31 @@
             font-size: 1rem;
             transition: transform 0.3s ease;
         }
+
         .schedule-month-table tr.today .mobile-expand-icon {
             color: #ffffff;
         }
-        
+
         .schedule-month-table tr.expanded {
             padding-bottom: 16px;
         }
+
         .schedule-month-table tr.expanded .mobile-expand-icon {
             transform: rotate(180deg);
         }
+
         .schedule-month-table tr.expanded td {
             display: block;
         }
+
         .schedule-month-table tr.expanded td:nth-child(1),
         .schedule-month-table tr.expanded td:nth-child(2) {
             display: inline-block;
         }
+
         .schedule-month-table tr.expanded td:nth-child(3) {
             margin-top: 12px;
-            border-top: 1px solid rgba(0,0,0,0.06);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
             padding-top: 16px;
         }
     }
@@ -545,14 +612,16 @@
     .features-section {
         background-color: #fbfbfd;
     }
+
     .feature-card {
         transition: all 0.4s cubic-bezier(0.1, 0.8, 0.2, 1);
         height: 100%;
     }
+
     .feature-card:hover {
         transform: translateY(-4px);
     }
-    
+
     .footer-icon {
         color: #86868b;
         font-size: 1.35rem;
@@ -560,6 +629,7 @@
         transition: color 0.2s ease;
         text-decoration: none;
     }
+
     .footer-icon:hover {
         color: #ffffff;
     }
@@ -570,6 +640,7 @@
         gap: 6px;
         align-items: center;
     }
+
     .apple-page-btn {
         width: 32px;
         height: 32px;
@@ -586,18 +657,22 @@
         transition: all 0.2s ease;
         cursor: pointer;
     }
+
     .apple-page-btn:hover:not(:disabled) {
         background: #f5f5f7;
     }
+
     .apple-page-btn.active {
         background: #0071e3;
         color: #ffffff;
     }
+
     .apple-page-btn:disabled {
         color: #d2d2d7;
         cursor: not-allowed;
         background: transparent;
     }
+
     .form-select.apple-select {
         border: none;
         background-color: #f5f5f7;
@@ -607,13 +682,15 @@
         box-shadow: none;
         transition: all 0.2s ease;
     }
+
     .form-select.apple-select:hover {
         background-color: #e8e8ed;
     }
+
     .form-select.apple-select:focus {
         box-shadow: 0 0 0 0.25rem rgba(0, 113, 227, 0.25);
     }
-    
+
     .schedule-table tbody tr:hover {
         background-color: #fbfbfd;
     }
@@ -621,8 +698,8 @@
     /* Article Cards */
     .article-card {
         border-radius: 24px;
-        border: 1px solid rgba(0,0,0,0.04);
-        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
         background: #ffffff;
         overflow: hidden;
         transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 0.3s ease;
@@ -630,14 +707,14 @@
         display: flex;
         flex-direction: column;
     }
-    
+
     .article-card:hover {
         transform: translateY(-6px);
-        box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
     }
 
     .article-card img {
-        border-bottom: 1px solid rgba(0,0,0,0.04);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     }
 
     .article-card .card-body {
@@ -645,7 +722,7 @@
         display: flex;
         flex-direction: column;
     }
-    
+
     .article-title {
         font-family: 'PlusJakartaSansDisplay', sans-serif;
         font-weight: 700;
@@ -659,7 +736,8 @@
         color: #86868b !important;
         font-size: 0.95rem;
         line-height: 1.6;
-        margin-bottom: auto; /* push button to bottom */
+        margin-bottom: auto;
+        /* push button to bottom */
     }
 
     .btn-outline-gov-blue {
@@ -669,7 +747,7 @@
         padding: 8px 20px;
         font-weight: 600;
     }
-    
+
     .btn-outline-gov-blue:hover {
         background-color: #0071e3;
         color: #ffffff;
@@ -678,8 +756,8 @@
     /* Leaflet Map */
     #map {
         border-radius: 24px;
-        border: 1px solid rgba(0,0,0,0.04);
-        box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
         overflow: hidden;
     }
 
@@ -687,16 +765,17 @@
     .gallery-carousel {
         border-radius: 32px;
         overflow: hidden;
-        box-shadow: 0 24px 48px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
-        transform: translateZ(0); /* Anti-aliasing pada sudut membulat */
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.03);
+        transform: translateZ(0);
+        /* Anti-aliasing pada sudut membulat */
     }
-    
+
     .gallery-carousel .carousel-item img {
         height: 560px;
         object-fit: cover;
         width: 100%;
     }
-    
+
     @media (max-width: 768px) {
         .gallery-carousel .carousel-item img {
             height: 300px;
@@ -709,30 +788,30 @@
         color: #f5f5f7 !important;
         padding: 5rem 0 3rem 0;
     }
-    
+
     footer .text-gov-dark {
         color: #f5f5f7 !important;
     }
-    
+
     footer h5 {
         color: #ffffff;
         font-family: 'PlusJakartaSansDisplay', sans-serif;
         font-size: 1.1rem;
         margin-bottom: 1.5rem;
     }
-    
+
     footer a {
         color: #86868b !important;
         transition: color 0.2s ease;
         text-decoration: none;
     }
-    
+
     footer a:hover {
         color: #ffffff !important;
     }
-    
+
     footer hr {
-        border-color: rgba(255,255,255,0.1);
+        border-color: rgba(255, 255, 255, 0.1);
         margin: 2rem 0;
     }
 
