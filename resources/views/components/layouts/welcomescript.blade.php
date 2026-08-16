@@ -86,28 +86,57 @@
         
         paginationWrapper.style.display = 'flex';
 
+        let activeRows = rows;
+
+        const filterDateInput = document.getElementById('filterDate');
+        const resetFilterBtn = document.getElementById('resetFilterBtn');
+
+        if (filterDateInput && resetFilterBtn) {
+            filterDateInput.addEventListener('change', function() {
+                const val = this.value;
+                if (val) {
+                    activeRows = rows.filter(r => r.getAttribute('data-date') === val);
+                    resetFilterBtn.style.display = 'inline-block';
+                } else {
+                    activeRows = rows;
+                    resetFilterBtn.style.display = 'none';
+                }
+                currentPage = 1;
+                renderTable();
+            });
+
+            resetFilterBtn.addEventListener('click', function() {
+                filterDateInput.value = '';
+                activeRows = rows;
+                resetFilterBtn.style.display = 'none';
+                currentPage = 1;
+                renderTable();
+            });
+        }
+
         function renderTable() {
             const isAll = pageSizeSelect.value === 'all';
-            const currentSize = isAll ? totalRows : pageSize;
-            const totalPages = isAll ? 1 : Math.ceil(totalRows / currentSize);
+            const currentTotal = activeRows.length;
+            const currentSize = isAll ? (currentTotal || 1) : pageSize;
+            const totalPages = isAll ? 1 : Math.ceil(currentTotal / currentSize);
             
-            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
 
             const startIdx = (currentPage - 1) * currentSize;
             const endIdx = startIdx + currentSize;
 
-            rows.forEach((row, index) => {
+            rows.forEach(r => r.style.display = 'none');
+
+            activeRows.forEach((row, index) => {
                 if (isAll || (index >= startIdx && index < endIdx)) {
                     row.style.display = '';
-                } else {
-                    row.style.display = 'none';
                 }
             });
 
-            const displayStart = startIdx + 1;
-            const displayEnd = isAll ? totalRows : Math.min(endIdx, totalRows);
-            pageInfo.textContent = `Menampilkan ${displayStart}-${displayEnd} dari ${totalRows} data`;
+            const displayStart = currentTotal === 0 ? 0 : startIdx + 1;
+            const displayEnd = isAll ? currentTotal : Math.min(endIdx, currentTotal);
+            pageInfo.textContent = `Menampilkan ${displayStart}-${displayEnd} dari ${currentTotal} data`;
 
             renderPagination(totalPages);
         }

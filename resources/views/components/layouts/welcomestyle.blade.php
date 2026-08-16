@@ -141,16 +141,7 @@
         position: relative;
     }
 
-    .hero::before {
-        content: "";
-        position: absolute;
-        top: -10%;
-        left: -5%;
-        width: 50%;
-        height: 60%;
-        background: radial-gradient(circle, rgba(0,113,227,0.06) 0%, rgba(255,255,255,0) 70%);
-        z-index: 0;
-    }
+
 
     .hero .container {
         position: relative;
@@ -182,11 +173,6 @@
         margin: 0 auto;
         display: block;
         filter: drop-shadow(0 20px 40px rgba(0,0,0,0.08));
-        transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
-    }
-    
-    .hero-composite:hover {
-        transform: translateY(-10px);
     }
 
     /* Cards & Glass Containers */
@@ -417,11 +403,15 @@
         color: #ffffff;
     }
 
-    .schedule-table tbody td:first-child {
+    .schedule-table tbody td:first-child,
+    .schedule-table tbody td:nth-child(2) {
         font-family: 'PlusJakartaSansText', sans-serif;
         font-size: 1.05rem;
         letter-spacing: normal;
         font-weight: 600;
+    }
+    .schedule-table tbody td:nth-child(2) {
+        font-weight: normal; /* Tanggal tidak usah ditebalkan (bold) seperti nama hari */
     }
 
     @media (max-width: 768px) {

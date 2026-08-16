@@ -153,8 +153,25 @@
 
         <section class="py-5">
             <div class="container">
-                <h2 class="mb-3 text-gov-dark fw-bold">Jadwal Sholat Kota Pekanbaru - {{ $monthName ?? '' }}
-                    {{ $yearNumber ?? '' }}</h2>
+                @php
+                    $minDate = '';
+                    $maxDate = '';
+                    if (!empty($jadwalSholat)) {
+                        $minDate = collect($jadwalSholat)->first()['date'] ?? '';
+                        $maxDate = collect($jadwalSholat)->last()['date'] ?? '';
+                    }
+                @endphp
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3">
+                    <div>
+                        <h2 class="mb-1 text-gov-dark fw-bold">Jadwal Sholat Kota Pekanbaru - {{ $monthName ?? '' }} {{ $yearNumber ?? '' }}</h2>
+                    </div>
+                    <div class="mt-3 mt-md-0 d-flex gap-2 align-items-center">
+                        <label for="filterDate" class="text-muted small fw-semibold mb-0" style="white-space: nowrap;">Cari Tanggal:</label>
+                        <input type="date" id="filterDate" class="form-control form-control-sm rounded-pill px-3" style="width: auto; border-color: #d2d2d7; font-family: 'PlusJakartaSansText', sans-serif;" min="{{ $minDate }}" max="{{ $maxDate }}">
+                        <button type="button" id="resetFilterBtn" class="btn btn-sm btn-outline-secondary rounded-pill" style="display: none;">Reset</button>
+                    </div>
+                </div>
+                
                 @if (!empty($jadwalSholat))
                     <div class="schedule-table">
                         <div class="table-responsive">
@@ -177,20 +194,20 @@
                                 <tbody>
                                     @foreach ($jadwalSholat as $row)
                                         @php $isToday = !empty($todayIsoDate) && ($row['date'] ?? '') === $todayIsoDate; @endphp
-                                        <tr class="{{ $isToday ? 'today expanded' : '' }}">
-                                            @php
-                                                $iso = $row['date'] ?? null;
-                                                if ($iso) {
-                                                    $hari = \Carbon\Carbon::parse($iso, 'Asia/Jakarta')
-                                                        ->locale('id')
-                                                        ->translatedFormat('l');
-                                                    $tgl = \Carbon\Carbon::parse($iso, 'Asia/Jakarta')->format('d/m/Y');
-                                                } else {
-                                                    $parts = explode(',', $row['tanggal'] ?? ',');
-                                                    $hari = trim($parts[0] ?? '');
-                                                    $tgl = trim($parts[1] ?? '');
-                                                }
-                                            @endphp
+                                        @php
+                                            $iso = $row['date'] ?? null;
+                                            if ($iso) {
+                                                $hari = \Carbon\Carbon::parse($iso, 'Asia/Jakarta')
+                                                    ->locale('id')
+                                                    ->translatedFormat('l');
+                                                $tgl = \Carbon\Carbon::parse($iso, 'Asia/Jakarta')->format('d/m/Y');
+                                            } else {
+                                                $parts = explode(',', $row['tanggal'] ?? ',');
+                                                $hari = trim($parts[0] ?? '');
+                                                $tgl = trim($parts[1] ?? '');
+                                            }
+                                        @endphp
+                                        <tr class="{{ $isToday ? 'today expanded' : '' }}" data-date="{{ $iso }}">
                                             <td data-label="Hari" class="fw-bold text-gov-dark">{{ $hari }}
                                             </td>
                                             <td data-label="Tanggal" class="text-gov-dark">
