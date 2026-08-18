@@ -687,7 +687,7 @@
                                     </span>
                                     <span class="nav-link-title text-white">
                                         Agenda
-                                        <span class="badge bg-danger me-5 mt-2 text-white rounded-4">New</span>
+                                        {{-- <span class="badge bg-danger me-5 mt-2 text-white rounded-4">New</span> --}}
                                     </span>
                                 </a>
                             </li>
