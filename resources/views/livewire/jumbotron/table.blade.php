@@ -20,49 +20,83 @@
                     <td class="text-center text-muted">
                         {{ $loop->iteration + ($jumboList->currentPage() - 1) * $jumboList->perPage() }}
                     </td>
-                    <td class="text-wrap">{{ $jumbo->user->name ?? '-' }}</td>
-                    <td>
-                        @if ($jumbo->jumbo1)
-                            <img src="{{ asset($jumbo->jumbo1) }}" width="60" class="img-thumbnail">
-                        @else
-                            <span class="text-gray-400">-</span>
-                        @endif
+                    <td class="text-wrap">
+                        {{ $jumbo->user->name ?? '-' }}
+                        <div class="mt-1">
+                            @if ($jumbo->media_type === 'video')
+                                <span class="badge bg-purple-lt">Video</span>
+                                @if ($jumbo->has_audio)
+                                    <span class="badge bg-teal-lt" title="Audio Aktif">Audio On</span>
+                                @else
+                                    <span class="badge bg-secondary-lt" title="Mode Bisu">Muted</span>
+                                @endif
+                            @else
+                                <span class="badge bg-azure-lt">Gambar</span>
+                            @endif
+                        </div>
                     </td>
-                    <td>
-                        @if ($jumbo->jumbo2)
-                            <img src="{{ asset($jumbo->jumbo2) }}" width="60" class="img-thumbnail">
-                        @else
-                            <span class="text-gray-400">-</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($jumbo->jumbo3)
-                            <img src="{{ asset($jumbo->jumbo3) }}" width="60" class="img-thumbnail">
-                        @else
-                            <span class="text-gray-400">-</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($jumbo->jumbo4)
-                            <img src="{{ asset($jumbo->jumbo4) }}" width="60" class="img-thumbnail">
-                        @else
-                            <span class="text-gray-400">-</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($jumbo->jumbo5)
-                            <img src="{{ asset($jumbo->jumbo5) }}" width="60" class="img-thumbnail">
-                        @else
-                            <span class="text-gray-400">-</span>
-                        @endif
-                    </td>
-                    <td>
-                        @if ($jumbo->jumbo6)
-                            <img src="{{ asset($jumbo->jumbo6) }}" width="60" class="img-thumbnail">
-                        @else
-                            <span class="text-gray-400">-</span>
-                        @endif
-                    </td>
+                    @if ($jumbo->media_type === 'video')
+                        <td colspan="6" class="text-start">
+                            <div class="d-flex align-items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                                <div>
+                                    @if ($jumbo->video_file)
+                                        <a href="{{ asset($jumbo->video_file) }}" target="_blank" class="fw-bold text-decoration-none">
+                                            {{ basename($jumbo->video_file) }}
+                                        </a>
+                                        @if ($jumbo->video_duration)
+                                            <span class="text-muted small ms-1">({{ gmdate('i:s', $jumbo->video_duration) }})</span>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">- Belum ada file video -</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </td>
+                    @else
+                        <td>
+                            @if ($jumbo->jumbo1)
+                                <img src="{{ asset($jumbo->jumbo1) }}" width="60" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($jumbo->jumbo2)
+                                <img src="{{ asset($jumbo->jumbo2) }}" width="60" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($jumbo->jumbo3)
+                                <img src="{{ asset($jumbo->jumbo3) }}" width="60" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($jumbo->jumbo4)
+                                <img src="{{ asset($jumbo->jumbo4) }}" width="60" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($jumbo->jumbo5)
+                                <img src="{{ asset($jumbo->jumbo5) }}" width="60" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($jumbo->jumbo6)
+                                <img src="{{ asset($jumbo->jumbo6) }}" width="60" class="img-thumbnail">
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                    @endif
                     <td>
                         <span class="badge {{ $jumbo->is_active ? 'bg-primary-lt' : 'bg-danger-lt' }}">
                             {{ $jumbo->is_active ? 'Aktif' : 'Tidak Aktif' }}

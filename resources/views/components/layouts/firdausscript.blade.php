@@ -907,6 +907,15 @@
 
         // Fungsi untuk menjeda audio
         function pauseAudio() {
+            // Emergency stop video jumbotron jika sedang diputar
+            if (typeof window.cleanupJumbotronVideo === 'function' && window.isJumbotronVideoPlaying) {
+                window.cleanupJumbotronVideo();
+                window.isJumbotronVideoPlaying = false;
+                window.inJumbotronPhase = false;
+                $('#jumbotronImage').hide();
+                console.log('Video jumbotron dihentikan darurat karena waktu sholat/adzan');
+            }
+
             // Jika audio sudah dijeda untuk adzan, tidak perlu melakukan apa-apa
             if (isAudioPausedForAdzan) {
                 return;
@@ -4101,6 +4110,15 @@
                     pauseAudio();
                     isAudioPausedForAdzan = true;
                 }
+                // Hentikan video jika sedang berputar di jendela pra-adzan
+                if (window.isJumbotronVideoPlaying) {
+                    if (typeof window.cleanupJumbotronVideo === 'function') {
+                        window.cleanupJumbotronVideo();
+                    }
+                    window.isJumbotronVideoPlaying = false;
+                    window.inJumbotronPhase = false;
+                    $('#jumbotronImage').hide();
+                }
             } else {
                 // Reset flag jika sudah di luar jendela waktu jeda
                 // Ini akan direset dengan benar saat adzan selesai
@@ -4260,14 +4278,44 @@
         // Objek global untuk menyimpan cache gambar
         window.imageCache = window.imageCache || {};
 
+        function normalizeJumbotronItem(item) {
+            if (!item) return null;
+            if (typeof item === 'string') {
+                const trimmed = item.trim();
+                if (!trimmed) return null;
+                const clean = trimmed.split('?')[0].toLowerCase();
+                const isVideo = clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.ogg');
+                return {
+                    type: isVideo ? 'video' : 'image',
+                    url: trimmed,
+                    has_audio: false,
+                    duration: isVideo ? 0 : 20
+                };
+            }
+            if (typeof item === 'object') {
+                const url = (item.url || '').trim();
+                if (!url) return null;
+                return {
+                    type: item.type === 'video' ? 'video' : 'image',
+                    url: url,
+                    has_audio: Boolean(item.has_audio),
+                    duration: parseInt(item.duration, 10) || 0
+                };
+            }
+            return null;
+        }
+
         function getAllActiveUrls() {
             const slideUrls = window.slideUrls || [];
             const iqomahImages = window.iqomahImages || [];
             const fridayImages = window.fridayImages || [];
-            const jumbotronUrls = Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [];
+            const jumbotronUrls = (Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])
+                .map(normalizeJumbotronItem)
+                .filter(item => item && item.type === 'image')
+                .map(item => item.url);
             const adzan15 = $('#adzan15').val() || '/images/other/lurus-rapat-shaf-default.webp';
             return [...new Set([...slideUrls, ...iqomahImages, ...fridayImages, ...jumbotronUrls, adzan15])]
-                .filter(url => url.trim() !== '');
+                .filter(url => typeof url === 'string' && url.trim() !== '');
         }
 
         function clearUnusedCache(currentUrls) {
@@ -4293,10 +4341,15 @@
 
         // Fungsi preloadImages yang sudah ada
         function preloadImages(urls) {
-            return Promise.all(urls.map(url => {
+            const validImageUrls = (urls || []).filter(url => {
+                if (typeof url !== 'string' || url.trim() === '') return false;
+                const lower = url.toLowerCase().split('?')[0];
+                return !lower.endsWith('.mp4') && !lower.endsWith('.webm') && !lower.endsWith('.ogg');
+            });
+            return Promise.all(validImageUrls.map(url => {
                 return new Promise((resolve, reject) => {
                     if (window.imageCache[url] && window.imageCache[url].complete) {
-                        console.log(`Gambar sudah ada di cache: ${url}`);
+                        // console.log(`Gambar sudah ada di cache: ${url}`);
                         resolve(window.imageCache[url]);
                         return;
                     }
@@ -4414,8 +4467,9 @@
                         $('#jumbotron_is_active').val(d.is_active ? 'true' : 'false');
                         try {
                             const seq = Array.isArray(d.items) ? d.items : [];
-                            window.jumbotronSequence = seq.filter(u => typeof u === 'string' && u
-                                .trim() !== '');
+                            window.jumbotronSequence = seq
+                                .map(normalizeJumbotronItem)
+                                .filter(Boolean);
                             $('#jumbotron-sequence').val(JSON.stringify(window.jumbotronSequence));
                         } catch (e) {
                             window.jumbotronSequence = [];
@@ -4440,9 +4494,130 @@
         function manageSlideDisplay() {
             const $mosqueImageElement = $('.mosque-image');
             const $jumbotronImageElement = $('#jumbotronImage');
+            const $jumbotronVideoElement = $('#jumbotronVideoPlayer');
+            const videoPlayer = $jumbotronVideoElement.length ? $jumbotronVideoElement[0] : null;
+
             if (!$mosqueImageElement.length || !$jumbotronImageElement.length) {
                 console.warn('Elemen .mosque-image atau #jumbotronImage tidak ditemukan');
                 return;
+            }
+
+            window.isJumbotronVideoPlaying = false;
+            window.isAudioPausedForVideo = false;
+            window.lastVideoEndTime = 0;
+            let videoSafetyTimer = null;
+
+            function cleanupVideoMemory() {
+                if (videoSafetyTimer) {
+                    clearTimeout(videoSafetyTimer);
+                    videoSafetyTimer = null;
+                }
+                if (videoPlayer) {
+                    try {
+                        videoPlayer.pause();
+                        videoPlayer.removeAttribute('src');
+                        videoPlayer.load();
+                    } catch (e) {
+                        console.warn('Gagal membersihkan buffer video:', e);
+                    }
+                    $jumbotronVideoElement.hide();
+                }
+            }
+            window.cleanupJumbotronVideo = cleanupVideoMemory;
+
+            function pauseAudioForVideo() {
+                if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying && typeof audioPlayer !== 'undefined' && audioPlayer) {
+                    try {
+                        audioPlayer.pause();
+                        isAudioPlaying = false;
+                        window.isAudioPausedForVideo = true;
+                        console.log('Background murottal audio dijeda untuk video jumbotron');
+                    } catch (e) {}
+                }
+            }
+
+            function resumeAudioFromVideo() {
+                if (window.isAudioPausedForVideo) {
+                    window.isAudioPausedForVideo = false;
+                    if (typeof isAudioPausedForAdzan !== 'undefined' && !isAudioPausedForAdzan &&
+                        typeof isAdzanPlaying !== 'undefined' && !isAdzanPlaying) {
+                        try {
+                            if (typeof playAudio === 'function') {
+                                playAudio();
+                                console.log('Background murottal audio dilanjutkan setelah video jumbotron selesai');
+                            }
+                        } catch (e) {}
+                    }
+                }
+            }
+
+            function onVideoFinished() {
+                if (!window.isJumbotronVideoPlaying) return;
+                console.log('Video jumbotron selesai diputar');
+                cleanupVideoMemory();
+                resumeAudioFromVideo();
+                window.isJumbotronVideoPlaying = false;
+                window.inJumbotronPhase = false;
+                window.lastVideoEndTime = Date.now();
+                $jumbotronImageElement.hide();
+                updateSlide();
+            }
+
+            function playJumbotronVideo(videoItem) {
+                if (!videoPlayer) {
+                    console.warn('Elemen jumbotronVideoPlayer tidak ditemukan');
+                    return;
+                }
+                window.isJumbotronVideoPlaying = true;
+
+                $mosqueImageElement.hide();
+                $jumbotronImageElement.css({
+                    'background-image': 'none',
+                    'display': 'block'
+                });
+                $jumbotronVideoElement.show();
+
+                videoPlayer.onended = null;
+                videoPlayer.onerror = null;
+
+                if (videoItem.has_audio) {
+                    pauseAudioForVideo();
+                    videoPlayer.muted = false;
+                    videoPlayer.volume = 1.0;
+                } else {
+                    videoPlayer.muted = true;
+                }
+
+                videoPlayer.src = videoItem.url;
+                videoPlayer.load();
+
+                videoPlayer.onended = function() {
+                    onVideoFinished();
+                };
+
+                videoPlayer.onerror = function(e) {
+                    console.error('Error saat pemutaran video jumbotron:', e);
+                    onVideoFinished();
+                };
+
+                const maxDurationSec = Math.max(30, (videoItem.duration ? videoItem.duration + 15 : 600));
+                if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
+                videoSafetyTimer = setTimeout(() => {
+                    console.warn('Safety timeout video jumbotron tercapai, beralih ke slide berikutnya');
+                    onVideoFinished();
+                }, maxDurationSec * 1000);
+
+                const playPromise = videoPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.warn('Autoplay video bersuara diblokir browser policy, mencoba fallback muted:', error);
+                        videoPlayer.muted = true;
+                        videoPlayer.play().catch(err2 => {
+                            console.error('Fallback pemutaran video jumbotron gagal:', err2);
+                            onVideoFinished();
+                        });
+                    });
+                }
             }
 
             // Inisialisasi slideUrls
@@ -4456,46 +4631,51 @@
             ].filter(url => url.trim() !== '');
 
             if (window.slideUrls.length === 0) {
-                // console.warn('Tidak ada slide mosque-image yang valid, menggunakan gambar default');
                 window.slideUrls = ['/images/other/slide-jws-default.jpg'];
             }
 
             // Inisialisasi jumbotron sequence dari hidden input
             try {
                 const rawSeq = $('#jumbotron-sequence').val();
-                window.jumbotronSequence = JSON.parse(rawSeq || '[]').filter(u => typeof u === 'string' && u
-                    .trim() !== '');
+                window.jumbotronSequence = JSON.parse(rawSeq || '[]')
+                    .map(normalizeJumbotronItem)
+                    .filter(Boolean);
             } catch (e) {
                 window.jumbotronSequence = [];
             }
 
             async function initSlider() {
                 try {
-                    const allUrls = [...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
-                        window.jumbotronSequence : [])];
+                    const imageItemsToPreload = (Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])
+                        .filter(item => item && item.type === 'image')
+                        .map(item => item.url);
+                    const allUrls = [...window.slideUrls, ...imageItemsToPreload];
                     await preloadImages(allUrls);
-                    // console.log('Semua gambar telah dimuat, memulai slider', allUrls);
 
                     const slideDuration = 20000; // 20 detik per gambar
 
                     function updateSlide() {
+                        if (window.isJumbotronVideoPlaying) {
+                            return;
+                        }
+
                         const isSequenceActive = $('#jumbotron_is_active').val() === 'true' && Array
                             .isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
                         if (!isSequenceActive) {
                             window.jumbotronSequence = [];
                             $jumbotronImageElement.css('display', 'none');
+                            cleanupVideoMemory();
+                            resumeAudioFromVideo();
                         }
 
                         if (window.slideUrls.length === 0) {
-                            console.warn('slideUrls kosong, menggunakan gambar default');
                             window.slideUrls = ['/images/other/slide-jws-default.jpg'];
                         }
 
                         const now = getCurrentTimeFromServer();
                         const totalSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now
                             .getSeconds();
-                        const slideCycleDuration = slideDuration * window.slideUrls
-                            .length; // Durasi siklus penuh mosque-image
+                        const slideCycleDuration = slideDuration * window.slideUrls.length;
                         const totalCycleDuration = isSequenceActive ? slideCycleDuration + slideDuration :
                             slideCycleDuration;
 
@@ -4503,37 +4683,46 @@
                             totalCycleDuration;
                         const imageIndex = Math.floor(cyclePosition / slideDuration);
 
+                        const isVideoCooldown = (Date.now() - (window.lastVideoEndTime || 0)) < slideDuration;
+
                         let currentUrl;
-                        if (isSequenceActive && imageIndex === window.slideUrls.length) {
+                        if (isSequenceActive && imageIndex === window.slideUrls.length && !isVideoCooldown) {
                             if (!window.inJumbotronPhase) {
                                 window.inJumbotronPhase = true;
                                 window.jsIndex = typeof window.jsIndex === 'number' ? window.jsIndex : 0;
                                 const seqLen = window.jumbotronSequence.length;
                                 const nextIndex = seqLen > 0 ? (window.jsIndex % seqLen) : 0;
                                 window.jsIndex++;
-                                window.currentJumbotronUrl = window.imageCache[window.jumbotronSequence[
-                                        nextIndex]]?.src ||
-                                    window.jumbotronSequence[nextIndex] ||
-                                    '/images/other/slide-jws-default.jpg';
+                                window.currentJumbotronItem = window.jumbotronSequence[nextIndex];
                             }
-                            currentUrl = window.currentJumbotronUrl ||
-                                '/images/other/slide-jws-default.jpg';
-                            $mosqueImageElement.css('display', 'none');
-                            $jumbotronImageElement.css({
-                                'background-image': `url("${currentUrl}")`,
-                                'display': 'block',
-                                'transition': 'background-image 0.5s ease-in-out'
-                            });
-                            // Reset dan jalankan animasi progress bar
-                            // const $progressBar = $('.jumbotron-progress-bar');
-                            // $progressBar.css('width', '0%');
-                            // $progressBar.css('animation',
-                            //     `progressAnimation ${slideDuration}ms linear forwards`);
-                            // console.log(
-                            // `Jumbotron ditampilkan: Index ${currentJumboIndex}, URL ${currentUrl}`);
+
+                            const currentItem = window.currentJumbotronItem;
+                            if (!currentItem) {
+                                window.inJumbotronPhase = false;
+                                return;
+                            }
+
+                            if (currentItem.type === 'video') {
+                                playJumbotronVideo(currentItem);
+                            } else {
+                                cleanupVideoMemory();
+                                resumeAudioFromVideo();
+                                currentUrl = window.imageCache[currentItem.url]?.src ||
+                                    currentItem.url ||
+                                    '/images/other/slide-jws-default.jpg';
+                                $mosqueImageElement.css('display', 'none');
+                                $jumbotronImageElement.css({
+                                    'background-image': `url("${currentUrl}")`,
+                                    'display': 'block',
+                                    'transition': 'background-image 0.5s ease-in-out'
+                                });
+                            }
                         } else {
                             window.inJumbotronPhase = false;
-                            window.currentJumbotronUrl = null;
+                            window.currentJumbotronItem = null;
+                            cleanupVideoMemory();
+                            resumeAudioFromVideo();
+
                             const slideIndex = imageIndex % window.slideUrls.length;
                             currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
                                 window.slideUrls[slideIndex] ||
@@ -4544,26 +4733,19 @@
                                 'display': 'block',
                                 'transition': 'background-image 0.5s ease-in-out'
                             });
-                            // Hentikan animasi progress bar saat jumbotron tidak ditampilkan
-                            // $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
-                            // console.log(`Mosque-image ditampilkan: Index ${slideIndex}, URL ${currentUrl}`);
                         }
 
                         clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
                             window.jumbotronSequence : [])]);
-                        $(document).trigger('slideUpdated'); // Picu event slideUpdated
+                        $(document).trigger('slideUpdated');
                     }
 
                     updateSlide();
                     setInterval(updateSlide, 1000);
 
                     $(document).on('slidesUpdated', async function(event, newSlides) {
-                        // console.log('Event slidesUpdated diterima, memperbarui slider');
                         const newUrls = newSlides.filter(url => url.trim() !== '');
                         if (newUrls.length === 0) {
-                            console.warn(
-                                'Tidak ada slide baru yang valid, menggunakan gambar default'
-                            );
                             window.slideUrls = ['/images/other/slide-jws-default.jpg'];
                         } else {
                             window.slideUrls = newUrls;
@@ -4572,11 +4754,9 @@
                         const urlsToPreload = window.slideUrls.filter(url => !window.imageCache[
                             url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
-                            console.log(`Preload gambar baru: ${urlsToPreload}`);
                             await preloadImages(urlsToPreload);
                         }
 
-                        // console.log('slideUrls diperbarui:', window.slideUrls);
                         clearUnusedCache([...window.slideUrls, ...(Array.isArray(window
                             .jumbotronSequence) ? window.jumbotronSequence : [])]);
                     });
@@ -4584,13 +4764,16 @@
                     $(document).on('jumbotronUpdated', async function() {
                         try {
                             const seqRaw = $('#jumbotron-sequence').val();
-                            window.jumbotronSequence = JSON.parse(seqRaw || '[]').filter(u =>
-                                typeof u === 'string' && u.trim() !== '');
+                            window.jumbotronSequence = JSON.parse(seqRaw || '[]')
+                                .map(normalizeJumbotronItem)
+                                .filter(Boolean);
                         } catch (e) {
                             window.jumbotronSequence = [];
                         }
-                        const urlsToPreload = window.jumbotronSequence.filter(url => !window
-                            .imageCache[url] || !window.imageCache[url].complete);
+                        const urlsToPreload = window.jumbotronSequence
+                            .filter(item => item.type === 'image')
+                            .map(item => item.url)
+                            .filter(url => !window.imageCache[url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
                             await preloadImages(urlsToPreload);
                         }
@@ -4601,16 +4784,18 @@
                             if (newHash !== window.jumbotronSequenceHash) {
                                 window.jumbotronSequenceHash = newHash;
                                 window.jsIndex = 0;
+                                if (window.isJumbotronVideoPlaying) {
+                                    cleanupVideoMemory();
+                                    resumeAudioFromVideo();
+                                    window.isJumbotronVideoPlaying = false;
+                                }
                                 window.inJumbotronPhase = false;
-                                window.currentJumbotronUrl = null;
+                                window.currentJumbotronItem = null;
                             }
                         } catch (e) {}
                     });
-
-                    // jumbotronMasjidUpdated deprecated; use jumbotronUpdated
                 } catch (error) {
                     console.error('Error saat menginisialisasi slider:', error);
-                    // Fallback: Gunakan gambar default jika preload gagal
                     window.slideUrls = ['/images/other/slide-jws-default.jpg'];
                     const fallbackUrl = window.imageCache[window.slideUrls[0]]?.src || window.slideUrls[0];
                     $mosqueImageElement.css({
@@ -4619,8 +4804,6 @@
                         'transition': 'background-image 0.5s ease-in-out'
                     });
                     $jumbotronImageElement.css('display', 'none');
-                    // Hentikan animasi progress bar pada fallback
-                    // $('.jumbotron-progress-bar').css('animation', 'none').css('width', '0%');
                     $(document).trigger('slideUpdated');
                 }
             }

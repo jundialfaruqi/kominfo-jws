@@ -50,12 +50,21 @@ class MasterController extends Controller
         try {
             $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
             $data = [];
-            if ($jumbotron->jumbo1) $data[] = asset($jumbotron->jumbo1);
-            if ($jumbotron->jumbo2) $data[] = asset($jumbotron->jumbo2);
-            if ($jumbotron->jumbo3) $data[] = asset($jumbotron->jumbo3);
-            if ($jumbotron->jumbo4) $data[] = asset($jumbotron->jumbo4);
-            if ($jumbotron->jumbo5) $data[] = asset($jumbotron->jumbo5);
-            if ($jumbotron->jumbo6) $data[] = asset($jumbotron->jumbo6);
+            if ($jumbotron->media_type === 'video' && $jumbotron->video_file) {
+                $data[] = [
+                    'type' => 'video',
+                    'url' => asset($jumbotron->video_file),
+                    'has_audio' => (bool) $jumbotron->has_audio,
+                    'duration' => (int) $jumbotron->video_duration,
+                ];
+            } else {
+                if ($jumbotron->jumbo1) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo1)];
+                if ($jumbotron->jumbo2) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo2)];
+                if ($jumbotron->jumbo3) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo3)];
+                if ($jumbotron->jumbo4) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo4)];
+                if ($jumbotron->jumbo5) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo5)];
+                if ($jumbotron->jumbo6) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo6)];
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data jumbotron !',
@@ -102,12 +111,21 @@ class MasterController extends Controller
             $globalActive = false;
             try {
                 $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
-                if ($jumbotron->jumbo1) $globalItems[] = asset($jumbotron->jumbo1);
-                if ($jumbotron->jumbo2) $globalItems[] = asset($jumbotron->jumbo2);
-                if ($jumbotron->jumbo3) $globalItems[] = asset($jumbotron->jumbo3);
-                if ($jumbotron->jumbo4) $globalItems[] = asset($jumbotron->jumbo4);
-                if ($jumbotron->jumbo5) $globalItems[] = asset($jumbotron->jumbo5);
-                if ($jumbotron->jumbo6) $globalItems[] = asset($jumbotron->jumbo6);
+                if ($jumbotron->media_type === 'video' && $jumbotron->video_file) {
+                    $globalItems[] = [
+                        'type' => 'video',
+                        'url' => asset($jumbotron->video_file),
+                        'has_audio' => (bool) $jumbotron->has_audio,
+                        'duration' => (int) $jumbotron->video_duration,
+                    ];
+                } else {
+                    if ($jumbotron->jumbo1) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo1)];
+                    if ($jumbotron->jumbo2) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo2)];
+                    if ($jumbotron->jumbo3) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo3)];
+                    if ($jumbotron->jumbo4) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo4)];
+                    if ($jumbotron->jumbo5) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo5)];
+                    if ($jumbotron->jumbo6) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo6)];
+                }
                 $globalActive = true;
             } catch (ModelNotFoundException $e) {
             }
@@ -117,12 +135,12 @@ class MasterController extends Controller
             try {
                 $profil = Profil::where('slug', $slug)->firstOrFail();
                 $jm = JumbotronMasjid::where('masjid_id', $profil->id)->where('aktif', true)->firstOrFail();
-                if ($jm->jumbotron_masjid_1) $masjidItems[] = asset($jm->jumbotron_masjid_1);
-                if ($jm->jumbotron_masjid_2) $masjidItems[] = asset($jm->jumbotron_masjid_2);
-                if ($jm->jumbotron_masjid_3) $masjidItems[] = asset($jm->jumbotron_masjid_3);
-                if ($jm->jumbotron_masjid_4) $masjidItems[] = asset($jm->jumbotron_masjid_4);
-                if ($jm->jumbotron_masjid_5) $masjidItems[] = asset($jm->jumbotron_masjid_5);
-                if ($jm->jumbotron_masjid_6) $masjidItems[] = asset($jm->jumbotron_masjid_6);
+                if ($jm->jumbotron_masjid_1) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_1)];
+                if ($jm->jumbotron_masjid_2) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_2)];
+                if ($jm->jumbotron_masjid_3) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_3)];
+                if ($jm->jumbotron_masjid_4) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_4)];
+                if ($jm->jumbotron_masjid_5) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_5)];
+                if ($jm->jumbotron_masjid_6) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_6)];
                 $masjidActive = (bool) $jm->aktif;
             } catch (ModelNotFoundException $e) {
             }

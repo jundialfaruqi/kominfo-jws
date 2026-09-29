@@ -23,3 +23,13 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# HTTP 206 Partial Content (Byte Range Requests) for Video Streaming
+<IfModule mod_deflate.c>
+    SetEnvIfNoCase Request_URI \.(mp4|webm|ogv)$ no-gzip dont-vary
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Accept-Ranges bytes
+</IfModule>
+

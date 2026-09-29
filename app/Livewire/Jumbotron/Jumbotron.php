@@ -38,6 +38,11 @@ class Jumbotron extends Component
     public $jumbo6;
     public $tmp_jumbo6;
     public $is_active = true;
+    public $media_type = 'image';
+    public $video_file;
+    public $tmp_video_file;
+    public $has_audio = false;
+    public $video_duration = 0;
 
     public $isEdit = false;
     public $showForm = false;
@@ -45,17 +50,33 @@ class Jumbotron extends Component
     public $deleteJumboId;
     public $deleteJumboName;
 
-    protected $rules = [
-        'jumbo1' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbo2' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbo3' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbo4' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbo5' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbo6' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'is_active' => 'boolean',
-    ];
+    protected function rules()
+    {
+        if ($this->media_type === 'video') {
+            return [
+                'media_type' => 'required|in:image,video',
+                'video_file' => ($this->isEdit && $this->tmp_video_file) ? 'nullable|mimes:mp4,webm|max:51200' : 'required|mimes:mp4,webm|max:51200',
+                'has_audio' => 'boolean',
+                'is_active' => 'boolean',
+            ];
+        }
+
+        return [
+            'media_type' => 'required|in:image,video',
+            'jumbo1' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'jumbo2' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'jumbo3' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'jumbo4' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'jumbo5' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'jumbo6' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'is_active' => 'boolean',
+        ];
+    }
 
     protected $messages = [
+        'video_file.required' => 'File video wajib diunggah untuk tipe video',
+        'video_file.mimes'    => 'File video harus berformat MP4 atau WebM',
+        'video_file.max'      => 'Ukuran file video tidak boleh lebih dari 50 MB',
         'jumbo1.image' => 'File harus berupa gambar',
         'jumbo2.image' => 'File harus berupa gambar',
         'jumbo3.image' => 'File harus berupa gambar',
@@ -75,6 +96,13 @@ class Jumbotron extends Component
         'jumbo5.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
         'jumbo6.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
     ];
+
+    public function clearVideo()
+    {
+        $this->video_file = null;
+        $this->tmp_video_file = null;
+        $this->dispatch('resetFileInput', ['inputName' => 'video_file']);
+    }
 
     private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
     {
@@ -385,7 +413,7 @@ class Jumbotron extends Component
     public function render()
     {
         $query = ModelsJumbotron::with('user')
-            ->select('id', 'user_id', 'jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6', 'is_active')
+            ->select('id', 'user_id', 'media_type', 'jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6', 'video_file', 'has_audio', 'video_duration', 'is_active')
             ->whereHas('user', function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%');
             });
@@ -402,6 +430,11 @@ class Jumbotron extends Component
         $this->resetValidation();
         $this->reset([
             'jumboId',
+            'media_type',
+            'video_file',
+            'tmp_video_file',
+            'has_audio',
+            'video_duration',
             'jumbo1',
             'tmp_jumbo1',
             'jumbo2',
@@ -417,6 +450,7 @@ class Jumbotron extends Component
             'is_active',
         ]);
 
+        $this->media_type = 'image';
         $this->isEdit = false;
         $this->showForm = true;
         $this->is_active = true;
@@ -429,6 +463,11 @@ class Jumbotron extends Component
         $jumbo = ModelsJumbotron::findOrFail($id);
 
         $this->jumboId = $jumbo->id;
+        $this->media_type = $jumbo->media_type ?? 'image';
+        $this->video_file = null;
+        $this->tmp_video_file = $jumbo->video_file;
+        $this->has_audio = (bool) $jumbo->has_audio;
+        $this->video_duration = (int) $jumbo->video_duration;
         $this->tmp_jumbo1 = $jumbo->jumbo1;
         $this->tmp_jumbo2 = $jumbo->jumbo2;
         $this->tmp_jumbo3 = $jumbo->jumbo3;
@@ -449,6 +488,11 @@ class Jumbotron extends Component
         $this->resetValidation();
         $this->reset([
             'jumboId',
+            'media_type',
+            'video_file',
+            'tmp_video_file',
+            'has_audio',
+            'video_duration',
             'jumbo1',
             'tmp_jumbo1',
             'jumbo2',
@@ -463,6 +507,7 @@ class Jumbotron extends Component
             'tmp_jumbo6',
             'is_active',
         ]);
+        $this->media_type = 'image';
     }
 
     public function save()
@@ -478,58 +523,80 @@ class Jumbotron extends Component
                 $jumbo->user_id = $currentUser->id;
             }
 
-            if ($this->jumbo1) {
-                if ($this->isEdit && $jumbo->jumbo1 && file_exists(public_path($jumbo->jumbo1))) {
-                    File::delete(public_path($jumbo->jumbo1));
-                }
-                $jumbo->jumbo1 = $this->saveProcessedImage($this->jumbo1, 1);
-            } else {
-                $jumbo->jumbo1 = $this->tmp_jumbo1;
-            }
+            $jumbo->media_type = $this->media_type;
 
-            if ($this->jumbo2) {
-                if ($this->isEdit && $jumbo->jumbo2 && file_exists(public_path($jumbo->jumbo2))) {
-                    File::delete(public_path($jumbo->jumbo2));
-                }
-                $jumbo->jumbo2 = $this->saveProcessedImage($this->jumbo2, 2);
-            } else {
-                $jumbo->jumbo2 = $this->tmp_jumbo2;
-            }
+            if ($this->media_type === 'video') {
+                $jumbo->has_audio = (bool) $this->has_audio;
+                $jumbo->video_duration = (int) $this->video_duration;
 
-            if ($this->jumbo3) {
-                if ($this->isEdit && $jumbo->jumbo3 && file_exists(public_path($jumbo->jumbo3))) {
-                    File::delete(public_path($jumbo->jumbo3));
+                if ($this->video_file) {
+                    if ($this->isEdit && $jumbo->video_file && file_exists(public_path($jumbo->video_file))) {
+                        File::delete(public_path($jumbo->video_file));
+                    }
+                    $origName = pathinfo($this->video_file->getClientOriginalName(), PATHINFO_FILENAME);
+                    $cleanName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $origName);
+                    $detectedExt = strtolower($this->video_file->getClientOriginalExtension() ?: 'mp4');
+                    $ext = in_array($detectedExt, ['mp4', 'webm']) ? $detectedExt : 'mp4';
+                    $fileName = time() . '_jumbo_video_' . $cleanName . '.' . $ext;
+                    $this->video_file->storeAs('', $fileName, 'public_videos_jumbotron');
+                    $jumbo->video_file = 'videos/jumbotrons/' . $fileName;
+                } else {
+                    $jumbo->video_file = $this->tmp_video_file;
                 }
-                $jumbo->jumbo3 = $this->saveProcessedImage($this->jumbo3, 3);
             } else {
-                $jumbo->jumbo3 = $this->tmp_jumbo3;
-            }
+                if ($this->jumbo1) {
+                    if ($this->isEdit && $jumbo->jumbo1 && file_exists(public_path($jumbo->jumbo1))) {
+                        File::delete(public_path($jumbo->jumbo1));
+                    }
+                    $jumbo->jumbo1 = $this->saveProcessedImage($this->jumbo1, 1);
+                } else {
+                    $jumbo->jumbo1 = $this->tmp_jumbo1;
+                }
 
-            if ($this->jumbo4) {
-                if ($this->isEdit && $jumbo->jumbo4 && file_exists(public_path($jumbo->jumbo4))) {
-                    File::delete(public_path($jumbo->jumbo4));
+                if ($this->jumbo2) {
+                    if ($this->isEdit && $jumbo->jumbo2 && file_exists(public_path($jumbo->jumbo2))) {
+                        File::delete(public_path($jumbo->jumbo2));
+                    }
+                    $jumbo->jumbo2 = $this->saveProcessedImage($this->jumbo2, 2);
+                } else {
+                    $jumbo->jumbo2 = $this->tmp_jumbo2;
                 }
-                $jumbo->jumbo4 = $this->saveProcessedImage($this->jumbo4, 4);
-            } else {
-                $jumbo->jumbo4 = $this->tmp_jumbo4;
-            }
 
-            if ($this->jumbo5) {
-                if ($this->isEdit && $jumbo->jumbo5 && file_exists(public_path($jumbo->jumbo5))) {
-                    File::delete(public_path($jumbo->jumbo5));
+                if ($this->jumbo3) {
+                    if ($this->isEdit && $jumbo->jumbo3 && file_exists(public_path($jumbo->jumbo3))) {
+                        File::delete(public_path($jumbo->jumbo3));
+                    }
+                    $jumbo->jumbo3 = $this->saveProcessedImage($this->jumbo3, 3);
+                } else {
+                    $jumbo->jumbo3 = $this->tmp_jumbo3;
                 }
-                $jumbo->jumbo5 = $this->saveProcessedImage($this->jumbo5, 5);
-            } else {
-                $jumbo->jumbo5 = $this->tmp_jumbo5;
-            }
 
-            if ($this->jumbo6) {
-                if ($this->isEdit && $jumbo->jumbo6 && file_exists(public_path($jumbo->jumbo6))) {
-                    File::delete(public_path($jumbo->jumbo6));
+                if ($this->jumbo4) {
+                    if ($this->isEdit && $jumbo->jumbo4 && file_exists(public_path($jumbo->jumbo4))) {
+                        File::delete(public_path($jumbo->jumbo4));
+                    }
+                    $jumbo->jumbo4 = $this->saveProcessedImage($this->jumbo4, 4);
+                } else {
+                    $jumbo->jumbo4 = $this->tmp_jumbo4;
                 }
-                $jumbo->jumbo6 = $this->saveProcessedImage($this->jumbo6, 6);
-            } else {
-                $jumbo->jumbo6 = $this->tmp_jumbo6;
+
+                if ($this->jumbo5) {
+                    if ($this->isEdit && $jumbo->jumbo5 && file_exists(public_path($jumbo->jumbo5))) {
+                        File::delete(public_path($jumbo->jumbo5));
+                    }
+                    $jumbo->jumbo5 = $this->saveProcessedImage($this->jumbo5, 5);
+                } else {
+                    $jumbo->jumbo5 = $this->tmp_jumbo5;
+                }
+
+                if ($this->jumbo6) {
+                    if ($this->isEdit && $jumbo->jumbo6 && file_exists(public_path($jumbo->jumbo6))) {
+                        File::delete(public_path($jumbo->jumbo6));
+                    }
+                    $jumbo->jumbo6 = $this->saveProcessedImage($this->jumbo6, 6);
+                } else {
+                    $jumbo->jumbo6 = $this->tmp_jumbo6;
+                }
             }
 
             $jumbo->is_active = $this->is_active;
@@ -543,6 +610,11 @@ class Jumbotron extends Component
             $this->showTable = true;
             $this->reset([
                 'jumboId',
+                'media_type',
+                'video_file',
+                'tmp_video_file',
+                'has_audio',
+                'video_duration',
                 'jumbo1',
                 'tmp_jumbo1',
                 'jumbo2',
@@ -557,6 +629,7 @@ class Jumbotron extends Component
                 'tmp_jumbo6',
                 'is_active',
             ]);
+            $this->media_type = 'image';
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menyimpan jumbotron: ' . $e->getMessage());
         }
@@ -574,6 +647,10 @@ class Jumbotron extends Component
     {
         try {
             $jumbo = ModelsJumbotron::findOrFail($this->deleteJumboId);
+
+            if ($jumbo->video_file && file_exists(public_path($jumbo->video_file))) {
+                File::delete(public_path($jumbo->video_file));
+            }
 
             foreach (['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'] as $field) {
                 if ($jumbo->$field && file_exists(public_path($jumbo->$field))) {

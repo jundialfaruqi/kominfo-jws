@@ -251,6 +251,10 @@ class MyMasjidController extends Controller
                 $jumbotronPemkoData = [
                     'id' => $jumbotronPemko->id,
                     'is_active' => (bool) $jumbotronPemko->is_active,
+                    'media_type' => $jumbotronPemko->media_type ?? 'image',
+                    'video_file' => $jumbotronPemko->video_file ? asset($jumbotronPemko->video_file) : null,
+                    'has_audio' => (bool) $jumbotronPemko->has_audio,
+                    'video_duration' => (int) $jumbotronPemko->video_duration,
                     'slide1' => $jumbotronPemko->jumbo1,
                     'slide2' => $jumbotronPemko->jumbo2,
                     'slide3' => $jumbotronPemko->jumbo3,

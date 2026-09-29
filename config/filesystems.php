@@ -92,6 +92,15 @@ return [
             'throw' => false,
         ],
 
+        // disk configuration for public videos jumbotron
+        'public_videos_jumbotron' => [
+            'driver' => 'local',
+            'root' => public_path('videos/jumbotrons'),
+            'url' => env('APP_URL') . '/videos/jumbotrons',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
         // new disk configuration for public images adzan
         'public_images_adzan' => [
             'driver' => 'local',

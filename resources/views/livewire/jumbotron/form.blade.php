@@ -3,16 +3,168 @@
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-12">
-                    <div class="col-md-12 mb-4">
-                        <label class="form-label">Status Aktif</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" wire:model.live="is_active"
-                                wire:change="$refresh" id="is_active" {{ $is_active ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">
-                                {{ $is_active ? 'Aktif' : 'Tidak Aktif' }}
-                            </label>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Status Aktif</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" wire:model.live="is_active"
+                                    wire:change="$refresh" id="is_active" {{ $is_active ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">
+                                    {{ $is_active ? 'Aktif' : 'Tidak Aktif' }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tipe Konten Jumbotron</label>
+                            <div class="d-flex gap-4 mt-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" wire:model.live="media_type"
+                                        id="media_type_image" value="image">
+                                    <label class="form-check-label" for="media_type_image">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                        Gambar (6 Slot Rotasi)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" wire:model.live="media_type"
+                                        id="media_type_video" value="video">
+                                    <label class="form-check-label" for="media_type_video">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                                        Video (MP4 / WebM)
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    @if ($media_type === 'video')
+                        <div class="card p-3 rounded-4 shadow-sm border mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-7" x-data="{ isUploading: false, progress: 0 }"
+                                    x-on:livewire-upload-start="isUploading = true; progress = 0"
+                                    x-on:livewire-upload-finish="isUploading = false"
+                                    x-on:livewire-upload-error="isUploading = false; if (window.iziToast) iziToast.error({ title: 'Gagal Unggah', message: 'Koneksi terputus atau file gagal diunggah.', position: 'topRight' });"
+                                    x-on:livewire-upload-progress="progress = $event.detail.progress">
+                                    <label class="form-label fw-bold">Unggah Berkas Video</label>
+                                    @if ($video_file)
+                                        <div class="alert alert-success d-flex align-items-center mb-2 py-2 px-3" role="alert">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                            <div class="small">
+                                                <strong>Video Terpilih:</strong> {{ $video_file->getClientOriginalName() }} ({{ round($video_file->getSize() / 1024 / 1024, 2) }} MB)
+                                            </div>
+                                        </div>
+                                    @elseif ($tmp_video_file)
+                                        <div class="mb-2">
+                                            <video src="{{ asset($tmp_video_file) }}" controls class="rounded-3 w-100 shadow-sm" style="max-height: 220px; background-color: #000;"></video>
+                                        </div>
+                                    @endif
+
+                                    {{-- Real-Time Upload Progress Bar --}}
+                                    <div x-show="isUploading" class="my-2 p-2 bg-light border rounded-3" style="display: none;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <span class="small fw-semibold text-primary">
+                                                <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                                Mengunggah video ke server...
+                                            </span>
+                                            <span class="small fw-bold text-primary" x-text="progress + '%'"></span>
+                                        </div>
+                                        <div class="progress rounded-pill" style="height: 8px;">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                                role="progressbar"
+                                                :style="`width: ${progress}%`"
+                                                :aria-valuenow="progress"
+                                                aria-valuemin="0"
+                                                aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center gap-2">
+                                        <input type="file" id="video_file_input"
+                                            class="form-control rounded-3 @error('video_file') is-invalid @enderror"
+                                            wire:model="video_file" accept="video/mp4,video/webm"
+                                            onchange="(function(el){
+                                                const f = el.files[0];
+                                                const err = document.getElementById('video_file-client-error');
+                                                const show = (m) => {
+                                                    el.classList.add('is-invalid');
+                                                    if (err) { err.textContent = m; err.style.display = 'block'; }
+                                                    if (window.iziToast) {
+                                                        iziToast.error({ title: 'Batas Ukuran Video', message: m, position: 'topRight' });
+                                                    }
+                                                };
+                                                const hide = () => {
+                                                    el.classList.remove('is-invalid');
+                                                    if (err) { err.style.display = 'none'; err.textContent = ''; }
+                                                };
+                                                if (!f) { hide(); return; }
+                                                const name = (f.name || '').toLowerCase();
+                                                const validExt = name.endsWith('.mp4') || name.endsWith('.webm');
+                                                if (!validExt) {
+                                                    event.stopImmediatePropagation();
+                                                    el.value = '';
+                                                    show('Format file harus MP4 atau WebM.');
+                                                    return;
+                                                }
+                                                const maxSize = 50 * 1024 * 1024; // 50 MB
+                                                if (f.size > maxSize) {
+                                                    event.stopImmediatePropagation();
+                                                    el.value = '';
+                                                    const sizeMB = (f.size / (1024 * 1024)).toFixed(1);
+                                                    show('Ukuran file video maksimal 50 MB (File Anda: ' + sizeMB + ' MB). Silakan kompresi video terlebih dahulu.');
+                                                    return;
+                                                }
+                                                hide();
+                                            })(this)">
+                                        @if ($video_file || $tmp_video_file)
+                                            <button type="button" class="btn btn-outline-danger rounded-3" wire:click="clearVideo" title="Hapus / Reset Video">
+                                                Reset
+                                            </button>
+                                        @endif
+                                    </div>
+                                    <div id="video_file-client-error" class="invalid-feedback" style="display:none"></div>
+                                    @error('video_file')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+
+                                    <div class="form-text mt-2">
+                                        <small class="text-muted d-block"><span class="text-danger">*</span> Format: <strong>MP4 (H.264)</strong> atau <strong>WebM</strong>.</small>
+                                        <small class="text-muted d-block"><span class="text-danger">*</span> Ukuran maksimal: <strong>50 MB</strong>. Rasio rekomendasi: <strong>16:9 (1080p)</strong>.</small>
+                                        <small class="text-muted d-block"><span class="text-danger">*</span> Didukung pemutaran <em>streaming buffer (HTTP 206 Partial Content)</em> langsung di TV.</small>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-5">
+                                    <div class="card p-3 rounded-3 bg-light border-0">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Pengaturan Audio Video</label>
+                                            <div class="form-check form-switch mb-2">
+                                                <input class="form-check-input" type="checkbox" wire:model.live="has_audio" id="has_audio">
+                                                <label class="form-check-label fw-semibold" for="has_audio">
+                                                    {{ $has_audio ? 'Suara Video Aktif' : 'Mode Bisu / Senyap (Muted)' }}
+                                                </label>
+                                            </div>
+                                            <div class="form-text">
+                                                <small class="text-muted">
+                                                    <strong>Mode Bisu (Direkomendasikan):</strong> Audio murottal masjid tetap berputar lembut di latar belakang.<br>
+                                                    <strong>Suara Aktif:</strong> Audio murottal otomatis dijeda saat video tayang, lalu dilanjutkan kembali setelah video selesai.
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-2">
+                                            <label class="form-label fw-bold">Durasi Video (Detik - Opsional)</label>
+                                            <input type="number" class="form-control rounded-3" wire:model="video_duration" placeholder="Contoh: 329 (5m 29s)">
+                                            <div class="form-text">
+                                                <small class="text-muted">Catatan durasi video dalam satuan detik.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @else
                     <div class="row g-2 mb-3">
                         <div class="col-md-4 mb-2 px-2">
                             <label class="form-label">Gambar Jumbotron 1</label>
@@ -381,7 +533,7 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

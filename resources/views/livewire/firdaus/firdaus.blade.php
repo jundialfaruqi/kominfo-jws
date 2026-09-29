@@ -336,6 +336,15 @@
 
     {{-- Jumbotron Banner --}}
     <div id="jumbotronImage" class="jumbotron-image" style="display: none;">
+        {{-- Video Player for Jumbotron Video --}}
+        <video id="jumbotronVideoPlayer" 
+               playsinline 
+               webkit-playsinline 
+               disablePictureInPicture 
+               controlsList="nodownload nofullscreen noremoteplayback" 
+               preload="metadata"
+               style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+        </video>
         <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo" class="jumbotron-logo">
         <div class="jumbotron-countdown">
             <span id="jumbotron-next-prayer-label"></span>
