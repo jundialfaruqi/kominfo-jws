@@ -4559,13 +4559,22 @@
             function onVideoFinished() {
                 if (!window.isJumbotronVideoPlaying) return;
                 console.log('Video jumbotron selesai diputar');
-                cleanupVideoMemory();
-                resumeAudioFromVideo();
                 window.isJumbotronVideoPlaying = false;
                 window.inJumbotronPhase = false;
                 window.lastVideoEndTime = Date.now();
-                $jumbotronImageElement.hide();
+                resumeAudioFromVideo();
+
+                // Pastikan slide utama di latar belakang sudah siap menampilkan gambar terkini
                 updateSlide();
+
+                // Transisi fadeOut yang lembut agar layar tidak berkedip atau glitch
+                $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
+                    cleanupVideoMemory();
+                    $jumbotronImageElement.css({
+                        'display': 'none',
+                        'background-image': 'none'
+                    });
+                });
             }
 
             function playJumbotronVideo(videoItem) {
@@ -4575,11 +4584,10 @@
                 }
                 window.isJumbotronVideoPlaying = true;
 
-                $mosqueImageElement.hide();
+                // Tampilkan jumbotron dengan fade-in yang halus, biarkan .mosque-image tetap ada di latar belakang
                 $jumbotronImageElement.css({
-                    'background-image': 'none',
-                    'display': 'block'
-                });
+                    'background-image': 'none'
+                }).stop(true, true).fadeIn(300);
                 $jumbotronVideoElement.show();
 
                 videoPlayer.onended = null;
@@ -4658,14 +4666,19 @@
                 }
             }
 
+            const getSlideUrl = (id) => {
+                const $el = $(id);
+                return $el.attr('src') || $el.val() || '';
+            };
+
             // Inisialisasi slideUrls
             window.slideUrls = [
-                $('#slide1').val() || '',
-                $('#slide2').val() || '',
-                $('#slide3').val() || '',
-                $('#slide4').val() || '',
-                $('#slide5').val() || '',
-                $('#slide6').val() || ''
+                getSlideUrl('#slide1'),
+                getSlideUrl('#slide2'),
+                getSlideUrl('#slide3'),
+                getSlideUrl('#slide4'),
+                getSlideUrl('#slide5'),
+                getSlideUrl('#slide6')
             ].filter(url => url.trim() !== '');
 
             if (window.slideUrls.length === 0) {
@@ -4701,7 +4714,7 @@
                             .isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
                         if (!isSequenceActive) {
                             window.jumbotronSequence = [];
-                            $jumbotronImageElement.css('display', 'none');
+                            $jumbotronImageElement.stop(true, true).fadeOut(250);
                             cleanupVideoMemory();
                             resumeAudioFromVideo();
                         }
@@ -4748,12 +4761,9 @@
                                 currentUrl = window.imageCache[currentItem.url]?.src ||
                                     currentItem.url ||
                                     '/images/other/slide-jws-default.jpg';
-                                $mosqueImageElement.css('display', 'none');
                                 $jumbotronImageElement.css({
-                                    'background-image': `url("${currentUrl}")`,
-                                    'display': 'block',
-                                    'transition': 'background-image 0.5s ease-in-out'
-                                });
+                                    'background-image': `url("${currentUrl}")`
+                                }).stop(true, true).fadeIn(300);
                             }
                         } else {
                             window.inJumbotronPhase = false;
@@ -4761,18 +4771,28 @@
                             cleanupVideoMemory();
                             resumeAudioFromVideo();
 
+                            if ($jumbotronImageElement.is(':visible')) {
+                                $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
+                                    $jumbotronImageElement.css({
+                                        'display': 'none',
+                                        'background-image': 'none'
+                                    });
+                                });
+                            }
+
                             const slideIndex = imageIndex % window.slideUrls.length;
                             currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
                                 window.slideUrls[slideIndex] ||
                                 '/images/other/slide-jws-default.jpg';
-                            $jumbotronImageElement.css('display', 'none');
-                            $mosqueImageElement.css({
-                                'background-image': `url("${currentUrl}")`,
-                                'display': 'block',
-                                'transition': 'background-image 0.5s ease-in-out'
-                            });
-                        }
 
+                            if ($mosqueImageElement.data('current-url') !== currentUrl) {
+                                $mosqueImageElement.data('current-url', currentUrl);
+                                $mosqueImageElement.css({
+                                    'background-image': `url("${currentUrl}")`,
+                                    'display': 'block'
+                                });
+                            }
+                        }
                         clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
                             window.jumbotronSequence : [])]);
                         $(document).trigger('slideUpdated');

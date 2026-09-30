@@ -543,6 +543,17 @@ class Jumbotron extends Component
                 } else {
                     $jumbo->video_file = $this->tmp_video_file;
                 }
+
+                if ($jumbo->video_duration <= 0 && $jumbo->video_file && file_exists(public_path($jumbo->video_file))) {
+                    try {
+                        $fullPath = public_path($jumbo->video_file);
+                        $cmd = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ' . escapeshellarg($fullPath);
+                        $output = shell_exec($cmd);
+                        if ($output && is_numeric(trim($output))) {
+                            $jumbo->video_duration = (int) ceil((float) trim($output));
+                        }
+                    } catch (\Exception $e) {}
+                }
             } else {
                 if ($this->jumbo1) {
                     if ($this->isEdit && $jumbo->jumbo1 && file_exists(public_path($jumbo->jumbo1))) {

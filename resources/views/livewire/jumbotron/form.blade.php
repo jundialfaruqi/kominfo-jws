@@ -116,6 +116,18 @@
                                                     return;
                                                 }
                                                 hide();
+                                                try {
+                                                    const tempV = document.createElement('video');
+                                                    tempV.preload = 'metadata';
+                                                    tempV.onloadedmetadata = function() {
+                                                        window.URL.revokeObjectURL(tempV.src);
+                                                        const sec = Math.round(tempV.duration);
+                                                        if (sec > 0 && typeof @this !== 'undefined') {
+                                                            @this.set('video_duration', sec);
+                                                        }
+                                                    };
+                                                    tempV.src = URL.createObjectURL(f);
+                                                } catch (_) {}
                                             })(this)">
                                         @if ($video_file || $tmp_video_file)
                                             <button type="button" class="btn btn-outline-danger rounded-3" wire:click="clearVideo" title="Hapus / Reset Video">
