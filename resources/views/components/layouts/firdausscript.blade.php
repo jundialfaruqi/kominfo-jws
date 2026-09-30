@@ -4506,11 +4506,16 @@
             window.isAudioPausedForVideo = false;
             window.lastVideoEndTime = 0;
             let videoSafetyTimer = null;
+            let videoStallTimer = null;
 
             function cleanupVideoMemory() {
                 if (videoSafetyTimer) {
                     clearTimeout(videoSafetyTimer);
                     videoSafetyTimer = null;
+                }
+                if (videoStallTimer) {
+                    clearTimeout(videoStallTimer);
+                    videoStallTimer = null;
                 }
                 if (videoPlayer) {
                     try {
@@ -4579,6 +4584,8 @@
 
                 videoPlayer.onended = null;
                 videoPlayer.onerror = null;
+                videoPlayer.onloadedmetadata = null;
+                videoPlayer.onplaying = null;
 
                 if (videoItem.has_audio) {
                     pauseAudioForVideo();
@@ -4600,12 +4607,43 @@
                     onVideoFinished();
                 };
 
-                const maxDurationSec = Math.max(30, (videoItem.duration ? videoItem.duration + 15 : 600));
+                // Watchdog 1: Jika video macet / tidak ada data sama sekali dalam 15 detik awal (misal offline/stuck)
+                if (videoStallTimer) clearTimeout(videoStallTimer);
+                videoStallTimer = setTimeout(() => {
+                    if (window.isJumbotronVideoPlaying && videoPlayer.currentTime === 0) {
+                        console.warn('Video jumbotron tidak dapat memuat data awal dalam 15 detik, beralih ke slide berikutnya');
+                        onVideoFinished();
+                    }
+                }, 15000);
+
+                // Matikan stall watchdog begitu video berhasil mulai berputar
+                videoPlayer.onplaying = function() {
+                    if (videoStallTimer) {
+                        clearTimeout(videoStallTimer);
+                        videoStallTimer = null;
+                    }
+                };
+
+                // Watchdog 2: Timer pengaman batas durasi (default awal 3 menit atau durasi form + 15 detik)
+                let initialMaxSec = Math.max(30, (videoItem.duration ? videoItem.duration + 15 : 180));
                 if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
                 videoSafetyTimer = setTimeout(() => {
                     console.warn('Safety timeout video jumbotron tercapai, beralih ke slide berikutnya');
                     onVideoFinished();
-                }, maxDurationSec * 1000);
+                }, initialMaxSec * 1000);
+
+                // Otomatis deteksi durasi fisik asli dari berkas video begitu metadata terbaca browser
+                videoPlayer.onloadedmetadata = function() {
+                    if (videoPlayer.duration && !isNaN(videoPlayer.duration) && isFinite(videoPlayer.duration)) {
+                        const detectedSec = Math.ceil(videoPlayer.duration);
+                        const dynamicMaxSec = Math.max(20, detectedSec + 10);
+                        if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
+                        videoSafetyTimer = setTimeout(() => {
+                            console.warn('Safety timeout tercapai berdasarkan durasi metadata video (' + dynamicMaxSec + 's)');
+                            onVideoFinished();
+                        }, dynamicMaxSec * 1000);
+                    }
+                };
 
                 const playPromise = videoPlayer.play();
                 if (playPromise !== undefined) {

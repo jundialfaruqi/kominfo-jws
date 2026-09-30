@@ -31,5 +31,8 @@
 
 <IfModule mod_headers.c>
     Header set Accept-Ranges bytes
+    <FilesMatch "\.(mp4|webm|ogv)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
 </IfModule>
 
