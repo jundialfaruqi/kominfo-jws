@@ -907,8 +907,8 @@
 
         // Fungsi untuk menjeda audio
         function pauseAudio() {
-            // Emergency stop video jumbotron jika sedang diputar
-            if (typeof window.cleanupJumbotronVideo === 'function' && window.isJumbotronVideoPlaying) {
+            // Emergency stop video jumbotron jika ada
+            if (typeof window.cleanupJumbotronVideo === 'function') {
                 window.cleanupJumbotronVideo();
                 window.isJumbotronVideoPlaying = false;
                 window.inJumbotronPhase = false;
@@ -1833,6 +1833,32 @@
         let currentPrayerName = localStorage.getItem('currentPrayerName') || null;
         let currentPrayerTime = localStorage.getItem('currentPrayerTime') || null;
 
+        function isPrayerTimeActive() {
+            if (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) return true;
+            if (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) return true;
+            if (typeof window.isPreAdzanWindow !== 'undefined' && window.isPreAdzanWindow) return true;
+
+            if ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) return true;
+            if ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) return true;
+            if ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) return true;
+            if ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible')) return true;
+
+            const now = (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now());
+            if (typeof adzanStartTime !== 'undefined' && adzanStartTime) return true;
+            if (typeof iqomahStartTime !== 'undefined' && iqomahStartTime) return true;
+            if (typeof adzanImageEndTime !== 'undefined' && adzanImageEndTime && now < adzanImageEndTime) return true;
+            if (typeof fridayInfoEndTime !== 'undefined' && fridayInfoEndTime && now < fridayInfoEndTime) return true;
+
+            if (typeof window.nextPrayerSecondsRemaining !== 'undefined' &&
+                window.nextPrayerSecondsRemaining <= 60 &&
+                window.nextPrayerSecondsRemaining >= 0) {
+                return true;
+            }
+
+            return false;
+        }
+        window.isPrayerTimeActive = isPrayerTimeActive;
+
         function checkAndRestoreSessions() {
             const now = getCurrentTimeFromServer();
             const nowTime = now.getTime();
@@ -2441,6 +2467,14 @@
         }
 
         function showAdzanPopup(prayerName, prayerTimeStr, isRestored = false) {
+            isAdzanPlaying = true;
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+
             // Pastikan audio dijeda saat adzan dimulai
             pauseAudio();
 
@@ -2652,6 +2686,14 @@
         }
 
         function showSyuruqPopup(prayerName, prayerTimeStr, isRestored = false) {
+            isAdzanPlaying = true;
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+
             // Pastikan audio dijeda saat syuruq dimulai
             pauseAudio();
 
@@ -2789,6 +2831,14 @@
         }
 
         function showDhuhaPopup(prayerName, prayerTimeStr, isRestored = false) {
+            isAdzanPlaying = true;
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+
             pauseAudio();
             const now = getCurrentTimeFromServer();
             const serverMonth = now.getMonth() + 1;
@@ -2880,6 +2930,14 @@
         }
 
         function showImsakPopup(prayerName, prayerTimeStr, isRestored = false) {
+            isAdzanPlaying = true;
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+
             // Mirip Dhuha/Syuruq: hanya fase adzan dengan beep
             pauseAudio();
             const now = getCurrentTimeFromServer();
@@ -3121,6 +3179,13 @@
         }
 
         function showIqomahPopup(prayerTimeStr, isRestored = false) {
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+
             // Pastikan audio tetap dijeda saat iqomah dimulai
             pauseAudio();
 
@@ -3346,6 +3411,13 @@
         }
 
         function showFinalAdzanImage() {
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+            pauseAudio();
             if (currentPrayerName === "Jum'at" && getCurrentTimeFromServer().getDay() === 5) {
                 console.log('Tidak menampilkan final adzan image untuk adzan Jum\'at');
                 // Untuk sholat Jumat, audio akan dilanjutkan setelah fridayInfoPopup berakhir
@@ -3906,6 +3978,13 @@
         }
 
         function displayFridayInfoPopup(data, isRestored = false) {
+            if (typeof window.cleanupJumbotronVideo === 'function') {
+                window.cleanupJumbotronVideo();
+            }
+            window.isJumbotronVideoPlaying = false;
+            window.inJumbotronPhase = false;
+            $('#jumbotronImage').hide();
+
             // Pastikan audio tetap dijeda saat fridayInfoPopup ditampilkan
             pauseAudio();
 
@@ -4103,15 +4182,24 @@
                 timeDiffInMinutes += 24 * 60;
             }
 
+            const totalSecondsRemaining = timeDiffInMinutes * 60 - now.getSeconds();
+            window.nextPrayerSecondsRemaining = totalSecondsRemaining;
+
             // Menjeda audio latar belakang 1 menit sebelum waktu adzan
             const preAdzanPauseSeconds = 60; // 1 menit
-            if (timeDiffInMinutes * 60 <= preAdzanPauseSeconds && timeDiffInMinutes > 0) {
+            if (totalSecondsRemaining <= preAdzanPauseSeconds && totalSecondsRemaining >= 0) {
+                window.isPreAdzanWindow = true;
                 if (!isAudioPausedForAdzan) {
                     pauseAudio();
                     isAudioPausedForAdzan = true;
                 }
-                // Hentikan video jika sedang berputar di jendela pra-adzan
-                if (window.isJumbotronVideoPlaying) {
+            } else {
+                window.isPreAdzanWindow = false;
+            }
+
+            // Hentikan dan bersihkan video jumbotron secara proaktif jika waktu sholat sedang berlangsung
+            if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
+                if (window.isJumbotronVideoPlaying || (typeof videoPlayer !== 'undefined' && videoPlayer && !videoPlayer.paused)) {
                     if (typeof window.cleanupJumbotronVideo === 'function') {
                         window.cleanupJumbotronVideo();
                     }
@@ -4119,12 +4207,8 @@
                     window.inJumbotronPhase = false;
                     $('#jumbotronImage').hide();
                 }
-            } else {
-                // Reset flag jika sudah di luar jendela waktu jeda
-                // Ini akan direset dengan benar saat adzan selesai
             }
 
-            const totalSecondsRemaining = timeDiffInMinutes * 60 - now.getSeconds();
             const hours = Math.floor(totalSecondsRemaining / 3600);
             const minutes = Math.floor((totalSecondsRemaining % 3600) / 60);
             const seconds = totalSecondsRemaining % 60;
@@ -4520,6 +4604,7 @@
                 if (videoPlayer) {
                     try {
                         videoPlayer.pause();
+                        videoPlayer.muted = true;
                         videoPlayer.removeAttribute('src');
                         videoPlayer.load();
                     } catch (e) {
@@ -4578,6 +4663,14 @@
             }
 
             function playJumbotronVideo(videoItem) {
+                if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
+                    console.log('Pemutaran video jumbotron dibatalkan karena waktu sholat/adzan sedang berlangsung');
+                    cleanupVideoMemory();
+                    window.isJumbotronVideoPlaying = false;
+                    window.inJumbotronPhase = false;
+                    $jumbotronImageElement.hide();
+                    return;
+                }
                 if (!videoPlayer) {
                     console.warn('Elemen jumbotronVideoPlayer tidak ditemukan');
                     return;
@@ -4596,6 +4689,10 @@
                 videoPlayer.onplaying = null;
 
                 if (videoItem.has_audio) {
+                    if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
+                        cleanupVideoMemory();
+                        return;
+                    }
                     pauseAudioForVideo();
                     videoPlayer.muted = false;
                     videoPlayer.volume = 1.0;
@@ -4655,8 +4752,20 @@
 
                 const playPromise = videoPlayer.play();
                 if (playPromise !== undefined) {
-                    playPromise.catch(error => {
+                    playPromise.then(() => {
+                        if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
+                            console.log('Video jumbotron dihentikan setelah play promise karena waktu sholat');
+                            cleanupVideoMemory();
+                            window.isJumbotronVideoPlaying = false;
+                            window.inJumbotronPhase = false;
+                            $jumbotronImageElement.hide();
+                        }
+                    }).catch(error => {
                         console.warn('Autoplay video bersuara diblokir browser policy, mencoba fallback muted:', error);
+                        if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
+                            cleanupVideoMemory();
+                            return;
+                        }
                         videoPlayer.muted = true;
                         videoPlayer.play().catch(err2 => {
                             console.error('Fallback pemutaran video jumbotron gagal:', err2);
@@ -4706,17 +4815,35 @@
                     const slideDuration = 20000; // 20 detik per gambar
 
                     function updateSlide() {
-                        if (window.isJumbotronVideoPlaying) {
+                        const prayerActive = typeof window.isPrayerTimeActive === 'function' ? window.isPrayerTimeActive() : (
+                            (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
+                            (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) ||
+                            $('#adzanPopup').is(':visible') ||
+                            $('#iqomahPopup').is(':visible') ||
+                            $('#fridayInfoPopup').is(':visible') ||
+                            $('#adzanImageDisplay').is(':visible')
+                        );
+
+                        if (prayerActive) {
+                            if (window.isJumbotronVideoPlaying) {
+                                cleanupVideoMemory();
+                                window.isJumbotronVideoPlaying = false;
+                                window.inJumbotronPhase = false;
+                                $jumbotronImageElement.hide();
+                            }
+                        } else if (window.isJumbotronVideoPlaying) {
                             return;
                         }
 
-                        const isSequenceActive = $('#jumbotron_is_active').val() === 'true' && Array
+                        const isSequenceActive = !prayerActive && $('#jumbotron_is_active').val() === 'true' && Array
                             .isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
                         if (!isSequenceActive) {
                             window.jumbotronSequence = [];
                             $jumbotronImageElement.stop(true, true).fadeOut(250);
                             cleanupVideoMemory();
-                            resumeAudioFromVideo();
+                            if (!prayerActive) {
+                                resumeAudioFromVideo();
+                            }
                         }
 
                         if (window.slideUrls.length === 0) {
@@ -4737,7 +4864,7 @@
                         const isVideoCooldown = (Date.now() - (window.lastVideoEndTime || 0)) < slideDuration;
 
                         let currentUrl;
-                        if (isSequenceActive && imageIndex === window.slideUrls.length && !isVideoCooldown) {
+                        if (!prayerActive && isSequenceActive && imageIndex === window.slideUrls.length && !isVideoCooldown) {
                             if (!window.inJumbotronPhase) {
                                 window.inJumbotronPhase = true;
                                 window.jsIndex = typeof window.jsIndex === 'number' ? window.jsIndex : 0;
@@ -4769,7 +4896,9 @@
                             window.inJumbotronPhase = false;
                             window.currentJumbotronItem = null;
                             cleanupVideoMemory();
-                            resumeAudioFromVideo();
+                            if (!prayerActive) {
+                                resumeAudioFromVideo();
+                            }
 
                             if ($jumbotronImageElement.is(':visible')) {
                                 $jumbotronImageElement.stop(true, true).fadeOut(350, function() {

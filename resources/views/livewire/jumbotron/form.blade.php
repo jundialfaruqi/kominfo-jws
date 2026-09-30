@@ -176,6 +176,107 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- Panduan & Tata Cara Penggunaan Video Jumbotron (Tanpa Card, Tanpa Badge, Icon Tanpa BG) --}}
+                        <div class="mt-3 pt-3 border-top">
+                            <div class="d-flex align-items-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary me-2 flex-shrink-0">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 16v-4"/>
+                                    <path d="M12 8h.01"/>
+                                </svg>
+                                <h4 class="m-0 fw-bold text-dark">Panduan & Tata Cara Penggunaan Jumbotron Video</h4>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary me-2 flex-shrink-0">
+                                                <path d="M15 10l5 5-5 5"/>
+                                                <path d="M4 4v7a4 4 0 0 0 4 4h12"/>
+                                            </svg>
+                                            <span class="fw-bold text-dark">1. Format & Spesifikasi Berkas Video</span>
+                                        </div>
+                                        <ul class="text-secondary small ps-3 mb-0" style="line-height: 1.6;">
+                                            <li><strong>Format Video:</strong> Wajib format <strong>MP4 (H.264 / AAC)</strong> atau <strong>WebM</strong> agar kompatibel dengan seluruh peramban web dan aplikasi Android TV.</li>
+                                            <li><strong>Rasio & Resolusi:</strong> Direkomendasikan rasio layar <strong>16:9</strong> (resolusi Full HD <strong>1920x1080</strong> atau HD <strong>1280x720</strong>) agar pas satu layar penuh tanpa terpotong.</li>
+                                            <li><strong>Ukuran Berkas:</strong> Maksimal <strong>50 MB</strong>. Dianjurkan mengompresi video terlebih dahulu agar video ringan, cepat dimuat, dan hemat kuota internet.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-azure me-2 flex-shrink-0">
+                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                            </svg>
+                                            <span class="fw-bold text-dark">2. Pengaturan Audio / Suara Video</span>
+                                        </div>
+                                        <ul class="text-secondary small ps-3 mb-0" style="line-height: 1.6;">
+                                            <li><strong>Mode Bisu / Muted (Rekomendasi):</strong> Suara video dimatikan. Murottal/audio latar belakang masjid akan terus berputar lembut tanpa henti.</li>
+                                            <li><strong>Suara Video Aktif:</strong> Jika diaktifkan, audio murottal otomatis dijeda saat video diputar, dan akan dilanjutkan kembali secara otomatis setelah video selesai.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-success me-2 flex-shrink-0">
+                                                <circle cx="12" cy="12" r="10"/>
+                                                <polyline points="12 6 12 12 16 14"/>
+                                            </svg>
+                                            <span class="fw-bold text-dark">3. Durasi & Siklus Penayangan</span>
+                                        </div>
+                                        <ul class="text-secondary small ps-3 mb-0" style="line-height: 1.6;">
+                                            <li><strong>Deteksi Durasi Fisik:</strong> Sistem mendeteksi durasi asli video secara otomatis saat diunggah dan saat diputar di TV.</li>
+                                            <li><strong>Siklus Penayangan:</strong> Video berputar bergantian dengan slide informasi masjid setelah satu putaran slide selesai.</li>
+                                            <li><strong>Jeda Antar-Tayang:</strong> Terdapat jeda minimal agar video tidak berputar berulang-ulang secara terus-menerus.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning me-2 flex-shrink-0">
+                                                <path d="M12 2v4"/>
+                                                <path d="M12 18v4"/>
+                                                <path d="m4.93 4.93 2.83 2.83"/>
+                                                <path d="m16.24 16.24 2.83 2.83"/>
+                                                <path d="M2 12h4"/>
+                                                <path d="M18 12h4"/>
+                                                <path d="m4.93 19.07 2.83-2.83"/>
+                                                <path d="m16.24 7.76 2.83-2.83"/>
+                                            </svg>
+                                            <span class="fw-bold text-dark">4. Keamanan Otomatis Waktu Sholat</span>
+                                        </div>
+                                        <ul class="text-secondary small ps-3 mb-0" style="line-height: 1.6;">
+                                            <li><strong>1 Menit Pra-Adzan:</strong> Video dan audio otomatis dihentikan/senyap seketika demi menjaga ketenangan masjid.</li>
+                                            <li><strong>Saat Adzan & Iqomah:</strong> Pemutaran video diblokir penuh selama alarm beep, adzan, dan hitung mundur iqomah berlangsung.</li>
+                                            <li><strong>Selama Layar Sholat:</strong> Layar fokus menampilkan lurus rapatkan shaf / waktu sholat tanpa gangguan video.</li>
+                                            <li><strong>Selesai Sholat:</strong> Setelah layar sholat selesai ditutup dan kembali ke layar utama, pemutaran video dan murottal akan kembali beroperasi normal secara otomatis.</li>
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-info me-2 flex-shrink-0">
+                                                <rect width="20" height="14" x="2" y="3" rx="2"/>
+                                                <line x1="8" x2="16" y1="21" y2="21"/>
+                                                <line x1="12" x2="12" y1="17" y2="21"/>
+                                            </svg>
+                                            <span class="fw-bold text-dark">5. Sinkronisasi Web & Android TV</span>
+                                        </div>
+                                        <ul class="text-secondary small ps-3 mb-0" style="line-height: 1.6;">
+                                            <li><strong>Sinkronisasi Real-Time:</strong> Pengunggahan berkas atau perubahan status aktif langsung terdistribusi ke seluruh layar TV melalui koneksi WebSocket.</li>
+                                            <li><strong>Optimasi Android TV:</strong> TV mengunduh berkas ke penyimpanan lokal (*cache-first*) sehingga tidak buffering saat diputar berulang kali dan tetap dapat berjalan lancar.</li>
+                                            <li><strong>Timer Pengaman (Watchdog):</strong> Dilengkapi pengaman otomatis sehingga jika video mengalami kendala jaringan atau macet, layar akan langsung beralih ke slide berikutnya.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @else
                     <div class="row g-2 mb-3">
                         <div class="col-md-4 mb-2 px-2">
