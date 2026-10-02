@@ -12,7 +12,9 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 <script>
+    window.imageCache = window.imageCache || {};
     $(document).ready(function() {
+        window.imageCache = window.imageCache || {};
 
         let serverTimestamp = parseInt($('#server-timestamp').val()) || Date.now();
         let pageLoadTimestamp = Date.now();
@@ -1833,26 +1835,50 @@
         let currentPrayerName = localStorage.getItem('currentPrayerName') || null;
         let currentPrayerTime = localStorage.getItem('currentPrayerTime') || null;
 
+        var adzanImageStartTime = localStorage.getItem('adzanImageStartTime') ? parseInt(localStorage.getItem(
+            'adzanImageStartTime')) : null;
+        var adzanImageEndTime = localStorage.getItem('adzanImageEndTime') ? parseInt(localStorage.getItem(
+            'adzanImageEndTime')) : null;
+        var adzanImageSrc = localStorage.getItem('adzanImageSrc') || null;
+
+        var fridayInfoStartTime = localStorage.getItem('fridayInfoStartTime') ? parseInt(localStorage.getItem(
+            'fridayInfoStartTime')) : null;
+        var fridayInfoEndTime = localStorage.getItem('fridayInfoEndTime') ? parseInt(localStorage.getItem(
+            'fridayInfoEndTime')) : null;
+        var fridayInfoData = localStorage.getItem('fridayInfoData') ? JSON.parse(localStorage.getItem(
+            'fridayInfoData')) : null;
+        var fridayImageSliderInterval = null;
+
+        var iqomahSliderStartTime = localStorage.getItem('iqomahSliderStartTime') ? parseInt(localStorage
+            .getItem('iqomahSliderStartTime')) : null;
+        var fridaySliderStartTime = localStorage.getItem('fridaySliderStartTime') ? parseInt(localStorage
+            .getItem('fridaySliderStartTime')) : null;
+        var jumatAdzanShown = localStorage.getItem('jumatAdzanShown') === 'true';
+
         function isPrayerTimeActive() {
-            if (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) return true;
-            if (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) return true;
-            if (typeof window.isPreAdzanWindow !== 'undefined' && window.isPreAdzanWindow) return true;
+            try {
+                if (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) return true;
+                if (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) return true;
+                if (typeof window.isPreAdzanWindow !== 'undefined' && window.isPreAdzanWindow) return true;
 
-            if ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) return true;
-            if ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) return true;
-            if ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) return true;
-            if ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible')) return true;
+                if ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) return true;
+                if ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) return true;
+                if ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) return true;
+                if ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible')) return true;
 
-            const now = (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now());
-            if (typeof adzanStartTime !== 'undefined' && adzanStartTime) return true;
-            if (typeof iqomahStartTime !== 'undefined' && iqomahStartTime) return true;
-            if (typeof adzanImageEndTime !== 'undefined' && adzanImageEndTime && now < adzanImageEndTime) return true;
-            if (typeof fridayInfoEndTime !== 'undefined' && fridayInfoEndTime && now < fridayInfoEndTime) return true;
+                const now = (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now());
+                if (typeof adzanStartTime !== 'undefined' && adzanStartTime) return true;
+                if (typeof iqomahStartTime !== 'undefined' && iqomahStartTime) return true;
+                if (typeof adzanImageEndTime !== 'undefined' && adzanImageEndTime && now < adzanImageEndTime) return true;
+                if (typeof fridayInfoEndTime !== 'undefined' && fridayInfoEndTime && now < fridayInfoEndTime) return true;
 
-            if (typeof window.nextPrayerSecondsRemaining !== 'undefined' &&
-                window.nextPrayerSecondsRemaining <= 60 &&
-                window.nextPrayerSecondsRemaining >= 0) {
-                return true;
+                if (typeof window.nextPrayerSecondsRemaining !== 'undefined' &&
+                    window.nextPrayerSecondsRemaining <= 60 &&
+                    window.nextPrayerSecondsRemaining >= 0) {
+                    return true;
+                }
+            } catch (e) {
+                console.warn('isPrayerTimeActive error:', e);
             }
 
             return false;
@@ -3030,7 +3056,7 @@
         }
 
         let iqomahImageSliderInterval = null;
-        let iqomahSliderStartTime = localStorage.getItem('iqomahSliderStartTime') ? parseInt(localStorage
+        iqomahSliderStartTime = localStorage.getItem('iqomahSliderStartTime') ? parseInt(localStorage
             .getItem('iqomahSliderStartTime')) : null;
 
         function updateIqomahImages() {
@@ -3067,7 +3093,7 @@
                                 newIqomahImages);
                             window.iqomahImages = newIqomahImages;
                             // Preload gambar baru jika belum ada di cache
-                            const urlsToPreload = newIqomahImages.filter(url => !window.imageCache[
+                            const urlsToPreload = newIqomahImages.filter(url => !window.imageCache || !window.imageCache[
                                 url] || !window.imageCache[url].complete);
                             if (urlsToPreload.length > 0) {
                                 await preloadImages(urlsToPreload);
@@ -3297,11 +3323,11 @@
             };
         }
 
-        let adzanImageStartTime = localStorage.getItem('adzanImageStartTime') ? parseInt(localStorage.getItem(
+        adzanImageStartTime = localStorage.getItem('adzanImageStartTime') ? parseInt(localStorage.getItem(
             'adzanImageStartTime')) : null;
-        let adzanImageEndTime = localStorage.getItem('adzanImageEndTime') ? parseInt(localStorage.getItem(
+        adzanImageEndTime = localStorage.getItem('adzanImageEndTime') ? parseInt(localStorage.getItem(
             'adzanImageEndTime')) : null;
-        let adzanImageSrc = localStorage.getItem('adzanImageSrc') || null;
+        adzanImageSrc = localStorage.getItem('adzanImageSrc') || null;
 
         function checkAndRestoreAdzanImage() {
             const now = getCurrentTimeFromServer().getTime();
@@ -3478,13 +3504,13 @@
         }
 
 
-        let fridayInfoStartTime = localStorage.getItem('fridayInfoStartTime') ? parseInt(localStorage.getItem(
+        fridayInfoStartTime = localStorage.getItem('fridayInfoStartTime') ? parseInt(localStorage.getItem(
             'fridayInfoStartTime')) : null;
-        let fridayInfoEndTime = localStorage.getItem('fridayInfoEndTime') ? parseInt(localStorage.getItem(
+        fridayInfoEndTime = localStorage.getItem('fridayInfoEndTime') ? parseInt(localStorage.getItem(
             'fridayInfoEndTime')) : null;
-        let fridayInfoData = localStorage.getItem('fridayInfoData') ? JSON.parse(localStorage.getItem(
+        fridayInfoData = localStorage.getItem('fridayInfoData') ? JSON.parse(localStorage.getItem(
             'fridayInfoData')) : null;
-        let fridayImageSliderInterval = null;
+        fridayImageSliderInterval = null;
 
         // ===================== Finance Overlay (summary + auto-scroll) =====================
         let financeScrollRaf = null;
@@ -3783,7 +3809,7 @@
             initFinanceOverlay();
         });
 
-        let fridaySliderStartTime = localStorage.getItem('fridaySliderStartTime') ? parseInt(localStorage
+        fridaySliderStartTime = localStorage.getItem('fridaySliderStartTime') ? parseInt(localStorage
             .getItem('fridaySliderStartTime')) : null;
 
         function checkAndRestoreFridayInfo() {
@@ -4034,7 +4060,7 @@
             }
         }
 
-        let jumatAdzanShown = localStorage.getItem('jumatAdzanShown') === 'true';
+        jumatAdzanShown = localStorage.getItem('jumatAdzanShown') === 'true';
 
         function showFridayInfo() {
             const now = getCurrentTimeFromServer();
@@ -4334,7 +4360,7 @@
                             }
 
                             // Preload gambar baru yang belum ada di cache
-                            const urlsToPreload = newUrls.filter(url => !window.imageCache[url] || !
+                            const urlsToPreload = newUrls.filter(url => !window.imageCache || !window.imageCache[url] || !
                                 window.imageCache[url].complete);
                             if (urlsToPreload.length > 0) {
                                 // console.log(`Preload gambar baru dari updateSlides: ${urlsToPreload}`);
@@ -4362,26 +4388,44 @@
         // Objek global untuk menyimpan cache gambar
         window.imageCache = window.imageCache || {};
 
+        function fixMediaUrl(rawUrl) {
+            if (!rawUrl || typeof rawUrl !== 'string') return '';
+            const trimmed = rawUrl.trim();
+            if (!trimmed) return '';
+            try {
+                if (trimmed.startsWith('/')) {
+                    return window.location.origin + trimmed;
+                }
+                const parsed = new URL(trimmed, window.location.origin);
+                if (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1') {
+                    return window.location.origin + parsed.pathname + parsed.search;
+                }
+                return parsed.href;
+            } catch (e) {
+                return trimmed;
+            }
+        }
+
         function normalizeJumbotronItem(item) {
             if (!item) return null;
             if (typeof item === 'string') {
-                const trimmed = item.trim();
-                if (!trimmed) return null;
-                const clean = trimmed.split('?')[0].toLowerCase();
+                const fixedUrl = fixMediaUrl(item);
+                if (!fixedUrl) return null;
+                const clean = fixedUrl.split('?')[0].toLowerCase();
                 const isVideo = clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.ogg');
                 return {
                     type: isVideo ? 'video' : 'image',
-                    url: trimmed,
+                    url: fixedUrl,
                     has_audio: false,
                     duration: isVideo ? 0 : 20
                 };
             }
             if (typeof item === 'object') {
-                const url = (item.url || '').trim();
-                if (!url) return null;
+                const fixedUrl = fixMediaUrl(item.url || '');
+                if (!fixedUrl) return null;
                 return {
                     type: item.type === 'video' ? 'video' : 'image',
-                    url: url,
+                    url: fixedUrl,
                     has_audio: Boolean(item.has_audio),
                     duration: parseInt(item.duration, 10) || 0
                 };
@@ -4403,6 +4447,7 @@
         }
 
         function clearUnusedCache(currentUrls) {
+            window.imageCache = window.imageCache || {};
             const maxCacheSize = 50;
             const activeUrls = getAllActiveUrls();
 
@@ -4564,6 +4609,7 @@
                         $('#jumbotron_is_active').val('false');
                         window.jumbotronSequence = [];
                         $('#jumbotron-sequence').val('[]');
+                        $(document).trigger('jumbotronUpdated');
                     }
                 },
                 error: function(xhr) {
@@ -4571,6 +4617,7 @@
                     $('#jumbotron_is_active').val('false');
                     window.jumbotronSequence = [];
                     $('#jumbotron-sequence').val('[]');
+                    $(document).trigger('jumbotronUpdated');
                 }
             });
         }
@@ -4643,23 +4690,15 @@
 
             function onVideoFinished() {
                 if (!window.isJumbotronVideoPlaying) return;
-                console.log('Video jumbotron selesai diputar');
+                console.log('Video jumbotron selesai diputar, beralih ke item jumbotron berikutnya');
                 window.isJumbotronVideoPlaying = false;
-                window.inJumbotronPhase = false;
                 window.lastVideoEndTime = Date.now();
+                cleanupVideoMemory();
                 resumeAudioFromVideo();
 
-                // Pastikan slide utama di latar belakang sudah siap menampilkan gambar terkini
-                updateSlide();
-
-                // Transisi fadeOut yang lembut agar layar tidak berkedip atau glitch
-                $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
-                    cleanupVideoMemory();
-                    $jumbotronImageElement.css({
-                        'display': 'none',
-                        'background-image': 'none'
-                    });
-                });
+                if (typeof window.advanceJumbotronItem === 'function') {
+                    window.advanceJumbotronItem();
+                }
             }
 
             function playJumbotronVideo(videoItem) {
@@ -4813,92 +4852,40 @@
                     await preloadImages(allUrls);
 
                     const slideDuration = 20000; // 20 detik per gambar
+                    let currentPhase = 'main'; // 'main' atau 'jumbotron'
+                    let mainSlideIndex = 0;
+                    let jumbotronIndex = 0;
+                    let phaseStartTime = Date.now();
 
-                    function updateSlide() {
-                        const prayerActive = typeof window.isPrayerTimeActive === 'function' ? window.isPrayerTimeActive() : (
-                            (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
-                            (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) ||
-                            $('#adzanPopup').is(':visible') ||
-                            $('#iqomahPopup').is(':visible') ||
-                            $('#fridayInfoPopup').is(':visible') ||
-                            $('#adzanImageDisplay').is(':visible')
-                        );
-
-                        if (prayerActive) {
-                            if (window.isJumbotronVideoPlaying) {
-                                cleanupVideoMemory();
-                                window.isJumbotronVideoPlaying = false;
-                                window.inJumbotronPhase = false;
-                                $jumbotronImageElement.hide();
-                            }
-                        } else if (window.isJumbotronVideoPlaying) {
-                            return;
+                    function isPrayerTimeOngoing() {
+                        try {
+                            return typeof window.isPrayerTimeActive === 'function' ? window.isPrayerTimeActive() : (
+                                (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
+                                (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) ||
+                                ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) ||
+                                ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) ||
+                                ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) ||
+                                ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible'))
+                            );
+                        } catch (err) {
+                            console.warn('isPrayerTimeOngoing error:', err);
+                            return false;
                         }
+                    }
 
-                        const isSequenceActive = !prayerActive && $('#jumbotron_is_active').val() === 'true' && Array
-                            .isArray(window.jumbotronSequence) && window.jumbotronSequence.length > 0;
-                        if (!isSequenceActive) {
-                            window.jumbotronSequence = [];
-                            $jumbotronImageElement.stop(true, true).fadeOut(250);
-                            cleanupVideoMemory();
-                            if (!prayerActive) {
-                                resumeAudioFromVideo();
-                            }
-                        }
-
-                        if (window.slideUrls.length === 0) {
-                            window.slideUrls = ['/images/other/slide-jws-default.jpg'];
-                        }
-
-                        const now = getCurrentTimeFromServer();
-                        const totalSeconds = (now.getHours() * 3600) + (now.getMinutes() * 60) + now
-                            .getSeconds();
-                        const slideCycleDuration = slideDuration * window.slideUrls.length;
-                        const totalCycleDuration = isSequenceActive ? slideCycleDuration + slideDuration :
-                            slideCycleDuration;
-
-                        const cyclePosition = (totalSeconds * 1000 + now.getMilliseconds()) %
-                            totalCycleDuration;
-                        const imageIndex = Math.floor(cyclePosition / slideDuration);
-
-                        const isVideoCooldown = (Date.now() - (window.lastVideoEndTime || 0)) < slideDuration;
-
-                        let currentUrl;
-                        if (!prayerActive && isSequenceActive && imageIndex === window.slideUrls.length && !isVideoCooldown) {
-                            if (!window.inJumbotronPhase) {
-                                window.inJumbotronPhase = true;
-                                window.jsIndex = typeof window.jsIndex === 'number' ? window.jsIndex : 0;
-                                const seqLen = window.jumbotronSequence.length;
-                                const nextIndex = seqLen > 0 ? (window.jsIndex % seqLen) : 0;
-                                window.jsIndex++;
-                                window.currentJumbotronItem = window.jumbotronSequence[nextIndex];
-                            }
-
-                            const currentItem = window.currentJumbotronItem;
-                            if (!currentItem) {
-                                window.inJumbotronPhase = false;
-                                return;
-                            }
-
-                            if (currentItem.type === 'video') {
-                                playJumbotronVideo(currentItem);
-                            } else {
-                                cleanupVideoMemory();
-                                resumeAudioFromVideo();
-                                currentUrl = window.imageCache[currentItem.url]?.src ||
-                                    currentItem.url ||
-                                    '/images/other/slide-jws-default.jpg';
-                                $jumbotronImageElement.css({
-                                    'background-image': `url("${currentUrl}")`
-                                }).stop(true, true).fadeIn(300);
-                            }
-                        } else {
+                    function advanceJumbotronItem() {
+                        jumbotronIndex++;
+                        phaseStartTime = Date.now();
+                        const seq = Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [];
+                        if (jumbotronIndex >= seq.length) {
+                            // Seluruh item jumbotron (video, gambar global, gambar masjid) telah selesai ditampilkan!
+                            // Kembali ke putaran slide utama
+                            currentPhase = 'main';
+                            mainSlideIndex = 0;
+                            jumbotronIndex = 0;
                             window.inJumbotronPhase = false;
-                            window.currentJumbotronItem = null;
                             cleanupVideoMemory();
-                            if (!prayerActive) {
-                                resumeAudioFromVideo();
-                            }
+                            resumeAudioFromVideo();
 
                             if ($jumbotronImageElement.is(':visible')) {
                                 $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
@@ -4908,10 +4895,75 @@
                                     });
                                 });
                             }
+                            renderCurrentState();
+                        } else {
+                            renderCurrentState();
+                        }
+                    }
+                    window.advanceJumbotronItem = advanceJumbotronItem;
 
-                            const slideIndex = imageIndex % window.slideUrls.length;
-                            currentUrl = window.imageCache[window.slideUrls[slideIndex]]?.src ||
-                                window.slideUrls[slideIndex] ||
+                    function advanceMainSlide() {
+                        mainSlideIndex++;
+                        phaseStartTime = Date.now();
+                        if (mainSlideIndex >= window.slideUrls.length) {
+                            mainSlideIndex = 0;
+                            const isSequenceActive = !isPrayerTimeOngoing() &&
+                                $('#jumbotron_is_active').val() === 'true' &&
+                                Array.isArray(window.jumbotronSequence) &&
+                                window.jumbotronSequence.length > 0;
+
+                            if (isSequenceActive) {
+                                // Masuk ke seluruh fase jumbotron: Video -> Gambar Global -> Gambar Masjid
+                                currentPhase = 'jumbotron';
+                                jumbotronIndex = 0;
+                                renderCurrentState();
+                            } else {
+                                renderCurrentState();
+                            }
+                        } else {
+                            renderCurrentState();
+                        }
+                    }
+
+                    function renderCurrentState() {
+                        const prayerActive = isPrayerTimeOngoing();
+
+                        if (prayerActive) {
+                            if (window.isJumbotronVideoPlaying) {
+                                cleanupVideoMemory();
+                                window.isJumbotronVideoPlaying = false;
+                                window.inJumbotronPhase = false;
+                                $jumbotronImageElement.hide();
+                            }
+                            return;
+                        }
+
+                        if (currentPhase === 'main') {
+                            window.inJumbotronPhase = false;
+                            window.isJumbotronVideoPlaying = false;
+                            cleanupVideoMemory();
+                            resumeAudioFromVideo();
+
+                            if ($jumbotronImageElement.is(':visible')) {
+                                $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
+                                    $jumbotronImageElement.css({
+                                        'display': 'none',
+                                        'background-image': 'none'
+                                    });
+                                });
+                            } else {
+                                $jumbotronImageElement.css({
+                                    'display': 'none',
+                                    'background-image': 'none'
+                                });
+                            }
+
+                            if (window.slideUrls.length === 0) {
+                                window.slideUrls = ['/images/other/slide-jws-default.jpg'];
+                            }
+
+                            const currentUrl = window.imageCache?.[window.slideUrls[mainSlideIndex]]?.src ||
+                                window.slideUrls[mainSlideIndex] ||
                                 '/images/other/slide-jws-default.jpg';
 
                             if ($mosqueImageElement.data('current-url') !== currentUrl) {
@@ -4920,14 +4972,88 @@
                                     'background-image': `url("${currentUrl}")`,
                                     'display': 'block'
                                 });
+                            } else {
+                                $mosqueImageElement.css('display', 'block');
+                            }
+                        } else if (currentPhase === 'jumbotron') {
+                            const isSequenceActive = !prayerActive &&
+                                $('#jumbotron_is_active').val() === 'true' &&
+                                Array.isArray(window.jumbotronSequence) &&
+                                window.jumbotronSequence.length > 0;
+
+                            if (!isSequenceActive || jumbotronIndex >= window.jumbotronSequence.length) {
+                                currentPhase = 'main';
+                                mainSlideIndex = 0;
+                                jumbotronIndex = 0;
+                                phaseStartTime = Date.now();
+                                $jumbotronImageElement.stop(true, true).hide().css({
+                                    'display': 'none',
+                                    'background-image': 'none'
+                                });
+                                renderCurrentState();
+                                return;
+                            }
+
+                            window.inJumbotronPhase = true;
+                            const currentItem = window.jumbotronSequence[jumbotronIndex];
+                            if (!currentItem) {
+                                advanceJumbotronItem();
+                                return;
+                            }
+
+                            if (currentItem.type === 'video') {
+                                playJumbotronVideo(currentItem);
+                            } else {
+                                cleanupVideoMemory();
+                                resumeAudioFromVideo();
+                                const currentUrl = window.imageCache?.[currentItem.url]?.src ||
+                                    currentItem.url ||
+                                    '/images/other/slide-jws-default.jpg';
+                                $jumbotronImageElement.css({
+                                    'background-image': `url("${currentUrl}")`
+                                }).stop(true, true).fadeIn(300);
                             }
                         }
+
                         clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
                             window.jumbotronSequence : [])]);
                         $(document).trigger('slideUpdated');
                     }
 
-                    updateSlide();
+                    function updateSlide() {
+                        const prayerActive = isPrayerTimeOngoing();
+                        if (prayerActive) {
+                            if (window.isJumbotronVideoPlaying) {
+                                cleanupVideoMemory();
+                                window.isJumbotronVideoPlaying = false;
+                                window.inJumbotronPhase = false;
+                                $jumbotronImageElement.hide();
+                            }
+                            return;
+                        }
+
+                        const elapsed = Date.now() - phaseStartTime;
+
+                        if (currentPhase === 'main') {
+                            if (elapsed >= slideDuration) {
+                                advanceMainSlide();
+                            }
+                        } else if (currentPhase === 'jumbotron') {
+                            const currentItem = window.jumbotronSequence[jumbotronIndex];
+                            if (!currentItem) {
+                                advanceJumbotronItem();
+                                return;
+                            }
+                            if (currentItem.type !== 'video') {
+                                if (elapsed >= slideDuration) {
+                                    advanceJumbotronItem();
+                                }
+                            }
+                        }
+                    }
+
+                    phaseStartTime = Date.now();
+                    renderCurrentState();
                     setInterval(updateSlide, 1000);
 
                     $(document).on('slidesUpdated', async function(event, newSlides) {
@@ -4938,7 +5064,7 @@
                             window.slideUrls = newUrls;
                         }
 
-                        const urlsToPreload = window.slideUrls.filter(url => !window.imageCache[
+                        const urlsToPreload = window.slideUrls.filter(url => !window.imageCache || !window.imageCache[
                             url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
                             await preloadImages(urlsToPreload);
@@ -4960,7 +5086,7 @@
                         const urlsToPreload = window.jumbotronSequence
                             .filter(item => item.type === 'image')
                             .map(item => item.url)
-                            .filter(url => !window.imageCache[url] || !window.imageCache[url].complete);
+                            .filter(url => !window.imageCache || !window.imageCache[url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
                             await preloadImages(urlsToPreload);
                         }
@@ -4968,18 +5094,44 @@
                             .jumbotronSequence) ? window.jumbotronSequence : [])]);
                         try {
                             const newHash = JSON.stringify(window.jumbotronSequence);
-                            if (newHash !== window.jumbotronSequenceHash) {
-                                window.jumbotronSequenceHash = newHash;
-                                window.jsIndex = 0;
+                            const isSeqActive = $('#jumbotron_is_active').val() === 'true' &&
+                                Array.isArray(window.jumbotronSequence) &&
+                                window.jumbotronSequence.length > 0;
+
+                            if (!isSeqActive) {
+                                // Jumbotron dinonaktifkan atau kosong: langsung beralih ke slide utama dan sembunyikan jumbotron
+                                currentPhase = 'main';
+                                mainSlideIndex = 0;
+                                jumbotronIndex = 0;
+                                window.inJumbotronPhase = false;
                                 if (window.isJumbotronVideoPlaying) {
                                     cleanupVideoMemory();
                                     resumeAudioFromVideo();
                                     window.isJumbotronVideoPlaying = false;
                                 }
-                                window.inJumbotronPhase = false;
-                                window.currentJumbotronItem = null;
+                                $jumbotronImageElement.stop(true, true).hide().css({
+                                    'display': 'none',
+                                    'background-image': 'none'
+                                });
+                                $mosqueImageElement.show();
+                                renderCurrentState();
+                            } else if (newHash !== window.jumbotronSequenceHash) {
+                                window.jumbotronSequenceHash = newHash;
+                                if (currentPhase === 'jumbotron') {
+                                    if (jumbotronIndex >= window.jumbotronSequence.length) {
+                                        jumbotronIndex = 0;
+                                    }
+                                    if (window.isJumbotronVideoPlaying) {
+                                        cleanupVideoMemory();
+                                        resumeAudioFromVideo();
+                                        window.isJumbotronVideoPlaying = false;
+                                    }
+                                    renderCurrentState();
+                                }
                             }
-                        } catch (e) {}
+                        } catch (e) {
+                            console.error('Error handling jumbotronUpdated:', e);
+                        }
                     });
                 } catch (error) {
                     console.error('Error saat menginisialisasi slider:', error);

@@ -48,30 +48,48 @@ class MasterController extends Controller
     public function get_jumbotron()
     {
         try {
-            $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
             $data = [];
-            if ($jumbotron->media_type === 'video' && $jumbotron->video_file) {
+            // Video global aktif
+            $videos = Jumbotron::where('is_active', true)
+                ->where('media_type', 'video')
+                ->whereNotNull('video_file')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($videos as $v) {
                 $data[] = [
                     'type' => 'video',
-                    'url' => asset($jumbotron->video_file),
-                    'has_audio' => (bool) $jumbotron->has_audio,
-                    'duration' => (int) $jumbotron->video_duration,
+                    'url' => asset($v->video_file),
+                    'has_audio' => (bool) $v->has_audio,
+                    'duration' => (int) $v->video_duration,
                 ];
-            } else {
-                if ($jumbotron->jumbo1) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo1)];
-                if ($jumbotron->jumbo2) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo2)];
-                if ($jumbotron->jumbo3) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo3)];
-                if ($jumbotron->jumbo4) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo4)];
-                if ($jumbotron->jumbo5) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo5)];
-                if ($jumbotron->jumbo6) $data[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo6)];
             }
+
+            // Gambar global aktif
+            $images = Jumbotron::where('is_active', true)
+                ->where(function ($q) {
+                    $q->where('media_type', 'image')->orWhereNull('media_type');
+                })
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($images as $img) {
+                foreach (['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'] as $field) {
+                    if ($img->$field) {
+                        $data[] = ['type' => 'image', 'url' => asset($img->$field)];
+                    }
+                }
+            }
+
+            if (empty($data)) {
+                return response()->json(['success' => false, 'message' => 'Jumbotron tidak ditemukan !'], 404);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data jumbotron !',
                 'data' => $data
             ]);
-        } catch (ModelNotFoundException $ex) {
-            return response()->json(['success' => false, 'message' => 'Jumbotron tidak ditemukan !'], 404);
         } catch (\Exception $ex) {
             return response()->json(['success' => false, 'message' => addslashes($ex->getMessage())], 500);
         }
@@ -82,15 +100,29 @@ class MasterController extends Controller
     {
         try {
             $profil = Profil::where('slug', $slug)->firstOrFail();
-            $jm = JumbotronMasjid::where('masjid_id', $profil->id)->where('aktif', true)->firstOrFail();
+            $jms = JumbotronMasjid::where('masjid_id', $profil->id)->where('aktif', true)->orderBy('id', 'asc')->get();
+            $slides = [];
+            foreach ($jms as $jm) {
+                foreach (['jumbotron_masjid_1', 'jumbotron_masjid_2', 'jumbotron_masjid_3', 'jumbotron_masjid_4', 'jumbotron_masjid_5', 'jumbotron_masjid_6'] as $field) {
+                    if ($jm->$field) {
+                        $slides[] = asset($jm->$field);
+                    }
+                }
+            }
+
+            if (empty($slides)) {
+                return response()->json(['success' => false, 'message' => 'Jumbotron masjid tidak ditemukan!'], 404);
+            }
+
             $data = [
-                'jumbo1' => $jm->jumbotron_masjid_1 ? asset($jm->jumbotron_masjid_1) : null,
-                'jumbo2' => $jm->jumbotron_masjid_2 ? asset($jm->jumbotron_masjid_2) : null,
-                'jumbo3' => $jm->jumbotron_masjid_3 ? asset($jm->jumbotron_masjid_3) : null,
-                'jumbo4' => $jm->jumbotron_masjid_4 ? asset($jm->jumbotron_masjid_4) : null,
-                'jumbo5' => $jm->jumbotron_masjid_5 ? asset($jm->jumbotron_masjid_5) : null,
-                'jumbo6' => $jm->jumbotron_masjid_6 ? asset($jm->jumbotron_masjid_6) : null,
-                'is_active' => (bool) $jm->aktif,
+                'jumbo1' => $slides[0] ?? null,
+                'jumbo2' => $slides[1] ?? null,
+                'jumbo3' => $slides[2] ?? null,
+                'jumbo4' => $slides[3] ?? null,
+                'jumbo5' => $slides[4] ?? null,
+                'jumbo6' => $slides[5] ?? null,
+                'all_slides' => $slides,
+                'is_active' => true,
             ];
             return response()->json([
                 'success' => true,
@@ -107,57 +139,80 @@ class MasterController extends Controller
     public function get_jumbotron_all($slug)
     {
         try {
-            $globalItems = [];
-            $globalActive = false;
-            try {
-                $jumbotron = Jumbotron::where('is_active', true)->firstOrFail();
-                if ($jumbotron->media_type === 'video' && $jumbotron->video_file) {
-                    $globalItems[] = [
-                        'type' => 'video',
-                        'url' => asset($jumbotron->video_file),
-                        'has_audio' => (bool) $jumbotron->has_audio,
-                        'duration' => (int) $jumbotron->video_duration,
-                    ];
-                } else {
-                    if ($jumbotron->jumbo1) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo1)];
-                    if ($jumbotron->jumbo2) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo2)];
-                    if ($jumbotron->jumbo3) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo3)];
-                    if ($jumbotron->jumbo4) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo4)];
-                    if ($jumbotron->jumbo5) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo5)];
-                    if ($jumbotron->jumbo6) $globalItems[] = ['type' => 'image', 'url' => asset($jumbotron->jumbo6)];
-                }
-                $globalActive = true;
-            } catch (ModelNotFoundException $e) {
+            // 1. Ambil semua Jumbotron Video Global yang aktif
+            $activeVideos = Jumbotron::where('is_active', true)
+                ->where('media_type', 'video')
+                ->whereNotNull('video_file')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            $videoItems = [];
+            foreach ($activeVideos as $v) {
+                $videoItems[] = [
+                    'type' => 'video',
+                    'category' => 'pemko_video',
+                    'url' => asset($v->video_file),
+                    'has_audio' => (bool) $v->has_audio,
+                    'duration' => (int) $v->video_duration,
+                ];
             }
 
-            $masjidItems = [];
-            $masjidActive = false;
+            // 2. Ambil semua Jumbotron Gambar Global yang aktif
+            $activeGlobalImages = Jumbotron::where('is_active', true)
+                ->where(function ($q) {
+                    $q->where('media_type', 'image')->orWhereNull('media_type');
+                })
+                ->orderBy('id', 'asc')
+                ->get();
+
+            $globalImageItems = [];
+            foreach ($activeGlobalImages as $img) {
+                foreach (['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'] as $field) {
+                    if ($img->$field) {
+                        $globalImageItems[] = [
+                            'type' => 'image',
+                            'category' => 'pemko_image',
+                            'url' => asset($img->$field),
+                        ];
+                    }
+                }
+            }
+
+            // 3. Ambil semua Jumbotron Masjid yang aktif
+            $masjidImageItems = [];
             try {
                 $profil = Profil::where('slug', $slug)->firstOrFail();
-                $jm = JumbotronMasjid::where('masjid_id', $profil->id)->where('aktif', true)->firstOrFail();
-                if ($jm->jumbotron_masjid_1) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_1)];
-                if ($jm->jumbotron_masjid_2) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_2)];
-                if ($jm->jumbotron_masjid_3) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_3)];
-                if ($jm->jumbotron_masjid_4) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_4)];
-                if ($jm->jumbotron_masjid_5) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_5)];
-                if ($jm->jumbotron_masjid_6) $masjidItems[] = ['type' => 'image', 'url' => asset($jm->jumbotron_masjid_6)];
-                $masjidActive = (bool) $jm->aktif;
-            } catch (ModelNotFoundException $e) {
-            }
+                $activeMasjidJumbos = JumbotronMasjid::where('masjid_id', $profil->id)
+                    ->where('aktif', true)
+                    ->orderBy('id', 'asc')
+                    ->get();
 
-            $mergedItems = [];
-            $maxLen = max(count($masjidItems), count($globalItems));
-            for ($i = 0; $i < $maxLen; $i++) {
-                if (isset($masjidItems[$i])) $mergedItems[] = $masjidItems[$i];
-                if (isset($globalItems[$i])) $mergedItems[] = $globalItems[$i];
-            }
+                foreach ($activeMasjidJumbos as $jm) {
+                    foreach (['jumbotron_masjid_1', 'jumbotron_masjid_2', 'jumbotron_masjid_3', 'jumbotron_masjid_4', 'jumbotron_masjid_5', 'jumbotron_masjid_6'] as $field) {
+                        if ($jm->$field) {
+                            $masjidImageItems[] = [
+                                'type' => 'image',
+                                'category' => 'masjid_image',
+                                'url' => asset($jm->$field),
+                            ];
+                        }
+                    }
+                }
+            } catch (\Exception $e) {}
+
+            // Siklus penayangan:
+            // slide -> jumbotron video -> jumbotron gambar global -> jumbotron masjid -> slide
+            $mergedItems = array_merge($videoItems, $globalImageItems, $masjidImageItems);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Berhasil get data jumbotron masjid dan global !',
                 'data' => [
-                    'is_active' => ($globalActive || $masjidActive),
+                    'is_active' => count($mergedItems) > 0,
                     'items' => $mergedItems,
+                    'videos' => $videoItems,
+                    'global_images' => $globalImageItems,
+                    'masjid_images' => $masjidImageItems,
                 ],
             ]);
         } catch (\Exception $ex) {

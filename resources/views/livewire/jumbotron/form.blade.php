@@ -3,37 +3,25 @@
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-12">
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Status Aktif</label>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" wire:model.live="is_active"
-                                    wire:change="$refresh" id="is_active" {{ $is_active ? 'checked' : '' }}>
-                                <label class="form-check-label" for="is_active">
-                                    {{ $is_active ? 'Aktif' : 'Tidak Aktif' }}
-                                </label>
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                        <div>
+                            <h3 class="card-title fw-bold m-0">
+                                {{ $isEdit ? 'Ubah Jumbotron ' . ($media_type === 'video' ? 'Video' : 'Gambar') : 'Tambah Jumbotron ' . ($media_type === 'video' ? 'Video' : 'Gambar') . ' Baru' }}
+                            </h3>
+                            <div class="text-muted small">
+                                Pastikan data yang dimasukkan sudah benar sebelum disimpan.
                             </div>
                         </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Tipe Konten Jumbotron</label>
-                            <div class="d-flex gap-4 mt-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" wire:model.live="media_type"
-                                        id="media_type_image" value="image">
-                                    <label class="form-check-label" for="media_type_image">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                                        Gambar (6 Slot Rotasi)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" wire:model.live="media_type"
-                                        id="media_type_video" value="video">
-                                    <label class="form-check-label" for="media_type_video">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
-                                        Video (MP4 / WebM)
-                                    </label>
-                                </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label fw-bold m-0">Status Aktif:</label>
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" wire:model.live="is_active"
+                                    wire:change="$refresh" id="is_active" {{ $is_active ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold" for="is_active">
+                                    <span class="badge {{ $is_active ? 'bg-primary-lt' : 'bg-danger-lt' }}">
+                                        {{ $is_active ? 'Aktif' : 'Tidak Aktif' }}
+                                    </span>
+                                </label>
                             </div>
                         </div>
                     </div>

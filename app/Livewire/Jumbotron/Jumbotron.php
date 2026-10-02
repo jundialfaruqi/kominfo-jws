@@ -38,6 +38,7 @@ class Jumbotron extends Component
     public $jumbo6;
     public $tmp_jumbo6;
     public $is_active = true;
+    public $activeTab = 'image';
     public $media_type = 'image';
     public $video_file;
     public $tmp_video_file;
@@ -49,6 +50,14 @@ class Jumbotron extends Component
     public $showTable = true;
     public $deleteJumboId;
     public $deleteJumboName;
+
+    public function setTab($tab)
+    {
+        $this->activeTab = in_array($tab, ['image', 'video']) ? $tab : 'image';
+        $this->media_type = $this->activeTab;
+        $this->cancelForm();
+        $this->resetPage();
+    }
 
     protected function rules()
     {
@@ -418,7 +427,15 @@ class Jumbotron extends Component
                 $q->where('name', 'like', '%' . $this->search . '%');
             });
 
-        $jumboList = $query->orderBy('id', 'asc')->paginate($this->paginate);
+        if ($this->activeTab === 'video') {
+            $query->where('media_type', 'video');
+        } else {
+            $query->where(function ($q) {
+                $q->where('media_type', 'image')->orWhereNull('media_type');
+            });
+        }
+
+        $jumboList = $query->orderBy('id', 'desc')->paginate($this->paginate);
 
         return view('livewire.jumbotron.jumbotron', [
             'jumboList' => $jumboList,
@@ -430,7 +447,6 @@ class Jumbotron extends Component
         $this->resetValidation();
         $this->reset([
             'jumboId',
-            'media_type',
             'video_file',
             'tmp_video_file',
             'has_audio',
@@ -450,7 +466,7 @@ class Jumbotron extends Component
             'is_active',
         ]);
 
-        $this->media_type = 'image';
+        $this->media_type = $this->activeTab;
         $this->isEdit = false;
         $this->showForm = true;
         $this->is_active = true;
@@ -464,6 +480,7 @@ class Jumbotron extends Component
 
         $this->jumboId = $jumbo->id;
         $this->media_type = $jumbo->media_type ?? 'image';
+        $this->activeTab = $this->media_type;
         $this->video_file = null;
         $this->tmp_video_file = $jumbo->video_file;
         $this->has_audio = (bool) $jumbo->has_audio;
@@ -488,7 +505,6 @@ class Jumbotron extends Component
         $this->resetValidation();
         $this->reset([
             'jumboId',
-            'media_type',
             'video_file',
             'tmp_video_file',
             'has_audio',
@@ -507,7 +523,7 @@ class Jumbotron extends Component
             'tmp_jumbo6',
             'is_active',
         ]);
-        $this->media_type = 'image';
+        $this->media_type = $this->activeTab;
     }
 
     public function save()
@@ -621,7 +637,6 @@ class Jumbotron extends Component
             $this->showTable = true;
             $this->reset([
                 'jumboId',
-                'media_type',
                 'video_file',
                 'tmp_video_file',
                 'has_audio',
@@ -640,7 +655,7 @@ class Jumbotron extends Component
                 'tmp_jumbo6',
                 'is_active',
             ]);
-            $this->media_type = 'image';
+            $this->media_type = $this->activeTab;
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menyimpan jumbotron: ' . $e->getMessage());
         }

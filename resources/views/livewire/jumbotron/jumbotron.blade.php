@@ -4,20 +4,27 @@
             <div class="row row-cards">
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm">
-                        <div class="card-header">
-                            <h3 class="card-title d-none d-md-block">
-                                @if ($showForm)
-                                    {{ $isEdit ? 'Ubah Pengaturan Jumbotron' : 'Tambah Jumbotron Baru' }}
-                                @else
-                                    Daftar Jumbotron
-                                @endif
-                            </h3>
+                        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link {{ $activeTab === 'image' ? 'active fw-bold' : '' }}" wire:click="setTab('image')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                        Jumbotron Gambar
+                                    </button>
+                                </li>
+                                <li class="nav-item">
+                                    <button type="button" class="nav-link {{ $activeTab === 'video' ? 'active fw-bold' : '' }}" wire:click="setTab('video')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+                                        Jumbotron Video
+                                    </button>
+                                </li>
+                            </ul>
                             @if (!$showForm)
                                 <div class="card-actions">
                                     @can('create-jumbotron')
-                                        <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                        <button wire:click="showAddForm" class="btn py-2 px-2 rounded-3 shadow-sm btn-primary">
                                             <span wire:loading.remove wire:target="showAddForm">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                                     class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-plus">
@@ -27,7 +34,7 @@
                                                     <path d="M16 19h6" />
                                                     <path d="M19 16v6" />
                                                 </svg>
-                                                Tambah Jumbotron
+                                                Tambah Jumbotron {{ $activeTab === 'video' ? 'Video' : 'Gambar' }}
                                             </span>
                                             <span wire:loading wire:target="showAddForm">
                                                 <span class="spinner-border spinner-border-sm" role="status"

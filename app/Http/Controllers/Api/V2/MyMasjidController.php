@@ -244,39 +244,94 @@ class MyMasjidController extends Controller
                     ];
                 });
 
-            // Ambil Jumbotron Pemko (Global)
-            $jumbotronPemko = \App\Models\Jumbotron::query()->first();
+            // Ambil semua Jumbotron Video Global yang aktif
+            $activeVideos = \App\Models\Jumbotron::query()
+                ->where('is_active', true)
+                ->where('media_type', 'video')
+                ->whereNotNull('video_file')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            $videosList = $activeVideos->map(function ($v) {
+                return [
+                    'id' => $v->id,
+                    'video_file' => $v->video_file ? asset($v->video_file) : null,
+                    'has_audio' => (bool) $v->has_audio,
+                    'video_duration' => (int) $v->video_duration,
+                ];
+            })->filter(fn($v) => !empty($v['video_file']))->values();
+
+            // Ambil semua Jumbotron Gambar Global yang aktif
+            $activeImages = \App\Models\Jumbotron::query()
+                ->where('is_active', true)
+                ->where(function ($q) {
+                    $q->where('media_type', 'image')->orWhereNull('media_type');
+                })
+                ->orderBy('id', 'asc')
+                ->get();
+
+            $allGlobalSlides = [];
+            foreach ($activeImages as $rec) {
+                foreach (['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'] as $field) {
+                    if (!empty($rec->$field)) {
+                        $allGlobalSlides[] = $rec->$field;
+                    }
+                }
+            }
+
+            $firstVideo = $videosList->first();
+            $firstImage = $activeImages->first();
+            $hasActiveGlobal = ($videosList->isNotEmpty() || count($allGlobalSlides) > 0);
+
             $jumbotronPemkoData = null;
-            if ($jumbotronPemko) {
+            if ($hasActiveGlobal || $activeVideos->isNotEmpty() || $activeImages->isNotEmpty()) {
                 $jumbotronPemkoData = [
-                    'id' => $jumbotronPemko->id,
-                    'is_active' => (bool) $jumbotronPemko->is_active,
-                    'media_type' => $jumbotronPemko->media_type ?? 'image',
-                    'video_file' => $jumbotronPemko->video_file ? asset($jumbotronPemko->video_file) : null,
-                    'has_audio' => (bool) $jumbotronPemko->has_audio,
-                    'video_duration' => (int) $jumbotronPemko->video_duration,
-                    'slide1' => $jumbotronPemko->jumbo1,
-                    'slide2' => $jumbotronPemko->jumbo2,
-                    'slide3' => $jumbotronPemko->jumbo3,
-                    'slide4' => $jumbotronPemko->jumbo4,
-                    'slide5' => $jumbotronPemko->jumbo5,
-                    'slide6' => $jumbotronPemko->jumbo6,
+                    'id' => $firstVideo['id'] ?? ($firstImage->id ?? 0),
+                    'is_active' => $hasActiveGlobal,
+                    'media_type' => $videosList->isNotEmpty() ? 'video' : 'image',
+                    'video_file' => $firstVideo['video_file'] ?? null,
+                    'has_audio' => $firstVideo['has_audio'] ?? false,
+                    'video_duration' => $firstVideo['video_duration'] ?? 0,
+                    'videos' => $videosList->toArray(),
+                    'slide1' => $allGlobalSlides[0] ?? null,
+                    'slide2' => $allGlobalSlides[1] ?? null,
+                    'slide3' => $allGlobalSlides[2] ?? null,
+                    'slide4' => $allGlobalSlides[3] ?? null,
+                    'slide5' => $allGlobalSlides[4] ?? null,
+                    'slide6' => $allGlobalSlides[5] ?? null,
+                    'all_slides' => $allGlobalSlides,
                 ];
             }
 
-            // Ambil Jumbotron Masjid
-            $jumbotronMasjid = \App\Models\JumbotronMasjid::query()->where('masjid_id', $profil->id)->first();
+            // Ambil Jumbotron Masjid yang aktif
+            $activeMasjidRecords = \App\Models\JumbotronMasjid::query()
+                ->where('masjid_id', $profil->id)
+                ->where('aktif', true)
+                ->orderBy('id', 'asc')
+                ->get();
+
+            $allMasjidSlides = [];
+            foreach ($activeMasjidRecords as $jm) {
+                foreach (['jumbotron_masjid_1', 'jumbotron_masjid_2', 'jumbotron_masjid_3', 'jumbotron_masjid_4', 'jumbotron_masjid_5', 'jumbotron_masjid_6'] as $field) {
+                    if (!empty($jm->$field)) {
+                        $allMasjidSlides[] = $jm->$field;
+                    }
+                }
+            }
+
+            $firstMasjid = $activeMasjidRecords->first();
             $jumbotronMasjidData = null;
-            if ($jumbotronMasjid) {
+            if ($firstMasjid) {
                 $jumbotronMasjidData = [
-                    'id' => $jumbotronMasjid->id,
-                    'is_active' => (bool) $jumbotronMasjid->aktif,
-                    'slide1' => $jumbotronMasjid->jumbotron_masjid_1,
-                    'slide2' => $jumbotronMasjid->jumbotron_masjid_2,
-                    'slide3' => $jumbotronMasjid->jumbotron_masjid_3,
-                    'slide4' => $jumbotronMasjid->jumbotron_masjid_4,
-                    'slide5' => $jumbotronMasjid->jumbotron_masjid_5,
-                    'slide6' => $jumbotronMasjid->jumbotron_masjid_6,
+                    'id' => $firstMasjid->id,
+                    'is_active' => count($allMasjidSlides) > 0,
+                    'slide1' => $allMasjidSlides[0] ?? null,
+                    'slide2' => $allMasjidSlides[1] ?? null,
+                    'slide3' => $allMasjidSlides[2] ?? null,
+                    'slide4' => $allMasjidSlides[3] ?? null,
+                    'slide5' => $allMasjidSlides[4] ?? null,
+                    'slide6' => $allMasjidSlides[5] ?? null,
+                    'all_slides' => $allMasjidSlides,
                 ];
             }
 
