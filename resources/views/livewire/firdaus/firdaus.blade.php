@@ -343,9 +343,9 @@
                disablePictureInPicture 
                controlsList="nodownload nofullscreen noremoteplayback" 
                preload="metadata"
-               style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;">
+               style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background-color: #000; z-index: 1;">
         </video>
-        <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo" class="jumbotron-logo">
+        <img src="{{ asset('theme/static/diskominfotiksan-logo.png') }}" alt="Logo" class="jumbotron-logo">
         <div class="jumbotron-countdown">
             <span id="jumbotron-next-prayer-label"></span>
             <span> - </span>
