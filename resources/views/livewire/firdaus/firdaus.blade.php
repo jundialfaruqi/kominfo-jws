@@ -337,13 +337,9 @@
     {{-- Jumbotron Banner --}}
     <div id="jumbotronImage" class="jumbotron-image" style="display: none;">
         {{-- Video Player for Jumbotron Video --}}
-        <video id="jumbotronVideoPlayer" 
-               playsinline 
-               webkit-playsinline 
-               disablePictureInPicture 
-               controlsList="nodownload nofullscreen noremoteplayback" 
-               preload="metadata"
-               style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background-color: #000; z-index: 1;">
+        <video id="jumbotronVideoPlayer" playsinline webkit-playsinline disablePictureInPicture
+            controlsList="nodownload nofullscreen noremoteplayback" preload="metadata"
+            style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; background-color: #000; z-index: 1;">
         </video>
         <img src="{{ asset('theme/static/diskominfotiksan-logo.png') }}" alt="Logo" class="jumbotron-logo">
         <div class="jumbotron-countdown">
@@ -371,7 +367,7 @@
             </div>
             <div id="adzanCountdown" class="countdown"></div>
             <div class="logo-popup">
-                <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
+                <img src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}" alt="Logo">
             </div>
         </div>
     </div>
@@ -386,7 +382,7 @@
             </div>
             <div id="iqomahCountdown" class="iqomah-countdown"></div>
             <div class="logo-popup">
-                <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
+                <img src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}" alt="Logo">
             </div>
         </div>
         <div class="iqomah-image">
@@ -409,7 +405,7 @@
             <input type="hidden" id="imam" value="{{ $petugas->imam ?? '' }}">
             <input type="hidden" id="muadzin" value="{{ $petugas->muadzin ?? '' }}">
             <div class="logo-popup">
-                <img src="{{ asset('theme/static/logo.webp') }}" alt="Logo">
+                <img src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}" alt="Logo">
             </div>
         </div>
         <div class="friday-image">
