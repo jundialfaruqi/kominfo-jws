@@ -247,7 +247,7 @@ body {
   --clock-center-dot-shadow-offset-y: 1;
 
   --clock-logo-url: ../theme/static/diskominfotiksan-logo-small.webp;
-  --clock-logo-scale: 0.23;
+  --clock-logo-scale: 0.18;
   --clock-logo-offset-y-scale: 0.33;
 
   width: 100%;
