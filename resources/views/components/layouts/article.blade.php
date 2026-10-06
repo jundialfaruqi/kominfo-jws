@@ -16,7 +16,9 @@
                 <img src="{{ asset('nav-brand.png') }}" width="35" alt="JWS Pekanbaru" class="me-2">
                 <div class="d-flex flex-column justify-content-center align-items-start">
                     <span class="fw-bold lh-1" style="font-size: 1.1rem;">JWS Pekanbaru</span>
-                    <span class="text-muted lh-1 mt-1" style="font-size: 0.65rem; font-family: 'PlusJakartaSansText', sans-serif; letter-spacing: 0.2px;">Jadwal Waktu Sholat Kota Pekanbaru</span>
+                    <span class="text-muted lh-1 mt-1"
+                        style="font-size: 0.65rem; font-family: 'PlusJakartaSansText', sans-serif; letter-spacing: 0.2px;">Jadwal
+                        Waktu Sholat Kota Pekanbaru</span>
                 </div>
             </a>
             <div class="ms-auto d-none d-lg-block">
@@ -41,7 +43,8 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <img src="{{ asset('theme/static/logo-pemko-kominfo.webp') }}" alt="Logo Pemko dan Kominfo" class="img-fluid mb-3" style="height: 45px; object-fit: contain; filter: grayscale(100%);">
+                    <img src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}" alt="Logo Pemko dan Kominfo"
+                        class="img-fluid mb-3" style="height: 45px; object-fit: contain; filter: grayscale(100%);">
                     <div class="fw-semibold">
                         Jadwal Waktu Sholat Pemerintah Kota Pekanbaru
                     </div>

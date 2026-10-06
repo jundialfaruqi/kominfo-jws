@@ -79,7 +79,7 @@
                             </div>
 
                             <p>Salam, Tim Diskominfo Kota Pekanbaru</p>
-                            <img class="img-fluid" src="{{ asset('theme/static/logo-pemko-kominfo.webp') }}"
+                            <img class="img-fluid" src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}"
                                 alt="Logo Diskominfo Pemerintah Kota Pekanbaru" style="width: 150px; height: auto;">
                         </div>
                     </div>

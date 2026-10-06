@@ -1265,7 +1265,7 @@
 
         // Muat gambar logo
         const logo = new Image();
-        logo.src = getCssStr(hostEl, '--clock-logo-url', '../theme/static/logo-small.png');
+        logo.src = getCssStr(hostEl, '--clock-logo-url', '../theme/static/diskominfotiksan-logo-small.webp');
 
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);

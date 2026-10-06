@@ -1275,7 +1275,7 @@
 
         // Muat gambar logo
         const logo = new Image();
-        logo.src = getCssStr(hostEl, '--clock-logo-url', '../theme/static/logo-small.png');
+        logo.src = getCssStr(hostEl, '--clock-logo-url', '../theme/static/diskominfotiksan-logo-small.webp');
 
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
@@ -1866,11 +1866,14 @@
                 if ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) return true;
                 if ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible')) return true;
 
-                const now = (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now());
+                const now = (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer()
+                    .getTime() : Date.now());
                 if (typeof adzanStartTime !== 'undefined' && adzanStartTime) return true;
                 if (typeof iqomahStartTime !== 'undefined' && iqomahStartTime) return true;
-                if (typeof adzanImageEndTime !== 'undefined' && adzanImageEndTime && now < adzanImageEndTime) return true;
-                if (typeof fridayInfoEndTime !== 'undefined' && fridayInfoEndTime && now < fridayInfoEndTime) return true;
+                if (typeof adzanImageEndTime !== 'undefined' && adzanImageEndTime && now < adzanImageEndTime)
+                    return true;
+                if (typeof fridayInfoEndTime !== 'undefined' && fridayInfoEndTime && now < fridayInfoEndTime)
+                    return true;
 
                 if (typeof window.nextPrayerSecondsRemaining !== 'undefined' &&
                     window.nextPrayerSecondsRemaining <= 60 &&
@@ -3093,8 +3096,9 @@
                                 newIqomahImages);
                             window.iqomahImages = newIqomahImages;
                             // Preload gambar baru jika belum ada di cache
-                            const urlsToPreload = newIqomahImages.filter(url => !window.imageCache || !window.imageCache[
-                                url] || !window.imageCache[url].complete);
+                            const urlsToPreload = newIqomahImages.filter(url => !window
+                                .imageCache || !window.imageCache[
+                                    url] || !window.imageCache[url].complete);
                             if (urlsToPreload.length > 0) {
                                 await preloadImages(urlsToPreload);
                             }
@@ -4225,7 +4229,8 @@
 
             // Hentikan dan bersihkan video jumbotron secara proaktif jika waktu sholat sedang berlangsung
             if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
-                if (window.isJumbotronVideoPlaying || (typeof videoPlayer !== 'undefined' && videoPlayer && !videoPlayer.paused)) {
+                if (window.isJumbotronVideoPlaying || (typeof videoPlayer !== 'undefined' && videoPlayer && !
+                        videoPlayer.paused)) {
                     if (typeof window.cleanupJumbotronVideo === 'function') {
                         window.cleanupJumbotronVideo();
                     }
@@ -4360,7 +4365,8 @@
                             }
 
                             // Preload gambar baru yang belum ada di cache
-                            const urlsToPreload = newUrls.filter(url => !window.imageCache || !window.imageCache[url] || !
+                            const urlsToPreload = newUrls.filter(url => !window.imageCache || !
+                                window.imageCache[url] || !
                                 window.imageCache[url].complete);
                             if (urlsToPreload.length > 0) {
                                 // console.log(`Preload gambar baru dari updateSlides: ${urlsToPreload}`);
@@ -4663,7 +4669,8 @@
             window.cleanupJumbotronVideo = cleanupVideoMemory;
 
             function pauseAudioForVideo() {
-                if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying && typeof audioPlayer !== 'undefined' && audioPlayer) {
+                if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying && typeof audioPlayer !==
+                    'undefined' && audioPlayer) {
                     try {
                         audioPlayer.pause();
                         isAudioPlaying = false;
@@ -4681,7 +4688,8 @@
                         try {
                             if (typeof playAudio === 'function') {
                                 playAudio();
-                                console.log('Background murottal audio dilanjutkan setelah video jumbotron selesai');
+                                console.log(
+                                    'Background murottal audio dilanjutkan setelah video jumbotron selesai');
                             }
                         } catch (e) {}
                     }
@@ -4703,7 +4711,8 @@
 
             function playJumbotronVideo(videoItem) {
                 if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
-                    console.log('Pemutaran video jumbotron dibatalkan karena waktu sholat/adzan sedang berlangsung');
+                    console.log(
+                        'Pemutaran video jumbotron dibatalkan karena waktu sholat/adzan sedang berlangsung');
                     cleanupVideoMemory();
                     window.isJumbotronVideoPlaying = false;
                     window.inJumbotronPhase = false;
@@ -4755,7 +4764,9 @@
                 if (videoStallTimer) clearTimeout(videoStallTimer);
                 videoStallTimer = setTimeout(() => {
                     if (window.isJumbotronVideoPlaying && videoPlayer.currentTime === 0) {
-                        console.warn('Video jumbotron tidak dapat memuat data awal dalam 15 detik, beralih ke slide berikutnya');
+                        console.warn(
+                            'Video jumbotron tidak dapat memuat data awal dalam 15 detik, beralih ke slide berikutnya'
+                            );
                         onVideoFinished();
                     }
                 }, 15000);
@@ -4772,18 +4783,22 @@
                 let initialMaxSec = Math.max(30, (videoItem.duration ? videoItem.duration + 15 : 180));
                 if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
                 videoSafetyTimer = setTimeout(() => {
-                    console.warn('Safety timeout video jumbotron tercapai, beralih ke slide berikutnya');
+                    console.warn(
+                    'Safety timeout video jumbotron tercapai, beralih ke slide berikutnya');
                     onVideoFinished();
                 }, initialMaxSec * 1000);
 
                 // Otomatis deteksi durasi fisik asli dari berkas video begitu metadata terbaca browser
                 videoPlayer.onloadedmetadata = function() {
-                    if (videoPlayer.duration && !isNaN(videoPlayer.duration) && isFinite(videoPlayer.duration)) {
+                    if (videoPlayer.duration && !isNaN(videoPlayer.duration) && isFinite(videoPlayer
+                            .duration)) {
                         const detectedSec = Math.ceil(videoPlayer.duration);
                         const dynamicMaxSec = Math.max(20, detectedSec + 10);
                         if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
                         videoSafetyTimer = setTimeout(() => {
-                            console.warn('Safety timeout tercapai berdasarkan durasi metadata video (' + dynamicMaxSec + 's)');
+                            console.warn(
+                                'Safety timeout tercapai berdasarkan durasi metadata video (' +
+                                dynamicMaxSec + 's)');
                             onVideoFinished();
                         }, dynamicMaxSec * 1000);
                     }
@@ -4792,16 +4807,22 @@
                 const playPromise = videoPlayer.play();
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
-                        if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
-                            console.log('Video jumbotron dihentikan setelah play promise karena waktu sholat');
+                        if (typeof window.isPrayerTimeActive === 'function' && window
+                            .isPrayerTimeActive()) {
+                            console.log(
+                                'Video jumbotron dihentikan setelah play promise karena waktu sholat'
+                                );
                             cleanupVideoMemory();
                             window.isJumbotronVideoPlaying = false;
                             window.inJumbotronPhase = false;
                             $jumbotronImageElement.hide();
                         }
                     }).catch(error => {
-                        console.warn('Autoplay video bersuara diblokir browser policy, mencoba fallback muted:', error);
-                        if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
+                        console.warn(
+                            'Autoplay video bersuara diblokir browser policy, mencoba fallback muted:',
+                            error);
+                        if (typeof window.isPrayerTimeActive === 'function' && window
+                            .isPrayerTimeActive()) {
                             cleanupVideoMemory();
                             return;
                         }
@@ -4845,7 +4866,8 @@
 
             async function initSlider() {
                 try {
-                    const imageItemsToPreload = (Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [])
+                    const imageItemsToPreload = (Array.isArray(window.jumbotronSequence) ? window
+                            .jumbotronSequence : [])
                         .filter(item => item && item.type === 'image')
                         .map(item => item.url);
                     const allUrls = [...window.slideUrls, ...imageItemsToPreload];
@@ -4859,14 +4881,18 @@
 
                     function isPrayerTimeOngoing() {
                         try {
-                            return typeof window.isPrayerTimeActive === 'function' ? window.isPrayerTimeActive() : (
-                                (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
-                                (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) ||
-                                ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) ||
-                                ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) ||
-                                ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) ||
-                                ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible'))
-                            );
+                            return typeof window.isPrayerTimeActive === 'function' ? window
+                                .isPrayerTimeActive() : (
+                                    (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
+                                    (typeof isAudioPausedForAdzan !== 'undefined' &&
+                                    isAudioPausedForAdzan) ||
+                                    ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) ||
+                                    ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) ||
+                                    ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(
+                                    ':visible')) ||
+                                    ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(
+                                        ':visible'))
+                                );
                         } catch (err) {
                             console.warn('isPrayerTimeOngoing error:', err);
                             return false;
@@ -5064,8 +5090,9 @@
                             window.slideUrls = newUrls;
                         }
 
-                        const urlsToPreload = window.slideUrls.filter(url => !window.imageCache || !window.imageCache[
-                            url] || !window.imageCache[url].complete);
+                        const urlsToPreload = window.slideUrls.filter(url => !window
+                            .imageCache || !window.imageCache[
+                                url] || !window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
                             await preloadImages(urlsToPreload);
                         }
@@ -5086,7 +5113,8 @@
                         const urlsToPreload = window.jumbotronSequence
                             .filter(item => item.type === 'image')
                             .map(item => item.url)
-                            .filter(url => !window.imageCache || !window.imageCache[url] || !window.imageCache[url].complete);
+                            .filter(url => !window.imageCache || !window.imageCache[url] || !
+                                window.imageCache[url].complete);
                         if (urlsToPreload.length > 0) {
                             await preloadImages(urlsToPreload);
                         }

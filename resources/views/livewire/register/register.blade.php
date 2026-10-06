@@ -3,7 +3,7 @@
         <div class="container container-tight py-4">
             <div class="text-center mb-4">
                 <a href="." class="navbar-brand navbar-brand-autodark">
-                    <img src="{{ asset('theme/static/logo-pemko-kominfo.webp') }}" width="110" height="32"
+                    <img src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}" width="110" height="32"
                         alt="Tabler" class="navbar-brand-image">
                 </a>
             </div>
