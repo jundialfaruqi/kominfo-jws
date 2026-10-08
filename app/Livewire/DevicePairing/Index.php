@@ -14,13 +14,29 @@ class Index extends Component
     #[Title('Tautkan TV')]
     public $pairingCode = '';
 
-    public function linkDevice()
+    public function mount()
     {
+        if (request()->has('code')) {
+            $code = strtoupper(trim(request()->query('code')));
+            if (strlen($code) === 6) {
+                $this->linkDevice($code);
+            }
+        }
+    }
+
+    public function linkDevice(?string $code = null)
+    {
+        if ($code !== null) {
+            $this->pairingCode = strtoupper(trim($code));
+        } else {
+            $this->pairingCode = strtoupper(trim($this->pairingCode));
+        }
+
         $this->validate([
             'pairingCode' => 'required|string|size:6',
         ]);
 
-        $code = strtoupper($this->pairingCode);
+        $code = $this->pairingCode;
         $pairing = DevicePairing::where('pairing_code', $code)->where('status', 'pending')->first();
 
         if (!$pairing) {

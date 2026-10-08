@@ -32,8 +32,14 @@ class DeviceController extends Controller
                     'masjid_id' => $pairing->profil_id,
                 ]);
             }
-            // Jika masih pending, kita bisa menggunakan kode lama atau membuat baru
-            // Untuk amannya, buat kode baru
+            // Jika masih pending dan kodenya masih ada (dalam 15 menit),
+            // pertahankan kode yang sama agar tidak berubah saat polling!
+            if ($pairing->status === 'pending' && !empty($pairing->pairing_code) && $pairing->updated_at?->gt(now()->subMinutes(15))) {
+                return response()->json([
+                    'status' => 'pending',
+                    'pairing_code' => $pairing->pairing_code,
+                ]);
+            }
         } else {
             $pairing = new DevicePairing();
             $pairing->device_id = $deviceId;
@@ -44,7 +50,7 @@ class DeviceController extends Controller
         $pairing->device_model = $request->device_model;
         $pairing->os_version   = $request->os_version;
 
-        // Generate unik 6 karakter alphanumeric kapital (hindari O dan 0 jika mau, tapi Str::upper(Str::random(6)) sudah cukup)
+        // Generate unik 6 karakter alphanumeric kapital
         $code = strtoupper(Str::random(6));
         
         // Pastikan unik

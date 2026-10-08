@@ -18,7 +18,10 @@
                                 <div class="col-md-8">
                                     <div class="form-label">Masukkan Kode 6 Digit</div>
                                     <input type="text" wire:model="pairingCode" placeholder="Contoh: X7B9KL"
-                                        class="form-control rounded-3 text-uppercase" maxlength="6" required>
+                                        class="form-control rounded-3 text-uppercase @error('pairingCode') is-invalid @enderror" maxlength="6" required>
+                                    @error('pairingCode')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-4">
                                     <button type="submit" class="btn btn-primary rounded-3 w-100"
@@ -204,13 +207,32 @@
             });
 
             function onScanSuccess(decodedText, decodedResult) {
-                html5QrcodeScanner.clear();
+                if (html5QrcodeScanner) {
+                    try {
+                        html5QrcodeScanner.clear();
+                    } catch (_) {}
+                }
 
                 let modalInstance = bootstrap.Modal.getInstance(modal);
-                modalInstance.hide();
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
 
-                $wire.set('pairingCode', decodedText);
-                $wire.linkDevice();
+                let code = decodedText.trim();
+                if (code.includes('code=')) {
+                    try {
+                        let url = new URL(code);
+                        code = url.searchParams.get('code') || code;
+                    } catch (e) {
+                        let match = code.match(/code=([A-Za-z0-9]{6})/);
+                        if (match) {
+                            code = match[1];
+                        }
+                    }
+                }
+                code = code.trim().toUpperCase();
+
+                $wire.linkDevice(code);
             }
 
             function onScanFailure(error) {
