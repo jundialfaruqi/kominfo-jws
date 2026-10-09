@@ -106,10 +106,23 @@ class Jumbotron extends Component
         'jumbo6.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
     ];
 
+    public function updatedVideoFile()
+    {
+        $this->validateOnly('video_file');
+
+        if ($this->video_file) {
+            $duration = $this->extractVideoDuration($this->video_file->getRealPath());
+            if ($duration > 0) {
+                $this->video_duration = $duration;
+            }
+        }
+    }
+
     public function clearVideo()
     {
         $this->video_file = null;
         $this->tmp_video_file = null;
+        $this->video_duration = 0;
         $this->dispatch('resetFileInput', ['inputName' => 'video_file']);
     }
 
@@ -485,6 +498,9 @@ class Jumbotron extends Component
         $this->tmp_video_file = $jumbo->video_file;
         $this->has_audio = (bool) $jumbo->has_audio;
         $this->video_duration = (int) $jumbo->video_duration;
+        if ($this->media_type === 'video' && $this->video_duration <= 0 && $this->tmp_video_file && file_exists(public_path($this->tmp_video_file))) {
+            $this->video_duration = $this->extractVideoDuration(public_path($this->tmp_video_file));
+        }
         $this->tmp_jumbo1 = $jumbo->jumbo1;
         $this->tmp_jumbo2 = $jumbo->jumbo2;
         $this->tmp_jumbo3 = $jumbo->jumbo3;
@@ -561,14 +577,7 @@ class Jumbotron extends Component
                 }
 
                 if ($jumbo->video_duration <= 0 && $jumbo->video_file && file_exists(public_path($jumbo->video_file))) {
-                    try {
-                        $fullPath = public_path($jumbo->video_file);
-                        $cmd = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ' . escapeshellarg($fullPath);
-                        $output = shell_exec($cmd);
-                        if ($output && is_numeric(trim($output))) {
-                            $jumbo->video_duration = (int) ceil((float) trim($output));
-                        }
-                    } catch (\Exception $e) {}
+                    $jumbo->video_duration = $this->extractVideoDuration(public_path($jumbo->video_file));
                 }
             } else {
                 if ($this->jumbo1) {
@@ -694,5 +703,103 @@ class Jumbotron extends Component
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
+
+    public function extractVideoDuration(?string $filePath): int
+    {
+        if (!$filePath || !file_exists($filePath)) {
+            return 0;
+        }
+
+        // 1. ffprobe (mendukung mp4, webm, mkv, dsb.)
+        $ffprobeBins = ['ffprobe', '/opt/homebrew/bin/ffprobe', '/usr/local/bin/ffprobe', '/usr/bin/ffprobe'];
+        foreach ($ffprobeBins as $bin) {
+            try {
+                $cmd = escapeshellcmd($bin) . ' -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 ' . escapeshellarg($filePath) . ' 2>/dev/null';
+                $output = @shell_exec($cmd);
+                if ($output !== null && is_numeric(trim($output))) {
+                    $sec = (int) ceil((float) trim($output));
+                    if ($sec > 0) {
+                        return $sec;
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        // 2. Pure PHP parser fallback (MP4 / MOV atom moov/mvhd)
+        try {
+            $pureSec = $this->extractMp4DurationPurePhp($filePath);
+            if ($pureSec > 0) {
+                return $pureSec;
+            }
+        } catch (\Throwable $e) {}
+
+        return 0;
+    }
+
+    private function extractMp4DurationPurePhp(string $filePath): int
+    {
+        $fp = @fopen($filePath, 'rb');
+        if (!$fp) {
+            return 0;
+        }
+
+        $duration = 0;
+        while (!feof($fp)) {
+            $pos = ftell($fp);
+            $buf = fread($fp, 8);
+            if (strlen($buf) < 8) {
+                break;
+            }
+
+            $arr = @unpack('Nsize/a4type', $buf);
+            if (!$arr || !isset($arr['size']) || !isset($arr['type'])) {
+                break;
+            }
+
+            $size = $arr['size'];
+            $type = $arr['type'];
+
+            if ($type === 'moov') {
+                $readLen = ($size > 8) ? min($size - 8, 4194304) : 4194304;
+                $moovData = fread($fp, $readLen);
+                $mvhdPos = strpos($moovData, 'mvhd');
+                if ($mvhdPos !== false && strlen($moovData) >= $mvhdPos + 24) {
+                    $version = ord($moovData[$mvhdPos + 4]);
+                    if ($version === 0) {
+                        $timescale = @unpack('N', substr($moovData, $mvhdPos + 16, 4))[1] ?? 0;
+                        $dur = @unpack('N', substr($moovData, $mvhdPos + 20, 4))[1] ?? 0;
+                    } else {
+                        $timescale = @unpack('N', substr($moovData, $mvhdPos + 24, 4))[1] ?? 0;
+                        $durUpper = @unpack('N', substr($moovData, $mvhdPos + 28, 4))[1] ?? 0;
+                        $durLower = @unpack('N', substr($moovData, $mvhdPos + 32, 4))[1] ?? 0;
+                        $dur = ($durUpper << 32) | $durLower;
+                    }
+                    if ($timescale > 0 && $dur > 0) {
+                        $duration = (int) ceil($dur / $timescale);
+                    }
+                }
+                break;
+            }
+
+            if ($size === 1) {
+                $buf8 = fread($fp, 8);
+                if (strlen($buf8) < 8) {
+                    break;
+                }
+                $size64 = @unpack('J', $buf8)[1] ?? 0;
+                if ($size64 < 16) {
+                    break;
+                }
+                fseek($fp, $pos + $size64, SEEK_SET);
+            } elseif ($size > 8) {
+                fseek($fp, $pos + $size, SEEK_SET);
+            } else {
+                break;
+            }
+        }
+        fclose($fp);
+
+        return $duration;
     }
 }

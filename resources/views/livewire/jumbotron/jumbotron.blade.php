@@ -137,6 +137,115 @@
                     }
                 });
             });
+
+            window.handleJumbotronVideoSelect = function(el, event) {
+                const f = el.files && el.files[0];
+                const err = document.getElementById('video_file-client-error');
+                const show = (m) => {
+                    el.classList.add('is-invalid');
+                    if (err) {
+                        err.textContent = m;
+                        err.style.display = 'block';
+                    }
+                    if (window.iziToast) {
+                        iziToast.error({ title: 'Batas Ukuran Video', message: m, position: 'topRight' });
+                    }
+                };
+                const hide = () => {
+                    el.classList.remove('is-invalid');
+                    if (err) {
+                        err.style.display = 'none';
+                        err.textContent = '';
+                    }
+                };
+
+                if (!f) {
+                    hide();
+                    return;
+                }
+
+                const name = (f.name || '').toLowerCase();
+                const validExt = name.endsWith('.mp4') || name.endsWith('.webm');
+                if (!validExt) {
+                    if (event) event.stopImmediatePropagation();
+                    el.value = '';
+                    show('Format file harus MP4 atau WebM.');
+                    return;
+                }
+
+                const maxSize = 50 * 1024 * 1024; // 50 MB
+                if (f.size > maxSize) {
+                    if (event) event.stopImmediatePropagation();
+                    el.value = '';
+                    const sizeMB = (f.size / (1024 * 1024)).toFixed(1);
+                    show('Ukuran file video maksimal 50 MB (File Anda: ' + sizeMB + ' MB). Silakan kompresi video terlebih dahulu.');
+                    return;
+                }
+
+                hide();
+
+                // Deteksi durasi video seketika di peramban (client-side)
+                try {
+                    const tempV = document.createElement('video');
+                    tempV.preload = 'metadata';
+                    const objUrl = URL.createObjectURL(f);
+                    tempV.onloadedmetadata = function() {
+                        window.URL.revokeObjectURL(objUrl);
+                        const sec = Math.ceil(tempV.duration) || Math.round(tempV.duration);
+                        if (sec > 0) {
+                            window._jwsDetectedDuration = sec;
+
+                            // 1. Langsung isi input durasi seketika
+                            const durInput = document.getElementById('video_duration_input');
+                            if (durInput) {
+                                durInput.value = sec;
+                                durInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                durInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+
+                            // 2. Langsung tampilkan badge visual
+                            const badge = document.getElementById('video_duration_badge');
+                            const badgeText = document.getElementById('video_duration_badge_text');
+                            if (badge && badgeText) {
+                                const m = Math.floor(sec / 60);
+                                const s = sec % 60;
+                                badgeText.textContent = 'Terdeteksi: ' + (m > 0 ? (m + 'm ' + s + 's') : (s + 's'));
+                                badge.style.display = 'inline-flex';
+                            }
+
+                            // 3. Tampilkan teks konfirmasi
+                            const infoText = document.getElementById('video_duration_info');
+                            if (infoText) {
+                                infoText.innerHTML = '<small class="text-success fw-semibold">Durasi ' + sec + ' detik terisi otomatis dari metadata video. Bisa diubah manual jika perlu.</small>';
+                            }
+
+                            // 4. Sinkronkan ke Livewire
+                            const wireEl = el.closest('[wire\\:id]');
+                            if (wireEl && window.Livewire) {
+                                const comp = Livewire.find(wireEl.getAttribute('wire:id'));
+                                if (comp) {
+                                    comp.set('video_duration', sec);
+                                }
+                            }
+                        }
+                    };
+                    tempV.onerror = function() {
+                        window.URL.revokeObjectURL(objUrl);
+                    };
+                    tempV.src = objUrl;
+                    tempV.load();
+                } catch (_) {}
+            };
+
+            window.resetJumbotronVideoDurationUI = function() {
+                window._jwsDetectedDuration = 0;
+                const badge = document.getElementById('video_duration_badge');
+                if (badge) badge.style.display = 'none';
+                const info = document.getElementById('video_duration_info');
+                if (info) {
+                    info.innerHTML = '<small class="text-muted">Akan terisi otomatis saat video dipilih. Jika tidak terisi, isi manual dalam satuan detik.</small>';
+                }
+            };
         </script>
     @endscript
 </div>

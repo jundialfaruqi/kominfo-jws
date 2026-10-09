@@ -31,7 +31,18 @@
                             <div class="row g-3">
                                 <div class="col-md-7" x-data="{ isUploading: false, progress: 0 }"
                                     x-on:livewire-upload-start="isUploading = true; progress = 0"
-                                    x-on:livewire-upload-finish="isUploading = false"
+                                    x-on:livewire-upload-finish="
+                                        isUploading = false;
+                                        const durInput = document.getElementById('video_duration_input');
+                                        const detected = window._jwsDetectedDuration || 0;
+                                        if (detected > 0 && (!durInput || !durInput.value || durInput.value == 0)) {
+                                            if (durInput) {
+                                                durInput.value = detected;
+                                                durInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                            }
+                                            $wire.set('video_duration', detected);
+                                        }
+                                    "
                                     x-on:livewire-upload-error="isUploading = false; if (window.iziToast) iziToast.error({ title: 'Gagal Unggah', message: 'Koneksi terputus atau file gagal diunggah.', position: 'topRight' });"
                                     x-on:livewire-upload-progress="progress = $event.detail.progress">
                                     <label class="form-label fw-bold">Unggah Berkas Video</label>
@@ -42,9 +53,31 @@
                                                 <strong>Video Terpilih:</strong> {{ $video_file->getClientOriginalName() }} ({{ round($video_file->getSize() / 1024 / 1024, 2) }} MB)
                                             </div>
                                         </div>
+                                        @php
+                                            $videoPreviewUrl = null;
+                                            try {
+                                                $videoPreviewUrl = $video_file->temporaryUrl();
+                                            } catch (\Throwable $e) {}
+                                        @endphp
+                                        @if ($videoPreviewUrl)
+                                            <div class="mb-3 position-relative">
+                                                <video src="{{ $videoPreviewUrl }}" controls class="rounded-3 w-100 shadow-sm border" style="max-height: 240px; background-color: #000; object-fit: contain;"></video>
+                                                <div class="position-absolute top-0 end-0 m-2">
+                                                    <span class="badge bg-dark bg-opacity-75 text-white shadow-sm">
+                                                        Pratinjau Video Baru
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        @endif
                                     @elseif ($tmp_video_file)
-                                        <div class="mb-2">
-                                            <video src="{{ asset($tmp_video_file) }}" controls class="rounded-3 w-100 shadow-sm" style="max-height: 220px; background-color: #000;"></video>
+                                        <div class="mb-3 position-relative">
+                                            <div class="alert alert-info d-flex align-items-center mb-2 py-1 px-3" role="alert">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-2 flex-shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                                                <div class="small">
+                                                    <strong>Video Saat Ini:</strong> {{ basename($tmp_video_file) }}
+                                                </div>
+                                            </div>
+                                            <video src="{{ asset($tmp_video_file) }}" controls class="rounded-3 w-100 shadow-sm border" style="max-height: 240px; background-color: #000; object-fit: contain;"></video>
                                         </div>
                                     @endif
 
@@ -72,53 +105,10 @@
                                         <input type="file" id="video_file_input"
                                             class="form-control rounded-3 @error('video_file') is-invalid @enderror"
                                             wire:model="video_file" accept="video/mp4,video/webm"
-                                            onchange="(function(el){
-                                                const f = el.files[0];
-                                                const err = document.getElementById('video_file-client-error');
-                                                const show = (m) => {
-                                                    el.classList.add('is-invalid');
-                                                    if (err) { err.textContent = m; err.style.display = 'block'; }
-                                                    if (window.iziToast) {
-                                                        iziToast.error({ title: 'Batas Ukuran Video', message: m, position: 'topRight' });
-                                                    }
-                                                };
-                                                const hide = () => {
-                                                    el.classList.remove('is-invalid');
-                                                    if (err) { err.style.display = 'none'; err.textContent = ''; }
-                                                };
-                                                if (!f) { hide(); return; }
-                                                const name = (f.name || '').toLowerCase();
-                                                const validExt = name.endsWith('.mp4') || name.endsWith('.webm');
-                                                if (!validExt) {
-                                                    event.stopImmediatePropagation();
-                                                    el.value = '';
-                                                    show('Format file harus MP4 atau WebM.');
-                                                    return;
-                                                }
-                                                const maxSize = 50 * 1024 * 1024; // 50 MB
-                                                if (f.size > maxSize) {
-                                                    event.stopImmediatePropagation();
-                                                    el.value = '';
-                                                    const sizeMB = (f.size / (1024 * 1024)).toFixed(1);
-                                                    show('Ukuran file video maksimal 50 MB (File Anda: ' + sizeMB + ' MB). Silakan kompresi video terlebih dahulu.');
-                                                    return;
-                                                }
-                                                hide();
-                                                try {
-                                                    const tempV = document.createElement('video');
-                                                    tempV.preload = 'metadata';
-                                                    tempV.onloadedmetadata = function() {
-                                                        window.URL.revokeObjectURL(tempV.src);
-                                                        const sec = Math.round(tempV.duration);
-                                                        if (sec > 0 && typeof @this !== 'undefined') {
-                                                            @this.set('video_duration', sec);
-                                                        }
-                                                    };
-                                                    tempV.src = URL.createObjectURL(f);
-                                                } catch (_) {}
-                                            })(this)">
+                                            onchange="handleJumbotronVideoSelect(this, event)">
                                         @if ($video_file || $tmp_video_file)
-                                            <button type="button" class="btn btn-outline-danger rounded-3" wire:click="clearVideo" title="Hapus / Reset Video">
+                                            <button type="button" class="btn btn-outline-danger rounded-3" wire:click="clearVideo" title="Hapus / Reset Video"
+                                                onclick="resetJumbotronVideoDurationUI()">
                                                 Reset
                                             </button>
                                         @endif
@@ -154,10 +144,34 @@
                                         </div>
 
                                         <div class="mb-2">
-                                            <label class="form-label fw-bold">Durasi Video (Detik - Opsional)</label>
-                                            <input type="number" class="form-control rounded-3" wire:model="video_duration" placeholder="Contoh: 329 (5m 29s)">
-                                            <div class="form-text">
-                                                <small class="text-muted">Catatan durasi video dalam satuan detik.</small>
+                                            <label class="form-label fw-bold d-flex align-items-center gap-2">
+                                                Durasi Video (Detik)
+                                                <span id="video_duration_badge" class="badge bg-success-lt text-success fw-normal small"
+                                                    style="{{ $video_duration > 0 ? 'display: inline-flex;' : 'display: none;' }}">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                                    <span id="video_duration_badge_text">Terdeteksi: {{ floor($video_duration / 60) > 0 ? floor($video_duration / 60) . 'm ' : '' }}{{ $video_duration % 60 }}s</span>
+                                                </span>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="number" id="video_duration_input"
+                                                    class="form-control rounded-start-3 @if($video_duration > 0) border-success @endif"
+                                                    wire:model.live="video_duration"
+                                                    placeholder="Terisi otomatis saat pilih video"
+                                                    min="0">
+                                                <span class="input-group-text @if($video_duration > 0) bg-success-lt text-success border-success @endif" id="video_duration_icon">
+                                                    @if ($video_duration > 0)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="Terdeteksi otomatis"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                                    @else
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                                    @endif
+                                                </span>
+                                            </div>
+                                            <div id="video_duration_info" class="form-text mt-1">
+                                                @if ($video_duration > 0)
+                                                    <small class="text-success fw-semibold">Durasi {{ $video_duration }} detik terisi otomatis dari metadata video. Bisa diubah manual jika perlu.</small>
+                                                @else
+                                                    <small class="text-muted">Akan terisi otomatis saat video dipilih. Jika tidak terisi, isi manual dalam satuan detik.</small>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
