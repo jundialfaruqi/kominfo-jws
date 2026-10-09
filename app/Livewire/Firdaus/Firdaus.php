@@ -9,6 +9,7 @@ use App\Models\Petugas;
 use App\Models\Slides;
 use App\Models\Durasi;
 use App\Models\Jumbotron; // Tambahkan model Jumbotron
+use App\Models\JumbotronMasjid;
 use Illuminate\Support\Facades\Http;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -557,6 +558,71 @@ class Firdaus extends Component
                 asset($this->adzanaudio->adzanshubuh) : '';
         }
 
+        // Jumbotron Sequence (sinkron dengan Flutter idle_screen_manager & MasterController)
+        $activeVideos = Jumbotron::where('is_active', true)
+            ->where('media_type', 'video')
+            ->whereNotNull('video_file')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $videoItems = [];
+        foreach ($activeVideos as $v) {
+            $videoItems[] = [
+                'type' => 'video',
+                'category' => 'pemko_video',
+                'url' => asset($v->video_file),
+                'has_audio' => (bool) $v->has_audio,
+                'duration' => (int) $v->video_duration,
+            ];
+        }
+
+        $activeGlobalImages = Jumbotron::where('is_active', true)
+            ->where(function ($q) {
+                $q->where('media_type', 'image')->orWhereNull('media_type');
+            })
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $globalImageItems = [];
+        foreach ($activeGlobalImages as $img) {
+            foreach (['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'] as $field) {
+                if ($img->$field) {
+                    $globalImageItems[] = [
+                        'type' => 'image',
+                        'category' => 'pemko_image',
+                        'url' => asset($img->$field),
+                        'has_audio' => false,
+                        'duration' => 20,
+                    ];
+                }
+            }
+        }
+
+        $masjidImageItems = [];
+        if ($this->profil) {
+            $activeMasjidJumbos = JumbotronMasjid::where('masjid_id', $this->profil->id)
+                ->where('aktif', true)
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($activeMasjidJumbos as $jm) {
+                foreach (['jumbotron_masjid_1', 'jumbotron_masjid_2', 'jumbotron_masjid_3', 'jumbotron_masjid_4', 'jumbotron_masjid_5', 'jumbotron_masjid_6'] as $field) {
+                    if ($jm->$field) {
+                        $masjidImageItems[] = [
+                            'type' => 'image',
+                            'category' => 'masjid_image',
+                            'url' => asset($jm->$field),
+                            'has_audio' => false,
+                            'duration' => 20,
+                        ];
+                    }
+                }
+            }
+        }
+
+        $jumbotronSequence = array_merge($videoItems, $globalImageItems, $masjidImageItems);
+        $jumbotronIsActive = count($jumbotronSequence) > 0;
+
         return view('livewire.firdaus.firdaus', [
             'themeCss' => $this->themeCss,
             'prayerTimes' => $this->prayerTimes,
@@ -570,6 +636,8 @@ class Firdaus extends Component
             'slides' => $this->slides,
             'durasi' => $this->durasi,
             'jumbotron' => $this->jumbotron,
+            'jumbotronSequence' => $jumbotronSequence,
+            'jumbotronIsActive' => $jumbotronIsActive,
             'audio' => $this->audio,
             'activePrayerStatus' => $this->activePrayerStatus,
             'apiSource' => $this->apiSource,

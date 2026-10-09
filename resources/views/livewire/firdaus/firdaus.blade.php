@@ -201,30 +201,33 @@
             <div class="mosque-image">
                 {{-- Mosque images with object-fit stretch --}}
                 @if ($slides)
-                    <img id="slide1" src="{{ $slides->slide1 ?? asset('images/other/slide-jws-default.jpg') }}"
+                    @php
+                        $hasAnySlide = !empty($slides->slide1) || !empty($slides->slide2) || !empty($slides->slide3) || !empty($slides->slide4) || !empty($slides->slide5) || !empty($slides->slide6);
+                    @endphp
+                    <img id="slide1" src="{{ !empty($slides->slide1) ? asset($slides->slide1) : (!$hasAnySlide ? asset('images/other/slide-jws-default.jpg') : '') }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
-                    <img id="slide2" src="{{ $slides->slide2 ?? asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide2" src="{{ !empty($slides->slide2) ? asset($slides->slide2) : '' }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
-                    <img id="slide3" src="{{ $slides->slide3 ?? asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide3" src="{{ !empty($slides->slide3) ? asset($slides->slide3) : '' }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
-                    <img id="slide4" src="{{ $slides->slide4 ?? asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide4" src="{{ !empty($slides->slide4) ? asset($slides->slide4) : '' }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
-                    <img id="slide5" src="{{ $slides->slide5 ?? asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide5" src="{{ !empty($slides->slide5) ? asset($slides->slide5) : '' }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
-                    <img id="slide6" src="{{ $slides->slide6 ?? asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide6" src="{{ !empty($slides->slide6) ? asset($slides->slide6) : '' }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @else
                     <img id="slide1" src="{{ asset('images/other/slide-jws-default.jpg') }}"
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 1">
-                    <img id="slide2" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide2" src=""
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 2">
-                    <img id="slide3" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide3" src=""
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 3">
-                    <img id="slide4" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide4" src=""
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 4">
-                    <img id="slide5" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide5" src=""
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 5">
-                    <img id="slide6" src="{{ asset('images/other/slide-jws-default.jpg') }}"
+                    <img id="slide6" src=""
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @endif
                 <div id="floating-agenda-1" class="floating-agenda-1">
@@ -305,8 +308,8 @@
     @endforeach
 
     {{-- Hidden inputs for jumbotron sequence (merged masjid+global) --}}
-    <input type="hidden" id="jumbotron_is_active" value="false">
-    <input type="hidden" id="jumbotron-sequence" value="[]">
+    <input type="hidden" id="jumbotron_is_active" value="{{ ($jumbotronIsActive ?? false) ? 'true' : 'false' }}">
+    <input type="hidden" id="jumbotron-sequence" value="{{ json_encode($jumbotronSequence ?? []) }}">
 
     {{-- Hidden inputs for audio data --}}
     @if ($audio)

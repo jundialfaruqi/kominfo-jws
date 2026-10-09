@@ -4421,19 +4421,23 @@
                 const isVideo = clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.ogg');
                 return {
                     type: isVideo ? 'video' : 'image',
+                    category: isVideo ? 'pemko_video' : 'pemko_image',
                     url: fixedUrl,
                     has_audio: false,
-                    duration: isVideo ? 0 : 20
+                    duration: isVideo ? 30 : 20
                 };
             }
             if (typeof item === 'object') {
                 const fixedUrl = fixMediaUrl(item.url || '');
                 if (!fixedUrl) return null;
+                const isVideo = item.type === 'video';
+                const parsedDur = parseInt(item.duration, 10);
                 return {
-                    type: item.type === 'video' ? 'video' : 'image',
+                    type: isVideo ? 'video' : 'image',
+                    category: item.category || (isVideo ? 'pemko_video' : 'pemko_image'),
                     url: fixedUrl,
-                    has_audio: Boolean(item.has_audio),
-                    duration: parseInt(item.duration, 10) || 0
+                    has_audio: Boolean(item.has_audio || item.hasAudio),
+                    duration: (parsedDur > 0) ? parsedDur : (isVideo ? 30 : 20)
                 };
             }
             return null;
@@ -4696,151 +4700,12 @@
                 }
             }
 
-            function onVideoFinished() {
-                if (!window.isJumbotronVideoPlaying) return;
-                console.log('Video jumbotron selesai diputar, beralih ke item jumbotron berikutnya');
-                window.isJumbotronVideoPlaying = false;
-                window.lastVideoEndTime = Date.now();
-                cleanupVideoMemory();
-                resumeAudioFromVideo();
-
-                if (typeof window.advanceJumbotronItem === 'function') {
-                    window.advanceJumbotronItem();
-                }
-            }
-
-            function playJumbotronVideo(videoItem) {
-                if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
-                    console.log(
-                        'Pemutaran video jumbotron dibatalkan karena waktu sholat/adzan sedang berlangsung');
-                    cleanupVideoMemory();
-                    window.isJumbotronVideoPlaying = false;
-                    window.inJumbotronPhase = false;
-                    $jumbotronImageElement.hide();
-                    return;
-                }
-                if (!videoPlayer) {
-                    console.warn('Elemen jumbotronVideoPlayer tidak ditemukan');
-                    return;
-                }
-                window.isJumbotronVideoPlaying = true;
-
-                // Tampilkan jumbotron dengan fade-in yang halus, biarkan .mosque-image tetap ada di latar belakang
-                $jumbotronImageElement.css({
-                    'background-image': 'none'
-                }).stop(true, true).fadeIn(300);
-                $jumbotronVideoElement.show();
-
-                videoPlayer.onended = null;
-                videoPlayer.onerror = null;
-                videoPlayer.onloadedmetadata = null;
-                videoPlayer.onplaying = null;
-
-                if (videoItem.has_audio) {
-                    if (typeof window.isPrayerTimeActive === 'function' && window.isPrayerTimeActive()) {
-                        cleanupVideoMemory();
-                        return;
-                    }
-                    pauseAudioForVideo();
-                    videoPlayer.muted = false;
-                    videoPlayer.volume = 1.0;
-                } else {
-                    videoPlayer.muted = true;
-                }
-
-                videoPlayer.src = videoItem.url;
-                videoPlayer.load();
-
-                videoPlayer.onended = function() {
-                    onVideoFinished();
-                };
-
-                videoPlayer.onerror = function(e) {
-                    console.error('Error saat pemutaran video jumbotron:', e);
-                    onVideoFinished();
-                };
-
-                // Watchdog 1: Jika video macet / tidak ada data sama sekali dalam 15 detik awal (misal offline/stuck)
-                if (videoStallTimer) clearTimeout(videoStallTimer);
-                videoStallTimer = setTimeout(() => {
-                    if (window.isJumbotronVideoPlaying && videoPlayer.currentTime === 0) {
-                        console.warn(
-                            'Video jumbotron tidak dapat memuat data awal dalam 15 detik, beralih ke slide berikutnya'
-                            );
-                        onVideoFinished();
-                    }
-                }, 15000);
-
-                // Matikan stall watchdog begitu video berhasil mulai berputar
-                videoPlayer.onplaying = function() {
-                    if (videoStallTimer) {
-                        clearTimeout(videoStallTimer);
-                        videoStallTimer = null;
-                    }
-                };
-
-                // Watchdog 2: Timer pengaman batas durasi (default awal 3 menit atau durasi form + 15 detik)
-                let initialMaxSec = Math.max(30, (videoItem.duration ? videoItem.duration + 15 : 180));
-                if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
-                videoSafetyTimer = setTimeout(() => {
-                    console.warn(
-                    'Safety timeout video jumbotron tercapai, beralih ke slide berikutnya');
-                    onVideoFinished();
-                }, initialMaxSec * 1000);
-
-                // Otomatis deteksi durasi fisik asli dari berkas video begitu metadata terbaca browser
-                videoPlayer.onloadedmetadata = function() {
-                    if (videoPlayer.duration && !isNaN(videoPlayer.duration) && isFinite(videoPlayer
-                            .duration)) {
-                        const detectedSec = Math.ceil(videoPlayer.duration);
-                        const dynamicMaxSec = Math.max(20, detectedSec + 10);
-                        if (videoSafetyTimer) clearTimeout(videoSafetyTimer);
-                        videoSafetyTimer = setTimeout(() => {
-                            console.warn(
-                                'Safety timeout tercapai berdasarkan durasi metadata video (' +
-                                dynamicMaxSec + 's)');
-                            onVideoFinished();
-                        }, dynamicMaxSec * 1000);
-                    }
-                };
-
-                const playPromise = videoPlayer.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        if (typeof window.isPrayerTimeActive === 'function' && window
-                            .isPrayerTimeActive()) {
-                            console.log(
-                                'Video jumbotron dihentikan setelah play promise karena waktu sholat'
-                                );
-                            cleanupVideoMemory();
-                            window.isJumbotronVideoPlaying = false;
-                            window.inJumbotronPhase = false;
-                            $jumbotronImageElement.hide();
-                        }
-                    }).catch(error => {
-                        console.warn(
-                            'Autoplay video bersuara diblokir browser policy, mencoba fallback muted:',
-                            error);
-                        if (typeof window.isPrayerTimeActive === 'function' && window
-                            .isPrayerTimeActive()) {
-                            cleanupVideoMemory();
-                            return;
-                        }
-                        videoPlayer.muted = true;
-                        videoPlayer.play().catch(err2 => {
-                            console.error('Fallback pemutaran video jumbotron gagal:', err2);
-                            onVideoFinished();
-                        });
-                    });
-                }
-            }
-
+            // Inisialisasi slideUrls
             const getSlideUrl = (id) => {
                 const $el = $(id);
                 return $el.attr('src') || $el.val() || '';
             };
 
-            // Inisialisasi slideUrls
             window.slideUrls = [
                 getSlideUrl('#slide1'),
                 getSlideUrl('#slide2'),
@@ -4848,7 +4713,7 @@
                 getSlideUrl('#slide4'),
                 getSlideUrl('#slide5'),
                 getSlideUrl('#slide6')
-            ].filter(url => url.trim() !== '');
+            ].filter(url => typeof url === 'string' && url.trim() !== '');
 
             if (window.slideUrls.length === 0) {
                 window.slideUrls = ['/images/other/slide-jws-default.jpg'];
@@ -4864,6 +4729,413 @@
                 window.jumbotronSequence = [];
             }
 
+            // -------------------------------------------------------------
+            // Siklus Jumbotron & Main Deterministik Berbasis Server Epoch
+            // Sama persis dengan arsitektur Flutter IdleScreenManager
+            // -------------------------------------------------------------
+            let cycleSlots = [];
+            let totalCycleMs = 0;
+            let currentSlotIndex = -1;
+            let currentSlotAbsoluteStartMs = 0;
+            let currentMainDurationMs = 30000;
+            let phaseTimer = null;
+            let videoWatchdogTimer = null;
+            let currentMainSlideUrl = null;
+
+            function isPrayerTimeOngoing() {
+                try {
+                    return typeof window.isPrayerTimeActive === 'function' ? window.isPrayerTimeActive() : (
+                        (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
+                        (typeof isAudioPausedForAdzan !== 'undefined' && isAudioPausedForAdzan) ||
+                        ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) ||
+                        ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) ||
+                        ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(':visible')) ||
+                        ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(':visible'))
+                    );
+                } catch (err) {
+                    console.warn('isPrayerTimeOngoing error:', err);
+                    return false;
+                }
+            }
+
+            function buildCycleSlots(items, mainDurationMs) {
+                if (!items || items.length === 0) return [];
+                const slots = [];
+                let offset = 0;
+
+                for (let i = 0; i < items.length; i++) {
+                    // 1. Slot Tampilan Utama (Main Phase)
+                    slots.push({
+                        isMain: true,
+                        startOffsetMs: offset,
+                        durationMs: mainDurationMs,
+                        item: null,
+                        itemIndex: -1
+                    });
+                    offset += mainDurationMs;
+
+                    // 2. Slot Jumbotron Item (Video 1, Video 2, Gambar Global 1, Gambar Masjid 1, dst.)
+                    const item = items[i];
+                    const itemDurationSec = (item.duration && item.duration > 0)
+                        ? item.duration
+                        : (item.type === 'video' ? 30 : 20);
+                    const itemDurationMs = itemDurationSec * 1000;
+
+                    slots.push({
+                        isMain: false,
+                        startOffsetMs: offset,
+                        durationMs: itemDurationMs,
+                        item: item,
+                        itemIndex: i
+                    });
+                    offset += itemDurationMs;
+                }
+
+                return slots;
+            }
+
+            function calcTotalCycleMs(slots) {
+                if (!slots || slots.length === 0) return 0;
+                const last = slots[slots.length - 1];
+                return last.startOffsetMs + last.durationMs;
+            }
+
+            function calcCurrentSlot(nowEpochMs, slots, totalMs) {
+                if (!slots || slots.length === 0 || totalMs <= 0) {
+                    return { slotIndex: -1, slotAbsoluteStartMs: nowEpochMs };
+                }
+
+                const posInCycle = nowEpochMs % totalMs;
+                const cycleStartEpoch = nowEpochMs - posInCycle;
+
+                for (let i = 0; i < slots.length; i++) {
+                    const slot = slots[i];
+                    if (posInCycle < slot.startOffsetMs + slot.durationMs) {
+                        return {
+                            slotIndex: i,
+                            slotAbsoluteStartMs: cycleStartEpoch + slot.startOffsetMs
+                        };
+                    }
+                }
+
+                return { slotIndex: 0, slotAbsoluteStartMs: cycleStartEpoch };
+            }
+
+            function playJumbotronVideo(videoItem, nowMs, slotAbsoluteStartMs, slotDurationMs) {
+                if (isPrayerTimeOngoing()) {
+                    cleanupVideoMemory();
+                    window.isJumbotronVideoPlaying = false;
+                    window.inJumbotronPhase = false;
+                    $jumbotronImageElement.hide();
+                    return;
+                }
+                if (!videoPlayer) {
+                    console.warn('Elemen jumbotronVideoPlayer tidak ditemukan');
+                    return;
+                }
+                window.isJumbotronVideoPlaying = true;
+
+                $jumbotronImageElement.css({
+                    'background-image': 'none'
+                }).stop(true, true).fadeIn(300);
+                $jumbotronVideoElement.show();
+
+                videoPlayer.onended = null;
+                videoPlayer.onerror = null;
+                videoPlayer.onloadedmetadata = null;
+                videoPlayer.onplaying = null;
+
+                if (videoItem.has_audio) {
+                    if (isPrayerTimeOngoing()) {
+                        cleanupVideoMemory();
+                        return;
+                    }
+                    pauseAudioForVideo();
+                    videoPlayer.muted = false;
+                    videoPlayer.volume = 1.0;
+                } else {
+                    resumeAudioFromVideo();
+                    videoPlayer.muted = true;
+                }
+
+                const elapsedMs = Math.max(0, (nowMs || (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now())) - slotAbsoluteStartMs);
+                const elapsedSec = elapsedMs / 1000;
+
+                const currentSrc = videoPlayer.currentSrc || videoPlayer.src;
+                const isSameSrc = currentSrc && (currentSrc === videoItem.url || currentSrc.endsWith(videoItem.url));
+
+                if (!isSameSrc) {
+                    videoPlayer.src = videoItem.url;
+                    videoPlayer.load();
+                }
+
+                if (elapsedSec > 1.5 && (!slotDurationMs || elapsedSec < (slotDurationMs / 1000))) {
+                    try {
+                        if (videoPlayer.readyState >= 1) {
+                            videoPlayer.currentTime = elapsedSec;
+                        } else {
+                            videoPlayer.onloadedmetadata = function() {
+                                try {
+                                    videoPlayer.currentTime = elapsedSec;
+                                } catch (_) {}
+                            };
+                        }
+                    } catch (_) {}
+                }
+
+                // Bug 3 fix: onended hanya trigger recalculate().
+                // Jika epoch time masih di dalam slot video, video tetap tampil paused pada frame terakhir
+                // sampai timer slot epoch berakhir serentak di semua device.
+                videoPlayer.onended = function() {
+                    console.log('[Jumbotron] Video onended fired, panggil recalculate()');
+                    recalculate();
+                };
+
+                videoPlayer.onerror = function(e) {
+                    console.error('[Jumbotron] Error saat pemutaran video jumbotron:', e);
+                    recalculate();
+                };
+
+                // Watchdog stall 15 detik jika video macet / tidak berputar
+                if (videoStallTimer) clearTimeout(videoStallTimer);
+                videoStallTimer = setTimeout(() => {
+                    if (window.isJumbotronVideoPlaying && videoPlayer.currentTime === 0 && !videoPlayer.ended) {
+                        console.warn('[Jumbotron] Video jumbotron tidak berputar dalam 15s (stall watchdog)');
+                        recalculate();
+                    }
+                }, 15000);
+
+                videoPlayer.onplaying = function() {
+                    if (videoStallTimer) {
+                        clearTimeout(videoStallTimer);
+                        videoStallTimer = null;
+                    }
+                };
+
+                const playPromise = videoPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        if (isPrayerTimeOngoing()) {
+                            cleanupVideoMemory();
+                            window.isJumbotronVideoPlaying = false;
+                            window.inJumbotronPhase = false;
+                            $jumbotronImageElement.hide();
+                        }
+                    }).catch(error => {
+                        console.warn('[Jumbotron] Autoplay video diblokir browser, fallback muted:', error);
+                        if (isPrayerTimeOngoing()) {
+                            cleanupVideoMemory();
+                            return;
+                        }
+                        videoPlayer.muted = true;
+                        videoPlayer.play().catch(err2 => {
+                            console.error('[Jumbotron] Fallback play muted gagal:', err2);
+                        });
+                    });
+                }
+            }
+
+            function scheduleNextTick(nowMs) {
+                if (!cycleSlots || cycleSlots.length === 0 || totalCycleMs <= 0) return;
+
+                const slotIdx = (currentSlotIndex >= 0 && currentSlotIndex < cycleSlots.length)
+                    ? currentSlotIndex
+                    : 0;
+                const slot = cycleSlots[slotIdx];
+
+                const posInCycle = nowMs % totalCycleMs;
+                const slotEndOffset = slot.startOffsetMs + slot.durationMs;
+                let msUntilSlotEnd = slotEndOffset - posInCycle;
+
+                if (msUntilSlotEnd <= 0) msUntilSlotEnd = totalCycleMs - posInCycle;
+                if (msUntilSlotEnd <= 0) msUntilSlotEnd = 100;
+
+                let msUntilNext = msUntilSlotEnd;
+
+                // Jika di slot Main, rotasi sub-slide setiap 20 detik (kelipatan 20.000 ms)
+                if (slot.isMain) {
+                    const relativeMs = Math.max(0, nowMs - currentSlotAbsoluteStartMs);
+                    const msUntilNextSlide = 20000 - (relativeMs % 20000);
+                    msUntilNext = Math.min(msUntilNextSlide, msUntilSlotEnd);
+                    if (msUntilNext <= 0) msUntilNext = 100;
+                }
+
+                console.log(
+                    `[Jumbotron] Slot ${slotIdx} (${slot.isMain ? 'main' : (slot.item?.category || slot.item?.type)}) next tick in ${msUntilNext}ms`
+                );
+
+                phaseTimer = setTimeout(() => {
+                    recalculate();
+                }, msUntilNext);
+
+                // Watchdog ekstra untuk video jumbotron (seperti Flutter: msUntilNext + 15000ms)
+                if (!slot.isMain && slot.item && slot.item.type === 'video') {
+                    const watchdogMs = msUntilSlotEnd + 15000;
+                    videoWatchdogTimer = setTimeout(() => {
+                        console.warn('[Jumbotron] Video watchdog timer triggered');
+                        recalculate();
+                    }, watchdogMs);
+                }
+            }
+
+            function recalculate(forceRebuild = false) {
+                if (phaseTimer) {
+                    clearTimeout(phaseTimer);
+                    phaseTimer = null;
+                }
+                if (videoWatchdogTimer) {
+                    clearTimeout(videoWatchdogTimer);
+                    videoWatchdogTimer = null;
+                }
+
+                const prayerActive = isPrayerTimeOngoing();
+                if (prayerActive) {
+                    if (window.isJumbotronVideoPlaying) {
+                        cleanupVideoMemory();
+                        window.isJumbotronVideoPlaying = false;
+                    }
+                    window.inJumbotronPhase = false;
+                    $jumbotronImageElement.hide();
+                    $mosqueImageElement.show();
+                    return;
+                }
+
+                const activeSlides = (Array.isArray(window.slideUrls) ? window.slideUrls : [])
+                    .filter(url => typeof url === 'string' && url.trim() !== '');
+                const mainSlides = activeSlides.length > 0 ? activeSlides : ['/images/other/slide-jws-default.jpg'];
+
+                const nowMs = (typeof getCurrentTimeFromServer === 'function')
+                    ? getCurrentTimeFromServer().getTime()
+                    : Date.now();
+
+                // Kasus 1: Tidak ada item jumbotron sama sekali
+                if (!cycleSlots || cycleSlots.length === 0 || totalCycleMs <= 0) {
+                    currentSlotIndex = -1;
+                    window.inJumbotronPhase = false;
+                    if (window.isJumbotronVideoPlaying) {
+                        cleanupVideoMemory();
+                        resumeAudioFromVideo();
+                        window.isJumbotronVideoPlaying = false;
+                    }
+                    $jumbotronImageElement.hide();
+
+                    const slideIndex = Math.floor(nowMs / 20000) % mainSlides.length;
+                    const nextUrl = window.imageCache?.[mainSlides[slideIndex]]?.src || mainSlides[slideIndex];
+                    if (currentMainSlideUrl !== nextUrl) {
+                        currentMainSlideUrl = nextUrl;
+                        $mosqueImageElement.css({
+                            'background-image': `url("${nextUrl}")`,
+                            'display': 'block'
+                        });
+                    } else {
+                        $mosqueImageElement.css('display', 'block');
+                    }
+
+                    const msUntilNext = 20000 - (nowMs % 20000);
+                    phaseTimer = setTimeout(() => recalculate(), Math.max(50, msUntilNext));
+                    $(document).trigger('slideUpdated');
+                    return;
+                }
+
+                // Kasus 2: Ada jumbotron items dalam siklus
+                const result = calcCurrentSlot(nowMs, cycleSlots, totalCycleMs);
+                const slotChanged = (result.slotIndex !== currentSlotIndex) || forceRebuild;
+                currentSlotIndex = result.slotIndex;
+                currentSlotAbsoluteStartMs = result.slotAbsoluteStartMs;
+
+                const slot = cycleSlots[currentSlotIndex];
+
+                if (slot.isMain) {
+                    window.inJumbotronPhase = false;
+                    if (window.isJumbotronVideoPlaying) {
+                        cleanupVideoMemory();
+                        resumeAudioFromVideo();
+                        window.isJumbotronVideoPlaying = false;
+                    }
+
+                    if ($jumbotronImageElement.is(':visible')) {
+                        $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
+                            $(this).css({
+                                'display': 'none',
+                                'background-image': 'none'
+                            });
+                        });
+                    } else {
+                        $jumbotronImageElement.css({
+                            'display': 'none',
+                            'background-image': 'none'
+                        });
+                    }
+
+                    const relativeMs = Math.max(0, nowMs - currentSlotAbsoluteStartMs);
+                    const slideIndex = Math.floor(relativeMs / 20000) % mainSlides.length;
+                    const nextUrl = window.imageCache?.[mainSlides[slideIndex]]?.src || mainSlides[slideIndex];
+
+                    if (currentMainSlideUrl !== nextUrl) {
+                        currentMainSlideUrl = nextUrl;
+                        $mosqueImageElement.css({
+                            'background-image': `url("${nextUrl}")`,
+                            'display': 'block'
+                        });
+                    } else {
+                        $mosqueImageElement.css('display', 'block');
+                    }
+                } else {
+                    window.inJumbotronPhase = true;
+                    const item = slot.item;
+
+                    if (item.type === 'video') {
+                        if (slotChanged) {
+                            playJumbotronVideo(item, nowMs, currentSlotAbsoluteStartMs, slot.durationMs);
+                        } else {
+                            if (!window.isJumbotronVideoPlaying && videoPlayer && !videoPlayer.ended) {
+                                playJumbotronVideo(item, nowMs, currentSlotAbsoluteStartMs, slot.durationMs);
+                            }
+                        }
+                    } else {
+                        // Gambar (pemko_image atau masjid_image)
+                        if (window.isJumbotronVideoPlaying) {
+                            cleanupVideoMemory();
+                            window.isJumbotronVideoPlaying = false;
+                        }
+                        resumeAudioFromVideo();
+
+                        const currentUrl = window.imageCache?.[item.url]?.src || item.url;
+                        $jumbotronImageElement.css({
+                            'background-image': `url("${currentUrl}")`
+                        }).stop(true, true).fadeIn(300);
+                    }
+                }
+
+                clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
+                    window.jumbotronSequence.map(it => it.url) : [])]);
+                $(document).trigger('slideUpdated');
+
+                scheduleNextTick(nowMs);
+            }
+
+            function updateCycleConfiguration(forceRebuild = true) {
+                const isSequenceActive = $('#jumbotron_is_active').val() === 'true';
+                const rawItems = (isSequenceActive && Array.isArray(window.jumbotronSequence))
+                    ? window.jumbotronSequence
+                    : [];
+                const items = rawItems.map(normalizeJumbotronItem).filter(Boolean);
+
+                const activeSlides = (Array.isArray(window.slideUrls) ? window.slideUrls : [])
+                    .filter(url => typeof url === 'string' && url.trim() !== '');
+                const mainSlides = activeSlides.length > 0 ? activeSlides : ['/images/other/slide-jws-default.jpg'];
+                currentMainDurationMs = (mainSlides.length * 20) * 1000;
+
+                cycleSlots = buildCycleSlots(items, currentMainDurationMs);
+                totalCycleMs = calcTotalCycleMs(cycleSlots);
+
+                console.log(
+                    `[Jumbotron] Siklus diperbarui: ${items.length} items, totalCycle=${totalCycleMs}ms (${(totalCycleMs / 1000).toFixed(1)}s)`
+                );
+
+                recalculate(forceRebuild);
+            }
+
             async function initSlider() {
                 try {
                     const imageItemsToPreload = (Array.isArray(window.jumbotronSequence) ? window
@@ -4873,232 +5145,56 @@
                     const allUrls = [...window.slideUrls, ...imageItemsToPreload];
                     await preloadImages(allUrls);
 
-                    const slideDuration = 20000; // 20 detik per gambar
-                    let currentPhase = 'main'; // 'main' atau 'jumbotron'
-                    let mainSlideIndex = 0;
-                    let jumbotronIndex = 0;
-                    let phaseStartTime = Date.now();
+                    updateCycleConfiguration(true);
 
-                    function isPrayerTimeOngoing() {
-                        try {
-                            return typeof window.isPrayerTimeActive === 'function' ? window
-                                .isPrayerTimeActive() : (
-                                    (typeof isAdzanPlaying !== 'undefined' && isAdzanPlaying) ||
-                                    (typeof isAudioPausedForAdzan !== 'undefined' &&
-                                    isAudioPausedForAdzan) ||
-                                    ($('#adzanPopup').length && $('#adzanPopup').is(':visible')) ||
-                                    ($('#iqomahPopup').length && $('#iqomahPopup').is(':visible')) ||
-                                    ($('#fridayInfoPopup').length && $('#fridayInfoPopup').is(
-                                    ':visible')) ||
-                                    ($('#adzanImageDisplay').length && $('#adzanImageDisplay').is(
-                                        ':visible'))
-                                );
-                        } catch (err) {
-                            console.warn('isPrayerTimeOngoing error:', err);
-                            return false;
-                        }
-                    }
-
-                    function advanceJumbotronItem() {
-                        jumbotronIndex++;
-                        phaseStartTime = Date.now();
-                        const seq = Array.isArray(window.jumbotronSequence) ? window.jumbotronSequence : [];
-                        if (jumbotronIndex >= seq.length) {
-                            // Seluruh item jumbotron (video, gambar global, gambar masjid) telah selesai ditampilkan!
-                            // Kembali ke putaran slide utama
-                            currentPhase = 'main';
-                            mainSlideIndex = 0;
-                            jumbotronIndex = 0;
-                            window.inJumbotronPhase = false;
-                            cleanupVideoMemory();
-                            resumeAudioFromVideo();
-
-                            if ($jumbotronImageElement.is(':visible')) {
-                                $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
-                                    $jumbotronImageElement.css({
-                                        'display': 'none',
-                                        'background-image': 'none'
-                                    });
-                                });
-                            }
-                            renderCurrentState();
-                        } else {
-                            renderCurrentState();
-                        }
-                    }
-                    window.advanceJumbotronItem = advanceJumbotronItem;
-
-                    function advanceMainSlide() {
-                        mainSlideIndex++;
-                        phaseStartTime = Date.now();
-                        if (mainSlideIndex >= window.slideUrls.length) {
-                            mainSlideIndex = 0;
-                            const isSequenceActive = !isPrayerTimeOngoing() &&
-                                $('#jumbotron_is_active').val() === 'true' &&
-                                Array.isArray(window.jumbotronSequence) &&
-                                window.jumbotronSequence.length > 0;
-
-                            if (isSequenceActive) {
-                                // Masuk ke seluruh fase jumbotron: Video -> Gambar Global -> Gambar Masjid
-                                currentPhase = 'jumbotron';
-                                jumbotronIndex = 0;
-                                renderCurrentState();
-                            } else {
-                                renderCurrentState();
-                            }
-                        } else {
-                            renderCurrentState();
-                        }
-                    }
-
-                    function renderCurrentState() {
+                    // Heartbeat liveness checker setiap 1 detik
+                    setInterval(() => {
                         const prayerActive = isPrayerTimeOngoing();
-
-                        if (prayerActive) {
-                            if (window.isJumbotronVideoPlaying) {
-                                cleanupVideoMemory();
-                                window.isJumbotronVideoPlaying = false;
-                                window.inJumbotronPhase = false;
-                                $jumbotronImageElement.hide();
-                            }
-                            return;
-                        }
-
-                        if (currentPhase === 'main') {
-                            window.inJumbotronPhase = false;
-                            window.isJumbotronVideoPlaying = false;
-                            cleanupVideoMemory();
-                            resumeAudioFromVideo();
-
-                            if ($jumbotronImageElement.is(':visible')) {
-                                $jumbotronImageElement.stop(true, true).fadeOut(350, function() {
-                                    $jumbotronImageElement.css({
-                                        'display': 'none',
-                                        'background-image': 'none'
-                                    });
-                                });
-                            } else {
-                                $jumbotronImageElement.css({
-                                    'display': 'none',
-                                    'background-image': 'none'
-                                });
-                            }
-
-                            if (window.slideUrls.length === 0) {
-                                window.slideUrls = ['/images/other/slide-jws-default.jpg'];
-                            }
-
-                            const currentUrl = window.imageCache?.[window.slideUrls[mainSlideIndex]]?.src ||
-                                window.slideUrls[mainSlideIndex] ||
-                                '/images/other/slide-jws-default.jpg';
-
-                            if ($mosqueImageElement.data('current-url') !== currentUrl) {
-                                $mosqueImageElement.data('current-url', currentUrl);
-                                $mosqueImageElement.css({
-                                    'background-image': `url("${currentUrl}")`,
-                                    'display': 'block'
-                                });
-                            } else {
-                                $mosqueImageElement.css('display', 'block');
-                            }
-                        } else if (currentPhase === 'jumbotron') {
-                            const isSequenceActive = !prayerActive &&
-                                $('#jumbotron_is_active').val() === 'true' &&
-                                Array.isArray(window.jumbotronSequence) &&
-                                window.jumbotronSequence.length > 0;
-
-                            if (!isSequenceActive || jumbotronIndex >= window.jumbotronSequence.length) {
-                                currentPhase = 'main';
-                                mainSlideIndex = 0;
-                                jumbotronIndex = 0;
-                                phaseStartTime = Date.now();
-                                $jumbotronImageElement.stop(true, true).hide().css({
-                                    'display': 'none',
-                                    'background-image': 'none'
-                                });
-                                renderCurrentState();
+                        if (!prayerActive) {
+                            if (!phaseTimer) {
+                                console.log('[Jumbotron] Recovery: timer mati setelah waktu sholat / idle, mengaktifkan kembali...');
+                                recalculate();
                                 return;
                             }
-
-                            window.inJumbotronPhase = true;
-                            const currentItem = window.jumbotronSequence[jumbotronIndex];
-                            if (!currentItem) {
-                                advanceJumbotronItem();
-                                return;
-                            }
-
-                            if (currentItem.type === 'video') {
-                                playJumbotronVideo(currentItem);
-                            } else {
-                                cleanupVideoMemory();
-                                resumeAudioFromVideo();
-                                const currentUrl = window.imageCache?.[currentItem.url]?.src ||
-                                    currentItem.url ||
-                                    '/images/other/slide-jws-default.jpg';
-                                $jumbotronImageElement.css({
-                                    'background-image': `url("${currentUrl}")`
-                                }).stop(true, true).fadeIn(300);
-                            }
-                        }
-
-                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window.jumbotronSequence) ?
-                            window.jumbotronSequence : [])]);
-                        $(document).trigger('slideUpdated');
-                    }
-
-                    function updateSlide() {
-                        const prayerActive = isPrayerTimeOngoing();
-                        if (prayerActive) {
-                            if (window.isJumbotronVideoPlaying) {
-                                cleanupVideoMemory();
-                                window.isJumbotronVideoPlaying = false;
-                                window.inJumbotronPhase = false;
-                                $jumbotronImageElement.hide();
-                            }
-                            return;
-                        }
-
-                        const elapsed = Date.now() - phaseStartTime;
-
-                        if (currentPhase === 'main') {
-                            if (elapsed >= slideDuration) {
-                                advanceMainSlide();
-                            }
-                        } else if (currentPhase === 'jumbotron') {
-                            const currentItem = window.jumbotronSequence[jumbotronIndex];
-                            if (!currentItem) {
-                                advanceJumbotronItem();
-                                return;
-                            }
-                            if (currentItem.type !== 'video') {
-                                if (elapsed >= slideDuration) {
-                                    advanceJumbotronItem();
+                            if (cycleSlots && cycleSlots.length > 0 && totalCycleMs > 0 && currentSlotIndex >= 0) {
+                                const now = (typeof getCurrentTimeFromServer === 'function')
+                                    ? getCurrentTimeFromServer().getTime()
+                                    : Date.now();
+                                const pos = now % totalCycleMs;
+                                const curSlot = cycleSlots[currentSlotIndex];
+                                const slotEnd = curSlot.startOffsetMs + curSlot.durationMs;
+                                if (pos >= slotEnd || pos < curSlot.startOffsetMs) {
+                                    console.log('[Jumbotron] Deteksi slot drift / expired, sinkronkan ulang...');
+                                    recalculate();
                                 }
                             }
+                        } else {
+                            if (window.isJumbotronVideoPlaying || window.inJumbotronPhase || $jumbotronImageElement.is(':visible')) {
+                                cleanupVideoMemory();
+                                window.isJumbotronVideoPlaying = false;
+                                window.inJumbotronPhase = false;
+                                $jumbotronImageElement.hide();
+                                $mosqueImageElement.show();
+                            }
                         }
-                    }
+                    }, 1000);
 
-                    phaseStartTime = Date.now();
-                    renderCurrentState();
-                    setInterval(updateSlide, 1000);
+                    document.addEventListener('visibilitychange', () => {
+                        if (!document.hidden) {
+                            console.log('[Jumbotron] Tab aktif kembali, sinkronisasi ulang siklus jumbotron');
+                            recalculate(true);
+                        }
+                    });
+
+                    window.addEventListener('focus', () => {
+                        recalculate(true);
+                    });
 
                     $(document).on('slidesUpdated', async function(event, newSlides) {
-                        const newUrls = newSlides.filter(url => url.trim() !== '');
-                        if (newUrls.length === 0) {
-                            window.slideUrls = ['/images/other/slide-jws-default.jpg'];
-                        } else {
-                            window.slideUrls = newUrls;
-                        }
-
-                        const urlsToPreload = window.slideUrls.filter(url => !window
-                            .imageCache || !window.imageCache[
-                                url] || !window.imageCache[url].complete);
-                        if (urlsToPreload.length > 0) {
-                            await preloadImages(urlsToPreload);
-                        }
-
-                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window
-                            .jumbotronSequence) ? window.jumbotronSequence : [])]);
+                        const newUrls = (Array.isArray(newSlides) ? newSlides : []).filter(url => typeof url === 'string' && url.trim() !== '');
+                        window.slideUrls = newUrls.length > 0 ? newUrls : ['/images/other/slide-jws-default.jpg'];
+                        await preloadImages(window.slideUrls);
+                        updateCycleConfiguration(true);
                     });
 
                     $(document).on('jumbotronUpdated', async function() {
@@ -5110,57 +5206,17 @@
                         } catch (e) {
                             window.jumbotronSequence = [];
                         }
+
                         const urlsToPreload = window.jumbotronSequence
                             .filter(item => item.type === 'image')
-                            .map(item => item.url)
-                            .filter(url => !window.imageCache || !window.imageCache[url] || !
-                                window.imageCache[url].complete);
+                            .map(item => item.url);
                         if (urlsToPreload.length > 0) {
                             await preloadImages(urlsToPreload);
                         }
-                        clearUnusedCache([...window.slideUrls, ...(Array.isArray(window
-                            .jumbotronSequence) ? window.jumbotronSequence : [])]);
-                        try {
-                            const newHash = JSON.stringify(window.jumbotronSequence);
-                            const isSeqActive = $('#jumbotron_is_active').val() === 'true' &&
-                                Array.isArray(window.jumbotronSequence) &&
-                                window.jumbotronSequence.length > 0;
 
-                            if (!isSeqActive) {
-                                // Jumbotron dinonaktifkan atau kosong: langsung beralih ke slide utama dan sembunyikan jumbotron
-                                currentPhase = 'main';
-                                mainSlideIndex = 0;
-                                jumbotronIndex = 0;
-                                window.inJumbotronPhase = false;
-                                if (window.isJumbotronVideoPlaying) {
-                                    cleanupVideoMemory();
-                                    resumeAudioFromVideo();
-                                    window.isJumbotronVideoPlaying = false;
-                                }
-                                $jumbotronImageElement.stop(true, true).hide().css({
-                                    'display': 'none',
-                                    'background-image': 'none'
-                                });
-                                $mosqueImageElement.show();
-                                renderCurrentState();
-                            } else if (newHash !== window.jumbotronSequenceHash) {
-                                window.jumbotronSequenceHash = newHash;
-                                if (currentPhase === 'jumbotron') {
-                                    if (jumbotronIndex >= window.jumbotronSequence.length) {
-                                        jumbotronIndex = 0;
-                                    }
-                                    if (window.isJumbotronVideoPlaying) {
-                                        cleanupVideoMemory();
-                                        resumeAudioFromVideo();
-                                        window.isJumbotronVideoPlaying = false;
-                                    }
-                                    renderCurrentState();
-                                }
-                            }
-                        } catch (e) {
-                            console.error('Error handling jumbotronUpdated:', e);
-                        }
+                        updateCycleConfiguration(true);
                     });
+
                 } catch (error) {
                     console.error('Error saat menginisialisasi slider:', error);
                     window.slideUrls = ['/images/other/slide-jws-default.jpg'];
