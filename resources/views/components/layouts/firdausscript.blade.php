@@ -4662,15 +4662,29 @@
                     try {
                         videoPlayer.pause();
                         videoPlayer.muted = true;
-                        videoPlayer.removeAttribute('src');
-                        videoPlayer.load();
+                        videoPlayer.currentTime = 0;
                     } catch (e) {
-                        console.warn('Gagal membersihkan buffer video:', e);
+                        console.warn('Gagal menjeda video player:', e);
                     }
                     $jumbotronVideoElement.hide();
                 }
             }
             window.cleanupJumbotronVideo = cleanupVideoMemory;
+
+            // Chrome Autoplay Policy helper: aktifkan audio jika user berinteraksi dengan layar
+            const enableAudioOnInteraction = () => {
+                if (window.isJumbotronVideoPlaying && videoPlayer && videoPlayer.muted) {
+                    const slot = (cycleSlots && currentSlotIndex >= 0 && currentSlotIndex < cycleSlots.length)
+                        ? cycleSlots[currentSlotIndex]
+                        : null;
+                    if (slot && !slot.isMain && slot.item && slot.item.has_audio && !isPrayerTimeOngoing()) {
+                        videoPlayer.muted = false;
+                    }
+                }
+            };
+            window.addEventListener('click', enableAudioOnInteraction, { passive: true });
+            window.addEventListener('keydown', enableAudioOnInteraction, { passive: true });
+            window.addEventListener('touchstart', enableAudioOnInteraction, { passive: true });
 
             function pauseAudioForVideo() {
                 if (typeof isAudioPlaying !== 'undefined' && isAudioPlaying && typeof audioPlayer !==
@@ -4858,34 +4872,71 @@
                     videoPlayer.muted = true;
                 }
 
-                const elapsedMs = Math.max(0, (nowMs || (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now())) - slotAbsoluteStartMs);
+                const currentNow = nowMs || (typeof getCurrentTimeFromServer === 'function' ? getCurrentTimeFromServer().getTime() : Date.now());
+                const elapsedMs = Math.max(0, currentNow - slotAbsoluteStartMs);
                 const elapsedSec = elapsedMs / 1000;
 
-                const currentSrc = videoPlayer.currentSrc || videoPlayer.src;
-                const isSameSrc = currentSrc && (currentSrc === videoItem.url || currentSrc.endsWith(videoItem.url));
+                const currentAttrSrc = videoPlayer.getAttribute('src');
+                const isSrcLoaded = currentAttrSrc === videoItem.url || (videoPlayer.currentSrc && videoPlayer.currentSrc.endsWith(videoItem.url));
 
-                if (!isSameSrc) {
-                    videoPlayer.src = videoItem.url;
-                    videoPlayer.load();
-                }
+                const applySeekAndPlay = () => {
+                    if (!window.isJumbotronVideoPlaying) return;
 
-                if (elapsedSec > 1.5 && (!slotDurationMs || elapsedSec < (slotDurationMs / 1000))) {
                     try {
-                        if (videoPlayer.readyState >= 1) {
+                        if (elapsedSec > 1.5 && (!slotDurationMs || elapsedSec < (slotDurationMs / 1000))) {
                             videoPlayer.currentTime = elapsedSec;
                         } else {
-                            videoPlayer.onloadedmetadata = function() {
-                                try {
-                                    videoPlayer.currentTime = elapsedSec;
-                                } catch (_) {}
-                            };
+                            videoPlayer.currentTime = 0;
                         }
                     } catch (_) {}
+
+                    const playPromise = videoPlayer.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            if (isPrayerTimeOngoing() || !window.isJumbotronVideoPlaying) {
+                                cleanupVideoMemory();
+                                window.isJumbotronVideoPlaying = false;
+                                window.inJumbotronPhase = false;
+                                $jumbotronImageElement.hide();
+                            }
+                        }).catch(error => {
+                            if (error.name === 'NotAllowedError') {
+                                console.warn('[Jumbotron] Autoplay video dengan audio diblokir Chrome, fallback muted:', error);
+                                if (isPrayerTimeOngoing() || !window.isJumbotronVideoPlaying) {
+                                    cleanupVideoMemory();
+                                    return;
+                                }
+                                videoPlayer.muted = true;
+                                videoPlayer.play().catch(err2 => {
+                                    if (err2.name !== 'AbortError') {
+                                        console.error('[Jumbotron] Fallback play muted gagal:', err2);
+                                    }
+                                });
+                            } else if (error.name === 'AbortError') {
+                                // Request play() diinterupsi oleh pause() normal saat pergantian slot atau sholat, abaikan
+                            } else {
+                                console.warn('[Jumbotron] Pemutaran video jumbotron gagal:', error);
+                            }
+                        });
+                    }
+                };
+
+                if (!isSrcLoaded) {
+                    videoPlayer.src = videoItem.url;
+                    videoPlayer.load();
+                    if (videoPlayer.readyState >= 1) {
+                        applySeekAndPlay();
+                    } else {
+                        videoPlayer.onloadedmetadata = function() {
+                            videoPlayer.onloadedmetadata = null;
+                            applySeekAndPlay();
+                        };
+                    }
+                } else {
+                    applySeekAndPlay();
                 }
 
-                // Bug 3 fix: onended hanya trigger recalculate().
-                // Jika epoch time masih di dalam slot video, video tetap tampil paused pada frame terakhir
-                // sampai timer slot epoch berakhir serentak di semua device.
+                // Video onended: trigger recalculate() untuk evaluasi epoch berikutnya
                 videoPlayer.onended = function() {
                     console.log('[Jumbotron] Video onended fired, panggil recalculate()');
                     recalculate();
@@ -4911,28 +4962,6 @@
                         videoStallTimer = null;
                     }
                 };
-
-                const playPromise = videoPlayer.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        if (isPrayerTimeOngoing()) {
-                            cleanupVideoMemory();
-                            window.isJumbotronVideoPlaying = false;
-                            window.inJumbotronPhase = false;
-                            $jumbotronImageElement.hide();
-                        }
-                    }).catch(error => {
-                        console.warn('[Jumbotron] Autoplay video diblokir browser, fallback muted:', error);
-                        if (isPrayerTimeOngoing()) {
-                            cleanupVideoMemory();
-                            return;
-                        }
-                        videoPlayer.muted = true;
-                        videoPlayer.play().catch(err2 => {
-                            console.error('[Jumbotron] Fallback play muted gagal:', err2);
-                        });
-                    });
-                }
             }
 
             function scheduleNextTick(nowMs) {
