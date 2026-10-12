@@ -1294,12 +1294,12 @@
 
             // Ambil semua variabel gaya (CSS > default JS)
             const faceFill = getCssStr(hostEl, '--clock-face-fill', '#003366');
-            const faceStroke = getCssStr(hostEl, '--clock-face-stroke', '#0055a4');
+            const faceStroke = getCssStr(hostEl, '--clock-face-stroke', '#808080');
             // Face stroke width dengan dukungan scale
             const faceStrokeWidthScale = getCssNum(hostEl, '--clock-face-stroke-width-scale', null);
             const faceStrokeWidth = (faceStrokeWidthScale && isFinite(faceStrokeWidthScale)) ?
                 clockRadius * faceStrokeWidthScale :
-                getCssNum(hostEl, '--clock-face-stroke-width', 15);
+                getCssNum(hostEl, '--clock-face-stroke-width', 10);
             const faceShadowColor = getCssStr(hostEl, '--clock-face-shadow-color', 'rgba(0, 0, 0, 0.5)');
             const faceShadowBlur = getCssNum(hostEl, '--clock-face-shadow-blur', 20);
             const faceShadowOffsetX = getCssNum(hostEl, '--clock-face-shadow-offset-x', 0);

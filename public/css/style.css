@@ -170,10 +170,10 @@ body {
 .clock-container {
   /* Clock style variables (override in themes if needed) */
   --clock-face-fill: #003366;
-  --clock-face-stroke: #0055a4;
-  /* --clock-face-stroke-width: 15; */
+  --clock-face-stroke: #808080;
+  /* --clock-face-stroke-width: 10; */
   /* Optional: use scaling for face stroke width */
-  --clock-face-stroke-width-scale: 0.1;
+  --clock-face-stroke-width-scale: 0.06;
   --clock-face-shadow-color: rgba(0, 0, 0, 0.5);
   --clock-face-shadow-blur: 5;
   --clock-face-shadow-offset-x: 0;
