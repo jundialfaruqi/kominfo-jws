@@ -1277,6 +1277,13 @@
         const logo = new Image();
         logo.src = getCssStr(hostEl, '--clock-logo-url', '../theme/static/diskominfotiksan-logo-small.webp');
 
+        // Muat gambar bubble (kaca cembung jam)
+        const bubble = new Image();
+        const bubbleUrl = getCssStr(hostEl, '--clock-bubble-url', '../theme/static/bubble.png');
+        if (bubbleUrl && bubbleUrl !== 'none') {
+            bubble.src = bubbleUrl;
+        }
+
         function drawClock() {
             ctx.clearRect(0, 0, $canvas[0].width, $canvas[0].height);
             const now = getCurrentTimeFromServer();
@@ -1494,6 +1501,19 @@
             ctx.arc(clockCenter.x, clockCenter.y, centerDotRadius, 0, Math.PI * 2);
             ctx.fillStyle = centerDotColor;
             ctx.fill();
+
+            // Gambar efek bubble/kaca melayang di atas jam (sebesar jam, tidak sampai ke border luar)
+            if (bubble.complete && bubble.naturalWidth > 0) {
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                const bubbleRadius = clockRadius - (faceStrokeWidth / 2);
+                const bubbleSize = bubbleRadius * 2;
+                const bubbleX = clockCenter.x - bubbleRadius;
+                const bubbleY = clockCenter.y - bubbleRadius;
+                ctx.drawImage(bubble, bubbleX, bubbleY, bubbleSize, bubbleSize);
+            }
 
             ctx.restore();
 
