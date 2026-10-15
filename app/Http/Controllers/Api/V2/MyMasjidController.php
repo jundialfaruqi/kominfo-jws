@@ -149,42 +149,30 @@ class MyMasjidController extends Controller
             $now = Carbon::now('Asia/Jakarta');
             $cityId = '0412'; // Default Kota Pekanbaru
 
-            // Bulan Ini
-            $year = $now->format('Y');
-            $month = $now->format('m');
-            $cacheKey = "jadwal_sholat_{$cityId}_{$year}_{$month}";
-            $jadwalBulanIni = Cache::remember($cacheKey, now()->addDays(7), function () use ($cityId, $year, $month) {
-                try {
-                    $response = Http::timeout(10)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$year}/{$month}");
-                    if ($response->successful()) {
-                        return $response->json('data.jadwal');
-                    }
-                } catch (\Exception $e) {}
-                return [];
-            });
+            // Mengambil jadwal sholat 12 bulan ke depan (Rolling 365 hari ke depan)
+            $jadwalGabungan = [];
+            for ($i = 0; $i < 12; $i++) {
+                $targetMonth = $now->copy()->addMonths($i);
+                $targetYear = $targetMonth->format('Y');
+                $targetMonthNum = $targetMonth->format('m');
+                $cacheKey = "jadwal_sholat_{$cityId}_{$targetYear}_{$targetMonthNum}";
 
-            // Bulan Depan (Untuk jaga-jaga jika berganti bulan tanpa reload)
-            $nextMonthDate = $now->copy()->addMonth();
-            $nYear = $nextMonthDate->format('Y');
-            $nMonth = $nextMonthDate->format('m');
-            $nCacheKey = "jadwal_sholat_{$cityId}_{$nYear}_{$nMonth}";
-            $jadwalBulanDepan = Cache::remember($nCacheKey, now()->addDays(7), function () use ($cityId, $nYear, $nMonth) {
-                try {
-                    $response = Http::timeout(10)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$nYear}/{$nMonth}");
-                    if ($response->successful()) {
-                        return $response->json('data.jadwal');
-                    }
-                } catch (\Exception $e) {}
-                return [];
-            });
+                $bulanData = Cache::remember($cacheKey, now()->addDays(30), function () use ($cityId, $targetYear, $targetMonthNum) {
+                    try {
+                        $response = Http::timeout(8)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$targetYear}/{$targetMonthNum}");
+                        if ($response->successful()) {
+                            return $response->json('data.jadwal');
+                        }
+                    } catch (\Exception $e) {}
+                    return [];
+                });
 
-            // Gabungkan menjadi satu array besar (sekitar 60 hari)
-            $jadwalGabungan = array_merge(
-                is_array($jadwalBulanIni) ? $jadwalBulanIni : [],
-                is_array($jadwalBulanDepan) ? $jadwalBulanDepan : []
-            );
+                if (is_array($bulanData) && !empty($bulanData)) {
+                    $jadwalGabungan = array_merge($jadwalGabungan, $bulanData);
+                }
+            }
 
-            // Filter agar hanya mengirim dari hari ini ke depan (opsional untuk menghemat payload)
+            // Filter agar hanya mengirim dari hari ini ke depan (sekitar 365 hari ke depan)
             $dateStr = $now->format('Y-m-d');
             $jadwalFinal = collect($jadwalGabungan)->filter(function ($item) use ($dateStr) {
                 return isset($item['date']) && $item['date'] >= $dateStr;
