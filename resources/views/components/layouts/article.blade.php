@@ -48,7 +48,7 @@
                     <div class="fw-semibold">
                         Jadwal Waktu Sholat Pemerintah Kota Pekanbaru
                     </div>
-                    <div class="text-white-50 small mt-1">© {{ date('Y') }} Diskominfo Pekanbaru</div>
+                    <div class="text-white-50 small mt-1">© {{ date('Y') }} Diskominfo Pekanbaru • <a href="{{ route('privacy-policy.index') }}" class="text-white-50 text-decoration-none">Kebijakan Privasi</a></div>
                 </div>
                 <div
                     class="col-md-6 text-md-end mt-4 mt-md-0 d-flex justify-content-md-end justify-content-start align-items-center">

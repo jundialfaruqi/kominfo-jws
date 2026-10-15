@@ -251,6 +251,10 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     })->name('logout');
 });
 
+// Privacy Policy & Compliance Routes (Public)
+Route::get('/kebijakan-privasi', \App\Livewire\PrivacyPolicy\Index::class)->name('privacy-policy.index');
+Route::get('/privacy-policy', \App\Livewire\PrivacyPolicy\Index::class);
+
 Route::get('/berita/{date}/{slug}', \App\Livewire\Articles\ArticleShow::class)->name('articles.show');
 Route::get('{slug}', \App\Livewire\Firdaus\Firdaus::class)->name('firdaus');
 
