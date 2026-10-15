@@ -306,7 +306,7 @@
                         Kompleks Perkantoran Pemerintah Kota Pekanbaru<br>
                         Jl. Abdul Rahman Hamid No. 1, Kecamatan Tenayan Raya, Kota Pekanbaru, Riau 28285<br>
                         Email Layanan: <a href="mailto:kominfopkb@gmail.com"
-                            class="text-decoration-none">diskominfo@pekanbaru.go.id</a><br>
+                            class="text-decoration-none">kominfopkb@gmail.com</a><br>
                         Portal Resmi: <a href="https://pekanbaru.go.id" target="_blank" rel="noopener noreferrer"
                             class="text-decoration-none">https://pekanbaru.go.id</a>
                     </div>
