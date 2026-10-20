@@ -67,4 +67,21 @@ class DeviceController extends Controller
             'pairing_code' => $code,
         ]);
     }
+
+    public function unpair(Request $request)
+    {
+        $request->validate([
+            'device_id' => 'required|string',
+        ]);
+
+        $pairing = DevicePairing::where('device_id', $request->device_id)->first();
+        if ($pairing) {
+            $pairing->delete();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Device berhasil diputus.',
+        ]);
+    }
 }

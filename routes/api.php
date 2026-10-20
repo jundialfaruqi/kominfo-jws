@@ -193,6 +193,9 @@ Route::prefix('v2')->group(function () {
     Route::post('device/request-code', [DeviceController::class, 'requestCode'])
         ->name('api.v2.device.request-code');
 
+    Route::post('device/unpair', [DeviceController::class, 'unpair'])
+        ->name('api.v2.device.unpair');
+
     // Auth Pusher Presence Channel untuk TV (tanpa login)
     Route::post('device/broadcasting/auth', [DeviceBroadcastAuthController::class, 'auth'])
         ->name('api.v2.device.broadcasting.auth');
