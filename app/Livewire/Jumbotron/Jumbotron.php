@@ -645,6 +645,8 @@ class Jumbotron extends Component
             $this->resetValidation();
             $this->media_type = $this->activeTab;
             session(['jumbotron_active_tab' => $this->activeTab]);
+            // Paksa Alpine re-sync currentTab setelah save (untuk memastikan x-show bekerja benar setelah morphdom)
+            $this->dispatch('jumbotronSaved', tab: $this->activeTab);
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menyimpan jumbotron: ' . $e->getMessage());
         }
