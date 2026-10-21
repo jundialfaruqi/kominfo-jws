@@ -55,12 +55,22 @@
                             <label class="form-label">Kecepatan Marquee</label>
                         </div>
                         <div class="col-md-5">
-                            <div class="card rounded-4">
+                            <div class="card rounded-4" x-data="{
+                                speed: $wire.entangle('marquee_speed'),
+                                increment() {
+                                    let val = parseFloat(this.speed) || 1.0;
+                                    this.speed = Math.min(10.0, Math.round((val + 0.1) * 10) / 10).toFixed(1);
+                                },
+                                decrement() {
+                                    let val = parseFloat(this.speed) || 1.0;
+                                    this.speed = Math.max(0.1, Math.round((val - 0.1) * 10) / 10).toFixed(1);
+                                }
+                            }">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center gap-3">
                                         <button type="button"
                                             class="btn btn-sm rounded-circle btn-outline-primary btn-icon"
-                                            wire:click="decrementMarqueeSpeed" aria-label="Kurangi">
+                                            @click="decrement()" aria-label="Kurangi">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -72,11 +82,11 @@
 
                                         <input type="range" step="0.1" min="0.1" max="10"
                                             class="form-range @error('marquee_speed') is-invalid @enderror"
-                                            wire:model.live="marquee_speed">
+                                            x-model="speed">
 
                                         <button type="button"
                                             class="btn btn-sm rounded-circle btn-outline-primary btn-icon"
-                                            wire:click="incrementMarqueeSpeed" aria-label="Tambah">
+                                            @click="increment()" aria-label="Tambah">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -87,11 +97,11 @@
                                             </svg>
                                         </button>
 
-                                        <span
-                                            class="badge bg-primary w-25 text-white">{{ $marquee_speed ?? 1.0 }}x</span>
+                                        <span class="badge bg-primary w-25 text-white"
+                                            x-text="(parseFloat(speed) || 1.0).toFixed(1) + 'x'">{{ $marquee_speed ?? 1.0 }}x</span>
                                     </div>
                                     @error('marquee_speed')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
