@@ -72,12 +72,12 @@ class Jumbotron extends Component
 
         return [
             'media_type' => 'required|in:image,video',
-            'jumbo1' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-            'jumbo2' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-            'jumbo3' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-            'jumbo4' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-            'jumbo5' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-            'jumbo6' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+            'jumbo1' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+            'jumbo2' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+            'jumbo3' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+            'jumbo4' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+            'jumbo5' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+            'jumbo6' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
             'is_active' => 'boolean',
         ];
     }
@@ -92,18 +92,18 @@ class Jumbotron extends Component
         'jumbo4.image' => 'File harus berupa gambar',
         'jumbo5.image' => 'File harus berupa gambar',
         'jumbo6.image' => 'File harus berupa gambar',
-        'jumbo1.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
-        'jumbo2.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
-        'jumbo3.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
-        'jumbo4.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
-        'jumbo5.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
-        'jumbo6.mimes' => 'File harus berupa gambar jpg,png,jpeg,webp',
-        'jumbo1.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
-        'jumbo2.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
-        'jumbo3.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
-        'jumbo4.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
-        'jumbo5.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
-        'jumbo6.max'   => 'Ukuran file gambar tidak boleh lebih dari 1000 KB',
+        'jumbo1.mimes' => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'jumbo2.mimes' => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'jumbo3.mimes' => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'jumbo4.mimes' => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'jumbo5.mimes' => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'jumbo6.mimes' => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'jumbo1.max'   => 'Ukuran gambar maksimal 300KB',
+        'jumbo2.max'   => 'Ukuran gambar maksimal 300KB',
+        'jumbo3.max'   => 'Ukuran gambar maksimal 300KB',
+        'jumbo4.max'   => 'Ukuran gambar maksimal 300KB',
+        'jumbo5.max'   => 'Ukuran gambar maksimal 300KB',
+        'jumbo6.max'   => 'Ukuran gambar maksimal 300KB',
     ];
 
     public function updatedVideoFile()
@@ -118,6 +118,13 @@ class Jumbotron extends Component
         }
     }
 
+    public function updated($name)
+    {
+        if (in_array($name, ['jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6'])) {
+            $this->validateOnly($name);
+        }
+    }
+
     public function clearVideo()
     {
         $this->video_file = null;
@@ -126,86 +133,38 @@ class Jumbotron extends Component
         $this->dispatch('resetFileInput', ['inputName' => 'video_file']);
     }
 
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
-    {
-        try {
-            $maxSizeBytes = $maxSizeKB * 1024;
-            $image = Image::read($uploadedFile->getRealPath());
-            $targetWidth = 1920;
-            $targetHeight = 1080;
-
-            $originalWidth = $image->width();
-            $originalHeight = $image->height();
-            $image->resize($targetWidth, $targetHeight);
-            $quality = 95;
-            $minQuality = 20;
-
-            do {
-                $encoded = $image->toJpeg($quality);
-                $currentSize = strlen($encoded);
-
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                if ($currentSize > $maxSizeBytes * 1.5) {
-                    $quality -= 10;
-                } elseif ($currentSize > $maxSizeBytes * 1.2) {
-                    $quality -= 5;
-                } else {
-                    $quality -= 2;
-                }
-            } while ($quality >= $minQuality);
-
-            if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
-                $scaleFactor = 0.9;
-                while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                    $newWidth = (int)($targetWidth * $scaleFactor);
-                    $newHeight = (int)($targetHeight * $scaleFactor);
-                    $image->resize($newWidth, $newHeight);
-                    $scaleFactor -= 0.05;
-                }
-            }
-
-            return $image;
-        } catch (\Exception $e) {
-            throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
-        }
-    }
-
+    /**
+     * Method untuk menyimpan gambar jumbotron yang sudah dikompresi di sisi client browser (format WebP).
+     * Server backend berfungsi sebagai validator (tipe file & maks 300KB) dan menyimpan langsung file tanpa kompresi ulang.
+     */
     private function saveProcessedImage($uploadedFile, $jumboNumber)
     {
         try {
-            $processedImage = $this->resizeImageToLimit($uploadedFile);
-            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $fileName = time() . '_jumbo' . $jumboNumber . '_' . $originalName . '.jpg';
-            $filePath = public_path('images/jumbotrons/' . $fileName);
+            // Validasi batas maksimal 300KB di server sebagai penjaga pintu
+            $maxSizeBytes = 300 * 1024;
+            $fileSize = $uploadedFile->getSize();
+            if ($fileSize > $maxSizeBytes) {
+                throw new \Exception("Ukuran file melebihi batas maksimal server (300KB): " . round($fileSize / 1024, 2) . "KB");
+            }
 
-            $directory = dirname($filePath);
+            $directory = public_path('images/jumbotrons');
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
 
-            $maxSizeBytes = 990 * 1024;
-            $quality = 95;
-
-            do {
-                $encoded = $processedImage->toJpeg($quality);
-                $currentSize = strlen($encoded);
-
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                $quality -= 1;
-            } while ($quality >= 60);
-
-            $processedImage->toJpeg($quality)->save($filePath);
-
-            $finalSize = filesize($filePath);
-            if ($finalSize > $maxSizeBytes) {
-                throw new \Exception("Ukuran file masih terlalu besar: " . round($finalSize / 1024, 2) . "KB");
+            // Dapatkan ekstensi asli (default webp dari kompresi browser)
+            $extension = strtolower($uploadedFile->getClientOriginalExtension());
+            if (empty($extension) || $extension === 'tmp') {
+                $extension = 'webp';
             }
+
+            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = \Illuminate\Support\Str::slug($originalName);
+            $fileName = time() . '_jumbo' . $jumboNumber . '_' . ($safeName ?: 'jumbo') . '.' . $extension;
+            $filePath = $directory . '/' . $fileName;
+
+            // Simpan langsung file dari temporary ke public/images/jumbotrons tanpa kompresi ulang
+            File::copy($uploadedFile->getRealPath(), $filePath);
 
             return '/images/jumbotrons/' . $fileName;
         } catch (\Exception $e) {

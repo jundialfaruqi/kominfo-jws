@@ -32,35 +32,45 @@ class EditJumbotronMasjid extends Component
     public $is_active = false;
 
     protected $rules = [
-        'jumbotron_masjid_1' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbotron_masjid_2' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbotron_masjid_3' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbotron_masjid_4' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbotron_masjid_5' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
-        'jumbotron_masjid_6' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:1000',
+        'jumbotron_masjid_1' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:300',
+        'jumbotron_masjid_2' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:300',
+        'jumbotron_masjid_3' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:300',
+        'jumbotron_masjid_4' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:300',
+        'jumbotron_masjid_5' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:300',
+        'jumbotron_masjid_6' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:300',
         'is_active' => 'required|boolean'
     ];
 
     protected $messages = [
         'jumbotron_masjid_1.image'  => 'Jumbotron Masjid 1 harus berupa gambar',
-        'jumbotron_masjid_1.max'    => 'Jumbotron Masjid 1 maksimal 1000KB',
+        'jumbotron_masjid_1.max'    => 'Jumbotron Masjid 1 maksimal 300KB',
         'jumbotron_masjid_1.mimes'  => 'Jumbotron Masjid 1 harus berupa gambar jpg, png, jpeg, webp',
         'jumbotron_masjid_2.image'  => 'Jumbotron Masjid 2 harus berupa gambar',
-        'jumbotron_masjid_2.max'    => 'Jumbotron Masjid 2 maksimal 1000KB',
+        'jumbotron_masjid_2.max'    => 'Jumbotron Masjid 2 maksimal 300KB',
         'jumbotron_masjid_2.mimes'  => 'Jumbotron Masjid 2 harus berupa gambar jpg, png, jpeg, webp',
         'jumbotron_masjid_3.image'  => 'Jumbotron Masjid 3 harus berupa gambar',
-        'jumbotron_masjid_3.max'    => 'Jumbotron Masjid 3 maksimal 1000KB',
+        'jumbotron_masjid_3.max'    => 'Jumbotron Masjid 3 maksimal 300KB',
         'jumbotron_masjid_3.mimes'  => 'Jumbotron Masjid 3 harus berupa gambar jpg, png, jpeg, webp',
         'jumbotron_masjid_4.image'  => 'Jumbotron Masjid 4 harus berupa gambar',
-        'jumbotron_masjid_4.max'    => 'Jumbotron Masjid 4 maksimal 1000KB',
+        'jumbotron_masjid_4.max'    => 'Jumbotron Masjid 4 maksimal 300KB',
         'jumbotron_masjid_4.mimes'  => 'Jumbotron Masjid 4 harus berupa gambar jpg, png, jpeg, webp',
         'jumbotron_masjid_5.image'  => 'Jumbotron Masjid 5 harus berupa gambar',
-        'jumbotron_masjid_5.max'    => 'Jumbotron Masjid 5 maksimal 1000KB',
+        'jumbotron_masjid_5.max'    => 'Jumbotron Masjid 5 maksimal 300KB',
         'jumbotron_masjid_5.mimes'  => 'Jumbotron Masjid 5 harus berupa gambar jpg, png, jpeg, webp',
         'jumbotron_masjid_6.image'  => 'Jumbotron Masjid 6 harus berupa gambar',
-        'jumbotron_masjid_6.max'    => 'Jumbotron Masjid 6 maksimal 1000KB',
+        'jumbotron_masjid_6.max'    => 'Jumbotron Masjid 6 maksimal 300KB',
         'jumbotron_masjid_6.mimes'  => 'Jumbotron Masjid 6 harus berupa gambar jpg, png, jpeg, webp',
     ];
+
+    public function updated($name)
+    {
+        if (in_array($name, [
+            'jumbotron_masjid_1', 'jumbotron_masjid_2', 'jumbotron_masjid_3',
+            'jumbotron_masjid_4', 'jumbotron_masjid_5', 'jumbotron_masjid_6'
+        ])) {
+            $this->validateOnly($name);
+        }
+    }
 
     public function mount()
     {
@@ -82,70 +92,43 @@ class EditJumbotronMasjid extends Component
         }
     }
 
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
-    {
-        $maxSizeBytes = $maxSizeKB * 1024;
-        $image = Image::read($uploadedFile->getRealPath());
-        $targetRatio = 16 / 9;
-        $targetWidth = 1920;
-        $targetHeight = 1080;
-        $originalWidth = $image->width();
-        $originalHeight = $image->height();
-        $image->resize($targetWidth, $targetHeight);
-        $quality = 95;
-        $minQuality = 20;
-        do {
-            $encoded = $image->toJpeg($quality);
-            $currentSize = strlen($encoded);
-            if ($currentSize <= $maxSizeBytes) {
-                break;
-            }
-            if ($currentSize > $maxSizeBytes * 1.5) {
-                $quality -= 10;
-            } elseif ($currentSize > $maxSizeBytes * 1.2) {
-                $quality -= 5;
-            } else {
-                $quality -= 2;
-            }
-        } while ($quality >= $minQuality);
-        if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
-            $scaleFactor = 0.9;
-            while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                $newWidth = (int)($targetWidth * $scaleFactor);
-                $newHeight = (int)($targetHeight * $scaleFactor);
-                $image->resize($newWidth, $newHeight);
-                $scaleFactor -= 0.05;
-            }
-        }
-        return $image;
-    }
-
+    /**
+     * Method untuk menyimpan gambar jumbotron masjid yang sudah dikompresi di sisi client browser (format WebP).
+     * Server backend berfungsi sebagai validator (tipe file & maks 300KB) dan menyimpan langsung file tanpa kompresi ulang.
+     */
     private function saveProcessedImage($uploadedFile, $jumboNumber)
     {
-        $processedImage = $this->resizeImageToLimit($uploadedFile);
-        $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-        $fileName = time() . '_jumbo' . $jumboNumber . '_' . $originalName . '.jpg';
-        $filePath = public_path('images/jumbotrons/' . $fileName);
-        $directory = dirname($filePath);
-        if (!file_exists($directory)) {
-            mkdir($directory, 0755, true);
-        }
-        $maxSizeBytes = 990 * 1024;
-        $quality = 95;
-        do {
-            $encoded = $processedImage->toJpeg($quality);
-            $currentSize = strlen($encoded);
-            if ($currentSize <= $maxSizeBytes) {
-                break;
+        try {
+            // Validasi batas maksimal 300KB di server sebagai penjaga pintu
+            $maxSizeBytes = 300 * 1024;
+            $fileSize = $uploadedFile->getSize();
+            if ($fileSize > $maxSizeBytes) {
+                throw new \Exception("Ukuran file melebihi batas maksimal server (300KB): " . round($fileSize / 1024, 2) . "KB");
             }
-            $quality -= 1;
-        } while ($quality >= 60);
-        $processedImage->toJpeg($quality)->save($filePath);
-        $finalSize = filesize($filePath);
-        if ($finalSize > $maxSizeBytes) {
-            throw new \Exception("Ukuran file masih terlalu besar: " . round($finalSize / 1024, 2) . "KB");
+
+            $directory = public_path('images/jumbotrons');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
+            }
+
+            // Dapatkan ekstensi asli (default webp dari kompresi browser)
+            $extension = strtolower($uploadedFile->getClientOriginalExtension());
+            if (empty($extension) || $extension === 'tmp') {
+                $extension = 'webp';
+            }
+
+            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = \Illuminate\Support\Str::slug($originalName);
+            $fileName = time() . '_jumbo_masjid' . $jumboNumber . '_' . ($safeName ?: 'jumbo') . '.' . $extension;
+            $filePath = $directory . '/' . $fileName;
+
+            // Simpan langsung file dari temporary ke public/images/jumbotrons tanpa kompresi ulang
+            File::copy($uploadedFile->getRealPath(), $filePath);
+
+            return '/images/jumbotrons/' . $fileName;
+        } catch (\Exception $e) {
+            throw new \Exception('Gagal menyimpan gambar: ' . $e->getMessage());
         }
-        return '/images/jumbotrons/' . $fileName;
     }
 
     public function clearJumbotronMasjid1()
@@ -213,6 +196,7 @@ class EditJumbotronMasjid extends Component
             }
 
             event(new ContentUpdatedEvent($profil->slug, 'jumbotron_masjid'));
+            $this->dispatch('resetFileInput', ['inputName' => $field]);
             $this->dispatch('reset_success', 'Gambar jumbotron berhasil direset');
         } catch (\Exception $e) {
             $this->dispatch('reset_error', 'Gagal mereset gambar jumbotron: ' . $e->getMessage());
