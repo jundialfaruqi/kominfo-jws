@@ -7,6 +7,7 @@ use App\Events\GlobalUpdatedEvent;
 use App\Models\Jumbotron as ModelsJumbotron;
 use App\Models\User;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -38,6 +39,8 @@ class Jumbotron extends Component
     public $jumbo6;
     public $tmp_jumbo6;
     public $is_active = true;
+
+    #[Url(as: 'tab')]
     public $activeTab = 'image';
     public $media_type = 'image';
     public $video_file;
@@ -55,8 +58,10 @@ class Jumbotron extends Component
     {
         $this->activeTab = in_array($tab, ['image', 'video']) ? $tab : 'image';
         $this->media_type = $this->activeTab;
+        session(['jumbotron_active_tab' => $this->activeTab]);
         $this->cancelForm();
-        $this->resetPage();
+        $this->resetPage('page_image');
+        $this->resetPage('page_video');
     }
 
     protected function rules()
@@ -345,6 +350,12 @@ class Jumbotron extends Component
         $this->paginate = 10;
         $this->search = '';
 
+        // Dapatkan tab dari URL query (?tab=video) atau session
+        $tab = request()->query('tab') ?: session('jumbotron_active_tab', 'image');
+        $this->activeTab = in_array($tab, ['image', 'video']) ? $tab : 'image';
+        $this->media_type = $this->activeTab;
+        session(['jumbotron_active_tab' => $this->activeTab]);
+
         // Check access using both role and permission
         $this->checkAccess();
     }
@@ -393,29 +404,35 @@ class Jumbotron extends Component
 
     public function render()
     {
-        $query = ModelsJumbotron::with('user')
+        $baseQuery = ModelsJumbotron::with('user')
             ->select('id', 'user_id', 'media_type', 'jumbo1', 'jumbo2', 'jumbo3', 'jumbo4', 'jumbo5', 'jumbo6', 'video_file', 'has_audio', 'video_duration', 'is_active')
             ->whereHas('user', function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%');
-            });
+            })
+            ->orderBy('id', 'desc');
 
-        if ($this->activeTab === 'video') {
-            $query->where('media_type', 'video');
-        } else {
-            $query->where(function ($q) {
+        $jumboImageList = (clone $baseQuery)
+            ->where(function ($q) {
                 $q->where('media_type', 'image')->orWhereNull('media_type');
-            });
-        }
+            })
+            ->paginate($this->paginate, ['*'], 'page_image');
 
-        $jumboList = $query->orderBy('id', 'desc')->paginate($this->paginate);
+        $jumboVideoList = (clone $baseQuery)
+            ->where('media_type', 'video')
+            ->paginate($this->paginate, ['*'], 'page_video');
 
         return view('livewire.jumbotron.jumbotron', [
-            'jumboList' => $jumboList,
+            'jumboImageList' => $jumboImageList,
+            'jumboVideoList' => $jumboVideoList,
         ]);
     }
 
-    public function showAddForm()
+    public function showAddForm($tab = null)
     {
+        if ($tab && in_array($tab, ['image', 'video'])) {
+            $this->activeTab = $tab;
+            session(['jumbotron_active_tab' => $this->activeTab]);
+        }
         $this->resetValidation();
         $this->reset([
             'jumboId',
@@ -453,6 +470,7 @@ class Jumbotron extends Component
         $this->jumboId = $jumbo->id;
         $this->media_type = $jumbo->media_type ?? 'image';
         $this->activeTab = $this->media_type;
+        session(['jumbotron_active_tab' => $this->activeTab]);
         $this->video_file = null;
         $this->tmp_video_file = $jumbo->video_file;
         $this->has_audio = (bool) $jumbo->has_audio;
@@ -623,7 +641,10 @@ class Jumbotron extends Component
                 'tmp_jumbo6',
                 'is_active',
             ]);
+            $this->isEdit = false;
+            $this->resetValidation();
             $this->media_type = $this->activeTab;
+            session(['jumbotron_active_tab' => $this->activeTab]);
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan saat menyimpan jumbotron: ' . $e->getMessage());
         }
