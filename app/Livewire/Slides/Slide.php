@@ -27,22 +27,22 @@ class Slide extends Component
 
     public $slideId;
     public $userId;
-    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
+    #[Validate('nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300')]
     public $slide1;
     public $tmp_slide1;
-    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
+    #[Validate('nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300')]
     public $slide2;
     public $tmp_slide2;
-    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
+    #[Validate('nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300')]
     public $slide3;
     public $tmp_slide3;
-    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
+    #[Validate('nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300')]
     public $slide4;
     public $tmp_slide4;
-    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
+    #[Validate('nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300')]
     public $slide5;
     public $tmp_slide5;
-    #[Validate('nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800')]
+    #[Validate('nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300')]
     public $slide6;
     public $tmp_slide6;
 
@@ -54,12 +54,12 @@ class Slide extends Component
 
     protected $rules = [
         'userId' => 'required|exists:users,id',
-        'slide1' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
-        'slide2' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
-        'slide3' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
-        'slide4' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
-        'slide5' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
-        'slide6' => 'nullable|image|mimes:jpg,png,jpeg,webp,gif|max:800',
+        'slide1' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+        'slide2' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+        'slide3' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+        'slide4' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+        'slide5' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
+        'slide6' => 'nullable|image|mimes:webp,jpg,png,jpeg,gif|max:300',
     ];
 
     protected $messages = [
@@ -71,117 +71,52 @@ class Slide extends Component
         'slide4.image'    => 'File harus berupa gambar',
         'slide5.image'    => 'File harus berupa gambar',
         'slide6.image'    => 'File harus berupa gambar',
-        'slide1.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide2.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide3.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide4.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide5.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide6.mimes'    => 'File harus berupa gambar jpg,png,jpeg,webp,gif',
-        'slide1.max'      => 'Ukuran gambar maksimal 800KB',
-        'slide2.max'      => 'Ukuran gambar maksimal 800KB',
-        'slide3.max'      => 'Ukuran gambar maksimal 800KB',
-        'slide4.max'      => 'Ukuran gambar maksimal 800KB',
-        'slide5.max'      => 'Ukuran gambar maksimal 800KB',
-        'slide6.max'      => 'Ukuran gambar maksimal 800KB',
+        'slide1.mimes'    => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'slide2.mimes'    => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'slide3.mimes'    => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'slide4.mimes'    => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'slide5.mimes'    => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'slide6.mimes'    => 'File harus berupa gambar webp, jpg, png, jpeg, gif',
+        'slide1.max'      => 'Ukuran gambar maksimal 300KB',
+        'slide2.max'      => 'Ukuran gambar maksimal 300KB',
+        'slide3.max'      => 'Ukuran gambar maksimal 300KB',
+        'slide4.max'      => 'Ukuran gambar maksimal 300KB',
+        'slide5.max'      => 'Ukuran gambar maksimal 300KB',
+        'slide6.max'      => 'Ukuran gambar maksimal 300KB',
     ];
 
     /**
-     * Method untuk resize gambar dengan ukuran maksimal 800KB
-     */
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 800)
-    {
-        try {
-            // Konversi ke bytes
-            $maxSizeBytes = $maxSizeKB * 1024;
-
-            // Baca gambar menggunakan Intervention Image
-            $image = Image::read($uploadedFile->getRealPath());
-
-            // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
-            $quality = 95;
-            $minQuality = 20;
-
-            do {
-                // Encode dengan kualitas saat ini
-                $encoded = $image->toJpeg($quality);
-                $currentSize = strlen($encoded);
-
-                // Jika ukuran sudah sesuai, keluar dari loop
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                // Turunkan kualitas secara bertahap
-                if ($currentSize > $maxSizeBytes * 1.5) {
-                    $quality -= 10; // Penurunan cepat jika masih jauh dari target
-                } elseif ($currentSize > $maxSizeBytes * 1.2) {
-                    $quality -= 5;  // Penurunan sedang
-                } else {
-                    $quality -= 2;  // Penurunan halus untuk fine-tuning
-                }
-            } while ($quality >= $minQuality);
-
-            // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil dengan mempertahankan aspect ratio
-            if (strlen($image->toJpeg($minQuality)) > $maxSizeBytes) {
-                $scaleFactor = 0.9;
-                while (strlen($image->toJpeg($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                    $newWidth = (int)($image->width() * $scaleFactor);
-                    $newHeight = (int)($image->height() * $scaleFactor);
-                    $image->resize($newWidth, $newHeight);
-                    $scaleFactor -= 0.05;
-                }
-            }
-
-            return $image;
-        } catch (\Exception $e) {
-            throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Method untuk menyimpan gambar yang sudah diproses
+     * Method untuk menyimpan gambar yang sudah dikompresi di sisi client browser (format WebP).
+     * Server backend berfungsi sebagai validator (tipe file & maks 300KB) dan menyimpan langsung file tanpa kompresi ulang.
      */
     private function saveProcessedImage($uploadedFile, $slideNumber)
     {
         try {
-            // Proses resize gambar dengan ukuran maksimal 800KB
-            $processedImage = $this->resizeImageToLimit($uploadedFile);
+            // Validasi batas maksimal 300KB di server sebagai penjaga pintu
+            $maxSizeBytes = 300 * 1024;
+            $fileSize = $uploadedFile->getSize();
+            if ($fileSize > $maxSizeBytes) {
+                throw new \Exception("Ukuran file melebihi batas maksimal server (300KB): " . round($fileSize / 1024, 2) . "KB");
+            }
 
-            // Generate nama file dengan ekstensi .jpg (karena kita convert ke JPEG)
-            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $fileName = time() . '_slide' . $slideNumber . '_' . $originalName . '.jpg';
-            $filePath = public_path('images/slides/' . $fileName);
-
-            // Pastikan directory ada
-            $directory = dirname($filePath);
+            $directory = public_path('images/slides');
             if (!file_exists($directory)) {
                 mkdir($directory, 0755, true);
             }
 
-            // Tentukan kualitas optimal berdasarkan ukuran target
-            $maxSizeBytes = 800 * 1024; // 800KB
-            $quality = 95;
-
-            // Fine-tune kualitas untuk mendekati 800KB
-            do {
-                $encoded = $processedImage->toJpeg($quality);
-                $currentSize = strlen($encoded);
-
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                $quality -= 1;
-            } while ($quality >= 60);
-
-            // Simpan gambar yang sudah diproses dengan kualitas optimal
-            $processedImage->toJpeg($quality)->save($filePath);
-
-            // Verifikasi ukuran file hasil akhir
-            $finalSize = filesize($filePath);
-            if ($finalSize > $maxSizeBytes) {
-                throw new \Exception("Ukuran file masih terlalu besar: " . round($finalSize / 1024, 2) . "KB");
+            // Dapatkan ekstensi asli (default webp dari kompresi browser)
+            $extension = strtolower($uploadedFile->getClientOriginalExtension());
+            if (empty($extension) || $extension === 'tmp') {
+                $extension = 'webp';
             }
+
+            $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = \Illuminate\Support\Str::slug($originalName);
+            $fileName = time() . '_slide' . $slideNumber . '_' . ($safeName ?: 'slide') . '.' . $extension;
+            $filePath = $directory . '/' . $fileName;
+
+            // Simpan langsung file dari temporary ke public/images/slides tanpa kompresi ulang
+            File::copy($uploadedFile->getRealPath(), $filePath);
 
             return '/images/slides/' . $fileName;
         } catch (\Exception $e) {
