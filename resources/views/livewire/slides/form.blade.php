@@ -80,10 +80,6 @@
                                 <small class="text-muted"><span class="text-danger">*</span>Format: JPG, PNG, JPEG,
                                     WEBP.</small>
                             </div>
-                            <div class="form-text">
-                                <small class="text-muted"><span class="text-danger">*</span>Rasio gambar 16:9
-                                    (Rekomendasi : 1920x1080 Piksel)</small>
-                            </div>
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
@@ -149,10 +145,6 @@
                                 <small class="text-muted"><span class="text-danger">*</span>Format: JPG, PNG, JPEG,
                                     WEBP.</small>
                             </div>
-                            <div class="form-text">
-                                <small class="text-muted"><span class="text-danger">*</span>Rasio gambar 16:9
-                                    (Rekomendasi : 1920x1080 Piksel)</small>
-                            </div>
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
@@ -166,9 +158,8 @@
                                         class="btn btn-danger rounded-4 my-2 d-flex align-items-center justify-content-center"
                                         wire:click="clearSlide2" title="Hapus gambar">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            class="icon icon-1">
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" class="icon icon-1">
                                             <path d="M4 7l16 0"></path>
                                             <path d="M10 11l0 6"></path>
                                             <path d="M14 11l0 6"></path>
@@ -219,10 +210,6 @@
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format: JPG, PNG, JPEG,
                                     WEBP.</small>
-                            </div>
-                            <div class="form-text">
-                                <small class="text-muted"><span class="text-danger">*</span>Rasio gambar 16:9
-                                    (Rekomendasi : 1920x1080 Piksel)</small>
                             </div>
 
                             {{-- Container untuk input file dan tombol trash --}}
@@ -291,10 +278,6 @@
                                 <small class="text-muted"><span class="text-danger">*</span>Format: JPG, PNG, JPEG,
                                 </small>
                             </div>
-                            <div class="form-text">
-                                <small class="text-muted"><span class="text-danger">*</span>Rasio gambar 16:9
-                                    (Rekomendasi : 1920x1080 Piksel)</small>
-                            </div>
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
@@ -362,10 +345,6 @@
                                 <small class="text-muted"><span class="text-danger">*</span>Format: JPG, PNG, JPEG,
                                     WEBP.</small>
                             </div>
-                            <div class="form-text">
-                                <small class="text-muted"><span class="text-danger">*</span>Rasio gambar 16:9
-                                    (Rekomendasi : 1920x1080 Piksel)</small>
-                            </div>
 
                             {{-- Container untuk input file dan tombol trash --}}
                             <div class="d-flex align-items-center gap-2">
@@ -432,10 +411,6 @@
                             <div class="form-text">
                                 <small class="text-muted"><span class="text-danger">*</span>Format: JPG, PNG, JPEG,
                                     WEBP.</small>
-                            </div>
-                            <div class="form-text">
-                                <small class="text-muted"><span class="text-danger">*</span>Rasio gambar 16:9
-                                    (Rekomendasi : 1920x1080 Piksel)</small>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <input type="file" id="slide6-input"
