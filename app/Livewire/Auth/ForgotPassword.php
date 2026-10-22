@@ -32,13 +32,13 @@ class ForgotPassword extends Component
     {
         $this->validate();
 
-        $status = Password::sendResetLink(['email' => $this->email]);
+        // Selalu kirim request ke Password::sendResetLink (jika email tidak ditemukan,
+        // Laravel secara internal tidak mengirim email, tapi kita tetap tampilkan
+        // pesan yang sama untuk mencegah user enumeration / account disclosure).
+        Password::sendResetLink(['email' => $this->email]);
 
-        if ($status === Password::RESET_LINK_SENT) {
-            session()->flash('status', 'Link reset password telah dikirim ke email Anda.');
-            $this->reset('email');
-        } else {
-            $this->addError('email', 'Email tidak ditemukan.');
-        }
+        // Pesan generik — tidak membedakan email terdaftar atau tidak (OWASP: CWE-204)
+        session()->flash('status', 'Jika email Anda terdaftar di sistem, link reset password akan segera dikirim.');
+        $this->reset('email');
     }
 }
