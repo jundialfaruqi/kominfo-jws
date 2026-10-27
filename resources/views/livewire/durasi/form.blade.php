@@ -188,7 +188,7 @@
                                 <select class="form-select rounded-3 @error('adzan_shuruq') is-invalid @enderror"
                                     wire:model="adzan_shuruq">
                                     <option value="">Pilih durasi shuruq</option>
-                                    @for ($i = 2; $i <= 20; $i++)
+                                    @for ($i = 10; $i <= 15; $i++)
                                         <option value="{{ $i }}">
                                             {{ $i }} menit</option>
                                     @endfor
