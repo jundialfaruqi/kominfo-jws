@@ -26,3 +26,25 @@
         }
     }
 </script>
+<script data-navigate-once>
+    document.addEventListener('livewire:navigating', () => {
+        const sidebar = document.getElementById('main-sidebar');
+        if (sidebar) {
+            sessionStorage.setItem('jws_sidebar_scroll', sidebar.scrollTop);
+        }
+    });
+
+    document.addEventListener('livewire:navigated', () => {
+        const sidebar = document.getElementById('main-sidebar');
+        if (!sidebar) return;
+
+        const savedScroll = sessionStorage.getItem('jws_sidebar_scroll');
+        if (savedScroll !== null) {
+            sidebar.scrollTop = parseInt(savedScroll, 10);
+        }
+
+        sidebar.addEventListener('scroll', function() {
+            sessionStorage.setItem('jws_sidebar_scroll', sidebar.scrollTop);
+        }, { passive: true });
+    });
+</script>

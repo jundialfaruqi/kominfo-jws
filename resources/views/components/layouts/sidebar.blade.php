@@ -1,4 +1,4 @@
-<aside class="navbar navbar-vertical navbar-expand-lg sticky-top" data-bs-theme="dark">
+<aside id="main-sidebar" class="navbar navbar-vertical navbar-expand-lg sticky-top" data-bs-theme="dark">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -785,4 +785,17 @@
             </ul>
         </div>
     </div>
+    <script>
+        (function() {
+            const sidebar = document.getElementById('main-sidebar');
+            if (!sidebar) return;
+            const savedScroll = sessionStorage.getItem('jws_sidebar_scroll');
+            if (savedScroll !== null) {
+                sidebar.scrollTop = parseInt(savedScroll, 10);
+            }
+            sidebar.addEventListener('scroll', function() {
+                sessionStorage.setItem('jws_sidebar_scroll', sidebar.scrollTop);
+            }, { passive: true });
+        })();
+    </script>
 </aside>
