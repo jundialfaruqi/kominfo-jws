@@ -62,7 +62,7 @@
             </div>
         </div>
         <div class="collapse navbar-collapse" id="sidebar-menu">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav pb-4">
                 @if (Auth::user()->status === 'Active')
                     <div class="mt-3 mb-1 px-3">
                         <div class="d-flex align-items-center">
