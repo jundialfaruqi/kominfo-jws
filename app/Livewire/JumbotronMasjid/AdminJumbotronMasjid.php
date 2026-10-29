@@ -12,7 +12,20 @@ use Livewire\Attributes\Title;
 class AdminJumbotronMasjid extends Component
 {
     use WithPagination;
+
+    protected $paginationTheme = 'bootstrap';
+    public $paginate = '10';
     public $search = '';
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPaginate()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -30,7 +43,7 @@ class AdminJumbotronMasjid extends Component
             });
         }
 
-        $jumbotronMasjidsData = $query->orderBy('id', 'asc')->paginate(10);
+        $jumbotronMasjidsData = $query->orderBy('id', 'asc')->paginate($this->paginate);
         return view('livewire.jumbotron-masjid.admin-jumbotron-masjid', [
             'jumbotronMasjidsData' => $jumbotronMasjidsData,
             'search' => $this->search,

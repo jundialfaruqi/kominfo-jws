@@ -34,9 +34,9 @@
                         @include('livewire.jumbotron-masjid.jumbotron-masjid-table')
 
                         {{-- Pagination --}}
-                        {{-- <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
-                            {{ $jumbotronMasjidsData->links() }}
-                        </div> --}}
+                        <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
+                            {{ $jumbotronMasjidsData->links(data: ['scrollTo' => false]) }}
+                        </div>
                     </div>
                 </div>
             </div>
