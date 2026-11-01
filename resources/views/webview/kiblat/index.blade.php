@@ -738,15 +738,39 @@
       el.textContent = nx ? fmtRemain(nx.time - Date.now()) : "--:--:--");
   }
 
+  const HIJRI_MONTHS = [
+    "Muharram", "Safar", "Rabiul Awal", "Rabiul Akhir",
+    "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban",
+    "Ramadhan", "Syawal", "Dzulkaidah", "Dzulhijjah"
+  ];
+
   function hijriString(d){
-    try{
-      return new Intl.DateTimeFormat("id-ID-u-ca-islamic-umalqura",
-        { day:"numeric", month:"long", year:"numeric" }).format(d)
-        .replace(/Jumadilawal/g, "Jumadil Awal")
-        .replace(/Jumadilakhir/g, "Jumadil Akhir")
-        .replace(/Rabiulawal/g, "Rabiul Awal")
-        .replace(/Rabiulakhir/g, "Rabiul Akhir");
-    }catch(e){ return ""; }
+    for (const loc of ["en-u-ca-islamic-umalqura", "id-ID-u-ca-islamic-umalqura", "en-u-ca-islamic"]){
+      try{
+        const parts = new Intl.DateTimeFormat(loc, {
+          day:"numeric", month:"numeric", year:"numeric"
+        }).formatToParts(d);
+        const day = parseInt((parts.find(p => p.type === "day") || {}).value, 10);
+        const month = parseInt((parts.find(p => p.type === "month") || {}).value, 10);
+        const year = parseInt((parts.find(p => p.type === "year") || {}).value, 10);
+        if (day && month >= 1 && month <= 12 && year && year < 1700){
+          return `${day} ${HIJRI_MONTHS[month - 1]} ${year} H`;
+        }
+      }catch(e){}
+    }
+    // Fallback perhitungan kalender Hijriah jika browser tidak mendukung Intl islamic calendar
+    const jd = Math.floor(d.getTime() / 86400000) + 2440588;
+    const l = jd - 1948440 + 10632;
+    const n = Math.floor((l - 1) / 10631);
+    const l2 = l - 10631 * n + 354;
+    const j = (Math.floor((10985 - l2) / 5316)) * (Math.floor((50 * l2) / 17719)) +
+              (Math.floor(l2 / 5670)) * (Math.floor((43 * l2) / 15238));
+    const l3 = l2 - (Math.floor((30 - j) / 15)) * (Math.floor((17719 * j) / 50)) -
+               (Math.floor(j / 16)) * (Math.floor((15238 * j) / 43)) + 29;
+    const month = Math.floor((24 * l3) / 709);
+    const day = l3 - Math.floor((709 * month) / 24);
+    const year = 30 * n + j - 30;
+    return `${day} ${HIJRI_MONTHS[(month - 1) % 12]} ${year} H`;
   }
 
   function updateDates(){
