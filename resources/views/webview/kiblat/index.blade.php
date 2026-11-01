@@ -155,14 +155,19 @@
     background:radial-gradient(circle,rgba(84,204,180,.42) 0%,rgba(60,180,180,.16) 48%,transparent 70%);
   }
   .dial{position:absolute;inset:0;will-change:transform;filter:drop-shadow(0 16px 26px rgba(0,0,0,.45))}
-  .needle{position:absolute;inset:0;will-change:transform;pointer-events:none}
+  .needle{position:absolute;inset:0;will-change:transform;pointer-events:none;z-index:2}
   .needle svg{width:100%;height:100%;display:block}
   .compass-wrap.aligned .needle{filter:drop-shadow(0 0 14px rgba(84,204,180,.9))}
   .hub{
     position:absolute;left:50%;top:50%;width:13%;height:13%;transform:translate(-50%,-50%);
     border-radius:50%;background:radial-gradient(circle at 34% 28%,#ffffff,#cfe9e6 42%,#3f8f8b);
     box-shadow:0 0 0 5px rgba(5,15,23,.55),0 6px 16px rgba(0,0,0,.5);
-    display:flex;align-items:center;justify-content:center;font-size:.9rem;
+    display:flex;align-items:center;justify-content:center;font-size:.9rem;z-index:2;
+  }
+  .compass-logo{
+    position:absolute;left:50%;top:60.5%;transform:translateX(-50%);
+    width:34%;height:auto;pointer-events:none;z-index:1;
+    display:block;object-fit:contain;
   }
   .fixed-mark{
     position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:0;height:0;
@@ -274,6 +279,7 @@
       <div class="compass-wrap" id="wrap">
         <div class="fixed-mark"></div>
         <div class="dial" id="dial"></div>
+        <img class="compass-logo" src="{{ asset('theme/static/diskominfotiksan-logo-small.webp') }}" alt="Diskominfotiksan Kota Pekanbaru" />
         <div class="needle" id="needle"></div>
         <div class="hub">🕋</div>
       </div>
