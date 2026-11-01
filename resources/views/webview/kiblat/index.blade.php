@@ -304,7 +304,7 @@
           <select id="provSelect" aria-label="Provinsi"></select>
           <select id="citySelect" aria-label="Kabupaten atau Kota" disabled></select>
           <button class="btn primary" id="btnGps">📍 Lokasi Saya</button>
-          <p class="hint">Pilih provinsi lalu kabupaten/kota secara manual, atau tekan <b>Lokasi Saya</b> untuk memakai GPS perangkat.</p>
+          <p class="hint" id="gpsHint">Pilih provinsi lalu kabupaten/kota secara manual, atau tekan <b>Lokasi Saya</b> untuk memakai GPS perangkat.</p>
         </div>
 
         <div class="card">
@@ -520,20 +520,52 @@
   }
 
   function useGPS(){
+    const btn = $("btnGps"), hint = $("gpsHint");
+    const setStatus = (html, ms) => {
+      if (hint) hint.innerHTML = html;
+      say(html, ms);
+    };
     if (!navigator.geolocation){
-      say("Perangkat tidak mendukung geolokasi. Pilih kab/kota manual di tab Pengaturan.", 8000);
+      setStatus("Perangkat tidak mendukung geolokasi. Pilih kab/kota manual di tab Pengaturan.", 8000);
       return;
     }
-    say("Mencari lokasi…", 15000);
+    btn.disabled = true;
+    btn.textContent = "⏳ Mencari lokasi…";
+    setStatus("Sedang mencari lokasi GPS perangkat…", 15000);
+
+    const onSuccess = p => {
+      btn.disabled = false;
+      btn.textContent = "📍 Lokasi Saya";
+      const c = nearestCity(p.coords.latitude, p.coords.longitude);
+      setLocation(p.coords.latitude, p.coords.longitude, c, true);
+      $("kvAcc").textContent = "±" + Math.round(p.coords.accuracy) + " m";
+      setStatus(`Lokasi ditemukan: <b>${c[1]}</b>.`, 6000);
+    };
+
+    const onError = err => {
+      btn.disabled = false;
+      btn.textContent = "📍 Lokasi Saya";
+      const msg = err && err.code === 1
+        ? "Izin lokasi ditolak. Aktifkan izin lokasi di browser/HP, atau pilih kab/kota manual."
+        : "Gagal mengambil lokasi (" + (err ? err.message : "timeout") + "). Pastikan GPS aktif atau pilih manual.";
+      setStatus(msg, 8000);
+    };
+
     navigator.geolocation.getCurrentPosition(
-      p => {
-        const c = nearestCity(p.coords.latitude, p.coords.longitude);
-        setLocation(p.coords.latitude, p.coords.longitude, c, true);
-        $("kvAcc").textContent = "±" + Math.round(p.coords.accuracy) + " m";
-        say(`Lokasi ditemukan: <b>${c[1]}</b>.`, 6000);
+      onSuccess,
+      err => {
+        // Jika izin ditolak (code 1), langsung tampilkan pesan; jika timeout/unavailable, fallback ke low accuracy
+        if (err && err.code === 1){
+          onError(err);
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          onSuccess,
+          onError,
+          { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+        );
       },
-      err => say("Gagal mengambil lokasi (" + err.message + "). Pilih kab/kota manual.", 8000),
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     );
   }
 
