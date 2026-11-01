@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#04223f" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -29,6 +29,7 @@
     padding:0;
     overflow:hidden;
     overscroll-behavior:none;
+    touch-action:none;
     position:fixed;
     inset:0;
   }
@@ -782,6 +783,34 @@
   document.querySelectorAll(".nav button").forEach(b =>
     b.addEventListener("click", () => setTab(b.dataset.tab)));
   $("cityLink").addEventListener("click", () => setTab("pengaturan"));
+
+  /* ================= kunci zoom & scroll ================= */
+  ["gesturestart", "gesturechange", "gestureend"].forEach(ev => {
+    document.addEventListener(ev, e => e.preventDefault(), { passive: false });
+  });
+  document.addEventListener("touchstart", e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener("touchmove", e => {
+    if (e.touches.length > 1 || (typeof e.scale === "number" && e.scale !== 1)) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+  let lastTouchEnd = 0;
+  document.addEventListener("touchend", e => {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+  document.addEventListener("dblclick", e => e.preventDefault(), { passive: false });
+  document.addEventListener("wheel", e => {
+    if (e.ctrlKey) e.preventDefault();
+  }, { passive: false });
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && ["+", "-", "=", "0"].includes(e.key)) {
+      e.preventDefault();
+    }
+  });
 
   /* ================= init ================= */
   $("btnGps").addEventListener("click", useGPS);
