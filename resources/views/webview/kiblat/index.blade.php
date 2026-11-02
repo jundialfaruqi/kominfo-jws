@@ -464,7 +464,7 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            bottom: 16px;
+            bottom: 80px;
             text-align: center;
             font-size: .92rem;
             line-height: 1.5;
@@ -729,7 +729,8 @@
                         <select id="citySelect" aria-label="Kabupaten atau Kota" disabled></select>
                         <button class="btn primary" id="btnGps">📍 Lokasi Saya</button>
                         <p class="hint" id="gpsHint">Pilih provinsi lalu kabupaten/kota secara manual, atau tekan
-                            <b>Lokasi Saya</b> untuk memakai GPS perangkat.</p>
+                            <b>Lokasi Saya</b> untuk memakai GPS perangkat.
+                        </p>
                     </div>
 
                     <div class="card">
