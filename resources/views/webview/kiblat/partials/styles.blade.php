@@ -20,7 +20,6 @@
         body {
             width: 100%;
             height: 100%;
-            height: 100dvh;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -41,7 +40,6 @@
             width: 100%;
             max-width: 480px;
             height: 100%;
-            height: 100dvh;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -604,7 +602,7 @@
             background: rgba(255, 255, 255, .97);
             backdrop-filter: blur(12px);
             border-top: 1px solid var(--line);
-            padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+            padding: 8px 6px;
         }
 
         .nav button {
