@@ -490,6 +490,162 @@
                 return [h, m, x].map(v => String(v).padStart(2, "0")).join(":");
             }
 
+            function fmtMMSS(totalSec) {
+                const s = Math.max(0, Math.ceil(totalSec));
+                const m = Math.floor(s / 60),
+                    x = s % 60;
+                return [m, x].map(v => String(v).padStart(2, "0")).join(":");
+            }
+
+            /* ================= status banner adzan & alert (4 menit) ================= */
+            const PHASE_DURATION_SEC = 240; // Hardcode 4 menit (240 detik)
+            const PHASES = [
+                { key: "imsak",   name: "IMSAK",   type: "alert" },
+                { key: "subuh",   name: "SHUBUH",  type: "adzan" },
+                { key: "terbit",  name: "SYURUQ",  type: "alert" },
+                { key: "dhuha",   name: "DHUHA",   type: "alert" },
+                { key: "dzuhur",  name: "DZUHUR",  type: "adzan" },
+                { key: "ashar",   name: "ASHAR",   type: "adzan" },
+                { key: "maghrib", name: "MAGHRIB", type: "adzan" },
+                { key: "isya",    name: "ISYA",    type: "adzan" }
+            ];
+
+            const PREVIEW_MAP = {
+                imsak:   { key: "imsak",   name: "IMSAK",   type: "alert", forceFriday: false },
+                subuh:   { key: "subuh",   name: "SHUBUH",  type: "adzan", forceFriday: false },
+                shubuh:  { key: "subuh",   name: "SHUBUH",  type: "adzan", forceFriday: false },
+                syuruq:  { key: "terbit",  name: "SYURUQ",  type: "alert", forceFriday: false },
+                shuruq:  { key: "terbit",  name: "SYURUQ",  type: "alert", forceFriday: false },
+                terbit:  { key: "terbit",  name: "SYURUQ",  type: "alert", forceFriday: false },
+                dhuha:   { key: "dhuha",   name: "DHUHA",   type: "alert", forceFriday: false },
+                dzuhur:  { key: "dzuhur",  name: "DZUHUR",  type: "adzan", forceFriday: false },
+                jumat:   { key: "dzuhur",  name: "JUM'AT",  type: "adzan", forceFriday: true  },
+                ashar:   { key: "ashar",   name: "ASHAR",   type: "adzan", forceFriday: false },
+                maghrib: { key: "maghrib", name: "MAGHRIB", type: "adzan", forceFriday: false },
+                adzan:   { key: "maghrib", name: "MAGHRIB", type: "adzan", forceFriday: false },
+                isya:    { key: "isya",    name: "ISYA",    type: "adzan", forceFriday: false }
+            };
+
+            const previewState = (function initPreview() {
+                try {
+                    const params = new URLSearchParams(window.location.search);
+                    const raw = (params.get("preview") || "").trim().toLowerCase();
+                    if (!raw || !PREVIEW_MAP[raw]) return null;
+                    const cfg = PREVIEW_MAP[raw];
+                    const customSec = parseInt(params.get("sec") || "", 10);
+                    const remainSec = (!isNaN(customSec) && customSec > 0 && customSec <= PHASE_DURATION_SEC)
+                        ? customSec
+                        : PHASE_DURATION_SEC;
+                    const nowMs = Date.now();
+                    const startMs = nowMs - (PHASE_DURATION_SEC - remainSec) * 1000;
+                    const endMs = startMs + PHASE_DURATION_SEC * 1000;
+                    return {
+                        ...cfg,
+                        startMs,
+                        endMs,
+                        totalSec: PHASE_DURATION_SEC
+                    };
+                } catch (e) {
+                    return null;
+                }
+            })();
+
+            const TIME_RE = /^\d{1,2}:\d{2}$/;
+
+            function getActiveBannerPhase(now) {
+                const nowMs = now.getTime();
+                const j = state.jadwal.today;
+                const dhuhaTime = (j && TIME_RE.test(j.dhuha || "")) ? j.dhuha : "06:18";
+                const dzuhurTime = (j && TIME_RE.test(j.dzuhur || "")) ? j.dzuhur : "12:03";
+
+                if (previewState && nowMs < previewState.endMs) {
+                    return {
+                        name: previewState.name,
+                        type: previewState.type,
+                        startMs: previewState.startMs,
+                        endMs: previewState.endMs,
+                        totalSec: previewState.totalSec,
+                        dhuhaTime,
+                        dzuhurTime
+                    };
+                }
+
+                if (!j) return null;
+
+                let matched = null;
+                for (const p of PHASES) {
+                    const hhmm = j[p.key];
+                    if (!hhmm || !TIME_RE.test(hhmm)) continue;
+                    const startMs = at(now, hhmm).getTime();
+                    const endMs = startMs + PHASE_DURATION_SEC * 1000;
+                    if (nowMs >= startMs && nowMs < endMs) {
+                        const isFriday = now.getDay() === 5;
+                        const displayName = (p.name === "DZUHUR" && isFriday) ? "JUM'AT" : p.name;
+                        matched = {
+                            name: displayName,
+                            type: p.type,
+                            startMs,
+                            endMs,
+                            totalSec: PHASE_DURATION_SEC,
+                            dhuhaTime,
+                            dzuhurTime
+                        };
+                    }
+                }
+                return matched;
+            }
+
+            function renderBanner(now) {
+                const banner = $("haramBanner"),
+                    box = $("haramStatus"),
+                    topEl = $("hsTop"),
+                    nameEl = $("hsName"),
+                    barEl = $("hsBarFill"),
+                    botEl = $("hsBottom");
+                if (!banner || !box) return;
+
+                const phase = getActiveBannerPhase(now);
+                if (!phase) {
+                    banner.classList.remove("is-active");
+                    box.hidden = true;
+                    box.classList.remove("is-syuruq", "is-dhuha", "is-blinking");
+                    return;
+                }
+
+                const remainFloatSec = Math.max(0, (phase.endMs - now.getTime()) / 1000);
+                const remainSec = Math.ceil(remainFloatSec);
+                const progressPct = Math.min(100, Math.max(0, ((phase.totalSec - remainFloatSec) / phase.totalSec) * 100));
+
+                const isSyuruq = phase.name === "SYURUQ";
+                const isDhuha = phase.name === "DHUHA";
+                const isBlinking = !isDhuha && remainSec <= 10 && remainSec > 0;
+
+                let topLabel = "WAKTU";
+                if (phase.type === "adzan") {
+                    topLabel = "WAKTUNYA ADZAN";
+                } else if (isDhuha) {
+                    topLabel = "WAKTU SHOLAT SUNAH";
+                } else if (isSyuruq) {
+                    topLabel = "WAKTU SYURUQ";
+                }
+
+                const mainTitle = isSyuruq ? "MENUJU SHOLAT SUNAH SYURUQ" : phase.name;
+                const bottomText = isDhuha ? `${phase.dhuhaTime} s/d ${phase.dzuhurTime}` : fmtMMSS(remainSec);
+
+                banner.classList.add("is-active");
+                box.hidden = false;
+                box.classList.toggle("is-syuruq", isSyuruq);
+                box.classList.toggle("is-dhuha", isDhuha);
+                box.classList.toggle("is-blinking", isBlinking);
+
+                if (topEl.textContent !== topLabel) topEl.textContent = topLabel;
+                if (nameEl.textContent !== mainTitle) nameEl.textContent = mainTitle;
+                barEl.style.width = `${progressPct.toFixed(2)}%`;
+                if (botEl.textContent !== bottomText) botEl.textContent = bottomText;
+            }
+
+            let lastNextKey = null;
+
             function renderGrid() {
                 const box = $("prayerGrid");
                 const j = state.jadwal.today;
@@ -499,6 +655,7 @@
                     return;
                 }
                 const nx = nextPrayer();
+                lastNextKey = nx ? `${nx.key}:${nx.off}` : "";
                 box.innerHTML = CARDS.map(([key, label]) => {
                     const active = nx && nx.key === key;
                     const badge = active ? (nx.off === 1 ? "besok" : "berikutnya") : "";
@@ -512,13 +669,19 @@
             }
 
             function tick() {
+                const now = new Date();
                 const nx = nextPrayer();
+                const curNextKey = nx ? `${nx.key}:${nx.off}` : "";
+                if (state.jadwal.today && lastNextKey !== null && curNextKey !== lastNextKey) {
+                    renderGrid();
+                }
                 document.querySelectorAll("[data-cd-label]").forEach(el =>
                     el.textContent = nx ? `Menuju Salat ${nx.label}` : "Menunggu jadwal");
                 document.querySelectorAll("[data-cd-time]").forEach(el =>
                     el.textContent = nx ? nx.time.toTimeString().slice(0, 5) : "--:--");
                 document.querySelectorAll("[data-cd-remain]").forEach(el =>
-                    el.textContent = nx ? fmtRemain(nx.time - Date.now()) : "--:--:--");
+                    el.textContent = nx ? fmtRemain(nx.time - now.getTime()) : "--:--:--");
+                renderBanner(now);
             }
 
             const HIJRI_MONTHS = [
@@ -558,8 +721,11 @@
                 return `${day} ${HIJRI_MONTHS[(month - 1) % 12]} ${year} H`;
             }
 
+            let lastDayKey = "";
+
             function updateDates() {
                 const d = new Date();
+                const dayKey = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
                 $("gregDate").textContent = d.toLocaleDateString("id-ID", {
                     weekday: "long",
                     day: "numeric",
@@ -567,6 +733,10 @@
                     year: "numeric"
                 });
                 $("hijriDate").textContent = hijriString(d);
+                if (lastDayKey && lastDayKey !== dayKey && state.city) {
+                    loadJadwal(state.city[4]);
+                }
+                lastDayKey = dayKey;
             }
 
             async function loadJadwal(cityId) {
@@ -668,6 +838,10 @@
                     const c = CITIES.find(x => x[1] === saved.name && x[0] === saved.prov) || nearestCity(saved.lat,
                         saved.lon);
                     setLocation(saved.lat, saved.lon, c, false);
+                } else if (previewState) {
+                    const pku = CITIES.find(x => x[1] === "Kota Pekanbaru") || CITIES[0];
+                    setLocation(pku[2], pku[3], pku, false);
+                    setTab("sholat");
                 } else {
                     setTab("pengaturan");
                     say("Pilih provinsi &amp; kab/kota, atau tekan <b>Lokasi Saya</b>.", 12000);

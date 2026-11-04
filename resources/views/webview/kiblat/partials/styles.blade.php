@@ -159,6 +159,11 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(180deg, rgba(3, 32, 60, .06) 0%, rgba(3, 32, 60, 0) 42%, rgba(3, 32, 60, .55) 100%);
+            transition: background .25s ease;
+        }
+
+        .haram.is-active::after {
+            background: linear-gradient(180deg, rgba(3, 18, 34, .74) 0%, rgba(3, 18, 34, .82) 100%);
         }
 
         .haram figcaption {
@@ -172,6 +177,126 @@
             text-transform: uppercase;
             color: rgba(255, 255, 255, .94);
             text-shadow: 0 1px 8px rgba(0, 0, 0, .65);
+            transition: opacity .2s ease;
+        }
+
+        .haram.is-active figcaption {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .haram-status {
+            position: absolute;
+            inset: 0;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            text-align: center;
+        }
+
+        .haram-status[hidden] {
+            display: none;
+        }
+
+        .hs-top {
+            font-size: clamp(.60rem, 1.55dvh, .80rem);
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .82);
+            line-height: 1.15;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, .45);
+        }
+
+        .haram-status.is-syuruq .hs-top,
+        .haram-status.is-dhuha .hs-top {
+            letter-spacing: .10em;
+        }
+
+        .hs-name {
+            font-size: clamp(1.30rem, 3.8dvh, 2.15rem);
+            font-weight: 900;
+            letter-spacing: .10em;
+            text-transform: uppercase;
+            color: #ffffff;
+            line-height: 1.05;
+            margin-top: clamp(3px, .6dvh, 6px);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, .55);
+            max-width: 100%;
+        }
+
+        .haram-status.is-syuruq .hs-name {
+            font-size: clamp(.78rem, 2.05dvh, 1.12rem);
+            letter-spacing: .05em;
+            line-height: 1.15;
+        }
+
+        .hs-bar-track {
+            width: min(82%, 280px);
+            height: clamp(8px, 1.45dvh, 13px);
+            background: rgba(255, 255, 255, .22);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: clamp(7px, 1.4dvh, 14px);
+            flex-shrink: 0;
+        }
+
+        .haram-status.is-syuruq .hs-bar-track {
+            width: min(88%, 310px);
+        }
+
+        .hs-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #ffd600;
+            border-radius: 999px;
+            transition: width .35s linear;
+        }
+
+        .hs-bottom {
+            font-family: "JetBrainsMono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: clamp(1.45rem, 4.3dvh, 2.45rem);
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+            margin-top: clamp(6px, 1.15dvh, 11px);
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, .55);
+        }
+
+        .haram-status.is-dhuha .hs-bottom {
+            font-size: clamp(.92rem, 2.4dvh, 1.32rem);
+            letter-spacing: .04em;
+            white-space: nowrap;
+        }
+
+        @keyframes hsBlinkBar {
+            0%, 49.9% {
+                background-color: #ef4444;
+            }
+            50%, 100% {
+                background-color: #ffd600;
+            }
+        }
+
+        @keyframes hsBlinkText {
+            0%, 49.9% {
+                color: #ef4444;
+            }
+            50%, 100% {
+                color: #ffd600;
+            }
+        }
+
+        .haram-status.is-blinking .hs-bar-fill {
+            animation: hsBlinkBar 1s steps(1, end) infinite;
+        }
+
+        .haram-status.is-blinking .hs-bottom {
+            animation: hsBlinkText 1s steps(1, end) infinite;
         }
 
         .grid-head {

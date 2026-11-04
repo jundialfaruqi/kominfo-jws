@@ -15,10 +15,18 @@
                     </div>
                 </div>
 
-                <figure class="haram">
+                <figure class="haram" id="haramBanner">
                     <img src="@include('webview.kiblat.partials.haram-image-data')"
                         alt="Masjidil Haram, Makkah" />
-                    <figcaption>Masjidil Haram · Makkah</figcaption>
+                    <div class="haram-status" id="haramStatus" hidden>
+                        <div class="hs-top" id="hsTop">WAKTUNYA ADZAN</div>
+                        <div class="hs-name" id="hsName">MAGHRIB</div>
+                        <div class="hs-bar-track">
+                            <div class="hs-bar-fill" id="hsBarFill"></div>
+                        </div>
+                        <div class="hs-bottom" id="hsBottom">04:00</div>
+                    </div>
+                    <figcaption id="haramCaption">Masjidil Haram · Makkah</figcaption>
                 </figure>
 
                 <div class="grid-head">
