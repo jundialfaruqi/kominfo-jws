@@ -30,7 +30,7 @@ class MarqueeObserver
         $changedTextSlots = [];
         for ($i = 1; $i <= 6; $i++) {
             $field = 'marquee' . $i;
-            if ($marquee->wasChanged($field)) {
+            if (MasjidActivityLogger::hasFieldActuallyChanged($marquee, $field, 'string')) {
                 $changedTextSlots[] = 'Teks ' . $i;
             }
         }
@@ -39,8 +39,8 @@ class MarqueeObserver
         if (!empty($changedTextSlots)) {
             $parts[] = 'mengubah isi Teks Berjalan (' . implode(', ', $changedTextSlots) . ')';
         }
-        if ($marquee->wasChanged('marquee_speed')) {
-            $parts[] = 'mengubah kecepatan Teks Berjalan menjadi ' . $marquee->marquee_speed;
+        if (MasjidActivityLogger::hasFieldActuallyChanged($marquee, 'marquee_speed', 'float')) {
+            $parts[] = 'mengubah kecepatan Teks Berjalan menjadi ' . (float) $marquee->marquee_speed;
         }
 
         if (!empty($parts)) {

@@ -24,8 +24,12 @@ class AgendaObserver
             return;
         }
 
-        if ($agenda->wasChanged(['name', 'date', 'aktif', 'id_masjid'])) {
-            if ($agenda->wasChanged('aktif') && !$agenda->wasChanged(['name', 'date'])) {
+        $nameChanged = MasjidActivityLogger::hasFieldActuallyChanged($agenda, 'name', 'string');
+        $dateChanged = MasjidActivityLogger::hasFieldActuallyChanged($agenda, 'date', 'string');
+        $aktifChanged = MasjidActivityLogger::hasFieldActuallyChanged($agenda, 'aktif', 'bool');
+
+        if ($nameChanged || $dateChanged || $aktifChanged) {
+            if ($aktifChanged && !$nameChanged && !$dateChanged) {
                 $statusText = $agenda->aktif ? 'Mengaktifkan' : 'Menonaktifkan';
                 $description = $statusText . ' agenda: "' . $name . '"';
             } else {

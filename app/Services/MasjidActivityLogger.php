@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\MasjidActivityLog;
 use App\Models\Profil;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -23,6 +24,34 @@ class MasjidActivityLogger
      * @var array<string, int>
      */
     private static array $recentSignatures = [];
+
+    /**
+     * Memeriksa apakah nilai suatu kolom benar-benar berubah secara nilai (bukan sekadar perbedaan tipe data
+     * seperti string DECIMAL "1.50" dari MySQL vs float 1.5 dari PHP, atau int 1 vs bool true).
+     */
+    public static function hasFieldActuallyChanged(Model $model, string $field, string $type = 'string'): bool
+    {
+        if (!$model->wasChanged($field)) {
+            return false;
+        }
+
+        $previous = method_exists($model, 'getPrevious') ? $model->getPrevious() : [];
+        $old = array_key_exists($field, $previous)
+            ? $previous[$field]
+            : $model->getRawOriginal($field);
+        $new = $model->getAttribute($field);
+
+        if ($old === null && $new === null) {
+            return false;
+        }
+
+        return match ($type) {
+            'float' => round((float) ($old ?? 0), 4) !== round((float) ($new ?? 0), 4),
+            'int'   => (int) ($old ?? 0) !== (int) ($new ?? 0),
+            'bool'  => (bool) ($old ?? false) !== (bool) ($new ?? false),
+            default => trim((string) ($old ?? '')) !== trim((string) ($new ?? '')),
+        };
+    }
 
     /**
      * Rekam aktivitas masjid secara aman (fail-safe).
@@ -123,4 +152,3 @@ class MasjidActivityLogger
         return self::$tableExists;
     }
 }
-

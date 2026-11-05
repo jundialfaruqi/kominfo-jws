@@ -53,7 +53,7 @@ class JumbotronMasjidObserver
         if (!empty($deletedSlots)) {
             $parts[] = 'menghapus gambar Jumbotron Masjid (' . implode(', ', $deletedSlots) . ')';
         }
-        if ($jumbotronMasjid->wasChanged('aktif')) {
+        if (MasjidActivityLogger::hasFieldActuallyChanged($jumbotronMasjid, 'aktif', 'bool')) {
             $parts[] = $jumbotronMasjid->aktif
                 ? 'mengaktifkan tampilan Jumbotron Masjid'
                 : 'menonaktifkan tampilan Jumbotron Masjid';

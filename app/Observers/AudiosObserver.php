@@ -49,7 +49,7 @@ class AudiosObserver
         if (!empty($deletedSlots)) {
             $parts[] = 'menghapus file ' . implode(', ', $deletedSlots);
         }
-        if ($audios->wasChanged('status')) {
+        if (MasjidActivityLogger::hasFieldActuallyChanged($audios, 'status', 'bool')) {
             $parts[] = $audios->status
                 ? 'mengaktifkan pemutaran Audio Murottal'
                 : 'menonaktifkan pemutaran Audio Murottal';

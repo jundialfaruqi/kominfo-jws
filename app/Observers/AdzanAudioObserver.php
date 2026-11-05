@@ -33,7 +33,7 @@ class AdzanAudioObserver
                 : 'mengubah file Audio Adzan Shubuh';
         }
 
-        if ($adzanAudio->wasChanged('status')) {
+        if (MasjidActivityLogger::hasFieldActuallyChanged($adzanAudio, 'status', 'bool')) {
             $parts[] = $adzanAudio->status
                 ? 'mengaktifkan pemutaran Audio Adzan'
                 : 'menonaktifkan pemutaran Audio Adzan';
