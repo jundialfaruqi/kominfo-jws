@@ -7,8 +7,22 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="card-title">Daftar TV Terhubung</h3>
                     <div class="w-25">
-                        <input type="text" class="form-control rounded-3" placeholder="Cari kode/masjid..."
-                            wire:model.live="search">
+                        <input type="search" class="form-control rounded-3"
+                            placeholder="Cari kode/masjid (min. 3 huruf)..." autocomplete="off"
+                            value="{{ $search }}"
+                            x-data
+                            x-on:input.debounce.500ms="
+                                const val = $el.value.trim();
+                                if (val.length >= 3) {
+                                    $wire.set('search', val).then(() => {
+                                        if (window.syncMonitorTvBadges) window.syncMonitorTvBadges();
+                                    });
+                                } else if ($wire.search !== '') {
+                                    $wire.set('search', '').then(() => {
+                                        if (window.syncMonitorTvBadges) window.syncMonitorTvBadges();
+                                    });
+                                }
+                            ">
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -16,7 +30,7 @@
 
                         <tbody>
                             @forelse ($devices->groupBy(fn($d) => $d->profil->name ?? 'Tanpa Profil Masjid') as $masjidName => $groupedDevices)
-                                <tr class="table-light">
+                                <tr class="table-light" wire:key="group-title-{{ md5($masjidName) }}">
                                     <td colspan="6" class="text-primary" style="background-color: #f4f6fa;">
                                         <div class="d-flex flex-column">
                                             <div class="fw-bold text-uppercase">
@@ -30,7 +44,8 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr class="text-muted small" style="background-color: #fcfcfc;">
+                                <tr class="text-muted small" style="background-color: #fcfcfc;"
+                                    wire:key="group-head-{{ md5($masjidName) }}">
                                     <th class="fw-bold">Status</th>
                                     <th class="fw-bold">Device ID</th>
                                     <th class="fw-bold">Kode Aktivasi</th>
@@ -41,7 +56,7 @@
                                 @foreach ($groupedDevices as $device)
                                     <tr wire:key="device-row-{{ $device->id }}">
                                         <td>
-                                            <span id="status-badge-{{ $device->device_id }}"
+                                            <span wire:ignore id="status-badge-{{ $device->device_id }}"
                                                 data-device-id="{{ $device->device_id }}"
                                                 class="badge bg-secondary text-secondary-fg">
                                                 <span class="status-dot me-1">●</span> Memeriksa...
@@ -117,10 +132,9 @@
                 const badge = document.getElementById(`status-badge-${deviceId}`);
                 if (!badge) return;
 
-                const targetState = isOnline ? 'online' : 'offline';
-                if (badge.getAttribute('data-status-state') === targetState) return;
+                const targetClass = isOnline ? 'bg-success' : 'bg-danger';
+                if (badge.classList.contains(targetClass)) return;
 
-                badge.setAttribute('data-status-state', targetState);
                 if (isOnline) {
                     badge.className = 'badge bg-success text-success-fg';
                     badge.innerHTML = '<span class="status-dot me-1">●</span> Online';
@@ -132,6 +146,7 @@
 
             let pusherInstance = null;
             const subscribedChannels = new Map();
+            const deviceOnlineState = new Map();
 
             if (typeof Pusher !== 'undefined') {
                 pusherInstance = new Pusher(PUSHER_KEY, {
@@ -185,12 +200,18 @@
                 }
 
                 currentDeviceIds.forEach(deviceId => {
-                    // Jika channel sudah pernah di-subscribe (mis. kembali ke halaman sebelumnya),
-                    // langsung terapkan status terakhir dari daftar member channel
+                    // Jika deviceId sudah pernah di-subscribe (mis. saat hasil pencarian muncul atau pindah halaman),
+                    // langsung terapkan status terakhir yang tersimpan di deviceOnlineState
                     if (subscribedChannels.has(deviceId)) {
-                        const existingChannel = subscribedChannels.get(deviceId);
-                        if (existingChannel && existingChannel.subscribed && existingChannel.members) {
-                            setBadge(deviceId, existingChannel.members.count > 1);
+                        if (deviceOnlineState.has(deviceId)) {
+                            setBadge(deviceId, deviceOnlineState.get(deviceId));
+                        } else {
+                            const existingChannel = subscribedChannels.get(deviceId);
+                            if (existingChannel && existingChannel.members && typeof existingChannel.members.count === 'number') {
+                                const isOnline = existingChannel.members.count > 1;
+                                deviceOnlineState.set(deviceId, isOnline);
+                                setBadge(deviceId, isOnline);
+                            }
                         }
                         return;
                     }
@@ -200,24 +221,31 @@
                     subscribedChannels.set(deviceId, channel);
 
                     channel.bind('pusher:subscription_succeeded', members => {
-                        const count = members.count;
-                        setBadge(deviceId, count > 1); // admin sendiri = 1
+                        const isOnline = members.count > 1; // admin sendiri = 1
+                        deviceOnlineState.set(deviceId, isOnline);
+                        setBadge(deviceId, isOnline);
                     });
 
                     channel.bind('pusher:member_added', () => {
+                        deviceOnlineState.set(deviceId, true);
                         setBadge(deviceId, true);
                     });
 
                     channel.bind('pusher:member_removed', () => {
                         const count = channel.members ? channel.members.count : 0;
-                        setBadge(deviceId, count > 1);
+                        const isOnline = count > 1;
+                        deviceOnlineState.set(deviceId, isOnline);
+                        setBadge(deviceId, isOnline);
                     });
 
                     channel.bind('pusher:subscription_error', () => {
+                        deviceOnlineState.set(deviceId, false);
                         setBadge(deviceId, false);
                     });
                 });
             }
+
+            window.syncMonitorTvBadges = syncDevicePresenceSubscriptions;
 
             // Jalankan saat halaman pertama kali dimuat
             syncDevicePresenceSubscriptions();
@@ -237,6 +265,11 @@
             if (typeof Livewire !== 'undefined' && typeof Livewire.hook === 'function') {
                 Livewire.hook('morph.updated', () => {
                     syncDevicePresenceSubscriptions();
+                });
+                Livewire.hook('commit', ({ succeed }) => {
+                    succeed(() => {
+                        setTimeout(syncDevicePresenceSubscriptions, 50);
+                    });
                 });
             }
         </script>

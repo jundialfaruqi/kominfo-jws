@@ -7,6 +7,7 @@ use Livewire\WithPagination;
 use App\Models\DevicePairing;
 use App\Events\DeviceUnpairedEvent;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 
 class Monitor extends Component
 {
@@ -14,6 +15,8 @@ class Monitor extends Component
 
     #[Title('Monitor TV Masjid')]
     protected $paginationTheme = 'bootstrap';
+
+    #[Url(except: '')]
     public $search = '';
 
     public function updatingSearch()
@@ -36,14 +39,16 @@ class Monitor extends Component
 
     public function render()
     {
+        $keyword = trim((string) $this->search);
+
         $devices = DevicePairing::select('device_pairings.*')
             ->leftJoin('profils', 'device_pairings.profil_id', '=', 'profils.id')
             ->with('profil')
             ->where('device_pairings.status', 'linked')
-            ->where(function ($query) {
-                if (!empty($this->search)) {
-                    $query->where('device_pairings.pairing_code', 'like', '%' . $this->search . '%')
-                          ->orWhere('profils.name', 'like', '%' . $this->search . '%');
+            ->where(function ($query) use ($keyword) {
+                if (strlen($keyword) >= 3) {
+                    $query->where('device_pairings.pairing_code', 'like', '%' . $keyword . '%')
+                          ->orWhere('profils.name', 'like', '%' . $keyword . '%');
                 }
             })
             ->orderBy('profils.name', 'asc')
