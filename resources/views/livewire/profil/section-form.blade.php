@@ -440,17 +440,23 @@
                     return reject(new Error('Canvas 2D tidak didukung di browser ini.'));
                 }
 
-                const getBlob = (size, q) => {
+                const getBlob = (size, q, mimeType) => {
                     return new Promise((res) => {
                         canvas.width = size;
                         canvas.height = size;
                         ctx.imageSmoothingEnabled = true;
                         ctx.imageSmoothingQuality = 'high';
-                        ctx.clearRect(0, 0, size, size);
+                        if (mimeType === 'image/jpeg') {
+                            // Isi background putih untuk JPEG agar area transparan (mis. PNG) tidak menjadi hitam di Safari
+                            ctx.fillStyle = '#ffffff';
+                            ctx.fillRect(0, 0, size, size);
+                        } else {
+                            ctx.clearRect(0, 0, size, size);
+                        }
                         ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, size, size);
                         canvas.toBlob((blob) => {
                             res(blob);
-                        }, 'image/webp', q);
+                        }, mimeType, q);
                     });
                 };
 
@@ -459,14 +465,32 @@
                 (async () => {
                     try {
                         let quality = 0.85;
+                        let targetMime = 'image/webp';
+                        let targetExt = 'webp';
+                        let formatLabel = 'WebP';
+
                         if (typeof onProgress === 'function') {
                             onProgress(30, 'Mengompres gambar ke WebP (maks 70KB)...');
                         }
                         await nextFrame();
 
-                        let blob = await getBlob(curSize, quality);
+                        let blob = await getBlob(curSize, quality, targetMime);
+
+                        // Antisipasi Safari: jika browser tidak mendukung encoding WebP (mengembalikan image/png atau null),
+                        // otomatis konversi dan kompres ke JPEG (image/jpeg) di sisi client
                         if (!blob || blob.type !== 'image/webp') {
-                            return reject(new Error('Browser tidak mendukung encoding WebP.'));
+                            targetMime = 'image/jpeg';
+                            targetExt = 'jpg';
+                            formatLabel = 'JPEG';
+                            if (typeof onProgress === 'function') {
+                                onProgress(32, 'Safari terdeteksi: Mengonversi & mengompres ke JPEG (maks 70KB)...');
+                            }
+                            await nextFrame();
+                            blob = await getBlob(curSize, quality, targetMime);
+                        }
+
+                        if (!blob || (blob.type !== 'image/webp' && blob.type !== 'image/jpeg')) {
+                            return reject(new Error('Browser tidak mendukung kompresi Canvas WebP/JPEG.'));
                         }
 
                         // Tahap 1: Turunkan kualitas bertahap jika ukuran masih > 70KB
@@ -475,11 +499,11 @@
                             quality = Math.max(0.20, +(quality - 0.10).toFixed(2));
                             step++;
                             if (typeof onProgress === 'function') {
-                                const prog = Math.min(50, 30 + step * 4);
-                                onProgress(prog, `Mengompres kualitas WebP (${formatLogoFileSize(blob.size)})...`);
+                                const prog = Math.min(50, 32 + step * 4);
+                                onProgress(prog, `Mengompres kualitas ${formatLabel} (${formatLogoFileSize(blob.size)})...`);
                             }
                             await nextFrame();
-                            blob = await getBlob(curSize, quality);
+                            blob = await getBlob(curSize, quality, targetMime);
                         }
 
                         // Tahap 2: Jika masih > 70KB, turunkan resolusi secara bertahap
@@ -491,34 +515,35 @@
 
                             if (typeof onProgress === 'function') {
                                 const prog = Math.min(68, 50 + attempts * 2);
-                                onProgress(prog, `Menyesuaikan dimensi ${curSize}x${curSize}px...`);
+                                onProgress(prog, `Menyesuaikan dimensi ${formatLabel} ${curSize}x${curSize}px...`);
                             }
                             await nextFrame();
 
-                            blob = await getBlob(curSize, quality);
+                            blob = await getBlob(curSize, quality, targetMime);
                             while (blob && blob.size > maxSizeBytes && quality > 0.25) {
                                 quality = Math.max(0.20, +(quality - 0.12).toFixed(2));
-                                blob = await getBlob(curSize, quality);
+                                blob = await getBlob(curSize, quality, targetMime);
                             }
                         }
 
-                        if (!blob || blob.type !== 'image/webp' || blob.size > maxSizeBytes) {
+                        if (!blob || blob.size > maxSizeBytes) {
                             return reject(new Error('Hasil kompresi di browser masih melebihi 70KB.'));
                         }
 
                         if (typeof onProgress === 'function') {
-                            onProgress(70, 'Kompresi selesai, mengunggah ke server...');
+                            onProgress(70, `Kompresi ${formatLabel} selesai, mengunggah ke server...`);
                         }
 
                         const originalName = file.name.replace(/\.[^/.]+$/, '');
                         const safeName = originalName.replace(/[^a-zA-Z0-9_-]/g, '_');
-                        const webpFile = new File([blob], `${safeName || 'logo'}.webp`, {
-                            type: 'image/webp',
+                        const outputFile = new File([blob], `${safeName || 'logo'}.${targetExt}`, {
+                            type: targetMime,
                             lastModified: Date.now()
                         });
 
                         resolve({
-                            file: webpFile,
+                            file: outputFile,
+                            formatLabel,
                             originalSize: file.size,
                             compressedSize: blob.size,
                             width: curSize,
@@ -587,13 +612,14 @@
             .then((result) => {
                 const {
                     file: compressedFile,
+                    formatLabel = 'WebP',
                     originalSize,
                     compressedSize
                 } = result;
                 const origFormatted = formatLogoFileSize(originalSize);
                 const compFormatted = formatLogoFileSize(compressedSize);
 
-                updateLogoProgressUI(propertyName, 72, `Mengunggah WebP (${compFormatted}) ke server...`, 'bg-primary');
+                updateLogoProgressUI(propertyName, 72, `Mengunggah ${formatLabel} (${compFormatted}) ke server...`, 'bg-primary');
 
                 component.upload(
                     propertyName,
@@ -606,7 +632,7 @@
                                 statusEl.className = 'small text-success mt-1';
                                 statusEl.style.display = 'block';
                                 statusEl.innerHTML =
-                                    `✓ Berhasil dikompres ke WebP: <strong>${compFormatted}</strong> (dari ${origFormatted})`;
+                                    `✓ Berhasil dikompres ke ${formatLabel}: <strong>${compFormatted}</strong> (dari ${origFormatted})`;
                             }
                         }, 250);
                         inputEl.classList.remove('is-invalid');
@@ -628,7 +654,7 @@
                         updateLogoProgressUI(
                             propertyName,
                             totalPercent,
-                            `Mengunggah WebP (${compFormatted}) ${uploadPercent}%...`,
+                            `Mengunggah ${formatLabel} (${compFormatted}) ${uploadPercent}%...`,
                             'bg-primary'
                         );
                     }

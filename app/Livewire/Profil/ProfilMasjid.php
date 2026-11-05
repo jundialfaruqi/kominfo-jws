@@ -280,9 +280,9 @@ class ProfilMasjid extends Component
     }
 
     /**
-     * Memastikan file logo sudah berupa WebP dengan ukuran <= 70KB.
-     * Jika sudah dikompresi oleh client browser (WebP <= 70KB), server tidak melakukan kompresi ulang.
-     * Jika kompresi di client browser gagal (ukuran > 70KB atau bukan WebP), server melakukan kompresi fallback.
+     * Memastikan file logo sudah terkompresi (WebP atau JPEG fallback Safari) dengan ukuran <= 70KB.
+     * Jika sudah dikompresi oleh client browser (WebP/JPEG <= 70KB), server tidak melakukan kompresi ulang.
+     * Jika kompresi di client browser gagal (ukuran > 70KB atau format lain), server melakukan kompresi fallback.
      */
     private function ensureClientOrServerCompressed(string $field): void
     {
@@ -300,8 +300,12 @@ class ProfilMasjid extends Component
         $fileSize = filesize($realPath);
         $mimeType = strtolower((string) $uploadedFile->getMimeType());
 
-        // Jika sudah dikompresi dari browser (<= 70KB dan format WebP), lewati kompresi server
-        if ($fileSize !== false && $fileSize <= self::MAX_LOGO_SIZE_BYTES && $mimeType === 'image/webp') {
+        // Jika sudah dikompresi dari browser (<= 70KB dan format WebP atau JPEG dari Safari), lewati kompresi server
+        if (
+            $fileSize !== false &&
+            $fileSize <= self::MAX_LOGO_SIZE_BYTES &&
+            in_array($mimeType, ['image/webp', 'image/jpeg', 'image/jpg'], true)
+        ) {
             return;
         }
 
@@ -392,10 +396,16 @@ class ProfilMasjid extends Component
             $fileSize = filesize($realPath);
             $mimeType = strtolower((string) $uploadedFile->getMimeType());
 
-            // Generate nama file dengan ekstensi .webp
             $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             $safeName = Str::slug($originalName) ?: 'logo';
-            $fileName = time() . '_' . $type . '_' . $safeName . '.webp';
+
+            // Tentukan ekstensi: .jpg jika hasil kompresi JPEG dari Safari, selain itu .webp
+            $isClientCompressed = $fileSize !== false
+                && $fileSize <= self::MAX_LOGO_SIZE_BYTES
+                && in_array($mimeType, ['image/webp', 'image/jpeg', 'image/jpg'], true);
+
+            $ext = ($isClientCompressed && in_array($mimeType, ['image/jpeg', 'image/jpg'], true)) ? 'jpg' : 'webp';
+            $fileName = time() . '_' . $type . '_' . $safeName . '.' . $ext;
             $filePath = public_path('images/logo/' . $fileName);
 
             // Pastikan directory ada
@@ -404,8 +414,8 @@ class ProfilMasjid extends Component
                 mkdir($directory, 0755, true);
             }
 
-            // Jika sudah dikompresi oleh client browser (WebP dan <= 70KB), langsung salin tanpa kompresi ulang di server
-            if ($fileSize !== false && $fileSize <= self::MAX_LOGO_SIZE_BYTES && $mimeType === 'image/webp') {
+            // Jika sudah dikompresi oleh client browser (WebP/JPEG dan <= 70KB), langsung salin tanpa kompresi ulang di server
+            if ($isClientCompressed) {
                 File::copy($realPath, $filePath);
             } else {
                 // Fallback: kompresi di sisi server jika kompresi client gagal / ukuran > 70KB
