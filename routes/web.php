@@ -111,6 +111,11 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     // Profile Routes
     Route::get('/profil-masjid', ProfilMasjid::class)->name('profilmasjid.index')->middleware('can:view-profil-masjid');
 
+    // Statistik & Aktivitas Masjid Routes
+    Route::get('/statistik-masjid', \App\Livewire\Statistik\Index::class)
+        ->name('statistik-masjid.index')
+        ->middleware('can:statistik-masjid-lihat');
+
     // Slider Routes
     Route::get('/slider-utama', Slide::class)->name('slide.index');
 

@@ -14,13 +14,30 @@ use App\Models\GroupCategory;
 use App\Policies\GroupCategoryPolicy;
 use App\Models\Petugas;
 use App\Models\Slides;
+use App\Models\Profil;
+use App\Models\Marquee;
+use App\Models\DevicePairing;
+use App\Models\User;
+use App\Models\Audios;
+use App\Models\AdzanAudio;
+use App\Models\JumbotronMasjid;
+use App\Models\Adzan;
+use App\Models\Agenda;
+use App\Models\Durasi;
 use App\Observers\PetugasObserver;
 use App\Observers\SlidesObserver;
 use App\Observers\LaporanObserver;
-use App\Models\Profil;
 use App\Observers\ProfilObserver;
-use App\Models\Marquee;
 use App\Observers\MarqueeObserver;
+use App\Observers\DevicePairingObserver;
+use App\Observers\UserObserver;
+use App\Observers\GroupCategoryObserver;
+use App\Observers\AudiosObserver;
+use App\Observers\AdzanAudioObserver;
+use App\Observers\JumbotronMasjidObserver;
+use App\Observers\AdzanObserver;
+use App\Observers\AgendaObserver;
+use App\Observers\DurasiObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,12 +71,21 @@ class AppServiceProvider extends ServiceProvider
         // Register policy untuk GroupCategory
         Gate::policy(GroupCategory::class, GroupCategoryPolicy::class);
 
-        // Register observers untuk aktivitas user
+        // Register observers untuk aktivitas masjid & user
         Petugas::observe(PetugasObserver::class);
         Slides::observe(SlidesObserver::class);
         Laporan::observe(LaporanObserver::class);
         Profil::observe(ProfilObserver::class);
         Marquee::observe(MarqueeObserver::class);
+        DevicePairing::observe(DevicePairingObserver::class);
+        User::observe(UserObserver::class);
+        GroupCategory::observe(GroupCategoryObserver::class);
+        Audios::observe(AudiosObserver::class);
+        AdzanAudio::observe(AdzanAudioObserver::class);
+        JumbotronMasjid::observe(JumbotronMasjidObserver::class);
+        Adzan::observe(AdzanObserver::class);
+        Agenda::observe(AgendaObserver::class);
+        Durasi::observe(DurasiObserver::class);
 
         // Set locale Carbon ke bahasa Indonesia untuk diffForHumans()
         Carbon::setLocale('id');

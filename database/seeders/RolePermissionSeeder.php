@@ -45,6 +45,9 @@ class RolePermissionSeeder extends Seeder
             'edit-profil-masjid',
             'delete-profil-masjid',
 
+            // Statistik & Aktivitas Masjid
+            'statistik-masjid-lihat',
+
             // Jumbotron Management
             'view-jumbotron',
             'create-jumbotron',
@@ -98,6 +101,7 @@ class RolePermissionSeeder extends Seeder
             'create-profil-masjid',
             'edit-profil-masjid',
             'delete-profil-masjid',
+            'statistik-masjid-lihat',
             'view-jumbotron',
             'create-jumbotron',
             'edit-jumbotron',
@@ -119,6 +123,25 @@ class RolePermissionSeeder extends Seeder
         // Admin Masjid - basic permissions for their own content
         $userRole = Role::create(['name' => 'Admin Masjid']);
         $userRole->givePermissionTo([
+            'view-dashboard',
+            'view-group-category',
+            'view-profil-masjid',
+            'create-group-category',
+            'edit-group-category',
+            'delete-group-category',
+            'view-laporan-keuangan',
+            'create-laporan-keuangan',
+            'edit-laporan-keuangan',
+            'delete-laporan-keuangan',
+            'view-jumbotron-masjid',
+            'create-jumbotron-masjid',
+            'edit-jumbotron-masjid',
+            'delete-jumbotron-masjid',
+        ]);
+
+        // Admin OPD - basic permissions for their own content (OPD / Instansi)
+        $opdRole = Role::firstOrCreate(['name' => 'Admin OPD']);
+        $opdRole->givePermissionTo([
             'view-dashboard',
             'view-group-category',
             'view-profil-masjid',

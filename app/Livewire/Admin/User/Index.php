@@ -452,8 +452,8 @@ class Index extends Component
             // Super Admin can assign any role
             return Role::all();
         } elseif ($currentUserRole === 'Admin') {
-            // Admin can only assign User and Admin Masjid roles
-            return Role::whereIn('name', ['User', 'Admin Masjid'])->get();
+            // Admin can only assign User, Admin Masjid, and Admin OPD roles
+            return Role::whereIn('name', ['User', 'Admin Masjid', 'Admin OPD'])->get();
         }
 
         return collect([]);

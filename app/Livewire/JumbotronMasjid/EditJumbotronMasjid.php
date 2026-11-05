@@ -187,7 +187,8 @@ class EditJumbotronMasjid extends Component
             }
 
             if ($existing) {
-                ModelsJumbotronMasjid::where('id', $existing->id)->update([$field => null]);
+                $existing->$field = null;
+                $existing->save();
             }
 
             $this->$field = null;
