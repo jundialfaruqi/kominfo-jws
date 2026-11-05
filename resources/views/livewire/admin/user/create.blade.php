@@ -62,7 +62,7 @@
                     <div class="input-group">
                         <input wire:model="password" type="password" id="password-create"
                             class="form-control rounded-start-3 @error('password') is-invalid @enderror"
-                            placeholder="Masukkan Password">
+                            placeholder="Masukkan Password" autocomplete="new-password">
                         <button type="button" class="btn btn-outline-secondary rounded-end-3"
                             onclick="togglePassword('password-create', this)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"

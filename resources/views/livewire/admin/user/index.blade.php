@@ -178,9 +178,11 @@
                                             </svg>
                                             Cari
                                         </span>
-                                        <input wire:model.live="search" type="text"
+                                        <input wire:model.live="search" type="search" name="search_user_query"
                                             class="form-control rounded-end-4" placeholder="Ketik disini"
-                                            autocomplete="off" />
+                                            autocomplete="off" autocorrect="off" autocapitalize="off"
+                                            spellcheck="false" readonly
+                                            onfocus="this.removeAttribute('readonly');" />
                                     </div>
                                 </div>
                             </div>
