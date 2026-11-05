@@ -499,31 +499,127 @@
 
             /* ================= status banner adzan & alert (4 menit) ================= */
             const PHASE_DURATION_SEC = 240; // Hardcode 4 menit (240 detik)
-            const PHASES = [
-                { key: "imsak",   name: "IMSAK",   type: "alert" },
-                { key: "subuh",   name: "SHUBUH",  type: "adzan" },
-                { key: "terbit",  name: "SYURUQ",  type: "alert" },
-                { key: "dhuha",   name: "DHUHA",   type: "alert" },
-                { key: "dzuhur",  name: "DZUHUR",  type: "adzan" },
-                { key: "ashar",   name: "ASHAR",   type: "adzan" },
-                { key: "maghrib", name: "MAGHRIB", type: "adzan" },
-                { key: "isya",    name: "ISYA",    type: "adzan" }
+            const PHASES = [{
+                    key: "imsak",
+                    name: "IMSAK",
+                    type: "alert"
+                },
+                {
+                    key: "subuh",
+                    name: "SUBUH",
+                    type: "adzan"
+                },
+                {
+                    key: "terbit",
+                    name: "SYURUQ",
+                    type: "alert"
+                },
+                {
+                    key: "dhuha",
+                    name: "DHUHA",
+                    type: "alert"
+                },
+                {
+                    key: "dzuhur",
+                    name: "DZUHUR",
+                    type: "adzan"
+                },
+                {
+                    key: "ashar",
+                    name: "ASHAR",
+                    type: "adzan"
+                },
+                {
+                    key: "maghrib",
+                    name: "MAGHRIB",
+                    type: "adzan"
+                },
+                {
+                    key: "isya",
+                    name: "ISYA",
+                    type: "adzan"
+                }
             ];
 
             const PREVIEW_MAP = {
-                imsak:   { key: "imsak",   name: "IMSAK",   type: "alert", forceFriday: false },
-                subuh:   { key: "subuh",   name: "SHUBUH",  type: "adzan", forceFriday: false },
-                shubuh:  { key: "subuh",   name: "SHUBUH",  type: "adzan", forceFriday: false },
-                syuruq:  { key: "terbit",  name: "SYURUQ",  type: "alert", forceFriday: false },
-                shuruq:  { key: "terbit",  name: "SYURUQ",  type: "alert", forceFriday: false },
-                terbit:  { key: "terbit",  name: "SYURUQ",  type: "alert", forceFriday: false },
-                dhuha:   { key: "dhuha",   name: "DHUHA",   type: "alert", forceFriday: false },
-                dzuhur:  { key: "dzuhur",  name: "DZUHUR",  type: "adzan", forceFriday: false },
-                jumat:   { key: "dzuhur",  name: "JUM'AT",  type: "adzan", forceFriday: true  },
-                ashar:   { key: "ashar",   name: "ASHAR",   type: "adzan", forceFriday: false },
-                maghrib: { key: "maghrib", name: "MAGHRIB", type: "adzan", forceFriday: false },
-                adzan:   { key: "maghrib", name: "MAGHRIB", type: "adzan", forceFriday: false },
-                isya:    { key: "isya",    name: "ISYA",    type: "adzan", forceFriday: false }
+                imsak: {
+                    key: "imsak",
+                    name: "IMSAK",
+                    type: "alert",
+                    forceFriday: false
+                },
+                subuh: {
+                    key: "subuh",
+                    name: "SUBUH",
+                    type: "adzan",
+                    forceFriday: false
+                },
+                subuh: {
+                    key: "subuh",
+                    name: "SUBUH",
+                    type: "adzan",
+                    forceFriday: false
+                },
+                syuruq: {
+                    key: "terbit",
+                    name: "SYURUQ",
+                    type: "alert",
+                    forceFriday: false
+                },
+                shuruq: {
+                    key: "terbit",
+                    name: "SYURUQ",
+                    type: "alert",
+                    forceFriday: false
+                },
+                terbit: {
+                    key: "terbit",
+                    name: "SYURUQ",
+                    type: "alert",
+                    forceFriday: false
+                },
+                dhuha: {
+                    key: "dhuha",
+                    name: "DHUHA",
+                    type: "alert",
+                    forceFriday: false
+                },
+                dzuhur: {
+                    key: "dzuhur",
+                    name: "DZUHUR",
+                    type: "adzan",
+                    forceFriday: false
+                },
+                jumat: {
+                    key: "dzuhur",
+                    name: "JUM'AT",
+                    type: "adzan",
+                    forceFriday: true
+                },
+                ashar: {
+                    key: "ashar",
+                    name: "ASHAR",
+                    type: "adzan",
+                    forceFriday: false
+                },
+                maghrib: {
+                    key: "maghrib",
+                    name: "MAGHRIB",
+                    type: "adzan",
+                    forceFriday: false
+                },
+                adzan: {
+                    key: "maghrib",
+                    name: "MAGHRIB",
+                    type: "adzan",
+                    forceFriday: false
+                },
+                isya: {
+                    key: "isya",
+                    name: "ISYA",
+                    type: "adzan",
+                    forceFriday: false
+                }
             };
 
             const previewState = (function initPreview() {
@@ -533,9 +629,9 @@
                     if (!raw || !PREVIEW_MAP[raw]) return null;
                     const cfg = PREVIEW_MAP[raw];
                     const customSec = parseInt(params.get("sec") || "", 10);
-                    const remainSec = (!isNaN(customSec) && customSec > 0 && customSec <= PHASE_DURATION_SEC)
-                        ? customSec
-                        : PHASE_DURATION_SEC;
+                    const remainSec = (!isNaN(customSec) && customSec > 0 && customSec <= PHASE_DURATION_SEC) ?
+                        customSec :
+                        PHASE_DURATION_SEC;
                     const nowMs = Date.now();
                     const startMs = nowMs - (PHASE_DURATION_SEC - remainSec) * 1000;
                     const endMs = startMs + PHASE_DURATION_SEC * 1000;
@@ -614,7 +710,8 @@
 
                 const remainFloatSec = Math.max(0, (phase.endMs - now.getTime()) / 1000);
                 const remainSec = Math.ceil(remainFloatSec);
-                const progressPct = Math.min(100, Math.max(0, ((phase.totalSec - remainFloatSec) / phase.totalSec) * 100));
+                const progressPct = Math.min(100, Math.max(0, ((phase.totalSec - remainFloatSec) / phase.totalSec) *
+                    100));
 
                 const isSyuruq = phase.name === "SYURUQ";
                 const isDhuha = phase.name === "DHUHA";
