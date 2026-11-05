@@ -234,6 +234,34 @@
             line-height: 1.15;
         }
 
+        .hs-sub {
+            font-size: clamp(.58rem, 1.45dvh, .76rem);
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .86);
+            line-height: 1.15;
+            margin-top: clamp(2px, .5dvh, 5px);
+            text-shadow: 0 1px 6px rgba(0, 0, 0, .45);
+        }
+
+        .hs-sub[hidden] {
+            display: none;
+        }
+
+        .haram-status.is-imsak .hs-name {
+            font-size: clamp(1.18rem, 3.3dvh, 1.85rem);
+        }
+
+        .haram-status.is-imsak .hs-bar-track {
+            margin-top: clamp(5px, 1.1dvh, 10px);
+        }
+
+        .haram-status.is-imsak .hs-bottom {
+            font-size: clamp(1.30rem, 3.8dvh, 2.15rem);
+            margin-top: clamp(4px, .9dvh, 8px);
+        }
+
         .hs-bar-track {
             width: min(82%, 280px);
             height: clamp(8px, 1.45dvh, 13px);

@@ -21,6 +21,7 @@
                     <div class="haram-status" id="haramStatus" hidden>
                         <div class="hs-top" id="hsTop">WAKTUNYA ADZAN</div>
                         <div class="hs-name" id="hsName">MAGHRIB</div>
+                        <div class="hs-sub" id="hsSub" hidden>MENUJU ADZAN SHUBUH</div>
                         <div class="hs-bar-track">
                             <div class="hs-bar-fill" id="hsBarFill"></div>
                         </div>

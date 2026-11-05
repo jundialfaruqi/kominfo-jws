@@ -497,8 +497,10 @@
                 return [m, x].map(v => String(v).padStart(2, "0")).join(":");
             }
 
-            /* ================= status banner adzan & alert (4 menit) ================= */
-            const PHASE_DURATION_SEC = 240; // Hardcode 4 menit (240 detik)
+            /* ================= status banner adzan & alert ================= */
+            const PHASE_DURATION_SEC = 240; // Default 4 menit (240 detik)
+            const IMSAK_DURATION_SEC = 600; // Khusus Imsak 10 menit (600 detik)
+            const getPhaseDurationSec = key => key === "imsak" ? IMSAK_DURATION_SEC : PHASE_DURATION_SEC;
             const PHASES = [{
                     key: "imsak",
                     name: "IMSAK",
@@ -628,18 +630,19 @@
                     const raw = (params.get("preview") || "").trim().toLowerCase();
                     if (!raw || !PREVIEW_MAP[raw]) return null;
                     const cfg = PREVIEW_MAP[raw];
+                    const totalSec = getPhaseDurationSec(cfg.key);
                     const customSec = parseInt(params.get("sec") || "", 10);
-                    const remainSec = (!isNaN(customSec) && customSec > 0 && customSec <= PHASE_DURATION_SEC) ?
+                    const remainSec = (!isNaN(customSec) && customSec > 0 && customSec <= totalSec) ?
                         customSec :
-                        PHASE_DURATION_SEC;
+                        totalSec;
                     const nowMs = Date.now();
-                    const startMs = nowMs - (PHASE_DURATION_SEC - remainSec) * 1000;
-                    const endMs = startMs + PHASE_DURATION_SEC * 1000;
+                    const startMs = nowMs - (totalSec - remainSec) * 1000;
+                    const endMs = startMs + totalSec * 1000;
                     return {
                         ...cfg,
                         startMs,
                         endMs,
-                        totalSec: PHASE_DURATION_SEC
+                        totalSec
                     };
                 } catch (e) {
                     return null;
@@ -672,8 +675,9 @@
                 for (const p of PHASES) {
                     const hhmm = j[p.key];
                     if (!hhmm || !TIME_RE.test(hhmm)) continue;
+                    const totalSec = getPhaseDurationSec(p.key);
                     const startMs = at(now, hhmm).getTime();
-                    const endMs = startMs + PHASE_DURATION_SEC * 1000;
+                    const endMs = startMs + totalSec * 1000;
                     if (nowMs >= startMs && nowMs < endMs) {
                         const isFriday = now.getDay() === 5;
                         const displayName = (p.name === "DZUHUR" && isFriday) ? "JUM'AT" : p.name;
@@ -682,7 +686,7 @@
                             type: p.type,
                             startMs,
                             endMs,
-                            totalSec: PHASE_DURATION_SEC,
+                            totalSec,
                             dhuhaTime,
                             dzuhurTime
                         };
@@ -696,6 +700,7 @@
                     box = $("haramStatus"),
                     topEl = $("hsTop"),
                     nameEl = $("hsName"),
+                    subEl = $("hsSub"),
                     barEl = $("hsBarFill"),
                     botEl = $("hsBottom");
                 if (!banner || !box) return;
@@ -704,7 +709,8 @@
                 if (!phase) {
                     banner.classList.remove("is-active");
                     box.hidden = true;
-                    box.classList.remove("is-syuruq", "is-dhuha", "is-blinking");
+                    box.classList.remove("is-imsak", "is-syuruq", "is-dhuha", "is-blinking");
+                    if (subEl) subEl.hidden = true;
                     return;
                 }
 
@@ -713,6 +719,7 @@
                 const progressPct = Math.min(100, Math.max(0, ((phase.totalSec - remainFloatSec) / phase.totalSec) *
                     100));
 
+                const isImsak = phase.name === "IMSAK";
                 const isSyuruq = phase.name === "SYURUQ";
                 const isDhuha = phase.name === "DHUHA";
                 const isBlinking = !isDhuha && remainSec <= 10 && remainSec > 0;
@@ -731,12 +738,19 @@
 
                 banner.classList.add("is-active");
                 box.hidden = false;
+                box.classList.toggle("is-imsak", isImsak);
                 box.classList.toggle("is-syuruq", isSyuruq);
                 box.classList.toggle("is-dhuha", isDhuha);
                 box.classList.toggle("is-blinking", isBlinking);
 
                 if (topEl.textContent !== topLabel) topEl.textContent = topLabel;
                 if (nameEl.textContent !== mainTitle) nameEl.textContent = mainTitle;
+                if (subEl) {
+                    subEl.hidden = !isImsak;
+                    if (isImsak && subEl.textContent !== "MENUJU ADZAN SHUBUH") {
+                        subEl.textContent = "MENUJU ADZAN SHUBUH";
+                    }
+                }
                 barEl.style.width = `${progressPct.toFixed(2)}%`;
                 if (botEl.textContent !== bottomText) botEl.textContent = bottomText;
             }
