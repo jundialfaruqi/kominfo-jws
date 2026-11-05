@@ -39,9 +39,10 @@
                                     <th class="fw-bold">Aksi</th>
                                 </tr>
                                 @foreach ($groupedDevices as $device)
-                                    <tr>
+                                    <tr wire:key="device-row-{{ $device->id }}">
                                         <td>
                                             <span id="status-badge-{{ $device->device_id }}"
+                                                data-device-id="{{ $device->device_id }}"
                                                 class="badge bg-secondary text-secondary-fg">
                                                 <span class="status-dot me-1">●</span> Memeriksa...
                                             </span>
@@ -105,18 +106,35 @@
                 });
             });
 
-            // ── Pusher Presence Channel: status online/offline real-time ──
+            // ── Pusher Presence Channel: status online/offline real-time (mendukung pindah halaman & pencarian) ──
             const PUSHER_KEY = '{{ config('broadcasting.connections.reverb.key') }}';
             const PUSHER_HOST = window.location.hostname;
             const PUSHER_PORT = window.location.protocol === 'https:' ? 443 :
                 {{ config('broadcasting.connections.reverb.options.port', 8080) }};
             const PUSHER_SCHEME = window.location.protocol === 'https:' ? 'https' : 'http';
 
-            // Collect all device IDs on the page
-            const deviceIds = @json($devices->pluck('device_id')->toArray());
+            function setBadge(deviceId, isOnline) {
+                const badge = document.getElementById(`status-badge-${deviceId}`);
+                if (!badge) return;
 
-            if (typeof Pusher !== 'undefined' && deviceIds.length > 0) {
-                const pusher = new Pusher(PUSHER_KEY, {
+                const targetState = isOnline ? 'online' : 'offline';
+                if (badge.getAttribute('data-status-state') === targetState) return;
+
+                badge.setAttribute('data-status-state', targetState);
+                if (isOnline) {
+                    badge.className = 'badge bg-success text-success-fg';
+                    badge.innerHTML = '<span class="status-dot me-1">●</span> Online';
+                } else {
+                    badge.className = 'badge bg-danger text-danger-fg';
+                    badge.innerHTML = '<span class="status-dot me-1">●</span> Offline';
+                }
+            }
+
+            let pusherInstance = null;
+            const subscribedChannels = new Map();
+
+            if (typeof Pusher !== 'undefined') {
+                pusherInstance = new Pusher(PUSHER_KEY, {
                     wsHost: PUSHER_HOST,
                     wsPort: PUSHER_PORT,
                     wssPort: PUSHER_PORT,
@@ -151,41 +169,75 @@
                         }
                     }
                 });
+            }
 
-                function setBadge(deviceId, isOnline) {
-                    const badge = document.getElementById(`status-badge-${deviceId}`);
-                    if (!badge) return;
-                    if (isOnline) {
-                        badge.className = 'badge bg-success text-success-fg';
-                        badge.innerHTML = '<span class="status-dot me-1">●</span> Online';
-                    } else {
-                        badge.className = 'badge bg-danger text-danger-fg';
-                        badge.innerHTML = '<span class="status-dot me-1">●</span> Offline';
-                    }
+            function syncDevicePresenceSubscriptions() {
+                const badges = document.querySelectorAll('[data-device-id]');
+                const currentDeviceIds = Array.from(badges)
+                    .map(el => el.getAttribute('data-device-id'))
+                    .filter(Boolean);
+
+                if (currentDeviceIds.length === 0) return;
+
+                if (!pusherInstance) {
+                    currentDeviceIds.forEach(deviceId => setBadge(deviceId, false));
+                    return;
                 }
 
-                deviceIds.forEach(deviceId => {
-                    const channel = pusher.subscribe(`presence-device-${deviceId}`);
+                currentDeviceIds.forEach(deviceId => {
+                    // Jika channel sudah pernah di-subscribe (mis. kembali ke halaman sebelumnya),
+                    // langsung terapkan status terakhir dari daftar member channel
+                    if (subscribedChannels.has(deviceId)) {
+                        const existingChannel = subscribedChannels.get(deviceId);
+                        if (existingChannel && existingChannel.subscribed && existingChannel.members) {
+                            setBadge(deviceId, existingChannel.members.count > 1);
+                        }
+                        return;
+                    }
+
+                    // Subscribe ke channel untuk deviceId baru di halaman aktif
+                    const channel = pusherInstance.subscribe(`presence-device-${deviceId}`);
+                    subscribedChannels.set(deviceId, channel);
 
                     channel.bind('pusher:subscription_succeeded', members => {
-                        // Jika ada member lain (TV) selain admin browser ini
                         const count = members.count;
                         setBadge(deviceId, count > 1); // admin sendiri = 1
                     });
 
-                    channel.bind('pusher:member_added', member => {
+                    channel.bind('pusher:member_added', () => {
                         setBadge(deviceId, true);
                     });
 
-                    channel.bind('pusher:member_removed', member => {
-                        // Cek apakah masih ada member lain
-                        const count = channel.members.count;
+                    channel.bind('pusher:member_removed', () => {
+                        const count = channel.members ? channel.members.count : 0;
                         setBadge(deviceId, count > 1);
                     });
+
+                    channel.bind('pusher:subscription_error', () => {
+                        setBadge(deviceId, false);
+                    });
                 });
-            } else {
-                // Pusher JS belum dimuat, set semua offline
-                deviceIds.forEach(deviceId => setBadge(deviceId, false));
+            }
+
+            // Jalankan saat halaman pertama kali dimuat
+            syncDevicePresenceSubscriptions();
+
+            // Jalankan ulang setiap kali DOM tabel berubah karena pindah halaman pagination atau pencarian Livewire
+            const tableContainer = document.querySelector('.table-responsive');
+            if (tableContainer) {
+                const observer = new MutationObserver(() => {
+                    syncDevicePresenceSubscriptions();
+                });
+                observer.observe(tableContainer, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+
+            if (typeof Livewire !== 'undefined' && typeof Livewire.hook === 'function') {
+                Livewire.hook('morph.updated', () => {
+                    syncDevicePresenceSubscriptions();
+                });
             }
         </script>
     @endscript
