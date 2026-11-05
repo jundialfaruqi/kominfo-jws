@@ -153,8 +153,8 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-danger">*</small>
-                                <small class="text-muted">Format: jpg, jpeg, png, webp, gif.
-                                    Maks: 1MB</small>
+                                <small class="text-muted">Format: jpg, jpeg, png, webp, gif
+                                    (Otomatis dikompres ke WebP maks 70KB)</small>
                             </div>
                             <div class="form-text">
                                 <small class="text-danger">*</small>
@@ -163,9 +163,9 @@
                                     gambar terbaik</small>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="logo_masjid-input"
                                     class="form-control my-2 rounded-4 @error('logo_masjid') is-invalid @enderror"
-                                    wire:model="logo_masjid" accept="image/*">
+                                    accept="image/*" onchange="handleLogoUpload(this, 'logo_masjid')">
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($logo_masjid || $temp_logo)
                                     <button type="button"
@@ -186,8 +186,26 @@
                                     </button>
                                 @endif
                             </div>
+                            <div wire:ignore>
+                                <div id="logo_masjid-progress-wrap" class="mt-2" style="display: none;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span id="logo_masjid-progress-label" class="small text-primary">
+                                            Mengompres gambar...
+                                        </span>
+                                        <span id="logo_masjid-progress-percent" class="small fw-bold text-primary">0%</span>
+                                    </div>
+                                    <div class="progress rounded-pill" style="height: 8px;">
+                                        <div id="logo_masjid-progress-bar"
+                                            class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                            role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0"
+                                            aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div id="logo_masjid-compress-status" class="small text-success mt-1" style="display: none;"></div>
+                                <div id="logo_masjid-upload-error" class="invalid-feedback" style="display: none;"></div>
+                            </div>
                             @error('logo_masjid')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-2">
@@ -219,9 +237,8 @@
                             </div>
                             <div class="form-text">
                                 <small class="text-danger">*</small>
-                                <small class="text-muted">Format: jpg, jpeg, png, webp,
-                                    gif.
-                                    Maks: 1MB</small>
+                                <small class="text-muted">Format: jpg, jpeg, png, webp, gif
+                                    (Otomatis dikompres ke WebP maks 70KB)</small>
                             </div>
                             <div class="form-text">
                                 <small class="text-danger">*</small>
@@ -230,9 +247,9 @@
                                     gambar terbaik</small>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="file"
+                                <input type="file" id="logo_pemerintah-input"
                                     class="form-control my-2 rounded-4 @error('logo_pemerintah') is-invalid @enderror"
-                                    wire:model="logo_pemerintah" accept="image/*">
+                                    accept="image/*" onchange="handleLogoUpload(this, 'logo_pemerintah')">
                                 {{-- Tombol Trash - hanya muncul jika ada gambar --}}
                                 @if ($logo_pemerintah || $temp_logo_pemerintah)
                                     <button type="button"
@@ -254,8 +271,26 @@
                                     </button>
                                 @endif
                             </div>
+                            <div wire:ignore>
+                                <div id="logo_pemerintah-progress-wrap" class="mt-2" style="display: none;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span id="logo_pemerintah-progress-label" class="small text-primary">
+                                            Mengompres gambar...
+                                        </span>
+                                        <span id="logo_pemerintah-progress-percent" class="small fw-bold text-primary">0%</span>
+                                    </div>
+                                    <div class="progress rounded-pill" style="height: 8px;">
+                                        <div id="logo_pemerintah-progress-bar"
+                                            class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                            role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0"
+                                            aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div id="logo_pemerintah-compress-status" class="small text-success mt-1" style="display: none;"></div>
+                                <div id="logo_pemerintah-upload-error" class="invalid-feedback" style="display: none;"></div>
+                            </div>
                             @error('logo_pemerintah')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>
@@ -288,7 +323,7 @@
                         </span>
                     </button>
                 @endif
-                <button type="submit" class="btn py-2 px-2 rounded-3 shadow-sm" wire:loading.attr="disabled">
+                <button type="submit" id="profil-submit-btn" class="btn py-2 px-2 rounded-3 shadow-sm" wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="save">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -309,3 +344,385 @@
         </div>
     </form>
 @endif
+
+{{-- Script Kompresi Logo Client-Side ke WebP (Maks 70KB) dengan Progress Bar & Fallback ke Server --}}
+<script>
+    /**
+     * Format ukuran byte menjadi teks KB / MB yang mudah dibaca.
+     */
+    function formatLogoFileSize(bytes) {
+        if (bytes >= 1024 * 1024) {
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+        return (bytes / 1024).toFixed(1) + ' KB';
+    }
+
+    /**
+     * Update UI progress loading bar untuk properti logo tertentu.
+     */
+    function updateLogoProgressUI(propertyName, percent, labelText, barClass = 'bg-primary') {
+        const wrapEl = document.getElementById(`${propertyName}-progress-wrap`);
+        const labelEl = document.getElementById(`${propertyName}-progress-label`);
+        const percentEl = document.getElementById(`${propertyName}-progress-percent`);
+        const barEl = document.getElementById(`${propertyName}-progress-bar`);
+
+        const clamped = Math.max(0, Math.min(100, Math.round(percent)));
+
+        if (wrapEl) {
+            wrapEl.style.display = 'block';
+        }
+        if (labelEl && labelText) {
+            labelEl.textContent = labelText;
+        }
+        if (percentEl) {
+            percentEl.textContent = `${clamped}%`;
+        }
+        if (barEl) {
+            barEl.className = `progress-bar progress-bar-striped progress-bar-animated ${barClass}`;
+            barEl.style.width = `${clamped}%`;
+            barEl.setAttribute('aria-valuenow', String(clamped));
+        }
+    }
+
+    function hideLogoProgressUI(propertyName) {
+        const wrapEl = document.getElementById(`${propertyName}-progress-wrap`);
+        if (wrapEl) {
+            wrapEl.style.display = 'none';
+        }
+    }
+
+    /**
+     * Kompres gambar logo di browser ke WebP (crop persegi 1:1 di tengah) dengan batas maksimal 70KB (71.680 bytes).
+     * Mendukung file gambar ukuran besar (mis. 10MB+) tanpa batas 1MB saat pemilihan file.
+     */
+    function compressLogoToWebP(file, maxSizeBytes = 70 * 1024, onProgress = null) {
+        return new Promise((resolve, reject) => {
+            if (!file || !file.type || !file.type.match(/^image\//i)) {
+                return reject(new Error('File yang dipilih bukan gambar yang valid.'));
+            }
+
+            if (typeof onProgress === 'function') {
+                onProgress(10, 'Membaca file gambar...');
+            }
+
+            const objectUrl = URL.createObjectURL(file);
+            const img = new Image();
+
+            img.onerror = () => {
+                URL.revokeObjectURL(objectUrl);
+                reject(new Error('Gagal memuat file gambar di browser.'));
+            };
+
+            img.onload = () => {
+                URL.revokeObjectURL(objectUrl);
+
+                if (typeof onProgress === 'function') {
+                    onProgress(20, 'Menyiapkan kanvas & memotong rasio 1:1...');
+                }
+
+                const srcW = img.naturalWidth || img.width;
+                const srcH = img.naturalHeight || img.height;
+                if (!srcW || !srcH) {
+                    return reject(new Error('Dimensi gambar tidak valid.'));
+                }
+
+                // Crop tengah 1:1 persegi dan batasi ukuran awal maksimal 800x800 px
+                const cropSize = Math.min(srcW, srcH);
+                const sx = Math.floor((srcW - cropSize) / 2);
+                const sy = Math.floor((srcH - cropSize) / 2);
+
+                const maxInitialDim = 800;
+                let curSize = Math.min(cropSize, maxInitialDim);
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    return reject(new Error('Canvas 2D tidak didukung di browser ini.'));
+                }
+
+                const getBlob = (size, q) => {
+                    return new Promise((res) => {
+                        canvas.width = size;
+                        canvas.height = size;
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.clearRect(0, 0, size, size);
+                        ctx.drawImage(img, sx, sy, cropSize, cropSize, 0, 0, size, size);
+                        canvas.toBlob((blob) => {
+                            res(blob);
+                        }, 'image/webp', q);
+                    });
+                };
+
+                const nextFrame = () => new Promise((r) => setTimeout(r, 15));
+
+                (async () => {
+                    try {
+                        let quality = 0.85;
+                        if (typeof onProgress === 'function') {
+                            onProgress(30, 'Mengompres gambar ke WebP (maks 70KB)...');
+                        }
+                        await nextFrame();
+
+                        let blob = await getBlob(curSize, quality);
+                        if (!blob || blob.type !== 'image/webp') {
+                            return reject(new Error('Browser tidak mendukung encoding WebP.'));
+                        }
+
+                        // Tahap 1: Turunkan kualitas bertahap jika ukuran masih > 70KB
+                        let step = 0;
+                        while (blob && blob.size > maxSizeBytes && quality > 0.25) {
+                            quality = Math.max(0.20, +(quality - 0.10).toFixed(2));
+                            step++;
+                            if (typeof onProgress === 'function') {
+                                const prog = Math.min(50, 30 + step * 4);
+                                onProgress(prog, `Mengompres kualitas WebP (${formatLogoFileSize(blob.size)})...`);
+                            }
+                            await nextFrame();
+                            blob = await getBlob(curSize, quality);
+                        }
+
+                        // Tahap 2: Jika masih > 70KB, turunkan resolusi secara bertahap
+                        let attempts = 0;
+                        while (blob && blob.size > maxSizeBytes && attempts < 12 && curSize > 64) {
+                            curSize = Math.max(64, Math.round(curSize * 0.85));
+                            quality = 0.75;
+                            attempts++;
+
+                            if (typeof onProgress === 'function') {
+                                const prog = Math.min(68, 50 + attempts * 2);
+                                onProgress(prog, `Menyesuaikan dimensi ${curSize}x${curSize}px...`);
+                            }
+                            await nextFrame();
+
+                            blob = await getBlob(curSize, quality);
+                            while (blob && blob.size > maxSizeBytes && quality > 0.25) {
+                                quality = Math.max(0.20, +(quality - 0.12).toFixed(2));
+                                blob = await getBlob(curSize, quality);
+                            }
+                        }
+
+                        if (!blob || blob.type !== 'image/webp' || blob.size > maxSizeBytes) {
+                            return reject(new Error('Hasil kompresi di browser masih melebihi 70KB.'));
+                        }
+
+                        if (typeof onProgress === 'function') {
+                            onProgress(70, 'Kompresi selesai, mengunggah ke server...');
+                        }
+
+                        const originalName = file.name.replace(/\.[^/.]+$/, '');
+                        const safeName = originalName.replace(/[^a-zA-Z0-9_-]/g, '_');
+                        const webpFile = new File([blob], `${safeName || 'logo'}.webp`, {
+                            type: 'image/webp',
+                            lastModified: Date.now()
+                        });
+
+                        resolve({
+                            file: webpFile,
+                            originalSize: file.size,
+                            compressedSize: blob.size,
+                            width: curSize,
+                            height: curSize
+                        });
+                    } catch (err) {
+                        reject(err);
+                    }
+                })();
+            };
+
+            img.src = objectUrl;
+        });
+    }
+
+    /**
+     * Handler onchange saat file dipilih pada input logo_masjid / logo_pemerintah.
+     * 1. Kompresi langsung di browser menjadi WebP <= 70KB dengan progress bar.
+     * 2. Jika kompresi client gagal, otomatis fallback mengunggah ke server agar dikompres oleh backend.
+     */
+    function handleLogoUpload(inputEl, propertyName) {
+        const file = inputEl.files && inputEl.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById(`${propertyName}-compress-status`);
+        const errorEl = document.getElementById(`${propertyName}-upload-error`);
+        const submitBtn = document.getElementById('profil-submit-btn');
+
+        inputEl.classList.remove('is-invalid');
+        if (errorEl) {
+            errorEl.style.display = 'none';
+            errorEl.textContent = '';
+        }
+        if (statusEl) {
+            statusEl.style.display = 'none';
+            statusEl.textContent = '';
+        }
+
+        if (!file.type || !file.type.match(/^image\//i)) {
+            inputEl.classList.add('is-invalid');
+            if (errorEl) {
+                errorEl.textContent = 'File harus berupa gambar (jpg, jpeg, png, webp, atau gif).';
+                errorEl.style.display = 'block';
+            }
+            return;
+        }
+
+        const container = inputEl.closest('[wire\\:id]');
+        const wireId = container ? container.getAttribute('wire:id') : null;
+        const component = (window.Livewire && wireId) ? window.Livewire.find(wireId) : null;
+
+        if (!component) {
+            if (errorEl) {
+                errorEl.textContent = 'Komponen Livewire tidak ditemukan.';
+                errorEl.style.display = 'block';
+            }
+            return;
+        }
+
+        if (submitBtn) submitBtn.disabled = true;
+        updateLogoProgressUI(propertyName, 5, 'Memulai kompresi gambar di browser...');
+
+        compressLogoToWebP(file, 70 * 1024, (percent, label) => {
+                updateLogoProgressUI(propertyName, percent, label, 'bg-primary');
+            })
+            .then((result) => {
+                const {
+                    file: compressedFile,
+                    originalSize,
+                    compressedSize
+                } = result;
+                const origFormatted = formatLogoFileSize(originalSize);
+                const compFormatted = formatLogoFileSize(compressedSize);
+
+                updateLogoProgressUI(propertyName, 72, `Mengunggah WebP (${compFormatted}) ke server...`, 'bg-primary');
+
+                component.upload(
+                    propertyName,
+                    compressedFile,
+                    () => {
+                        updateLogoProgressUI(propertyName, 100, 'Selesai!', 'bg-success');
+                        setTimeout(() => {
+                            hideLogoProgressUI(propertyName);
+                            if (statusEl) {
+                                statusEl.className = 'small text-success mt-1';
+                                statusEl.style.display = 'block';
+                                statusEl.innerHTML =
+                                    `✓ Berhasil dikompres ke WebP: <strong>${compFormatted}</strong> (dari ${origFormatted})`;
+                            }
+                        }, 250);
+                        inputEl.classList.remove('is-invalid');
+                        if (errorEl) errorEl.style.display = 'none';
+                        if (submitBtn) submitBtn.disabled = false;
+                    },
+                    (error) => {
+                        hideLogoProgressUI(propertyName);
+                        inputEl.classList.add('is-invalid');
+                        if (errorEl) {
+                            errorEl.textContent = error || 'Gagal mengunggah gambar ke server.';
+                            errorEl.style.display = 'block';
+                        }
+                        if (submitBtn) submitBtn.disabled = false;
+                    },
+                    (event) => {
+                        const uploadPercent = event?.detail?.progress || 0;
+                        const totalPercent = 70 + Math.round(uploadPercent * 0.30);
+                        updateLogoProgressUI(
+                            propertyName,
+                            totalPercent,
+                            `Mengunggah WebP (${compFormatted}) ${uploadPercent}%...`,
+                            'bg-primary'
+                        );
+                    }
+                );
+            })
+            .catch(() => {
+                // Fallback sesuai spesifikasi #3:
+                // Jika kompresi di sisi client gagal, kirim file ke server agar backend yang melakukan kompresi (<= 70KB)
+                const origFormatted = formatLogoFileSize(file.size);
+                updateLogoProgressUI(
+                    propertyName,
+                    30,
+                    `Kompresi browser gagal, mengalihkan kompresi ke server (${origFormatted})...`,
+                    'bg-warning'
+                );
+
+                component.upload(
+                    propertyName,
+                    file,
+                    () => {
+                        updateLogoProgressUI(propertyName, 100, 'Dikompresi oleh server!', 'bg-success');
+                        setTimeout(() => {
+                            hideLogoProgressUI(propertyName);
+                            if (statusEl) {
+                                statusEl.className = 'small text-success mt-1';
+                                statusEl.style.display = 'block';
+                                statusEl.innerHTML =
+                                    `✓ Dikompres otomatis oleh server ke WebP (maks 70 KB, dari ${origFormatted})`;
+                            }
+                        }, 250);
+                        inputEl.classList.remove('is-invalid');
+                        if (errorEl) errorEl.style.display = 'none';
+                        if (submitBtn) submitBtn.disabled = false;
+                    },
+                    (error) => {
+                        hideLogoProgressUI(propertyName);
+                        inputEl.classList.add('is-invalid');
+                        if (errorEl) {
+                            errorEl.textContent = error || 'Gagal memproses dan mengunggah gambar ke server.';
+                            errorEl.style.display = 'block';
+                        }
+                        if (submitBtn) submitBtn.disabled = false;
+                    },
+                    (event) => {
+                        const uploadPercent = event?.detail?.progress || 0;
+                        const totalPercent = 30 + Math.round(uploadPercent * 0.70);
+                        updateLogoProgressUI(
+                            propertyName,
+                            totalPercent,
+                            `Mengunggah ke server untuk kompresi fallback ${uploadPercent}%...`,
+                            'bg-warning'
+                        );
+                    }
+                );
+            });
+    }
+
+    /**
+     * Reset input file, progress bar, dan status ketika gambar dihapus / form direset.
+     */
+    function resetLogoInput(name) {
+        if (!name) return;
+        const input = document.getElementById(`${name}-input`);
+        const statusEl = document.getElementById(`${name}-compress-status`);
+        const errorEl = document.getElementById(`${name}-upload-error`);
+
+        hideLogoProgressUI(name);
+
+        if (input) {
+            input.value = '';
+            input.classList.remove('is-invalid');
+        }
+        if (statusEl) {
+            statusEl.style.display = 'none';
+            statusEl.textContent = '';
+        }
+        if (errorEl) {
+            errorEl.style.display = 'none';
+            errorEl.textContent = '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.Livewire) {
+            window.Livewire.on('resetFileInput', (event) => {
+                const name = event?.inputName || (Array.isArray(event) && event[0]?.inputName) || event;
+                resetLogoInput(name);
+            });
+        }
+    });
+
+    window.addEventListener('resetFileInput', (event) => {
+        const detail = event?.detail;
+        const name = detail?.inputName || (Array.isArray(detail) && detail[0]?.inputName) || detail;
+        resetLogoInput(name);
+    });
+</script>

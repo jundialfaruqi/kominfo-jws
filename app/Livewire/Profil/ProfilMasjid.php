@@ -41,14 +41,17 @@ class ProfilMasjid extends Component
     public $deleteProfileId;
     public $deleteProfileName; 
 
+    private const MAX_LOGO_SIZE_KB = 70;
+    private const MAX_LOGO_SIZE_BYTES = 70 * 1024; // 71.680 bytes
+
     protected $rules = [
         'userId'            => 'required|exists:users,id',
         'name'              => 'required|string|max:255',
         'slug'              => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:profils,slug',
         'address'           => 'required|string',
         'phone'             => 'required|string|max:15',
-        'logo_masjid'       => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
-        'logo_pemerintah'   => 'nullable|image|max:1000|mimes:jpg,png,jpeg,webp,gif',
+        'logo_masjid'       => 'nullable|image|max:70|mimes:webp,jpg,png,jpeg,gif',
+        'logo_pemerintah'   => 'nullable|image|max:70|mimes:webp,jpg,png,jpeg,gif',
     ];
 
     protected $messages = [
@@ -59,11 +62,11 @@ class ProfilMasjid extends Component
         'slug.regex'                => 'ID JWS hanya boleh mengandung huruf kecil, angka, dan tanda hubung (-)!',
         'slug.max'                  => 'ID JWS maksimal 255 karakter!',
         'logo_masjid.image'         => 'File harus berupa gambar',
-        'logo_masjid.mimes'         => 'Format file tidak valid. File harus berupa gambar jpg, jpeg, png, webp, atau gif!',
-        'logo_masjid.max'           => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
+        'logo_masjid.mimes'         => 'Format file tidak valid. File harus berupa gambar webp, jpg, jpeg, png, atau gif!',
+        'logo_masjid.max'           => 'File gambar terlalu besar. Ukuran file maksimal 70KB!',
         'logo_pemerintah.image'     => 'File harus berupa gambar',
-        'logo_pemerintah.mimes'     => 'Format file tidak valid. File harus berupa gambar jpg, jpeg, png, webp, atau gif!',
-        'logo_pemerintah.max'       => 'File gambar terlalu besar. Ukuran file maksimal 1MB!',
+        'logo_pemerintah.mimes'     => 'Format file tidak valid. File harus berupa gambar webp, jpg, jpeg, png, atau gif!',
+        'logo_pemerintah.max'       => 'File gambar terlalu besar. Ukuran file maksimal 70KB!',
         'phone.max'                 => 'Nomor telepon maksimal 15 karakter!',
         'phone.required'            => 'Nomor telepon wajib diisi!',
         'address.required'          => 'Alamat wajib diisi!',
@@ -71,6 +74,27 @@ class ProfilMasjid extends Component
         'name.max'                  => 'Nama Masjid maksimal 255 karakter!',
         'name.string'               => 'Nama Masjid harus berupa teks!',
     ];
+
+    /**
+     * Saat file logo diunggah ke Livewire:
+     * 1. Jika sudah dikompresi oleh client browser (WebP <= 70KB), langsung divalidasi tanpa kompresi ulang di server.
+     * 2. Jika kompresi di client gagal (ukuran > 70KB atau bukan WebP), server melakukan kompresi fallback ke WebP <= 70KB
+     *    sebelum menjalankan validasi ukuran maksimal 70KB.
+     */
+    public function updated($name)
+    {
+        if (in_array($name, ['logo_masjid', 'logo_pemerintah'])) {
+            try {
+                $this->ensureClientOrServerCompressed($name);
+            } catch (\Exception $e) {
+                $this->$name = null;
+                $this->addError($name, 'Gagal memproses gambar: ' . $e->getMessage());
+                return;
+            }
+
+            $this->validateOnly($name);
+        }
+    }
 
     public function mount()
     {
@@ -255,56 +279,102 @@ class ProfilMasjid extends Component
         );
     }
 
-    private function resizeImageToLimit($uploadedFile, $maxSizeKB = 990)
+    /**
+     * Memastikan file logo sudah berupa WebP dengan ukuran <= 70KB.
+     * Jika sudah dikompresi oleh client browser (WebP <= 70KB), server tidak melakukan kompresi ulang.
+     * Jika kompresi di client browser gagal (ukuran > 70KB atau bukan WebP), server melakukan kompresi fallback.
+     */
+    private function ensureClientOrServerCompressed(string $field): void
+    {
+        $uploadedFile = $this->$field ?? null;
+        if (!$uploadedFile || !method_exists($uploadedFile, 'getRealPath')) {
+            return;
+        }
+
+        $realPath = $uploadedFile->getRealPath();
+        if (!$realPath || !file_exists($realPath)) {
+            return;
+        }
+
+        clearstatcache(true, $realPath);
+        $fileSize = filesize($realPath);
+        $mimeType = strtolower((string) $uploadedFile->getMimeType());
+
+        // Jika sudah dikompresi dari browser (<= 70KB dan format WebP), lewati kompresi server
+        if ($fileSize !== false && $fileSize <= self::MAX_LOGO_SIZE_BYTES && $mimeType === 'image/webp') {
+            return;
+        }
+
+        // Fallback: kompresi di sisi server karena kompresi client gagal atau ukuran > 70KB
+        $encodedWebp = $this->resizeImageToLimit($uploadedFile, self::MAX_LOGO_SIZE_KB);
+        file_put_contents($realPath, $encodedWebp);
+        clearstatcache(true, $realPath);
+    }
+
+    /**
+     * Kompresi fallback di sisi server (jika kompresi di browser client gagal).
+     * Mengubah gambar menjadi WebP (crop 1:1 persegi) dengan ukuran maksimal 70KB.
+     */
+    private function resizeImageToLimit($uploadedFile, $maxSizeKB = self::MAX_LOGO_SIZE_KB): string
     {
         try {
-            // Konversi ke bytes
             $maxSizeBytes = $maxSizeKB * 1024;
+            $sourcePath = is_string($uploadedFile) ? $uploadedFile : $uploadedFile->getRealPath();
 
             // Baca gambar menggunakan Intervention Image
-            $image = Image::read($uploadedFile->getRealPath());
+            $image = Image::read($sourcePath);
 
-            // Crop ke rasio 1:1
+            // Crop ke rasio 1:1 (persegi di tengah)
             $width = $image->width();
             $height = $image->height();
             $size = min($width, $height);
-            $image->crop($size, $size, ($width - $size) / 2, ($height - $size) / 2);
+            $image->crop($size, $size, (int) (($width - $size) / 2), (int) (($height - $size) / 2));
 
-            // Mulai dengan kualitas tinggi dan turunkan sampai ukuran sesuai
-            $quality = 95;
+            // Batasi dimensi awal maksimal 800x800 agar kompresi ke <= 70KB cepat dan optimal
+            $maxInitialSize = 800;
+            if ($size > $maxInitialSize) {
+                $image->resize($maxInitialSize, $maxInitialSize);
+                $size = $maxInitialSize;
+            }
+
+            $quality = 85;
             $minQuality = 20;
+            $encoded = (string) $image->toWebp($quality);
 
-            do {
-                // Encode dengan kualitas saat ini ke WebP
-                $encoded = $image->toWebp($quality);
+            // Tahap 1: Turunkan kualitas secara bertahap hingga <= 70KB
+            while (strlen($encoded) > $maxSizeBytes && $quality > $minQuality) {
                 $currentSize = strlen($encoded);
-
-                // Jika ukuran sudah sesuai, keluar dari loop
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                // Turunkan kualitas secara bertahap
                 if ($currentSize > $maxSizeBytes * 1.5) {
-                    $quality -= 10; // Penurunan cepat jika masih jauh dari target
+                    $quality = max($minQuality, $quality - 12);
                 } elseif ($currentSize > $maxSizeBytes * 1.2) {
-                    $quality -= 5;  // Penurunan sedang
+                    $quality = max($minQuality, $quality - 6);
                 } else {
-                    $quality -= 2;  // Penurunan halus untuk fine-tuning
+                    $quality = max($minQuality, $quality - 3);
                 }
+                $encoded = (string) $image->toWebp($quality);
+            }
 
-                // Jika masih terlalu besar dengan kualitas minimum, resize lebih kecil
-                if ($quality < $minQuality && strlen($image->toWebp($minQuality)) > $maxSizeBytes) {
-                    $scaleFactor = 0.9;
-                    while (strlen($image->toWebp($minQuality)) > $maxSizeBytes && $scaleFactor > 0.5) {
-                        $newSize = (int)($size * $scaleFactor);
-                        $image->resize($newSize, $newSize);
-                        $scaleFactor -= 0.05;
-                    }
+            // Tahap 2: Jika dengan kualitas minimum masih > 70KB, perkecil resolusi bertahap
+            $attempts = 0;
+            $curSize = $size;
+            while (strlen($encoded) > $maxSizeBytes && $attempts < 12) {
+                $curSize = max(64, (int) round($curSize * 0.85));
+                $image->resize($curSize, $curSize);
+
+                $quality = 75;
+                $encoded = (string) $image->toWebp($quality);
+                while (strlen($encoded) > $maxSizeBytes && $quality > $minQuality) {
+                    $quality = max($minQuality, $quality - 10);
+                    $encoded = (string) $image->toWebp($quality);
                 }
-            } while ($quality >= $minQuality);
+                $attempts++;
+            }
 
-            return $image;
+            if (strlen($encoded) > $maxSizeBytes) {
+                throw new \Exception('Ukuran file masih melebihi batas ' . $maxSizeKB . 'KB (' . round(strlen($encoded) / 1024, 2) . 'KB)');
+            }
+
+            return $encoded;
         } catch (\Exception $e) {
             throw new \Exception('Gagal memproses gambar: ' . $e->getMessage());
         }
@@ -313,12 +383,19 @@ class ProfilMasjid extends Component
     private function saveProcessedImage($uploadedFile, $type)
     {
         try {
-            // Proses resize gambar dengan ukuran maksimal 990KB
-            $processedImage = $this->resizeImageToLimit($uploadedFile);
+            $realPath = $uploadedFile->getRealPath();
+            if (!$realPath || !file_exists($realPath)) {
+                throw new \Exception('File sementara gambar tidak ditemukan.');
+            }
+
+            clearstatcache(true, $realPath);
+            $fileSize = filesize($realPath);
+            $mimeType = strtolower((string) $uploadedFile->getMimeType());
 
             // Generate nama file dengan ekstensi .webp
             $originalName = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $fileName = time() . '_' . $type . '_' . $originalName . '.webp';
+            $safeName = Str::slug($originalName) ?: 'logo';
+            $fileName = time() . '_' . $type . '_' . $safeName . '.webp';
             $filePath = public_path('images/logo/' . $fileName);
 
             // Pastikan directory ada
@@ -327,29 +404,23 @@ class ProfilMasjid extends Component
                 mkdir($directory, 0755, true);
             }
 
-            // Tentukan kualitas optimal berdasarkan ukuran target
-            $maxSizeBytes = 990 * 1024; // 990KB
-            $quality = 95;
+            // Jika sudah dikompresi oleh client browser (WebP dan <= 70KB), langsung salin tanpa kompresi ulang di server
+            if ($fileSize !== false && $fileSize <= self::MAX_LOGO_SIZE_BYTES && $mimeType === 'image/webp') {
+                File::copy($realPath, $filePath);
+            } else {
+                // Fallback: kompresi di sisi server jika kompresi client gagal / ukuran > 70KB
+                $encodedWebp = $this->resizeImageToLimit($uploadedFile, self::MAX_LOGO_SIZE_KB);
+                file_put_contents($filePath, $encodedWebp);
+            }
 
-            // Fine-tune kualitas untuk mendekati 990KB
-            do {
-                $encoded = $processedImage->toWebp($quality);
-                $currentSize = strlen($encoded);
-
-                if ($currentSize <= $maxSizeBytes) {
-                    break;
-                }
-
-                $quality -= 1;
-            } while ($quality >= 60);
-
-            // Simpan gambar yang sudah diproses dengan kualitas optimal
-            $processedImage->toWebp($quality)->save($filePath);
-
-            // Verifikasi ukuran file hasil akhir
+            // Verifikasi ukuran file hasil akhir (double security <= 70KB)
+            clearstatcache(true, $filePath);
             $finalSize = filesize($filePath);
-            if ($finalSize > $maxSizeBytes) {
-                throw new \Exception("Ukuran file masih terlalu besar: " . round($finalSize / 1024, 2) . "KB");
+            if ($finalSize === false || $finalSize > self::MAX_LOGO_SIZE_BYTES) {
+                if (file_exists($filePath)) {
+                    File::delete($filePath);
+                }
+                throw new \Exception('Ukuran file melebihi batas maksimal 70KB: ' . round(($finalSize ?: 0) / 1024, 2) . 'KB');
             }
 
             return '/images/logo/' . $fileName;
@@ -515,6 +586,18 @@ class ProfilMasjid extends Component
             $rules['slug'] = 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:profils,slug,' . $this->profileId;
         }
 
+        // Pastikan jika kompresi di sisi client gagal, backend melakukan kompresi fallback sebelum validasi max:70
+        foreach (['logo_masjid', 'logo_pemerintah'] as $logoField) {
+            if ($this->$logoField) {
+                try {
+                    $this->ensureClientOrServerCompressed($logoField);
+                } catch (\Exception $e) {
+                    $this->addError($logoField, $e->getMessage());
+                    return;
+                }
+            }
+        }
+
         $this->validate($rules);
 
         try {
@@ -576,6 +659,9 @@ class ProfilMasjid extends Component
             $this->dispatch('success', $this->isEdit ? 'Profil masjid berhasil diperbarui!' : 'Profil masjid berhasil ditambahkan!');
             $this->showTable = true;
 
+            $this->dispatch('resetFileInput', ['inputName' => 'logo_masjid']);
+            $this->dispatch('resetFileInput', ['inputName' => 'logo_pemerintah']);
+
             // Only hide form and reset fields if user is admin
             if (in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
                 $this->showForm = false;
@@ -596,6 +682,8 @@ class ProfilMasjid extends Component
             } else {
                 // For regular users, keep the form visible and reload their data
                 $this->showForm = true;
+                $this->logo_masjid = null;
+                $this->logo_pemerintah = null;
                 $profil = Profil::where('user_id', Auth::id())->first();
                 if ($profil) {
                     $this->profileId            = $profil->id;

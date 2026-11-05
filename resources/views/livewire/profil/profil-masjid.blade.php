@@ -17,6 +17,13 @@
         {{-- Close Modal --}}
         @script
             <script>
+                $wire.on('resetFileInput', (data) => {
+                    const name = data?.inputName || (Array.isArray(data) && data[0]?.inputName) || data;
+                    if (typeof resetLogoInput === 'function') {
+                        resetLogoInput(name);
+                    }
+                });
+
                 $wire.on('closeDeleteModal', () => {
                     const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                     if (modal) {
