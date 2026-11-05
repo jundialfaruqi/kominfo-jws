@@ -39,7 +39,7 @@ class ProfilMasjid extends Component
     public $showForm = false;
     public $showTable = true;
     public $deleteProfileId;
-    public $deleteProfileName;
+    public $deleteProfileName; 
 
     protected $rules = [
         'userId'            => 'required|exists:users,id',
