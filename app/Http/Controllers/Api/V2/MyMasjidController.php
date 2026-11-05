@@ -107,7 +107,7 @@ class MyMasjidController extends Controller
             $durasi = null;
             if ($durasiModel) {
                 $durasi = [
-                    'adzan_imsak' => (int) $durasiModel->adzan_imsak,
+                    'adzan_imsak' => $durasiModel->adzan_imsak !== null ? (int) $durasiModel->adzan_imsak : null,
                     'adzan_shuruq' => (int) $durasiModel->adzan_shuruq,
                     'adzan_dhuha' => (int) $durasiModel->adzan_dhuha,
                     'adzan_shubuh' => (int) $durasiModel->adzan_shubuh,
