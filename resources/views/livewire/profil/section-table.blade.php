@@ -60,7 +60,6 @@
                         <th>Masjid & Admin</th>
                         <th>Alamat</th>
                         <th>No Hp</th>
-                        <th>Logo</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -110,13 +109,6 @@
                             </td>
                             <td class="text-wrap">{{ $profil->address }}</td>
                             <td class="text-wrap">{{ $profil->phone }}</td>
-                            <td>
-                                @if ($profil->logo_masjid)
-                                    <img src="{{ asset($profil->logo_masjid) }}" width="40" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
                             <td class="text-end">
                                 <button wire:click="edit('{{ $profil->id }}')"
                                     class="btn py-2 px-2 rounded-4 shadow-sm">
