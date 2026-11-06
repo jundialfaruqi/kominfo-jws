@@ -974,6 +974,15 @@ class Keuangan extends Component
             }
         }
 
+        // Sinkronkan nilai saldo (integer) dari saldoInput yang sudah diformat di client browser
+        $digits = preg_replace('/\D/', '', (string) $this->saldoInput);
+        if ($digits !== '') {
+            $this->saldo = (int) $digits;
+            $this->saldoInput = number_format((int) $digits, 0, ',', '.');
+        } elseif ($this->saldoInput === '' || $this->saldoInput === null) {
+            $this->saldo = null;
+        }
+
         $validated = $this->validate();
 
         if ($this->isEdit && $this->laporanId) {

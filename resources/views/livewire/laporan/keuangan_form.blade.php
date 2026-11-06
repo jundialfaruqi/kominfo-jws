@@ -86,7 +86,19 @@
                     <label class="form-label">Nominal</label>
                     <div class="input-group">
                         <span class="input-group-text" id="visible-addon">Rp</span>
-                        <input type="text" inputmode="numeric" wire:model.live="saldoInput"
+                        <input type="text" inputmode="numeric" autocomplete="off"
+                            wire:model="saldoInput"
+                            x-data
+                            x-on:input="
+                                let raw = $el.value.replace(/\D/g, '');
+                                raw = raw.replace(/^0+(?=\d)/, '');
+                                let formatted = raw !== '' ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : '';
+                                if ($el.value !== formatted) {
+                                    $el.value = formatted;
+                                }
+                                $wire.saldoInput = formatted;
+                                $wire.saldo = raw !== '' ? parseInt(raw, 10) : null;
+                            "
                             class="form-control @error('saldo') is-invalid @enderror" placeholder="Masukkan nominal"
                             style="letter-spacing: 0.06em; font-variant-numeric: tabular-nums;">
                         @error('saldo')
