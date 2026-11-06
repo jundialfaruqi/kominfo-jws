@@ -15,9 +15,31 @@
             </div>
             <div class="ms-auto text-secondary">
                 <span>Cari</span>
-                <div class="ms-2 d-inline-block">
-                    <input wire:model.live="search" type="text" class="form-control form-control py-1 rounded-3"
-                        placeholder="Ketik disini">
+                <div class="ms-2 d-inline-block"
+                    x-data="{
+                        query: $wire.entangle('search'),
+                        timer: null,
+                        onInput(e) {
+                            clearTimeout(this.timer);
+                            const val = (e.target.value || '').trim();
+                            this.timer = setTimeout(() => {
+                                if (val.length >= 3 || val.length === 0) {
+                                    $wire.set('search', val);
+                                }
+                            }, 500);
+                        }
+                    }">
+                    <input type="search"
+                        name="search_audio_masjid"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        :value="query"
+                        @input="onInput($event)"
+                        @search="onInput($event)"
+                        class="form-control form-control py-1 rounded-3"
+                        placeholder="Min. 3 karakter...">
                 </div>
             </div>
         </div>
@@ -38,11 +60,14 @@
             </thead>
             <tbody>
                 @foreach ($audioList as $audio)
-                    <tr>
+                    <tr wire:key="audio-row-{{ $audio->id }}">
                         <td class="text-center text-muted">
                             {{ $loop->iteration + ($audioList->currentPage() - 1) * $audioList->perPage() }}
                         </td>
-                        <td class="text-wrap">{{ $audio->user->name ?? '-' }}</td>
+                        <td class="text-nowrap">
+                            <div class="fw-bold text-nowrap">{{ $audio->user?->profil?->name ?? '-' }}</div>
+                            <div class="text-muted small text-nowrap">{{ $audio->user?->name ?? '-' }}</div>
+                        </td>
                         {{-- Audio 1 --}}
                         <td class="text-center">
                             @if ($audio->audio1_url)

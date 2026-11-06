@@ -7,6 +7,7 @@ use App\Models\AdzanAudio as AdzanAudioModel;
 use App\Models\Profil;
 use App\Models\User;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -22,9 +23,15 @@ class AdzanAudio extends Component
 
     #[Title('Audio Adzan')]
 
-    public $search;
+    #[Url]
+    public $search = '';
     public $paginate;
     protected $paginationTheme = 'bootstrap';
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
 
     public $adzanAudioId;
     public $userId;
@@ -317,7 +324,9 @@ class AdzanAudio extends Component
     public function mount()
     {
         $this->paginate = 10;
-        $this->search = '';
+        if ($this->search === null) {
+            $this->search = '';
+        }
         $this->audioadzanUploaded = false;
         $this->adzanshubuhUploaded = false;
 
@@ -405,17 +414,23 @@ class AdzanAudio extends Component
         $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
-        $query = AdzanAudioModel::with('user')
+        $query = AdzanAudioModel::with('user.profil')
             ->select('id', 'user_id', 'audioadzan', 'adzanshubuh', 'status');
 
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
         } else {
-            $query->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
+            // Admin can search through all adzan audio (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    })->orWhereHas('user.profil', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    });
                 });
-            });
+            }
         }
 
         $adzanAudioList = $query->orderBy('id', 'asc')->paginate($this->paginate);

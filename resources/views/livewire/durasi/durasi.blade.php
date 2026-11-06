@@ -60,10 +60,31 @@
                                     </div>
                                     <div class="ms-auto text-secondary">
                                         <span>Cari</span>
-                                        <div class="ms-2 d-inline-block">
-                                            <input wire:model.live="search" type="text"
+                                        <div class="ms-2 d-inline-block"
+                                            x-data="{
+                                                query: $wire.entangle('search'),
+                                                timer: null,
+                                                onInput(e) {
+                                                    clearTimeout(this.timer);
+                                                    const val = (e.target.value || '').trim();
+                                                    this.timer = setTimeout(() => {
+                                                        if (val.length >= 3 || val.length === 0) {
+                                                            $wire.set('search', val);
+                                                        }
+                                                    }, 500);
+                                                }
+                                            }">
+                                            <input type="search"
+                                                name="search_durasi_masjid"
+                                                autocomplete="off"
+                                                autocorrect="off"
+                                                autocapitalize="off"
+                                                spellcheck="false"
+                                                :value="query"
+                                                @input="onInput($event)"
+                                                @search="onInput($event)"
                                                 class="form-control form-control py-1 rounded-3"
-                                                placeholder="Ketik disini">
+                                                placeholder="Min. 3 karakter...">
                                         </div>
                                     </div>
                                 </div>

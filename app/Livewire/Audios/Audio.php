@@ -7,6 +7,7 @@ use App\Models\Audios;
 use App\Models\Profil;
 use App\Models\User;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -22,9 +23,15 @@ class Audio extends Component
 
     #[Title('Audio Masjid')]
 
-    public $search;
+    #[Url]
+    public $search = '';
     public $paginate;
     protected $paginationTheme = 'bootstrap';
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
 
     public $audioId;
     #[Validate('required|exists:users,id', message: [
@@ -308,7 +315,9 @@ class Audio extends Component
     public function mount()
     {
         $this->paginate = 10;
-        $this->search = '';
+        if ($this->search === null) {
+            $this->search = '';
+        }
 
         try {
             $this->checkLocalStorageConfig();
@@ -369,17 +378,23 @@ class Audio extends Component
         $isAdmin = in_array($currentUser->role, ['Super Admin', 'Admin']);
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
-        $query = Audios::with('user')
+        $query = Audios::with('user.profil')
             ->select('id', 'user_id', 'audio1', 'audio2', 'audio3', 'status');
 
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
         } else {
-            $query->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
+            // Admin can search through all audios (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    })->orWhereHas('user.profil', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    });
                 });
-            });
+            }
         }
 
         $audioList = $query->orderBy('id', 'asc')->paginate($this->paginate);

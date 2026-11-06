@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th class="w-1">No</th>
-                <th>Nama Admin Masjid</th>
+                <th>Admin Masjid</th>
                 <th class="text-center">Imsak</th>
                 <th class="text-center">Shubuh (A/I/F)</th>
                 <th class="text-center">Syuruq</th>
@@ -18,11 +18,14 @@
         </thead>
         <tbody>
             @foreach ($durasiList as $durasi)
-                <tr>
+                <tr wire:key="durasi-row-{{ $durasi->id }}">
                     <td class="text-center text-muted">
                         {{ $loop->iteration + ($durasiList->currentPage() - 1) * $durasiList->perPage() }}
                     </td>
-                    <td class="text-wrap">{{ $durasi->user->name }}</td>
+                    <td class="text-nowrap">
+                        <div class="fw-bold text-nowrap">{{ $durasi->user?->profil?->name ?? '-' }}</div>
+                        <div class="text-muted small text-nowrap">{{ $durasi->user?->name ?? '-' }}</div>
+                    </td>
                     <td class="text-center">{{ $durasi->adzan_imsak }}</td>
                     <td class="text-center">
                         {{ $durasi->adzan_shubuh }}/{{ $durasi->iqomah_shubuh }}/{{ $durasi->final_shubuh }}

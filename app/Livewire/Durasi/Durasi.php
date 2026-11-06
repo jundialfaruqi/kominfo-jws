@@ -8,6 +8,7 @@ use App\Models\Profil;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,7 +19,8 @@ class Durasi extends Component
     #[Title('Pengaturan Durasi')]
 
     public $paginate;
-    public $search;
+    #[Url]
+    public $search = '';
     protected $paginationTheme = 'bootstrap';
 
     public $durasiId;
@@ -139,7 +141,9 @@ class Durasi extends Component
     public function mount()
     {
         $this->paginate = 10;
-        $this->search = '';
+        if ($this->search === null) {
+            $this->search = '';
+        }
 
         // Jika user bukan admin
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
@@ -221,7 +225,7 @@ class Durasi extends Component
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder untuk durasi
-        $query = ModelsDurasi::with('user')
+        $query = ModelsDurasi::with('user.profil')
             ->select(
                 'id',
                 'user_id',
@@ -258,10 +262,17 @@ class Durasi extends Component
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
         } else {
-            // Admin dapat mencari semua durasi
-            $query->whereHas('user', function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%');
-            });
+            // Admin dapat mencari semua durasi (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    })->orWhereHas('user.profil', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    });
+                });
+            }
         }
 
         $durasiList = $query->orderBy('id', 'asc')
