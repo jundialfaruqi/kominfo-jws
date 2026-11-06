@@ -1,5 +1,23 @@
 @if (Auth::check() && in_array(Auth::user()->role, ['Super Admin', 'Admin']))
     @if ($showTable)
+        @php
+            $slideColumns = [
+                'adzan1'  => 'Iqomah 1',
+                'adzan2'  => 'Iqomah 2',
+                'adzan3'  => 'Iqomah 3',
+                'adzan4'  => 'Iqomah 4',
+                'adzan5'  => 'Iqomah 5',
+                'adzan6'  => 'Iqomah 6',
+                'adzan7'  => "Jum'at 1",
+                'adzan8'  => "Jum'at 2",
+                'adzan9'  => "Jum'at 3",
+                'adzan10' => "Jum'at 4",
+                'adzan11' => "Jum'at 5",
+                'adzan12' => "Jum'at 6",
+                'adzan15' => 'After Iqomah',
+            ];
+        @endphp
+
         {{-- Pagination & search control --}}
         <div class="card-body border-bottom py-3">
             <div class="d-flex">
@@ -17,13 +35,36 @@
                 </div>
                 <div class="ms-auto text-secondary">
                     <span>Cari</span>
-                    <div class="ms-2 d-inline-block">
-                        <input wire:model.live="search" type="text" class="form-control form-control py-1 rounded-3"
-                            placeholder="Ketik disini">
+                    <div class="ms-2 d-inline-block"
+                        x-data="{
+                            query: $wire.entangle('search'),
+                            timer: null,
+                            onInput(e) {
+                                clearTimeout(this.timer);
+                                const val = (e.target.value || '').trim();
+                                this.timer = setTimeout(() => {
+                                    if (val.length >= 3 || val.length === 0) {
+                                        $wire.set('search', val);
+                                    }
+                                }, 500);
+                            }
+                        }">
+                        <input type="search"
+                            name="search_adzan_masjid"
+                            autocomplete="off"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            :value="query"
+                            @input="onInput($event)"
+                            @search="onInput($event)"
+                            class="form-control form-control py-1 rounded-3"
+                            placeholder="Min. 3 karakter...">
                     </div>
                 </div>
             </div>
         </div>
+
         {{-- table --}}
         <div class="table-responsive">
             <table class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
@@ -31,120 +72,51 @@
                     <tr>
                         <th class="w-1">No.</th>
                         <th>Admin Masjid</th>
-                        <th>Iqomah 1</th>
-                        <th>Iqomah 2</th>
-                        <th>Iqomah 3</th>
-                        <th>Iqomah 4</th>
-                        <th>Iqomah 5</th>
-                        <th>Iqomah 6</th>
-                        <th>Jum'at 1</th>
-                        <th>Jum'at 2</th>
-                        <th>Jum'at 3</th>
-                        <th>Jum'at 4</th>
-                        <th>Jum'at 5</th>
-                        <th>Jum'at 6</th>
-                        <th>After Iqomah</th>
+                        @foreach ($slideColumns as $key => $title)
+                            <th class="text-center">{{ $title }}</th>
+                        @endforeach
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($adzanList as $adzan)
-                        <tr>
+                        @php
+                            $masjidName = $adzan->user?->profil?->name ?? ($adzan->user?->name ?? '-');
+                        @endphp
+                        <tr wire:key="adzan-row-{{ $adzan->id }}">
                             <td class="text-center text-muted">
                                 {{ $loop->iteration + ($adzanList->currentPage() - 1) * $adzanList->perPage() }}
                             </td>
-                            <td class="text-wrap">{{ $adzan->user->name ?? '-' }}</td>
-                            <td>
-                                @if ($adzan->adzan1)
-                                    <img src="{{ asset($adzan->adzan1) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
+                            <td class="text-wrap">
+                                <div class="fw-bold">{{ $adzan->user?->profil?->name ?? '-' }}</div>
+                                <div class="text-muted small">{{ $adzan->user?->name ?? '-' }}</div>
                             </td>
-                            <td>
-                                @if ($adzan->adzan2)
-                                    <img src="{{ asset($adzan->adzan2) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan3)
-                                    <img src="{{ asset($adzan->adzan3) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan4)
-                                    <img src="{{ asset($adzan->adzan4) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan5)
-                                    <img src="{{ asset($adzan->adzan5) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan6)
-                                    <img src="{{ asset($adzan->adzan6) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan7)
-                                    <img src="{{ asset($adzan->adzan7) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan8)
-                                    <img src="{{ asset($adzan->adzan8) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan9)
-                                    <img src="{{ asset($adzan->adzan9) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan10)
-                                    <img src="{{ asset($adzan->adzan10) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan11)
-                                    <img src="{{ asset($adzan->adzan11) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan12)
-                                    <img src="{{ asset($adzan->adzan12) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
-                            <td>
-                                @if ($adzan->adzan15)
-                                    <img src="{{ asset($adzan->adzan15) }}" width="60" class="img-thumbnail">
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
-                            </td>
+                            @foreach ($slideColumns as $field => $label)
+                                @php
+                                    $slidePath = $adzan->$field;
+                                @endphp
+                                <td class="text-center">
+                                    @if ($slidePath)
+                                        <div class="d-inline-flex flex-column align-items-center justify-content-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2.2"
+                                                stroke-linecap="round" stroke-linejoin="round"
+                                                class="icon">
+                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                <path d="M5 12l5 5l10 -10" />
+                                            </svg>
+                                            <a href="javascript:void(0)"
+                                                onclick="openAdzanSlidePreview(@js(asset($slidePath)), @js($label), @js($masjidName))"
+                                                class="small text-decoration-underline text-reset mt-1 fw-medium"
+                                                style="cursor: pointer;">
+                                                Lihat Slide
+                                            </a>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endif
+                                </td>
+                            @endforeach
                             <td class="text-end">
                                 <button wire:click="edit('{{ $adzan->id }}')"
                                     class="btn py-2 px-2 rounded-3 shadow-sm">
@@ -196,8 +168,91 @@
                 </tbody>
             </table>
         </div>
+
         <div class="card-footer align-items-center pb-0 rounded-bottom-4 shadow-sm">
             {{ $adzanList->links(data: ['scrollTo' => false]) }}
         </div>
+
+        {{-- Modal Overlay Pratinjau Slide --}}
+        <div wire:ignore.self class="modal modal-blur fade" id="adzanSlidePreviewModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content rounded-4 border-0 shadow">
+                    {{-- Header Modal + Judul & Tombol Icon Close --}}
+                    <div class="modal-header py-2 px-3 border-bottom">
+                        <div class="modal-title text-truncate pe-2">
+                            <span class="fw-bold" id="adzanSlidePreviewTitle">Pratinjau Slide</span>
+                            <span class="text-muted small ms-1" id="adzanSlidePreviewMasjid"></span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Tutup"></button>
+                    </div>
+
+                    {{-- Body Modal + Skeleton Loading & Gambar --}}
+                    <div class="modal-body p-3 d-flex align-items-center justify-content-center position-relative" style="min-height: 360px;">
+                        {{-- Skeleton Loading --}}
+                        <div id="adzanSlidePreviewSkeleton" class="w-100 placeholder-glow" style="aspect-ratio: 16 / 9; max-height: 70vh;">
+                            <div class="placeholder col-12 w-100 h-100 rounded-3" style="min-height: 340px;"></div>
+                        </div>
+
+                        {{-- Pesan Gagal Muat --}}
+                        <div id="adzanSlidePreviewError" class="text-center text-muted py-5" style="display: none;">
+                            Gagal memuat gambar slide.
+                        </div>
+
+                        {{-- Gambar Slide --}}
+                        <img id="adzanSlidePreviewImg" src="" alt="Pratinjau Slide" class="img-fluid rounded-3"
+                            style="max-height: 72vh; width: auto; object-fit: contain; display: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function openAdzanSlidePreview(url, title, masjid) {
+                const modalEl = document.getElementById('adzanSlidePreviewModal');
+                if (!modalEl) return;
+
+                const titleEl = document.getElementById('adzanSlidePreviewTitle');
+                const masjidEl = document.getElementById('adzanSlidePreviewMasjid');
+                const imgEl = document.getElementById('adzanSlidePreviewImg');
+                const skeletonEl = document.getElementById('adzanSlidePreviewSkeleton');
+                const errorEl = document.getElementById('adzanSlidePreviewError');
+
+                if (titleEl) titleEl.textContent = title || 'Pratinjau Slide';
+                if (masjidEl) masjidEl.textContent = masjid ? '— ' + masjid : '';
+
+                if (errorEl) errorEl.style.display = 'none';
+                if (skeletonEl) skeletonEl.style.display = 'block';
+
+                if (imgEl) {
+                    imgEl.style.display = 'none';
+                    imgEl.onload = function() {
+                        if (skeletonEl) skeletonEl.style.display = 'none';
+                        imgEl.style.display = 'block';
+                    };
+                    imgEl.onerror = function() {
+                        if (skeletonEl) skeletonEl.style.display = 'none';
+                        if (errorEl) errorEl.style.display = 'block';
+                    };
+                    imgEl.src = url;
+                }
+
+                if (!modalEl._hasHideListener) {
+                    modalEl.addEventListener('hidden.bs.modal', function () {
+                        if (imgEl) {
+                            imgEl.removeAttribute('src');
+                            imgEl.style.display = 'none';
+                        }
+                        if (skeletonEl) skeletonEl.style.display = 'block';
+                        if (errorEl) errorEl.style.display = 'none';
+                    });
+                    modalEl._hasHideListener = true;
+                }
+
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modal.show();
+                }
+            }
+        </script>
     @endif
 @endif

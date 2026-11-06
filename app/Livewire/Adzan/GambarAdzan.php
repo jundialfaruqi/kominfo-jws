@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -21,9 +22,15 @@ class GambarAdzan extends Component
 
     #[Title('Gambar Slides')]
 
-    public $search;
+    #[Url]
+    public $search = '';
     public $paginate;
     protected $paginationTheme = 'bootstrap';
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
 
     public $adzanId;
 
@@ -803,7 +810,9 @@ class GambarAdzan extends Component
     public function mount()
     {
         $this->paginate = 10;
-        $this->search = '';
+        if ($this->search === null) {
+            $this->search = '';
+        }
 
         // jika user bukan admin
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
@@ -891,7 +900,7 @@ class GambarAdzan extends Component
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // query builder for adzan
-        $query = Adzan::with('user')
+        $query = Adzan::with('user.profil')
             ->select('id', 'user_id', 'adzan1', 'adzan2', 'adzan3', 'adzan4', 'adzan5', 'adzan6', 'adzan7', 'adzan8', 'adzan9', 'adzan10', 'adzan11', 'adzan12', 'adzan13', 'adzan14', 'adzan15');
 
         // if user is not Super Admin, filter adzan and exclude users with 'Super Admin' or 'Admin' roles
@@ -905,12 +914,17 @@ class GambarAdzan extends Component
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
         } else {
-            // admin can search through all adzan
-            $query->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
+            // admin can search through all adzan (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    })->orWhereHas('user.profil', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    });
                 });
-            });
+            }
         }
 
         $adzanList = $query->orderBy('id', 'asc')
