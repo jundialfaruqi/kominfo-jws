@@ -13,7 +13,25 @@
                     </div>
 
                     <div class="mb-3" wire:ignore>
-                        <label class="form-label">Konten Berita</label>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label mb-0">Konten Berita</label>
+                        </div>
+
+                        {{-- Progress bar upload & kompresi gambar --}}
+                        <div id="imageUploadProgressContainer" class="p-2 mb-2 bg-light rounded-3 border d-none">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted d-flex align-items-center gap-2" id="imageUploadStatus">
+                                    <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                                    <span>Memproses gambar...</span>
+                                </span>
+                                <span class="small fw-bold text-primary" id="imageUploadPercent">0%</span>
+                            </div>
+                            <div class="progress progress-sm" style="height: 6px;">
+                                <div id="imageUploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                                    role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+
                         <div id="summernote"></div>
                     </div>
                 </div>

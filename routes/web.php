@@ -145,6 +145,9 @@ Route::middleware('auth', 'ensure-user-is-active', 'auth.session')->group(functi
     Route::get('/berita', \App\Livewire\Articles\ArticleIndex::class)
         ->name('articles.index')
         ->middleware('can:view-berita');
+    Route::post('/berita/upload-image', [\App\Http\Controllers\ArticleImageUploadController::class, 'upload'])
+        ->name('articles.upload-image')
+        ->middleware('can:view-berita');
 
     // Group Category Routes
     Route::get('/group-category', GroupCategoryGroup::class)

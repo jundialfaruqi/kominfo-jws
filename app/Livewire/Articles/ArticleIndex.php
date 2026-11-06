@@ -79,7 +79,11 @@ class ArticleIndex extends Component
 
     public function render()
     {
-        $query = Article::with(['user', 'category']);
+        $query = Article::select('id', 'user_id', 'article_category_id', 'title', 'slug', 'description', 'status', 'published_at', 'created_at')
+            ->with([
+                'user:id,name',
+                'category:id,name',
+            ]);
 
         if ($this->search) {
             $query->where(function($q) {
