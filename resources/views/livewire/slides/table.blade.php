@@ -19,7 +19,10 @@
                     <td class="text-center text-muted">
                         {{ $loop->iteration + ($slideList->currentPage() - 1) * $slideList->perPage() }}
                     </td>
-                    <td class="text-wrap">{{ $slide->user->name ?? '-' }}</td>
+                    <td class="text-wrap">
+                        <div class="fw-bold">{{ $slide->user?->profil?->name ?? '-' }}</div>
+                        <div class="text-muted small">{{ $slide->user?->name ?? '-' }}</div>
+                    </td>
                     <td>
                         @if ($slide->slide1)
                             <img src="{{ asset($slide->slide1) }}" width="60" class="img-thumbnail">

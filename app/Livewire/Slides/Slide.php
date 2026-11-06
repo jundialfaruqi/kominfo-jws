@@ -395,7 +395,7 @@ class Slide extends Component
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder for slides
-        $query = Slides::with('user')
+        $query = Slides::with('user.profil')
             ->select('id', 'user_id', 'slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slide6');
 
         // If user is not admin, only show their own slides
@@ -405,6 +405,8 @@ class Slide extends Component
             // Admin can search through all slides
             $query->where(function ($query) {
                 $query->whereHas('user', function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%');
+                })->orWhereHas('user.profil', function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%');
                 });
             });
