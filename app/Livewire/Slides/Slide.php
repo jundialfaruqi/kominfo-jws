@@ -362,8 +362,13 @@ class Slide extends Component
         }
     }
 
-    public function updatingSearch()
+    public function updatingSearch($value = '')
     {
+        $trimmed = trim((string) $value);
+        if ($trimmed !== '' && mb_strlen($trimmed) < 3) {
+            return;
+        }
+
         $this->resetPage();
         $this->showForm = false;
         $this->resetValidation();
@@ -402,14 +407,17 @@ class Slide extends Component
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
         } else {
-            // Admin can search through all slides
-            $query->where(function ($query) {
-                $query->whereHas('user', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
-                })->orWhereHas('user.profil', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%');
+            // Admin can search through all slides (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->whereHas('user', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    })->orWhereHas('user.profil', function ($q) use ($keyword) {
+                        $q->where('name', 'like', '%' . $keyword . '%');
+                    });
                 });
-            });
+            }
         }
 
         $slideList = $query->orderBy('id', 'asc')
