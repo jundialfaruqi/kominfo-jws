@@ -7,10 +7,8 @@
         <h1 class="navbar-brand me-lg-3 me-3">
             <a wire:navigate href="{{ route('dashboard.index') }}">
                 <span class="navbar-brand-image">
-                    <a wire:navigate href="{{ route('dashboard.index') }}">
-                        <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Pekanbaru"
-                            class="navbar-brand-image">
-                    </a>
+                    <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Pekanbaru"
+                        class="navbar-brand-image">
                 </span>
                 <span class="navbar-brand-text">JWS Pekanbaru</span>
             </a>
@@ -815,9 +813,6 @@
             if (savedScroll !== null) {
                 sidebar.scrollTop = parseInt(savedScroll, 10);
             }
-            sidebar.addEventListener('scroll', function() {
-                sessionStorage.setItem('jws_sidebar_scroll', sidebar.scrollTop);
-            }, { passive: true });
         })();
     </script>
 </aside>

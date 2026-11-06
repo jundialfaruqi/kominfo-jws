@@ -16,4 +16,16 @@
     body {
         font-feature-settings: "cv03", "cv04", "cv11";
     }
+
+    @media (max-width: 991.98px) {
+        #main-sidebar #sidebar-menu {
+            max-height: calc(100vh - 3.75rem);
+            max-height: calc(100dvh - 3.75rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+    }
 </style>

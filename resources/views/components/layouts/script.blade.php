@@ -43,9 +43,5 @@
         if (savedScroll !== null) {
             sidebar.scrollTop = parseInt(savedScroll, 10);
         }
-
-        sidebar.addEventListener('scroll', function() {
-            sessionStorage.setItem('jws_sidebar_scroll', sidebar.scrollTop);
-        }, { passive: true });
     });
 </script>
