@@ -22,6 +22,21 @@
         background-color: #ffffff !important;
         box-shadow: none !important;
         overflow-x: hidden !important;
+        scrollbar-width: none !important; /* Firefox */
+        -ms-overflow-style: none !important; /* IE & Edge */
+    }
+
+    /* Sembunyikan scrollbar indikator di sidebar (WebKit: Chrome, Safari, Edge) */
+    #main-sidebar::-webkit-scrollbar,
+    #main-sidebar #sidebar-menu::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    #main-sidebar #sidebar-menu {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
     }
 
     #main-sidebar .navbar-brand-text {
