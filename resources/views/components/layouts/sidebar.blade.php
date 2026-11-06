@@ -1,16 +1,25 @@
-<aside id="main-sidebar" class="navbar navbar-vertical navbar-expand-lg sticky-top bg-white border-end">
+<aside id="main-sidebar" class="navbar navbar-vertical navbar-expand-lg sticky-top bg-white">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu"
             aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <h1 class="navbar-brand me-lg-3 me-3">
-            <a wire:navigate href="{{ route('dashboard.index') }}">
-                <span class="navbar-brand-image">
-                    <img src="{{ asset('nav-brand.png') }}" width="30" alt="JWS Pekanbaru"
+        <h1 class="navbar-brand me-3 me-lg-0 text-start" style="white-space: normal;">
+            <a wire:navigate href="{{ route('dashboard.index') }}"
+                class="d-flex align-items-center gap-1 text-decoration-none text-start w-100"
+                style="white-space: normal;">
+                <span class="navbar-brand-image flex-shrink-0">
+                    <img src="{{ asset('nav-brand.png') }}" width="32" height="32" alt="JWS Pekanbaru"
                         class="navbar-brand-image">
                 </span>
-                <span class="navbar-brand-text">JWS Pekanbaru</span>
+                <div class="d-flex flex-column text-start flex-grow-1" style="min-width: 0; white-space: normal;">
+                    <span class="navbar-brand-text fw-bold text-dark lh-sm"
+                        style="font-size: 0.95rem; white-space: nowrap;">JWS DISKOMINFO</span>
+                    <span class="text-muted text-uppercase d-none d-lg-block"
+                        style="font-size: 0.52rem; line-height: 1.25; color: #64748b !important; white-space: normal;">
+                        DINAS KOMUNIKASI, INFORMATIKA,<br>STATISTIK &amp; PERSANDIAN KOTA PEKANBARU
+                    </span>
+                </div>
             </a>
         </h1>
         <div class="navbar-nav flex-row d-lg-none">

@@ -20,7 +20,8 @@
     /* Sidebar Putih dengan Teks dan Ikon Kontras Tinggi */
     #main-sidebar {
         background-color: #ffffff !important;
-        border-right: 1px solid #e2e8f0 !important;
+        box-shadow: none !important;
+        overflow-x: hidden !important;
     }
 
     #main-sidebar .navbar-brand-text {
@@ -108,14 +109,45 @@
 
         #main-sidebar.navbar-vertical.navbar-expand-lg {
             width: var(--tblr-sidebar-width, 18rem) !important;
+            border-right: 1px solid #e2e8f0 !important;
+            box-shadow: none !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
         }
 
         #main-sidebar.navbar-vertical.navbar-expand-lg ~ .page-wrapper {
             margin-left: var(--tblr-sidebar-width, 18rem) !important;
         }
+
+        /* Navbar Brand tetap diam di bagian atas saat menu sidebar di-scroll & rata kiri */
+        #main-sidebar .navbar-brand {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background-color: #ffffff !important;
+            margin: 0 !important;
+            padding: 0.875rem 1.25rem !important;
+            width: 100% !important;
+            border-bottom: 1px solid #e2e8f0;
+            justify-content: flex-start !important;
+            text-align: left !important;
+            white-space: normal !important;
+        }
+
+        #main-sidebar .navbar-brand a {
+            justify-content: flex-start !important;
+            text-align: left !important;
+            white-space: normal !important;
+        }
     }
 
     @media (max-width: 991.98px) {
+        #main-sidebar {
+            border-bottom: 1px solid #e2e8f0 !important;
+            border-right: none !important;
+            box-shadow: none !important;
+        }
+
         #main-sidebar #sidebar-menu {
             max-height: calc(100vh - 3.75rem);
             max-height: calc(100dvh - 3.75rem);
