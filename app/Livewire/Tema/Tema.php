@@ -334,8 +334,12 @@ class Tema extends Component
         }
     }
 
-    public function selectTheme()
+    public function selectTheme($themeId = null)
     {
+        if ($themeId !== null) {
+            $this->selectedThemeId = !empty($themeId) ? (int) $themeId : null;
+        }
+
         try {
             // Pastikan bertipe Eloquent User agar method save() dikenali oleh linter
             $currentUser = User::findOrFail(Auth::id());
@@ -367,6 +371,9 @@ class Tema extends Component
             }
 
             $this->selectedThemeId = $currentUser->theme_id;
+            $this->initialThemeId = $currentUser->theme_id;
+
+            $this->dispatch('theme-saved', themeId: $currentUser->theme_id);
         } catch (\Exception $e) {
             $this->dispatch('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

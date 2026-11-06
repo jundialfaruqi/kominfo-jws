@@ -95,11 +95,15 @@ class SetTema extends Component
         $this->showTable = false;
     }
 
-    public function save()
+    public function save($themeId = null)
     {
         if (!in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
             $this->dispatch('error', 'Anda tidak memiliki akses untuk menyimpan tema pengguna!');
             return;
+        }
+
+        if ($themeId !== null) {
+            $this->selectedThemeId = !empty($themeId) ? (int) $themeId : null;
         }
     
         $this->validate();

@@ -5,7 +5,15 @@
                 <div class="col-12">
                     <div class="card rounded-4 shadow-sm border-0">
                         @if ($userId)
-                            <form wire:submit.prevent="save">
+                            <style>
+                                [x-cloak] { display: none !important; }
+                            </style>
+                            <form x-data="{
+                                selectedId: @js($selectedThemeId),
+                                selectTheme(id) {
+                                    this.selectedId = id;
+                                }
+                            }" x-on:submit.prevent="$wire.save(selectedId)">
                                 <div class="card-body">
                                     <div class="row mb-3">
                                         <div class="col-md-12">
@@ -23,36 +31,38 @@
                                     <div class="row row-cards">
                                         @foreach ($availableThemes as $theme)
                                             <div class="col-md-4" wire:key="theme-{{ $theme->id }}">
-                                                <div
-                                                    class="card mb-3 rounded-4 pt-2 px-2 shadow-sm {{ $selectedThemeId == $theme->id ? 'border-primary bg-light shadow-sm' : 'shadow-sm' }}">
+                                                <div class="card mb-3 rounded-4 pt-2 px-2 shadow-sm"
+                                                    :class="selectedId == {{ $theme->id }} ? 'border-primary bg-light shadow-sm' : 'shadow-sm'">
                                                     <div class="position-relative">
                                                         <img src="{{ $theme->preview_image ? asset($theme->preview_image) : asset('images/other/default-theme.jpg') }}"
-                                                            class="card-img-top rounded-3 {{ $selectedThemeId == $theme->id ? 'opacity-50' : 'opacity-100' }}"
+                                                            class="card-img-top rounded-3"
+                                                            :class="selectedId == {{ $theme->id }} ? 'opacity-50' : 'opacity-100'"
                                                             alt="{{ $theme->name }}"
-                                                            style="height: 200px; object-fit: stright;">
-                                                        @if ($selectedThemeId == $theme->id)
-                                                            <div
-                                                                class="position-absolute top-0 end-0 me-4 mt-2 text-success avatar rounded-circle shadow-sm">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24"
-                                                                    height="24" viewBox="0 0 24 24"
-                                                                    fill="currentColor"
-                                                                    class="icon icon-tabler icons-tabler-filled icon-tabler-circle-check">
-                                                                    <path stroke="none" d="M0 0h24v24H0z"
-                                                                        fill="none" />
-                                                                    <path
-                                                                        d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 .083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-                                                                </svg>
-                                                            </div>
-                                                        @endif
+                                                            style="height: 200px; object-fit: cover;">
+                                                        <div x-show="selectedId == {{ $theme->id }}" x-cloak
+                                                            class="position-absolute top-0 end-0 me-4 mt-2 text-success avatar rounded-circle shadow-sm">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24"
+                                                                fill="currentColor"
+                                                                class="icon icon-tabler icons-tabler-filled icon-tabler-circle-check">
+                                                                <path stroke="none" d="M0 0h24v24H0z"
+                                                                    fill="none" />
+                                                                <path
+                                                                    d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                                                            </svg>
+                                                        </div>
                                                     </div>
                                                     <div class="card-body text-center">
-                                                        <h5
-                                                            class="card-title {{ $selectedThemeId == $theme->id ? 'text-primary' : '' }}">
+                                                        <h5 class="card-title"
+                                                            :class="selectedId == {{ $theme->id }} ? 'text-primary' : ''">
                                                             {{ $theme->name }}
                                                         </h5>
                                                         <button type="button"
-                                                            wire:click="selectTempTheme({{ $theme->id }})"
-                                                            class="btn btn-primary rounded-3 shadow-sm {{ $selectedThemeId == $theme->id ? 'disabled' : '' }}">
+                                                            @click="selectTheme({{ $theme->id }})"
+                                                            class="btn btn-primary rounded-3 shadow-sm"
+                                                            :class="{ 'disabled': selectedId == {{ $theme->id }} }"
+                                                            :disabled="selectedId == {{ $theme->id }}"
+                                                            x-text="selectedId == {{ $theme->id }} ? 'Dipilih' : 'Pilih Tema'">
                                                             {{ $selectedThemeId == $theme->id ? 'Dipilih' : 'Pilih Tema' }}
                                                         </button>
                                                     </div>

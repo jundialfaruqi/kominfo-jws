@@ -163,43 +163,58 @@
         </div>
     </form>
 @elseif (!$isAdmin)
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
     <!-- Form untuk user memilih tema -->
-    <form wire:submit.prevent="selectTheme">
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <div class="row g-2 mb-3">
-                        <div class="col-md-2">
-                            <label class="form-label required">Pilih Tema</label>
-                        </div>
-                        <div class="col-md-10">
-                            <select class="form-select rounded-3 @error('selectedThemeId') is-invalid @enderror"
-                                wire:model.live="selectedThemeId">
-                                <option value="">Tidak ada tema (default)</option>
-                                @foreach ($availableThemes as $theme)
-                                    <option value="{{ $theme->id }}">
-                                        {{ $theme->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('selectedThemeId')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+    <form x-data="{
+        selectedId: @js($selectedThemeId),
+        initialId: @js($initialThemeId),
+        selectTheme(id) {
+            this.selectedId = id;
+        },
+        cancelSelection() {
+            this.selectedId = this.initialId;
+        }
+        x-on:submit.prevent="$wire.selectTheme(selectedId)">
+            <div class="card-body" wire:ignore>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-2">
+                                <label class="form-label required">Pilih Tema</label>
+                            </div>
+                            <div class="col-md-10">
+                                <select class="form-select rounded-3 @error('selectedThemeId') is-invalid @enderror"
+                                    x-model="selectedId">
+                                    <option value="">Tidak ada tema (default)</option>
+                                    @foreach ($availableThemes as $theme)
+                                        <option value="{{ $theme->id }}">
+                                            {{ $theme->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('selectedThemeId')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row row-cards">
-                @foreach ($availableThemes as $theme)
-                    <div class="col-md-4" wire:key="theme-{{ $theme->id }}">
-                        <div
-                            class="card mb-3 rounded-4 pt-2 px-2 shadow-sm {{ $selectedThemeId == $theme->id ? 'border-primary bg-light shadow-sm' : 'shadow-sm' }}">
-                            <div class="position-relative">
-                                <img src="{{ $theme->preview_image ? asset($theme->preview_image) : asset('images/other/default-theme.jpg') }}"
-                                    class="card-img-top rounded-4 {{ $selectedThemeId == $theme->id ? 'opacity-50' : 'opacity-100' }}"
-                                    alt="{{ $theme->name }}" style="height: 200px; object-fit: stright;">
-                                @if ($selectedThemeId == $theme->id)
-                                    <div
+                <div class="row row-cards">
+                    @foreach ($availableThemes as $theme)
+                        <div class="col-md-4" wire:key="theme-{{ $theme->id }}">
+                            <div class="card mb-3 rounded-4 pt-2 px-2 shadow-sm" style="cursor: pointer;"
+                                @click="selectTheme({{ $theme->id }})"
+                                :class="selectedId == {{ $theme->id }} ? 'border-primary bg-light shadow-sm' : 'shadow-sm'">
+                                <div class="position-relative">
+                                    <img src="{{ $theme->preview_image ? asset($theme->preview_image) : asset('images/other/default-theme.jpg') }}"
+                                        class="card-img-top rounded-4"
+                                        :class="selectedId == {{ $theme->id }} ? 'opacity-50' : 'opacity-100'"
+                                        alt="{{ $theme->name }}" style="height: 200px; object-fit: cover;">
+                                    <div x-show="selectedId == {{ $theme->id }}" x-cloak
                                         class="position-absolute top-0 end-0 me-4 mt-2 text-success avatar rounded-circle shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="currentColor"
@@ -209,63 +224,58 @@
                                                 d="M17 3.34a10 10 0 1 1 -14.995 8.984l-.005 -.324l.005 -.324a10 10 0 0 1 14.995 -8.336zm-1.293 5.953a1 1 0 0 0 -1.32 -.083l-.094 .083l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.403 1.403l.083 .094l2 2l.094 .083a1 1 0 0 0 1.226 0l.094 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
                                         </svg>
                                     </div>
-                                @endif
-                            </div>
-                            <div class="card-body text-center">
-                                <h5 class="card-title {{ $selectedThemeId == $theme->id ? 'text-primary' : '' }}">
-                                    {{ $theme->name }}
-                                </h5>
-                                <button type="button" wire:click="selectTempTheme({{ $theme->id }})"
-                                    class="btn btn-primary rounded-3 shadow-sm {{ $selectedThemeId == $theme->id ? 'disabled' : '' }}">
-                                    {{ $selectedThemeId == $theme->id ? 'Dipilih' : 'Pilih Tema' }}
-                                </button>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title"
+                                        :class="selectedId == {{ $theme->id }} ? 'text-primary' : ''">
+                                        {{ $theme->name }}
+                                    </h5>
+                                        type="button" @click.stop="selectTheme({{ $theme->id }})"
+                                        class="btn btn-primary rounded-3 shadow-sm"
+                                        :class="{ 'disabled': selectedId == {{ $theme->id }} }"
+                                        :disabled="selectedId == {{ $theme->id }}"
+                                        x-text="selectedId == {{ $theme->id }} ? 'Dipilih' : 'Pilih Tema'">
+                                        {{ $selectedThemeId == $theme->id ? 'Dipilih' : 'Pilih Tema' }}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
-        </div>
-        <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
-            style="background-color: rgba(255, 255, 255, 0.9);">
-            <div class="d-flex justify-content-end gap-2">
-                @if ($selectedThemeId !== $initialThemeId)
-                    <button type="button" wire:click="cancelSelection" class="btn py-2 px-2 rounded-3 shadow-sm"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="cancelSelection">
+            <div class="card-footer rounded-bottom-4 border-0 sticky-bottom"
+                style="background-color: rgba(255, 255, 255, 0.9);">
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" x-show="selectedId != initialId" x-cloak @click="cancelSelection()"
+                        class="btn py-2 px-2 rounded-3 shadow-sm" wire:loading.attr="disabled">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                            <path d="M18 6l-12 12" />
+                            <path d="M6 6l12 12" />
+                        </svg>
+                        Batal
+                    </button>
+                    <button type="submit" class="btn py-2 px-2 rounded-3 shadow-sm" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="selectTheme">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round"
-                                class="icon icon-tabler icons-tabler-outline icon-tabler-x">
+                                class="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                <path d="M18 6l-12 12" />
-                                <path d="M6 6l12 12" />
+                                <path
+                                    d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
+                                <path d="M6.5 12h14.5" />
                             </svg>
-                            Batal
+                            Simpan
                         </span>
-                        <span wire:loading wire:target="cancelSelection">
+                        <span wire:loading wire:target="selectTheme">
                             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            <span class="small">Loading...</span>
+                            <span class="small">Menyimpan...</span>
                         </span>
                     </button>
-                @endif
-                <button type="submit" class="btn py-2 px-2 rounded-3 shadow-sm" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="selectTheme">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                            <path
-                                d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124z" />
-                            <path d="M6.5 12h14.5" />
-                        </svg>
-                        Simpan
-                    </span>
-                    <span wire:loading wire:target="selectTheme">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        <span class="small">Menyimpan...</span>
-                    </span>
-                </button>
+                </div>
             </div>
-        </div>
     </form>
 @endif
