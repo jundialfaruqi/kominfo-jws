@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Profil;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,7 +19,8 @@ class Marquee extends Component
     #[Title('Teks Berjalan (Marquee)')]
 
     public $paginate;
-    public $search;
+    #[Url]
+    public $search = '';
     protected $paginationTheme = 'bootstrap';
 
     public $marqueeId;
@@ -62,7 +64,9 @@ class Marquee extends Component
     public function mount()
     {
         $this->paginate = 10;
-        $this->search = '';
+        if ($this->search === null) {
+            $this->search = '';
+        }
 
         // If user is not admin
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
@@ -120,7 +124,7 @@ class Marquee extends Component
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder for marquee
-        $query = ModelsMarquee::with('user')
+        $query = ModelsMarquee::with('user.profil')
             ->select('id', 'user_id', 'marquee1', 'marquee2', 'marquee3', 'marquee4', 'marquee5', 'marquee6', 'marquee_speed');
 
         // If user is not Super Admin, filter marquee and exclude users with 'Super Admin' or 'Admin' roles
@@ -133,19 +137,36 @@ class Marquee extends Component
         // If user is not admin, only show their own marquee
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('marquee1', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee2', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee3', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee4', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee5', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee6', 'like', '%' . $keyword . '%');
+                });
+            }
         } else {
-            // Admin can search through all marquee
-            $query->where(function ($query) {
-                $query->where('marquee1', 'like', '%' . $this->search . '%')
-                    ->orWhere('marquee2', 'like', '%' . $this->search . '%')
-                    ->orWhere('marquee3', 'like', '%' . $this->search . '%')
-                    ->orWhere('marquee4', 'like', '%' . $this->search . '%')
-                    ->orWhere('marquee5', 'like', '%' . $this->search . '%')
-                    ->orWhere('marquee6', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('user', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
-            });
+            // Admin can search through all marquee (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('marquee1', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee2', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee3', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee4', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee5', 'like', '%' . $keyword . '%')
+                        ->orWhere('marquee6', 'like', '%' . $keyword . '%')
+                        ->orWhereHas('user', function ($q) use ($keyword) {
+                            $q->where('name', 'like', '%' . $keyword . '%');
+                        })
+                        ->orWhereHas('user.profil', function ($q) use ($keyword) {
+                            $q->where('name', 'like', '%' . $keyword . '%');
+                        });
+                });
+            }
         }
 
         $marqueeList = $query->orderBy('id', 'asc')

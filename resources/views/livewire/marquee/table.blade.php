@@ -16,9 +16,31 @@
             </div>
             <div class="ms-auto text-secondary">
                 <span>Cari</span>
-                <div class="ms-2 d-inline-block">
-                    <input wire:model.live="search" type="text" class="form-control form-control py-1 rounded-3"
-                        placeholder="Ketik disini">
+                <div class="ms-2 d-inline-block"
+                    x-data="{
+                        query: $wire.entangle('search'),
+                        timer: null,
+                        onInput(e) {
+                            clearTimeout(this.timer);
+                            const val = (e.target.value || '').trim();
+                            this.timer = setTimeout(() => {
+                                if (val.length >= 3 || val.length === 0) {
+                                    $wire.set('search', val);
+                                }
+                            }, 500);
+                        }
+                    }">
+                    <input type="search"
+                        name="search_marquee_masjid"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        :value="query"
+                        @input="onInput($event)"
+                        @search="onInput($event)"
+                        class="form-control form-control py-1 rounded-3"
+                        placeholder="Min. 3 karakter...">
                 </div>
             </div>
         </div>
@@ -29,7 +51,7 @@
             <thead>
                 <tr>
                     <th class="w-1">No.</th>
-                    <th>Nama Admin Masjid</th>
+                    <th>Admin Masjid</th>
                     <th>Teks Marquee 1</th>
                     <th>Teks Marquee 2</th>
                     <th>Teks Marquee 3</th>
@@ -41,12 +63,13 @@
             </thead>
             <tbody>
                 @foreach ($marqueeList as $marquee)
-                    <tr>
+                    <tr wire:key="marquee-row-{{ $marquee->id }}">
                         <td class="text-center text-muted">
                             {{ $loop->iteration + ($marqueeList->currentPage() - 1) * $marqueeList->perPage() }}
                         </td>
-                        <td class="text-wrap">
-                            {{ $marquee->user->name }}
+                        <td class="text-nowrap">
+                            <div class="fw-bold text-nowrap">{{ $marquee->user?->profil?->name ?? '-' }}</div>
+                            <div class="text-muted small text-nowrap">{{ $marquee->user?->name ?? '-' }}</div>
                         </td>
                         <td class="text-wrap">
                             {{ $marquee->marquee1 }}
