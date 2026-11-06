@@ -8,6 +8,7 @@ use App\Models\Profil;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -18,7 +19,8 @@ class Petugas extends Component
     #[Title('Petugas Jum\'at')]
 
     public $paginate;
-    public $search;
+    #[Url]
+    public $search = '';
     protected $paginationTheme = 'bootstrap';
 
     public $petugasId;
@@ -72,7 +74,9 @@ class Petugas extends Component
     public function mount()
     {
         $this->paginate = 10;
-        $this->search = '';
+        if ($this->search === null) {
+            $this->search = '';
+        }
 
         // For non-admin users, show table by default instead of form
         if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
@@ -107,7 +111,7 @@ class Petugas extends Component
         $isSuperAdmin = $currentUser->role === 'Super Admin';
 
         // Query builder for petugas
-        $query = ModelsPetugas::with('user')
+        $query = ModelsPetugas::with('user.profil')
             ->select('id', 'user_id', 'hari', 'khatib', 'imam', 'muadzin');
 
         // If user is not Super Admin, filter petugas and exclude users with 'Super Admin' or 'Admin' roles
@@ -120,17 +124,32 @@ class Petugas extends Component
         // If user is not admin, only show their own petugas
         if (!$isAdmin) {
             $query->where('user_id', $currentUser->id);
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('hari', 'like', '%' . $keyword . '%')
+                        ->orWhere('khatib', 'like', '%' . $keyword . '%')
+                        ->orWhere('imam', 'like', '%' . $keyword . '%')
+                        ->orWhere('muadzin', 'like', '%' . $keyword . '%');
+                });
+            }
         } else {
-            // Admin can search through all petugas
-            $query->where(function ($query) {
-                $query->where('hari', 'like', '%' . $this->search . '%')
-                    ->orWhere('khatib', 'like', '%' . $this->search . '%')
-                    ->orWhere('imam', 'like', '%' . $this->search . '%')
-                    ->orWhere('muadzin', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('user', function ($q) {
-                        $q->where('name', 'like', '%' . $this->search . '%');
-                    });
-            });
+            // Admin can search through all petugas (aktif minimal 3 karakter)
+            $keyword = trim((string) $this->search);
+            if (mb_strlen($keyword) >= 3) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('hari', 'like', '%' . $keyword . '%')
+                        ->orWhere('khatib', 'like', '%' . $keyword . '%')
+                        ->orWhere('imam', 'like', '%' . $keyword . '%')
+                        ->orWhere('muadzin', 'like', '%' . $keyword . '%')
+                        ->orWhereHas('user', function ($q) use ($keyword) {
+                            $q->where('name', 'like', '%' . $keyword . '%');
+                        })
+                        ->orWhereHas('user.profil', function ($q) use ($keyword) {
+                            $q->where('name', 'like', '%' . $keyword . '%');
+                        });
+                });
+            }
         }
 
         $petugasList = $query->orderBy('id', 'asc')

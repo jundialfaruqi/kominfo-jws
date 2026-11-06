@@ -16,9 +16,31 @@
             </div>
             <div class="ms-auto text-secondary">
                 <span>Cari</span>
-                <div class="ms-2 d-inline-block">
-                    <input wire:model.live="search" type="text" class="form-control form-control py-1 rounded-3"
-                        placeholder="Ketik disini">
+                <div class="ms-2 d-inline-block"
+                    x-data="{
+                        query: $wire.entangle('search'),
+                        timer: null,
+                        onInput(e) {
+                            clearTimeout(this.timer);
+                            const val = (e.target.value || '').trim();
+                            this.timer = setTimeout(() => {
+                                if (val.length >= 3 || val.length === 0) {
+                                    $wire.set('search', val);
+                                }
+                            }, 500);
+                        }
+                    }">
+                    <input type="search"
+                        name="search_petugas_masjid"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                        :value="query"
+                        @input="onInput($event)"
+                        @search="onInput($event)"
+                        class="form-control form-control py-1 rounded-3"
+                        placeholder="Min. 3 karakter...">
                 </div>
             </div>
         </div>
@@ -30,7 +52,7 @@
                 <tr>
                     <th class="w-1">No</th>
                     @can('view nama admin masjid')
-                        <th>Nama Admin Masjid</th>
+                        <th>Admin Masjid</th>
                     @endcan
                     <th>Hari</th>
                     <th>Khatib</th>
@@ -41,12 +63,15 @@
             </thead>
             <tbody>
                 @foreach ($petugasList as $petugas)
-                    <tr>
+                    <tr wire:key="petugas-row-{{ $petugas->id }}">
                         <td class="text-center text-muted">
                             {{ $loop->iteration + ($petugasList->currentPage() - 1) * $petugasList->perPage() }}
                         </td>
                         @can('view nama admin masjid')
-                            <td class="text-wrap">{{ $petugas->user->name }}</td>
+                            <td class="text-nowrap">
+                                <div class="fw-bold text-nowrap">{{ $petugas->user?->profil?->name ?? '-' }}</div>
+                                <div class="text-muted small text-nowrap">{{ $petugas->user?->name ?? '-' }}</div>
+                            </td>
                         @endcan
                         <td>{{ \Carbon\Carbon::parse($petugas->hari)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}
                         </td>
