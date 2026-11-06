@@ -22,9 +22,9 @@
                     <td class="text-center text-muted">
                         {{ $loop->iteration + ($slideList->currentPage() - 1) * $slideList->perPage() }}
                     </td>
-                    <td class="text-wrap">
-                        <div class="fw-bold">{{ $slide->user?->profil?->name ?? '-' }}</div>
-                        <div class="text-muted small">{{ $slide->user?->name ?? '-' }}</div>
+                    <td class="text-nowrap">
+                        <div class="fw-bold text-nowrap">{{ $slide->user?->profil?->name ?? '-' }}</div>
+                        <div class="text-muted small text-nowrap">{{ $slide->user?->name ?? '-' }}</div>
                     </td>
                     @for ($i = 1; $i <= 6; $i++)
                         @php

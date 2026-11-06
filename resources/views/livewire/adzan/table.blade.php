@@ -87,9 +87,9 @@
                             <td class="text-center text-muted">
                                 {{ $loop->iteration + ($adzanList->currentPage() - 1) * $adzanList->perPage() }}
                             </td>
-                            <td class="text-wrap">
-                                <div class="fw-bold">{{ $adzan->user?->profil?->name ?? '-' }}</div>
-                                <div class="text-muted small">{{ $adzan->user?->name ?? '-' }}</div>
+                            <td class="text-nowrap">
+                                <div class="fw-bold text-nowrap">{{ $adzan->user?->profil?->name ?? '-' }}</div>
+                                <div class="text-muted small text-nowrap">{{ $adzan->user?->name ?? '-' }}</div>
                             </td>
                             @foreach ($slideColumns as $field => $label)
                                 @php
