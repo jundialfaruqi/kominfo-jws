@@ -46,30 +46,30 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
+        <table class="table card-table table-vcenter table-striped table-hover text-wrap datatable">
             <thead>
                 <tr>
-                    <th class="w-1">No.</th>
-                    <th>Admin Masjid</th>
-                    <th class="text-center">Audio 1</th>
-                    <th class="text-center">Audio 2</th>
-                    <th class="text-center">Audio 3</th>
-                    <th class="text-center">Status</th>
-                    <th></th>
+                    <th class="w-1 text-wrap">No.</th>
+                    <th class="text-wrap">Admin Masjid</th>
+                    <th class="text-center text-wrap">Audio 1</th>
+                    <th class="text-center text-wrap">Audio 2</th>
+                    <th class="text-center text-wrap">Audio 3</th>
+                    <th class="text-center text-wrap">Status</th>
+                    <th class="w-1 text-nowrap"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($audioList as $audio)
                     <tr wire:key="audio-row-{{ $audio->id }}">
-                        <td class="text-center text-muted">
+                        <td class="text-center text-muted text-wrap">
                             {{ $loop->iteration + ($audioList->currentPage() - 1) * $audioList->perPage() }}
                         </td>
-                        <td class="text-nowrap">
-                            <div class="fw-bold text-nowrap">{{ $audio->user?->profil?->name ?? '-' }}</div>
-                            <div class="text-muted small text-nowrap">{{ $audio->user?->name ?? '-' }}</div>
+                        <td class="text-wrap">
+                            <div class="fw-bold text-wrap">{{ $audio->user?->profil?->name ?? '-' }}</div>
+                            <div class="text-muted small text-wrap">{{ $audio->user?->name ?? '-' }}</div>
                         </td>
                         {{-- Audio 1 --}}
-                        <td class="text-center">
+                        <td class="text-center text-wrap">
                             @if ($audio->audio1_url)
                                 <div
                                     class="text-wrap text-center mb-2 small align-items-center d-flex justify-content-center gap-1">
@@ -95,7 +95,7 @@
                         </td>
 
                         {{-- Audio 2 --}}
-                        <td class="text-center">
+                        <td class="text-center text-wrap">
                             @if ($audio->audio2_url)
                                 <div
                                     class="text-wrap text-center mb-2 small d-flex align-items-center justify-content-center gap-1">
@@ -121,7 +121,7 @@
                         </td>
 
                         {{-- Audio 3 --}}
-                        <td class="text-center">
+                        <td class="text-center text-wrap">
                             @if ($audio->audio3_url)
                                 <div
                                     class="text-wrap text-center mb-2 small d-flex align-items-center justify-content-center gap-1">
@@ -145,55 +145,57 @@
                                 <span class="text-gray-400">-</span>
                             @endif
                         </td>
-                        <td class="text-center">
+                        <td class="text-center text-wrap">
                             <span class="badge {{ $audio->status ? 'bg-primary-lt' : 'bg-danger-lt' }}">
                                 {{ $audio->status ? 'Aktif' : 'Tidak Aktif' }}
                             </span>
                         </td>
-                        <td class="text-end">
-                            <button wire:click="edit('{{ $audio->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm">
-                                <span wire:loading.remove wire:target="edit('{{ $audio->id }}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
-                                        <path
-                                            d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
-                                        <path d="M16 5l3 3" />
-                                    </svg>
-                                    Ubah
-                                </span>
-                                <span wire:loading wire:target="edit('{{ $audio->id }}')">
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
-                                    <span class="small">Loading...</span>
-                                </span>
-                            </button>
-                            <button wire:click="delete('{{ $audio->id }}')"
-                                class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
-                                data-bs-target="#deleteModal">
-                                <span wire:loading.remove wire:target="delete('{{ $audio->id }}')">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M4 7l16 0" />
-                                        <path d="M10 11l0 6" />
-                                        <path d="M14 11l0 6" />
-                                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
-                                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
-                                    </svg>
-                                    Hapus
-                                </span>
-                                <span wire:loading wire:target="delete('{{ $audio->id }}')">
-                                    <span class="spinner-border spinner-border-sm" role="status"
-                                        aria-hidden="true"></span>
-                                    <span class="small">Loading...</span>
-                                </span>
-                            </button>
+                        <td class="text-end text-nowrap">
+                            <div class="d-inline-flex gap-1 align-items-center justify-content-end text-nowrap">
+                                <button wire:click="edit('{{ $audio->id }}')" class="btn py-2 px-2 rounded-3 shadow-sm">
+                                    <span wire:loading.remove wire:target="edit('{{ $audio->id }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-edit">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                            <path
+                                                d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                            <path d="M16 5l3 3" />
+                                        </svg>
+                                        Ubah
+                                    </span>
+                                    <span wire:loading wire:target="edit('{{ $audio->id }}')">
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        <span class="small">Loading...</span>
+                                    </span>
+                                </button>
+                                <button wire:click="delete('{{ $audio->id }}')"
+                                    class="btn py-2 px-2 rounded-3 shadow-sm" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                    <span wire:loading.remove wire:target="delete('{{ $audio->id }}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-trash">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M4 7l16 0" />
+                                            <path d="M10 11l0 6" />
+                                            <path d="M14 11l0 6" />
+                                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                                        </svg>
+                                        Hapus
+                                    </span>
+                                    <span wire:loading wire:target="delete('{{ $audio->id }}')">
+                                        <span class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        <span class="small">Loading...</span>
+                                    </span>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
