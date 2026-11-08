@@ -178,7 +178,9 @@
         cancelSelection() {
             this.selectedId = this.initialId;
         }
-        x-on:submit.prevent="$wire.selectTheme(selectedId)">
+    }"
+    @theme-saved.window="initialId = $event.detail.themeId; selectedId = $event.detail.themeId"
+    x-on:submit.prevent="$wire.selectTheme(selectedId)">
             <div class="card-body" wire:ignore>
                 <div class="row mb-3">
                     <div class="col-md-12">
@@ -230,7 +232,7 @@
                                         :class="selectedId == {{ $theme->id }} ? 'text-primary' : ''">
                                         {{ $theme->name }}
                                     </h5>
-                                        type="button" @click.stop="selectTheme({{ $theme->id }})"
+                                    <button type="button" @click.stop="selectTheme({{ $theme->id }})"
                                         class="btn btn-primary rounded-3 shadow-sm"
                                         :class="{ 'disabled': selectedId == {{ $theme->id }} }"
                                         :disabled="selectedId == {{ $theme->id }}"
