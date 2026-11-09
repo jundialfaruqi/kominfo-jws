@@ -98,7 +98,7 @@
         }
 
         .np {
-            margin-top: 12px;
+            margin-top: 28px;
             text-align: left
         }
 
@@ -302,19 +302,27 @@
         }
 
         @keyframes hsBlinkBar {
-            0%, 49.9% {
+
+            0%,
+            49.9% {
                 background-color: #ef4444;
             }
-            50%, 100% {
+
+            50%,
+            100% {
                 background-color: #ffd600;
             }
         }
 
         @keyframes hsBlinkText {
-            0%, 49.9% {
+
+            0%,
+            49.9% {
                 color: #ef4444;
             }
-            50%, 100% {
+
+            50%,
+            100% {
                 color: #ffd600;
             }
         }
