@@ -63,10 +63,16 @@
                             Masjid
                             Paripurna.</p>
                         <div class="d-flex flex-wrap align-items-center">
-                            @if (!empty($showScheduleBtn) && !empty($scheduleUrl))
-                                <a class="btn btn-gov-blue btn-lg rounded-4 me-3 mb-2" href="{{ $scheduleUrl }}">Lihat
-                                    JWS Saya</a>
-                            @endif
+                            <a href="https://play.google.com/store/apps/details?id=id.go.pekanbaru.jws" target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn-playstore d-inline-flex align-items-center rounded-4 me-3 mb-2">
+                                <img src="{{ asset('welcome/assets/img/playstore.png') }}" alt="Play Store"
+                                    class="playstore-icon me-3">
+                                <div class="text-start">
+                                    <div class="playstore-subtext">DOWNLOAD DI</div>
+                                    <div class="playstore-title">Google Play</div>
+                                </div>
+                            </a>
                         </div>
                     </div>
                     <div class="col-lg-6 text-center">
@@ -877,10 +883,6 @@
                                 class="d-block w-100 img-fluid" alt="Sosialisasi JWS 6">
                         </div>
                         <div class="carousel-item">
-                            <img src="{{ asset('welcome/assets/img/sosialisasi-jws-gambar-6.webp') }}"
-                                class="d-block w-100 img-fluid" alt="Sosialisasi JWS 7">
-                        </div>
-                        <div class="carousel-item">
                             <img src="{{ asset('welcome/assets/img/sosialisasi-jws-gambar-8.webp') }}"
                                 class="d-block w-100 img-fluid" alt="Sosialisasi JWS 8">
                         </div>
@@ -931,13 +933,6 @@
                     </a>
                     <a class="footer-icon" href="https://www.instagram.com/diskominfopku/" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
-                    </a>
-                    <a class="footer-icon" href="https://www.instagram.com/diskominfopku/" aria-label="WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
-                    <a class="footer-icon" href="{{ asset('download/JWS Web V-1.0.apk') }}" download
-                        aria-label="Download APK">
-                        <i class="fab fa-android"></i>
                     </a>
                 </div>
             </div>

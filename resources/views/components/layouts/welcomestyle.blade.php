@@ -121,6 +121,49 @@
         background-color: rgba(0, 113, 227, 0.05);
     }
 
+    /* Google Play Store Badge Button */
+    .btn-playstore {
+        background: #000000;
+        color: #ffffff;
+        padding: 0.6rem 1.4rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+    }
+
+    .btn-playstore:hover {
+        background: #1d1d1f;
+        color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+        border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-playstore .playstore-icon {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+    }
+
+    .btn-playstore .playstore-subtext {
+        font-size: 0.625rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        line-height: 1;
+        margin-bottom: 3px;
+    }
+
+    .btn-playstore .playstore-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+    }
+
     /* Navbar Glassmorphism */
     .navbar {
         background: rgba(255, 255, 255, 0.72) !important;
