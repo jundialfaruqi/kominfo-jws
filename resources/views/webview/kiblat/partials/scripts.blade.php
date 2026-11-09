@@ -360,6 +360,17 @@
                 if (acc !== null && acc > 0) $("kvAcc").textContent = "±" + acc.toFixed(0) + "°";
             }
 
+            // Jembatan untuk Aplikasi Native (iOS / Android / Flutter)
+            window.updateNativeCompass = function(heading, acc) {
+                const h = typeof heading === "string" ? parseFloat(heading) : heading;
+                if (typeof h !== "number" || isNaN(h)) return;
+                state.sensorOn = true;
+                state.target = norm(h);
+                if (typeof acc === "number" && acc > 0) {
+                    $("kvAcc").textContent = "±" + Math.round(acc) + "°";
+                }
+            };
+
             function enableSensor() {
                 const OD = window.DeviceOrientationEvent || {};
                 const done = () => {
@@ -368,9 +379,18 @@
                     say("Sensor aktif. Kalibrasi: gerakkan ponsel membentuk angka <b>8</b>.", 8000);
                 };
                 if (typeof OD.requestPermission === "function") {
-                    OD.requestPermission().then(r => r === "granted" ? done() : say(
-                            "Izin sensor ditolak. Seret kompas manual.", 8000))
-                        .catch(() => say("Izin sensor gagal.", 8000));
+                    OD.requestPermission().then(r => {
+                            if (r === "granted") {
+                                done();
+                            } else {
+                                sensorAsked = false;
+                                say("Izin sensor ditolak. Cek Pengaturan Safari atau seret kompas manual.", 8000);
+                            }
+                        })
+                        .catch(() => {
+                            sensorAsked = false;
+                            say("Sensor tidak dapat diakses di aplikasi ini. Silakan seret kompas manual.", 8000);
+                        });
                 } else if ("ondeviceorientation" in window) {
                     done();
                 } else {
@@ -379,14 +399,16 @@
             }
             $("btnSensor2").addEventListener("click", enableSensor);
 
-            // Tombol kompas dihapus: sensor diaktifkan otomatis saat kompas pertama kali disentuh
-            // (iOS tetap butuh gestur pengguna untuk meminta izin gerak).
+            // Sensor diaktifkan otomatis saat kompas pertama kali disentuh
+            // (iOS Safari mewajibkan gestur pengguna click / touchend untuk meminta izin).
             let sensorAsked = false;
-            $("scrKiblat").addEventListener("pointerdown", () => {
+            const triggerSensor = () => {
                 if (sensorAsked || state.sensorOn) return;
                 sensorAsked = true;
                 enableSensor();
-            }, true);
+            };
+            $("scrKiblat").addEventListener("click", triggerSensor, true);
+            $("scrKiblat").addEventListener("touchend", triggerSensor, { passive: true });
             window.addEventListener("deviceorientationabsolute", onOrient, true);
             window.addEventListener("deviceorientation", onOrient, true);
 
