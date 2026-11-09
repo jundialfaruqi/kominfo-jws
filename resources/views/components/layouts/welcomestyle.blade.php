@@ -125,8 +125,10 @@
     .btn-playstore {
         background: #000000;
         color: #ffffff;
-        padding: 0.6rem 1.4rem;
+        padding: 0.6rem 1.6rem;
+        min-height: 58px;
         border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50rem !important;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
         transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         text-decoration: none;
@@ -162,6 +164,37 @@
         color: #ffffff;
         line-height: 1.1;
         letter-spacing: -0.01em;
+    }
+
+    /* Border Tutorial Button (Rounded Pill & Height Matched) */
+    .btn-ghost-tutorial {
+        color: #0071e3;
+        font-size: 1.05rem;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0 1.75rem;
+        min-height: 58px;
+        border: 2px solid #0071e3;
+        border-radius: 50rem !important;
+        background: transparent;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 4px 14px rgba(0, 113, 227, 0.1);
+    }
+
+    .btn-ghost-tutorial:hover {
+        color: #ffffff;
+        background-color: #0071e3;
+        border-color: #0071e3;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 113, 227, 0.35);
+    }
+
+    .btn-ghost-tutorial .arrow-icon {
+        transition: transform 0.25s ease;
+    }
+
+    .btn-ghost-tutorial:hover .arrow-icon {
+        transform: translateX(4px);
     }
 
     /* Navbar Glassmorphism */

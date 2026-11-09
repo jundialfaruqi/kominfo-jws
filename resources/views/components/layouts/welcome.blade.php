@@ -65,13 +65,25 @@
                         <div class="d-flex flex-wrap align-items-center">
                             <a href="https://play.google.com/store/apps/details?id=id.go.pekanbaru.jws" target="_blank"
                                 rel="noopener noreferrer"
-                                class="btn-playstore d-inline-flex align-items-center rounded-4 me-3 mb-2">
+                                class="btn-playstore d-inline-flex align-items-center rounded-pill me-3 mb-2">
                                 <img src="{{ asset('welcome/assets/img/playstore.png') }}" alt="Play Store"
                                     class="playstore-icon me-3">
                                 <div class="text-start">
                                     <div class="playstore-subtext">DOWNLOAD DI</div>
                                     <div class="playstore-title">Google Play</div>
                                 </div>
+                            </a>
+                            <a href="https://jadwalsholat.pekanbaru.go.id/berita/17-08-2026/cara-install-dan-konfigurasi-aplikasi-jws-pekanbaru-di-tv-android-tv-google-tv-dan-tv-box-android"
+                                class="btn-ghost-tutorial d-inline-flex align-items-center justify-content-center rounded-pill mb-2">
+                                <span>Lihat Tutorial</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="ms-2 arrow-icon">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M5 12l14 0" />
+                                    <path d="M13 18l6 -6" />
+                                    <path d="M13 6l6 6" />
+                                </svg>
                             </a>
                         </div>
                     </div>
