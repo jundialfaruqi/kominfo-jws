@@ -76,9 +76,9 @@
                             <a href="https://jadwalsholat.pekanbaru.go.id/berita/17-08-2026/cara-install-dan-konfigurasi-aplikasi-jws-pekanbaru-di-tv-android-tv-google-tv-dan-tv-box-android"
                                 class="btn-ghost-tutorial d-inline-flex align-items-center justify-content-center rounded-pill mb-2">
                                 <span>Lihat Tutorial</span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="ms-2 arrow-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                                    stroke-linecap="round" stroke-linejoin="round" class="ms-2 arrow-icon">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                     <path d="M5 12l14 0" />
                                     <path d="M13 18l6 -6" />
@@ -192,7 +192,8 @@
                         <input type="date" id="filterDate" class="form-control form-control-sm rounded-pill px-3"
                             style="width: auto; border-color: #d2d2d7; font-family: 'PlusJakartaSansText', sans-serif;"
                             min="{{ $minDate }}" max="{{ $maxDate }}">
-                        <button type="button" id="resetFilterBtn" class="btn btn-sm btn-outline-secondary rounded-pill"
+                        <button type="button" id="resetFilterBtn"
+                            class="btn btn-sm btn-outline-secondary rounded-pill"
                             style="display: none;">Reset</button>
                     </div>
                 </div>
