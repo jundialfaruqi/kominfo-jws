@@ -429,8 +429,8 @@
         .src {
             padding: 10px 20px 10px;
             margin: 0;
-            font-size: .66rem;
-            line-height: 1.4;
+            font-size: .78rem;
+            line-height: 1.45;
             color: #5d7c92;
             flex-shrink: 0
         }
@@ -755,7 +755,7 @@
             background: rgba(255, 255, 255, .97);
             backdrop-filter: blur(12px);
             border-top: 1px solid var(--line);
-            padding: 8px 6px;
+            padding: 8px 6px calc(8px + env(safe-area-inset-bottom, 0px));
         }
 
         .nav button {
@@ -767,28 +767,29 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
-            font-size: .62rem;
+            gap: 4px;
+            font-size: .8rem;
             font-weight: 700;
             color: #8a99a8;
-            padding: 2px 0;
+            padding: 4px 0;
+            transition: color .2s;
         }
 
         .nav button .ico {
-            font-size: 1.18rem;
+            font-size: 1.5rem;
             line-height: 1;
             filter: grayscale(1);
             opacity: .6;
-            transition: .2s
+            transition: transform .2s, opacity .2s, filter .2s;
         }
 
         .nav button.active {
-            color: var(--blue-lt)
+            color: var(--blue-lt);
         }
 
         .nav button.active .ico {
             filter: none;
             opacity: 1;
-            transform: translateY(-1px)
+            transform: scale(1.1) translateY(-2px);
         }
     </style>
