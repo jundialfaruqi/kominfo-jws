@@ -155,7 +155,7 @@
                     @can('security-monitor-lihat')
                         <li class="nav-item mx-2 {{ request()->is('pasak*') ? 'rounded-3 text-white' : '' }}"
                             style="{{ request()->is('pasak*') ? 'background-color: #1e5fa3;' : '' }}">
-                            <a class="nav-link" href="{{ url('/' . config('pasak.dashboard.prefix', 'pasak')) }}" target="_blank"
+                            <a class="nav-link" href="{{ url('/' . config('pasak.dashboard.prefix', 'pasak')) }}"
                                 rel="noopener noreferrer">
                                 <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
