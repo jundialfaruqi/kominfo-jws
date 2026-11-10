@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "71f8ebef876b654224aa6f677d82561a",
+    "content-hash": "b2aa34f963cc80ac84533435abd95af6",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -5162,6 +5162,96 @@
                 }
             ],
             "time": "2024-06-11T12:45:25+00:00"
+        },
+        {
+            "name": "robyajo/pasak",
+            "version": "v1.7.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/robyajo/pasak.git",
+                "reference": "039ff726e6c57f916ede6ad88dba46b6efad7906"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/robyajo/pasak/zipball/039ff726e6c57f916ede6ad88dba46b6efad7906",
+                "reference": "039ff726e6c57f916ede6ad88dba46b6efad7906",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.8|^8.0",
+                "illuminate/auth": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/routing": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/validation": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.2|^8.3|^8.4|^8.5"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.6",
+                "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+                "pestphp/pest": "^2.0|^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.0|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Pasak": "Internal\\Pasak\\Facades\\Pasak",
+                        "SecurityMonitor": "Internal\\Pasak\\Facades\\Pasak"
+                    },
+                    "providers": [
+                        "Internal\\Pasak\\PasakServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/compat.php"
+                ],
+                "psr-4": {
+                    "Internal\\Pasak\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roby",
+                    "email": "robyfull.dev@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Pasak - enterprise-grade headless self-hosted WAF, threat detection engine, zero-tolerance blocking, stepped login lockout, and security auditing toolkit for Laravel.",
+            "homepage": "https://github.com/robyajo/pasak",
+            "keywords": [
+                "brute-force",
+                "firewall",
+                "headless",
+                "ip-blocking",
+                "laravel",
+                "login-throttle",
+                "security",
+                "security-audit",
+                "threat-detection",
+                "waf",
+                "webshell-scanner"
+            ],
+            "support": {
+                "docs": "https://github.com/robyajo/pasak#readme",
+                "issues": "https://github.com/robyajo/pasak/issues",
+                "source": "https://github.com/robyajo/pasak"
+            },
+            "funding": [
+                {
+                    "url": "https://saweria.co/robykartis",
+                    "type": "custom"
+                }
+            ],
+            "time": "2026-11-09T21:52:47+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",

@@ -286,3 +286,7 @@ Route::get('test/testing-channel/event/{slug}', function ($slug) {
     event(new \App\Events\ContentUpdatedEvent($slug, 'hello ' . $profil->name));
     event(new \App\Events\GlobalUpdatedEvent('Testing channel global !'));
 });
+
+Route::middleware(['auth', 'can:security-monitor-lihat'])->group(function () {
+    require __DIR__.'/pasak.php';
+});

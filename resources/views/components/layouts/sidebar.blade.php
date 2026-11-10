@@ -152,6 +152,28 @@
                             </a>
                         </li>
                     @endcan
+                    @can('security-monitor-lihat')
+                        <li class="nav-item mx-2 {{ request()->is('pasak*') ? 'rounded-3 text-white' : '' }}"
+                            style="{{ request()->is('pasak*') ? 'background-color: #1e5fa3;' : '' }}">
+                            <a class="nav-link" href="{{ url('/' . config('pasak.dashboard.prefix', 'pasak')) }}" target="_blank"
+                                rel="noopener noreferrer">
+                                <span class="nav-link-icon d-md-none d-lg-inline-block text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        class="icon icon-tabler icons-tabler-outline icon-tabler-shield-check">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                        <path
+                                            d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" />
+                                        <path d="M9 12l2 2l4 -4" />
+                                    </svg>
+                                </span>
+                                <span class="nav-link-title text-white">
+                                    Security Monitor
+                                </span>
+                            </a>
+                        </li>
+                    @endcan
                     @if (Auth::user()->role === 'User')
                         <li class="nav-item mx-2 {{ request()->routeIs('tv-pairing.index') ? 'rounded-3 text-white' : '' }}"
                             style="{{ request()->routeIs('tv-pairing.index') ? 'background-color: #1e5fa3;' : '' }}">

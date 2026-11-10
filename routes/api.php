@@ -202,3 +202,5 @@ Route::prefix('v2')->group(function () {
 
 });
 
+
+require __DIR__.'/pasak-api.php';
