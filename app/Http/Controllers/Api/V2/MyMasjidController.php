@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class MyMasjidController extends Controller
 {
@@ -145,38 +146,113 @@ class MyMasjidController extends Controller
             // Sembunyikan user_id karena tidak diperlukan oleh Flutter
             $profil->makeHidden(['user_id']);
 
-            // Ambil jadwal sholat dari API eksternal (MyQuran) dengan caching (Bulan Ini & Bulan Depan)
+            // Ambil jadwal sholat dari API eksternal (MyQuran) dengan caching & fallback lokal (Rolling 365 hari)
             $now = Carbon::now('Asia/Jakarta');
             $cityId = '0412'; // Default Kota Pekanbaru
 
-            // Mengambil jadwal sholat 12 bulan ke depan (Rolling 365 hari ke depan)
             $jadwalGabungan = [];
+            $allMonthsFetchedSuccessfully = true;
+
+            // Periksa circuit breaker: apakah API eksternal sedang mengalami gangguan baru-baru ini?
+            $isApiDown = Cache::has('myquran_api_down');
+
             for ($i = 0; $i < 12; $i++) {
                 $targetMonth = $now->copy()->addMonths($i);
                 $targetYear = $targetMonth->format('Y');
                 $targetMonthNum = $targetMonth->format('m');
                 $cacheKey = "jadwal_sholat_{$cityId}_{$targetYear}_{$targetMonthNum}";
 
-                $bulanData = Cache::remember($cacheKey, now()->addDays(30), function () use ($cityId, $targetYear, $targetMonthNum) {
-                    try {
-                        $response = Http::timeout(8)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$targetYear}/{$targetMonthNum}");
-                        if ($response->successful()) {
-                            return $response->json('data.jadwal');
+                $bulanData = Cache::get($cacheKey);
+
+                // Sanitasi: jika cache sebelumnya menyimpan array kosong, bersihkan
+                if (is_array($bulanData) && empty($bulanData)) {
+                    Cache::forget($cacheKey);
+                    $bulanData = null;
+                }
+
+                // Jika belum ada di cache dan circuit breaker tidak aktif, coba fetch dari API
+                if (!is_array($bulanData) || empty($bulanData)) {
+                    if (!$isApiDown) {
+                        try {
+                            $response = Http::timeout(5)->get("https://api.myquran.com/v2/sholat/jadwal/{$cityId}/{$targetYear}/{$targetMonthNum}");
+                            if ($response->successful()) {
+                                $apiJadwal = $response->json('data.jadwal');
+                                if (is_array($apiJadwal) && !empty($apiJadwal)) {
+                                    $bulanData = $apiJadwal;
+                                    // HANYA simpan ke cache jika data valid dan tidak kosong!
+                                    Cache::put($cacheKey, $bulanData, now()->addDays(30));
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            Log::warning("MyQuran API unreachable for {$cityId}-{$targetYear}-{$targetMonthNum}: " . $e->getMessage());
                         }
-                    } catch (\Exception $e) {}
-                    return [];
-                });
+                    }
+
+                    // Jika masih gagal mendapatkan data untuk bulan ini
+                    if (!is_array($bulanData) || empty($bulanData)) {
+                        $allMonthsFetchedSuccessfully = false;
+                        // Aktifkan circuit breaker selama 2 menit agar request lain tidak timeout berantai
+                        if (!$isApiDown) {
+                            Cache::put('myquran_api_down', true, now()->addMinutes(2));
+                            $isApiDown = true;
+                        }
+                        // Hentikan iterasi sisa bulan untuk menghindari timeout berantai
+                        break;
+                    }
+                }
 
                 if (is_array($bulanData) && !empty($bulanData)) {
                     $jadwalGabungan = array_merge($jadwalGabungan, $bulanData);
                 }
             }
 
+            // Path fallback lokal (prioritaskan storage/app, cadangan di resources/data)
+            $fallbackPath = storage_path('app/jadwal_sholat_fallback_0412.json');
+            if (!file_exists($fallbackPath)) {
+                $resourceFallback = resource_path('data/jadwal_sholat_fallback_0412.json');
+                if (file_exists($resourceFallback)) {
+                    $fallbackPath = $resourceFallback;
+                }
+            }
+
+            // Jika API gagal atau ada bulan yang belum lengkap, lengkapi dari data fallback lokal
+            if (file_exists($fallbackPath)) {
+                $fallbackRaw = @file_get_contents($fallbackPath);
+                $fallbackData = json_decode($fallbackRaw, true);
+                if (is_array($fallbackData) && !empty($fallbackData)) {
+                    if (empty($jadwalGabungan)) {
+                        $jadwalGabungan = $fallbackData;
+                    } else {
+                        // Gabungkan hari yang belum ada dari data fallback
+                        $existingDates = array_flip(array_column($jadwalGabungan, 'date'));
+                        foreach ($fallbackData as $fbItem) {
+                            if (isset($fbItem['date']) && !isset($existingDates[$fbItem['date']])) {
+                                $jadwalGabungan[] = $fbItem;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Auto-refresh fallback lokal jika seluruh 12 bulan berhasil diambil dan file sudah berusia > 7 hari
+            if ($allMonthsFetchedSuccessfully && count($jadwalGabungan) >= 350) {
+                $storageFallback = storage_path('app/jadwal_sholat_fallback_0412.json');
+                if (!file_exists($storageFallback) || (time() - @filemtime($storageFallback) > 7 * 86400)) {
+                    try {
+                        @file_put_contents($storageFallback, json_encode($jadwalGabungan, JSON_PRETTY_PRINT));
+                    } catch (\Throwable $e) {}
+                }
+            }
+
             // Filter agar hanya mengirim dari hari ini ke depan (sekitar 365 hari ke depan)
             $dateStr = $now->format('Y-m-d');
-            $jadwalFinal = collect($jadwalGabungan)->filter(function ($item) use ($dateStr) {
-                return isset($item['date']) && $item['date'] >= $dateStr;
-            })->values()->toArray();
+            $jadwalFinal = collect($jadwalGabungan)
+                ->filter(function ($item) use ($dateStr) {
+                    return isset($item['date']) && $item['date'] >= $dateStr;
+                })
+                ->sortBy('date')
+                ->values()
+                ->toArray();
 
             // Ambil Agenda Masjid
             $todayStart = Carbon::now('Asia/Jakarta')->startOfDay();
