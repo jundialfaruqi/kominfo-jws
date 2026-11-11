@@ -1,6 +1,11 @@
 @extends('pages.pasak.layout', ['heading' => __('Blocked IPs'), 'subheading' => __('Karantina IP dan perangkat aktif beserta riwayatnya')])
 
+@section('page_support_key', 'blocked-ips')
+
 @section('content')
+@php
+    $DV = \Internal\Pasak\Support\DashboardView::class;
+@endphp
 <div class="sec-grid-4">
     <div class="sec-stat-card">
         <div class="sec-stat-label">{{ __('Total blocks') }}</div>
@@ -87,6 +92,7 @@
                     <th>{{ __('IP address') }}</th>
                     <th>{{ __('Scope') }}</th>
                     <th>{{ __('Reason') }}</th>
+                    <th>{{ __('Blocked at') }}</th>
                     <th>{{ __('Expires') }}</th>
                     <th>{{ __('Status') }}</th>
                     <th style="text-align: right;">{{ __('Action') }}</th>
@@ -98,7 +104,21 @@
                         <td class="sec-font-mono" style="font-weight: 600;">{{ $block->ip_address }}</td>
                         <td><span class="sec-badge sec-badge-low">{{ $block->block_scope }}</span></td>
                         <td style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $block->reason }}">{{ $block->reason }}</td>
-                        <td style="font-size: 12px;">{{ $block->expires_at ?? __('Permanent') }}</td>
+                        <td class="sec-font-mono" style="font-size: 12px; white-space: nowrap;">
+                            @php
+                                $blockedAt = $block->blocked_at ?? $block->created_at;
+                            @endphp
+                            <span title="{{ $blockedAt ? $DV::diffForHumans($blockedAt) : '' }}">
+                                {{ $blockedAt ? $DV::formatDate($blockedAt, 'd M Y H:i:s') : '—' }}
+                            </span>
+                        </td>
+                        <td style="font-size: 12px; white-space: nowrap;">
+                            @if ($block->expires_at)
+                                <span class="sec-font-mono" title="{{ $DV::diffForHumans($block->expires_at) }}">{{ $DV::formatDate($block->expires_at, 'd M Y H:i:s') }}</span>
+                            @else
+                                {{ __('Permanent') }}
+                            @endif
+                        </td>
                         <td>
                             <span class="sec-badge {{ $block->is_active ? 'sec-badge-critical' : 'sec-badge-low' }}">
                                 {{ $block->is_active ? __('Active') : __('Inactive') }}
@@ -120,7 +140,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" style="text-align: center; color: var(--sec-text-muted); padding: 32px;">{{ __('No blocked IPs.') }}</td>
+                        <td colspan="7" style="text-align: center; color: var(--sec-text-muted); padding: 32px;">{{ __('No blocked IPs.') }}</td>
                     </tr>
                 @endforelse
             </tbody>

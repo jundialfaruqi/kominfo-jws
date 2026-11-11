@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eaee6aae3d383505a983d44d3fa0eead",
+    "content-hash": "d4a4e835ab7cf27f60b97dc2bd4a01aa",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -1894,16 +1894,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.71.0",
+            "version": "v12.72.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "64dc24f5d965add4d402b4b8b64f59b561112af5"
+                "reference": "b089d3020e508f49b3625726ab4a2c897f1b78d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/64dc24f5d965add4d402b4b8b64f59b561112af5",
-                "reference": "64dc24f5d965add4d402b4b8b64f59b561112af5",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b089d3020e508f49b3625726ab4a2c897f1b78d5",
+                "reference": "b089d3020e508f49b3625726ab4a2c897f1b78d5",
                 "shasum": ""
             },
             "require": {
@@ -2112,7 +2112,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2026-11-03T15:08:25+00:00"
+            "time": "2026-11-10T15:45:11+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -2316,16 +2316,16 @@
         },
         {
             "name": "laravel/serializable-closure",
-            "version": "v2.1.0",
+            "version": "v2.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/serializable-closure.git",
-                "reference": "2d5869a838bbcf37e0d8b0568fc41914e81374b5"
+                "reference": "2bfb44e8af009b553ed2c060c94b0bc3c67b4769"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/2d5869a838bbcf37e0d8b0568fc41914e81374b5",
-                "reference": "2d5869a838bbcf37e0d8b0568fc41914e81374b5",
+                "url": "https://api.github.com/repos/laravel/serializable-closure/zipball/2bfb44e8af009b553ed2c060c94b0bc3c67b4769",
+                "reference": "2bfb44e8af009b553ed2c060c94b0bc3c67b4769",
                 "shasum": ""
             },
             "require": {
@@ -2373,7 +2373,7 @@
                 "issues": "https://github.com/laravel/serializable-closure/issues",
                 "source": "https://github.com/laravel/serializable-closure"
             },
-            "time": "2026-09-22T14:32:34+00:00"
+            "time": "2026-10-14T21:20:29+00:00"
         },
         {
             "name": "laravel/tinker",
@@ -5171,16 +5171,16 @@
         },
         {
             "name": "robyajo/pasak",
-            "version": "v1.7.4",
+            "version": "v1.7.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/robyajo/pasak.git",
-                "reference": "b0933362c7af413761593cce7f4b6131d3910852"
+                "reference": "41500cc60863f50599fedc3f2bec59f1965ba577"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/robyajo/pasak/zipball/b0933362c7af413761593cce7f4b6131d3910852",
-                "reference": "b0933362c7af413761593cce7f4b6131d3910852",
+                "url": "https://api.github.com/repos/robyajo/pasak/zipball/41500cc60863f50599fedc3f2bec59f1965ba577",
+                "reference": "41500cc60863f50599fedc3f2bec59f1965ba577",
                 "shasum": ""
             },
             "require": {
@@ -5257,7 +5257,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2026-11-10T09:40:53+00:00"
+            "time": "2026-11-11T00:59:55+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",

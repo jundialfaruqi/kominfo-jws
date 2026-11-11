@@ -1,6 +1,11 @@
 @extends('pages.pasak.layout', ['heading' => __('Allowed IPs'), 'subheading' => __('Daftar IP yang selalu diizinkan — tidak pernah dicatat maupun diblokir')])
 
+@section('page_support_key', 'allowed-ips')
+
 @section('content')
+@php
+    $DV = \Internal\Pasak\Support\DashboardView::class;
+@endphp
 <div class="sec-grid-4">
     <div class="sec-stat-card">
         <div class="sec-stat-label">{{ __('Total entries') }}</div>
@@ -82,6 +87,7 @@
                 <tr>
                     <th>{{ __('IP / range') }}</th>
                     <th>{{ __('Label') }}</th>
+                    <th>{{ __('Allowed at') }}</th>
                     <th>{{ __('Expires') }}</th>
                     <th>{{ __('Status') }}</th>
                     <th style="text-align: right;">{{ __('Action') }}</th>
@@ -92,7 +98,18 @@
                     <tr>
                         <td class="sec-font-mono" style="font-weight: 600;">{{ $entry->ip_address }}</td>
                         <td style="font-size: 12px;">{{ $entry->label ?? '-' }}</td>
-                        <td style="font-size: 12px;">{{ $entry->expires_at ?? __('Permanent') }}</td>
+                        <td class="sec-font-mono" style="font-size: 12px; white-space: nowrap;">
+                            <span title="{{ $entry->created_at ? $DV::diffForHumans($entry->created_at) : '' }}">
+                                {{ $entry->created_at ? $DV::formatDate($entry->created_at, 'd M Y H:i:s') : '—' }}
+                            </span>
+                        </td>
+                        <td style="font-size: 12px; white-space: nowrap;">
+                            @if ($entry->expires_at)
+                                <span class="sec-font-mono" title="{{ $DV::diffForHumans($entry->expires_at) }}">{{ $DV::formatDate($entry->expires_at, 'd M Y H:i:s') }}</span>
+                            @else
+                                {{ __('Permanent') }}
+                            @endif
+                        </td>
                         <td>
                             <span class="sec-badge {{ $entry->is_active ? 'sec-badge-success' : 'sec-badge-low' }}">
                                 {{ $entry->is_active ? __('Active') : __('Inactive') }}
@@ -113,7 +130,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align: center; color: var(--sec-text-muted); padding: 32px;">{{ __('No allowed IPs yet.') }}</td>
+                        <td colspan="6" style="text-align: center; color: var(--sec-text-muted); padding: 32px;">{{ __('No allowed IPs yet.') }}</td>
                     </tr>
                 @endforelse
             </tbody>
