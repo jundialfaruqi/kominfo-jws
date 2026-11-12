@@ -267,22 +267,15 @@ class MyMasjidController extends Controller
                 ->get()
                 ->map(function ($agenda) use ($todayStart) {
                     $agendaDate = Carbon::parse($agenda->date, 'Asia/Jakarta')->startOfDay();
-                    
-                    $hari = $agendaDate->locale('id')->translatedFormat('l');
-                    if (strtolower($hari) === 'minggu') {
-                        $hari = 'Ahad';
-                    }
-                    $formattedDate = $hari . ', ' . $agendaDate->format('d/m/Y');
 
                     if ($agendaDate->isSameDay($todayStart)) {
                         $days_label = 'Hari ini';
                     } else {
                         $days = $todayStart->diffInDays($agendaDate);
-                        $days_label = $days . ' Hari Lagi';
+                        $days_label = $days == 1 ? 'Besok' : $days . ' Hari Lagi';
                     }
                     return [
                         'name' => $agenda->name,
-                        'date' => $formattedDate,
                         'date_raw' => $agendaDate->format('Y-m-d'),
                         'days_label' => $days_label,
                         'aktif' => $agenda->aktif,
