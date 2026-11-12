@@ -45,8 +45,9 @@
             border-radius: clamp(0.2rem, 1.2vw, 2rem) !important;
         }
 
-        .right-content.theme-10.no-finance .floating-agenda-1 {
-            left: clamp(1%, 4%, 6%);
+        .right-content.theme-10 .floating-agenda-1 {
+            right: clamp(1%, 1.5%, 4%) !important;
+            left: auto !important;
         }
 
         /* Tema 4 (id:12 - CSS Grid layout): Ubah area grid menjadi 1 kolom penuh saat finance nonaktif */
