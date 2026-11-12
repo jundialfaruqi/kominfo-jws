@@ -59,7 +59,7 @@
                 "mosque-image" !important;
         }
 
-        /* Floating Agenda Tema 4 saat finance nonaktif (kotak siku & mepet kanan) */
+        /* Floating Agenda Tema 4 saat finance nonaktif (berjarak dari kanan & bawah, style sama dengan tema lain) */
         .right-content.theme-12:not(.no-finance) .floating-agenda-1 {
             display: none !important;
         }
@@ -67,11 +67,11 @@
         .right-content.theme-12.no-finance .floating-agenda-1:not(.is-empty) {
             display: grid;
             position: absolute;
-            right: 0 !important;
-            bottom: calc(clamp(0.4rem, 3vw, 8em) + 1vw) !important;
+            right: clamp(1%, 1.5%, 4%) !important;
+            bottom: calc(clamp(0.4rem, 3vw, 8em) + 1.5vw) !important;
             z-index: 30;
-            border-radius: 0 !important;
-            background-color: rgba(30, 94, 163, 0.95);
+            border-radius: clamp(0.2rem, 1.2vw, 2rem) !important;
+            background-color: rgba(30, 94, 163, 0.719);
             color: #ffffff;
             padding: clamp(0.01rem, 1vw, 1rem);
             box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.25);
