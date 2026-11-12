@@ -18,7 +18,15 @@ class Profil extends Model
         'logo_masjid',
         'logo_pemerintah',
         'slug',
+        'is_finance_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_finance_active' => 'boolean',
+        ];
+    }
     protected $hidden = [
         'logo_masjid_url',
         'logo_pemerintah_url',

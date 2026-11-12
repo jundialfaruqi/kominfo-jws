@@ -1,5 +1,76 @@
 @section('styles')
     <link href="{{ $themeCss }}" rel="stylesheet">
+    <style>
+        /* Override layout ketika laporan keuangan dinonaktifkan */
+        .right-content.no-finance .finance-overlay {
+            display: none !important;
+        }
+
+        /* Tema 3 (Flexbox layout) & Tema 4: Gambar slide melebar 100% penuh */
+        .right-content.no-finance .mosque-image {
+            flex: 1 !important;
+            width: 100% !important;
+            grid-column: 1 / -1 !important;
+        }
+
+        .right-content.no-finance .mosque-image img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: fill !important;
+        }
+
+        /* Tema 4 (CSS Grid layout): Ubah area grid menjadi 1 kolom penuh */
+        .right-content.no-finance {
+            grid-template-columns: 1fr !important;
+            grid-template-areas:
+                "mosque-info"
+                "date-info"
+                "mosque-image" !important;
+        }
+
+        /* Floating Agenda saat finance nonaktif */
+        .right-content.no-finance .floating-agenda-1 {
+            display: grid !important;
+            position: absolute;
+            right: clamp(1%, 3%, 5%);
+            bottom: clamp(1%, 2.5%, 9%);
+            z-index: 30;
+            border-radius: clamp(0.2rem, 1.2vw, 2rem);
+            background-color: rgba(30, 94, 163, 0.85);
+            color: #ffffff;
+            padding: clamp(0.01rem, 1vw, 1rem);
+            box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.25);
+            gap: 0.6rem;
+            width: 30vw;
+        }
+
+        .right-content.no-finance .floating-agenda-1 .agenda-header {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-size: clamp(0.01rem, 2vw, 2.8rem);
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .right-content.no-finance .floating-agenda-1 .agenda-title {
+            font-size: clamp(0.01em, 1.4vw, 1.7rem);
+            font-weight: 600;
+            color: #ffd84d;
+            line-height: 1.2;
+            margin-left: clamp(0rem, 0.3rem, 0.4rem);
+            margin-top: clamp(0.01em, 0.4rem, 0.2rem);
+        }
+
+        .right-content.no-finance .floating-agenda-1 svg {
+            width: clamp(0.6rem, 1em, 1.5em);
+            height: clamp(0.6rem, 1em, 1.5em);
+            stroke: #ffd84d;
+            flex-shrink: 0;
+            margin-bottom: clamp(0.01rem, 0.2vw, 2rem);
+            margin-left: clamp(0.14rem, 0.01vw, 0.5rem);
+        }
+    </style>
 @endsection
 <div>
     <div class="container">
@@ -124,7 +195,7 @@
         </div>
 
         {{-- Right Content - sekarang full --}}
-        <div class="right-content">
+        <div class="right-content {{ empty($profil->is_finance_active) ? 'no-finance' : '' }}">
             @livewire('firdaus.mosque-info', ['slug' => request()->route('slug')])
 
             <div class="date-info">

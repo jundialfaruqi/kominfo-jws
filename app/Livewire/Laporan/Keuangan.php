@@ -58,6 +58,9 @@ class Keuangan extends Component
     public $filterStartDate; // format: Y-m-d
     public $filterEndDate;   // format: Y-m-d
 
+    // Pengaturan tampilan display JWS
+    public $isFinanceActive = true;
+
     protected $rules = [
         'idMasjid' => 'required|exists:profils,id',
         'idGroupCategory' => 'required|exists:group_categories,id',
@@ -103,8 +106,52 @@ class Keuangan extends Component
             $profil = Auth::user()->profil;
             if ($profil) {
                 $this->idMasjid = $profil->id;
+                $this->isFinanceActive = (bool) ($profil->is_finance_active ?? true);
             }
         }
+    }
+
+    public function updatedIdMasjid($value)
+    {
+        if ($value) {
+            $p = Profil::find($value);
+            $this->isFinanceActive = $p ? (bool) ($p->is_finance_active ?? true) : true;
+        }
+    }
+
+    public function saveFinanceStatus($status)
+    {
+        $targetId = null;
+        if (Auth::check() && !in_array(Auth::user()->role, ['Super Admin', 'Admin'])) {
+            $profil = Auth::user()->profil;
+            $targetId = $profil ? $profil->id : null;
+        } else {
+            $targetId = $this->idMasjid;
+        }
+
+        if (!$targetId) {
+            $this->dispatch('error', 'Pilih Profil Masjid terlebih dahulu');
+            return;
+        }
+
+        $profil = Profil::find($targetId);
+        if (!$profil) {
+            $this->dispatch('error', 'Profil Masjid tidak ditemukan');
+            return;
+        }
+
+        $boolStatus = filter_var($status, FILTER_VALIDATE_BOOLEAN);
+        $profil->is_finance_active = $boolStatus;
+        $profil->save();
+
+        $this->isFinanceActive = $boolStatus;
+
+        try {
+            event(new ContentUpdatedEvent('laporan', $targetId));
+        } catch (\Throwable $e) {}
+
+        $this->dispatch('financeStatusSaved', status: $boolStatus);
+        $this->dispatch('success', 'Pengaturan tampilan laporan keuangan berhasil disimpan');
     }
 
     public function updatingSearch()

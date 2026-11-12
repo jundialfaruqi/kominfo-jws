@@ -3696,12 +3696,16 @@
                     $topList.append(row);
                 });
 
-                // Tampilkan overlay
-                $('#financeOverlay').show();
-                // Mulai scroll pada konten gabungan (totals + kategori + aktivitas)
-                const $containerAll = $('#financeScrollContainerAll');
-                const $contentAll = $('#financeScrollContentAll');
-                startVerticalScroll($containerAll, $contentAll);
+                // Tampilkan overlay jika tidak dinonaktifkan
+                if (!$('.right-content').hasClass('no-finance')) {
+                    $('#financeOverlay').show();
+                    // Mulai scroll pada konten gabungan (totals + kategori + aktivitas)
+                    const $containerAll = $('#financeScrollContainerAll');
+                    const $contentAll = $('#financeScrollContentAll');
+                    startVerticalScroll($containerAll, $contentAll);
+                } else {
+                    $('#financeOverlay').hide();
+                }
 
             } catch (e) {
                 showFinanceError('Kesalahan memproses data keuangan');

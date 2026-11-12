@@ -146,6 +146,9 @@
                 <div class="alert alert-info rounded-3">Silakan pilih Profil Masjid untuk menampilkan data laporan
                     keuangan.</div>
             @else
+                {{-- Pengaturan Tampilan Keuangan Display JWS --}}
+                @include('livewire.laporan.keuangan_setting_card')
+
                 {{-- Admin: kelompok per masjid (terpilih) lalu per kategori, tiap kategori tabel sendiri dengan card penuh --}}
                 @php
                     // computedGroups berisi tepat satu masjid yang dipilih
@@ -552,6 +555,9 @@
                 @endforelse
             @endif
         @else
+            {{-- Pengaturan Tampilan Keuangan Display JWS --}}
+            @include('livewire.laporan.keuangan_setting_card')
+
             {{-- Filter tanggal (Non-admin) --}}
             <div class="card mb-3 rounded-3 shadow-sm">
                 <div class="card-body">
