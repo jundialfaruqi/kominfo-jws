@@ -216,6 +216,17 @@
 
         let agendaItems = []; // Menyimpan objek {name, message}
 
+        function hideAgendaCard() {
+            if (agendaRotateTimer) {
+                clearInterval(agendaRotateTimer);
+                agendaRotateTimer = null;
+            }
+            agendaItems = [];
+            $('#agenda-title').text('');
+            $('#agenda-message').text('');
+            $('#floating-agenda').addClass('is-empty').hide();
+        }
+
         function loadAgenda() {
             const slug = window.location.pathname.replace(/^\//, '');
             if (!slug) return;
@@ -224,37 +235,40 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function(res) {
-                    const items = (res && res.data) ? res.data : [];
+                    lastAgendaDay = getCurrentTimeFromServer().toDateString();
+                    const rawItems = (res && Array.isArray(res.data)) ? res.data : [];
+                    const items = rawItems.filter(item => item && item.name && String(item.name).trim() !== '');
                     if (items.length > 0) {
                         agendaItems = items; // Simpan semua item agenda (name & message)
+                        $('#floating-agenda').removeClass('is-empty');
                         updateAgendaTitleByServerTime();
                         if (agendaRotateTimer) {
                             clearInterval(agendaRotateTimer);
                         }
                         agendaRotateTimer = setInterval(updateAgendaTitleByServerTime, 1000);
                         $('#floating-agenda').show();
-                        lastAgendaDay = getCurrentTimeFromServer().toDateString();
                     } else {
-                        if (agendaRotateTimer) {
-                            clearInterval(agendaRotateTimer);
-                            agendaRotateTimer = null;
-                        }
-                        agendaItems = [];
-                        $('#floating-agenda').hide();
+                        hideAgendaCard();
                     }
                 },
                 error: function() {
-                    if (agendaRotateTimer) {
-                        clearInterval(agendaRotateTimer);
-                        agendaRotateTimer = null;
-                    }
-                    agendaItems = [];
-                    $('#floating-agenda').hide();
+                    hideAgendaCard();
                 }
             });
         }
 
         let agendaItems1 = []; // Menyimpan objek {name, message} untuk agenda 1
+
+        function hideAgendaCard1() {
+            if (agendaRotateTimer1) {
+                clearInterval(agendaRotateTimer1);
+                agendaRotateTimer1 = null;
+            }
+            agendaItems1 = [];
+            $('#agenda1-title').text('');
+            $('#agenda1-message').text('');
+            $('#floating-agenda-1').addClass('is-empty').hide();
+        }
 
         function loadAgenda1() {
             const slug = window.location.pathname.replace(/^\//, '');
@@ -264,37 +278,32 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function(res) {
-                    const items = (res && res.data) ? res.data : [];
+                    lastAgendaDay = getCurrentTimeFromServer().toDateString();
+                    const rawItems = (res && Array.isArray(res.data)) ? res.data : [];
+                    const items = rawItems.filter(item => item && item.name && String(item.name).trim() !== '');
                     if (items.length > 0) {
                         agendaItems1 = items; // Simpan semua item agenda (name & message)
+                        $('#floating-agenda-1').removeClass('is-empty');
                         updateAgendaTitleByServerTime1();
                         if (agendaRotateTimer1) {
                             clearInterval(agendaRotateTimer1);
                         }
                         agendaRotateTimer1 = setInterval(updateAgendaTitleByServerTime1, 1000);
-                        $('#floating-agenda-1').show();
                     } else {
-                        if (agendaRotateTimer1) {
-                            clearInterval(agendaRotateTimer1);
-                            agendaRotateTimer1 = null;
-                        }
-                        agendaItems1 = [];
-                        $('#floating-agenda-1').hide();
+                        hideAgendaCard1();
                     }
                 },
                 error: function() {
-                    if (agendaRotateTimer1) {
-                        clearInterval(agendaRotateTimer1);
-                        agendaRotateTimer1 = null;
-                    }
-                    agendaItems1 = [];
-                    $('#floating-agenda-1').hide();
+                    hideAgendaCard1();
                 }
             });
         }
 
         function updateAgendaTitleByServerTime1() {
-            if (!agendaItems1 || agendaItems1.length === 0) return;
+            if (!agendaItems1 || agendaItems1.length === 0) {
+                $('#floating-agenda-1').addClass('is-empty').hide();
+                return;
+            }
             const t = getCurrentTimeFromServer().getTime();
             const rotateMs = 5000;
             const pauseMs = 10000;
@@ -304,11 +313,13 @@
             if (phase >= displayWindow) {
                 $('#floating-agenda-1').hide();
                 return;
-            } else {
-                $('#floating-agenda-1').show();
             }
             const idx = Math.floor(phase / rotateMs);
             const currentAgenda = agendaItems1[idx];
+            if (!currentAgenda || !currentAgenda.name) {
+                $('#floating-agenda-1').hide();
+                return;
+            }
 
             const txt1 = currentAgenda.name || '';
             const msg1 = currentAgenda.message || '';
@@ -318,13 +329,21 @@
 
             $('#agenda1-title').text(out1);
             $('#agenda1-message').text(msg1);
+            $('#floating-agenda-1').removeClass('is-empty').show();
         }
 
         function updateAgendaTitleByServerTime() {
-            if (!agendaItems || agendaItems.length === 0) return;
+            if (!agendaItems || agendaItems.length === 0) {
+                $('#floating-agenda').addClass('is-empty').hide();
+                return;
+            }
             const t = getCurrentTimeFromServer().getTime();
             const idx = Math.floor(t / 7000) % agendaItems.length;
             const currentAgenda = agendaItems[idx];
+            if (!currentAgenda || !currentAgenda.name) {
+                $('#floating-agenda').hide();
+                return;
+            }
 
             const txt = currentAgenda.name || '';
             const msg = currentAgenda.message || '';
@@ -334,6 +353,7 @@
 
             $('#agenda-title').text(out);
             $('#agenda-message').text(msg);
+            $('#floating-agenda').removeClass('is-empty').show();
         }
 
         // Variabel untuk menyimpan timestamp terakhir pembaruan audio
@@ -341,11 +361,12 @@
         let audioVersions = {}; // Menyimpan versi terakhir dari setiap audio
 
         window.newAudioAvailable = false;
-        $('#floating-agenda').hide();
-        $('#floating-agenda-1').hide();
+        $('#floating-agenda').addClass('is-empty').hide();
+        $('#floating-agenda-1').addClass('is-empty').hide();
         let lastAgendaDay = null;
         let agendaRotateTimer = null;
         let agendaRotateTimer1 = null;
+        let agendaDayCheckTimer = null;
 
         // Fungsi untuk memperbarui dan memutar audio
         function updateAndPlayAudio() {
@@ -515,24 +536,51 @@
             });
 
             loadAgenda();
-            try {
-                if (window.Echo) {
-                    window.Echo.channel(`masjid-${slug}`).listen('.App\\Events\\ContentUpdatedEvent', (e) => {
-                        if (e && e.type === 'agenda') loadAgenda();
-                        if (e && e.type === 'agenda') loadAgenda1();
-                    });
-                }
-            } catch (err) {}
+            loadAgenda1();
 
-            setInterval(function() {
+            if (!window.__agendaEchoInitialized) {
+                window.__agendaEchoInitialized = true;
+                const subscribeAgenda = () => {
+                    try {
+                        window.Echo.channel(`masjid-${slug}`)
+                            .listen('ContentUpdatedEvent', (e) => {
+                                if (e && e.type === 'agenda') {
+                                    loadAgenda();
+                                    loadAgenda1();
+                                }
+                            });
+                    } catch (err) {
+                        console.warn('Gagal subscribe Echo agenda:', err);
+                    }
+                };
+                if (window.Echo) {
+                    subscribeAgenda();
+                } else {
+                    let attempts = 0;
+                    const maxAttempts = 20;
+                    const echoWaitInterval = setInterval(() => {
+                        attempts++;
+                        if (window.Echo) {
+                            clearInterval(echoWaitInterval);
+                            subscribeAgenda();
+                        } else if (attempts >= maxAttempts) {
+                            clearInterval(echoWaitInterval);
+                        }
+                    }, 500);
+                }
+            }
+
+            if (agendaDayCheckTimer) {
+                clearInterval(agendaDayCheckTimer);
+            }
+            agendaDayCheckTimer = setInterval(function() {
                 const d = getCurrentTimeFromServer().toDateString();
-                if (lastAgendaDay && d !== lastAgendaDay) {
-                    loadAgenda();
+                if (!lastAgendaDay || d !== lastAgendaDay) {
                     lastAgendaDay = d;
+                    loadAgenda();
+                    loadAgenda1();
                 }
             }, 60000);
-
-            loadAgenda1();
 
         }
 

@@ -6,21 +6,51 @@
             display: none !important;
         }
 
-        /* Tema 3 (Flexbox layout) & Tema 4: Gambar slide melebar 100% penuh */
-        .right-content.no-finance .mosque-image {
+        /* Pastikan container flex/grid tidak meluber keluar batas layar karena ukuran asli gambar */
+        .right-content,
+        .right-content .mosque-image {
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Tema 3 (id:10) & Tema 4 (id:12): Gambar slide melebar 100% penuh saat finance nonaktif */
+        .right-content.theme-10.no-finance .mosque-image,
+        .right-content.theme-12.no-finance .mosque-image {
             flex: 1 !important;
             width: 100% !important;
             grid-column: 1 / -1 !important;
         }
 
-        .right-content.no-finance .mosque-image img {
+        .right-content.theme-10.no-finance .mosque-image img,
+        .right-content.theme-12.no-finance .mosque-image img {
             width: 100% !important;
             height: 100% !important;
             object-fit: fill !important;
         }
 
-        /* Tema 4 (CSS Grid layout): Ubah area grid menjadi 1 kolom penuh */
-        .right-content.no-finance {
+        /* Sembunyikan card agenda jika kosong / tidak ada agenda aktif */
+        .floating-agenda.is-empty,
+        .floating-agenda-1.is-empty,
+        .floating-agenda[style*="display: none"],
+        .floating-agenda[style*="display:none"],
+        .floating-agenda-1[style*="display: none"],
+        .floating-agenda-1[style*="display:none"] {
+            display: none !important;
+        }
+
+        /* Tema 1 (id:7), Tema 2 (id:4), Tema 3 (id:10): Sudut card agenda tetap rounded */
+        .right-content.theme-7 .floating-agenda-1,
+        .right-content.theme-4 .floating-agenda-1,
+        .right-content.theme-10 .floating-agenda-1 {
+            border-radius: clamp(0.2rem, 1.2vw, 2rem) !important;
+        }
+
+        .right-content.theme-10.no-finance .floating-agenda-1 {
+            left: clamp(1%, 4%, 6%);
+        }
+
+        /* Tema 4 (id:12 - CSS Grid layout): Ubah area grid menjadi 1 kolom penuh saat finance nonaktif */
+        .right-content.theme-12.no-finance {
             grid-template-columns: 1fr !important;
             grid-template-areas:
                 "mosque-info"
@@ -28,9 +58,13 @@
                 "mosque-image" !important;
         }
 
-        /* Floating Agenda saat finance nonaktif */
-        .right-content.no-finance .floating-agenda-1 {
-            display: grid !important;
+        /* Floating Agenda Tema 4 saat finance nonaktif (kotak siku & mepet kanan) */
+        .right-content.theme-12:not(.no-finance) .floating-agenda-1 {
+            display: none !important;
+        }
+
+        .right-content.theme-12.no-finance .floating-agenda-1:not(.is-empty) {
+            display: grid;
             position: absolute;
             right: 0 !important;
             bottom: calc(clamp(0.4rem, 3vw, 8em) + 1vw) !important;
@@ -44,7 +78,7 @@
             width: 30vw;
         }
 
-        .right-content.no-finance .floating-agenda-1 .agenda-header {
+        .right-content.theme-12.no-finance .floating-agenda-1 .agenda-header {
             display: flex;
             align-items: center;
             gap: 0.2rem;
@@ -53,7 +87,7 @@
             line-height: 1.2;
         }
 
-        .right-content.no-finance .floating-agenda-1 .agenda-title {
+        .right-content.theme-12.no-finance .floating-agenda-1 .agenda-title {
             font-size: clamp(0.01em, 1.4vw, 1.7rem);
             font-weight: 600;
             color: #ffd84d;
@@ -62,7 +96,7 @@
             margin-top: clamp(0.01em, 0.4rem, 0.2rem);
         }
 
-        .right-content.no-finance .floating-agenda-1 svg {
+        .right-content.theme-12.no-finance .floating-agenda-1 svg {
             width: clamp(0.6rem, 1em, 1.5em);
             height: clamp(0.6rem, 1em, 1.5em);
             stroke: #ffd84d;
@@ -195,7 +229,7 @@
         </div>
 
         {{-- Right Content - sekarang full --}}
-        <div class="right-content {{ empty($profil->is_finance_active) ? 'no-finance' : '' }}">
+        <div class="right-content theme-{{ $theme->id ?? 7 }} {{ empty($profil->is_finance_active) ? 'no-finance' : '' }}">
             @livewire('firdaus.mosque-info', ['slug' => request()->route('slug')])
 
             <div class="date-info">
@@ -245,7 +279,7 @@
                         <div class="finance-scroll-content" id="financeTopCategoriesList"></div>
                     </div>
                 </div>
-                <div id="floating-agenda" class="floating-agenda">
+                <div id="floating-agenda" class="floating-agenda is-empty" style="display: none;">
                     <div class="agenda-card">
                         <div class="agenda-header">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -301,7 +335,7 @@
                     <img id="slide6" src=""
                         style="object-fit: stretch; width: 100%; height: 100%; display: none;" alt="Slide 6">
                 @endif
-                <div id="floating-agenda-1" class="floating-agenda-1">
+                <div id="floating-agenda-1" class="floating-agenda-1 is-empty" style="display: none;">
                     <div class="agenda-card">
                         <div class="agenda-header">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
