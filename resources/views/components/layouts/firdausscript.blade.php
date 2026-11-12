@@ -3744,6 +3744,12 @@
                     $topList.append(row);
                 });
 
+                // Sinkronisasi status aktif/nonaktif keuangan secara realtime
+                if (data.profil && typeof data.profil.is_finance_active !== 'undefined') {
+                    const isFinanceActive = Boolean(data.profil.is_finance_active);
+                    $('.right-content').toggleClass('no-finance', !isFinanceActive);
+                }
+
                 // Tampilkan overlay jika tidak dinonaktifkan
                 if (!$('.right-content').hasClass('no-finance')) {
                     $('#financeOverlay').show();
@@ -3752,6 +3758,7 @@
                     const $contentAll = $('#financeScrollContentAll');
                     startVerticalScroll($containerAll, $contentAll);
                 } else {
+                    stopVerticalScroll();
                     $('#financeOverlay').hide();
                 }
 

@@ -147,7 +147,7 @@ class Keuangan extends Component
         $this->isFinanceActive = $boolStatus;
 
         try {
-            event(new ContentUpdatedEvent('laporan', $targetId));
+            event(new ContentUpdatedEvent($profil->slug, 'laporan'));
         } catch (\Throwable $e) {}
 
         $this->dispatch('financeStatusSaved', status: $boolStatus);

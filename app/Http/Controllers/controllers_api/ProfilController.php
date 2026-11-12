@@ -39,7 +39,8 @@ class ProfilController extends Controller
                 'logo_masjid' => $profil->logo_masjid,
                 'logo_pemerintah' => $profil->logo_pemerintah,
                 'logo_masjid_url' => $profil->logo_masjid_url,
-                'logo_pemerintah_url' => $profil->logo_pemerintah_url
+                'logo_pemerintah_url' => $profil->logo_pemerintah_url,
+                'is_finance_active' => (bool) ($profil->is_finance_active ?? true),
             ];
 
             return response()->json([
@@ -883,7 +884,11 @@ class ProfilController extends Controller
             }
 
             $data = [
-                'profil' => ['id' => $profil->id, 'name' => $profil->name],
+                'profil' => [
+                    'id' => $profil->id,
+                    'name' => $profil->name,
+                    'is_finance_active' => (bool) ($profil->is_finance_active ?? true),
+                ],
                 'categories' => $categories,
                 'grandTotals' => $grandTotals,
             ];
