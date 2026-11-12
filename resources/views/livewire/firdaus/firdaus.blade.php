@@ -32,11 +32,11 @@
         .right-content.no-finance .floating-agenda-1 {
             display: grid !important;
             position: absolute;
-            right: clamp(1%, 3%, 5%);
-            bottom: clamp(1%, 2.5%, 9%);
+            right: 0 !important;
+            bottom: calc(clamp(0.4rem, 3vw, 8em) + 1vw) !important;
             z-index: 30;
-            border-radius: clamp(0.2rem, 1.2vw, 2rem);
-            background-color: rgba(30, 94, 163, 0.85);
+            border-radius: 0 !important;
+            background-color: rgba(30, 94, 163, 0.95);
             color: #ffffff;
             padding: clamp(0.01rem, 1vw, 1rem);
             box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.25);
