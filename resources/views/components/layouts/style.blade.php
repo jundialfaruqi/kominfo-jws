@@ -156,6 +156,11 @@
         }
     }
 
+    /* Jadikan kontainer page-body content selebar container-fluid secara global */
+    .page-wrapper .page-body > .container-xl {
+        max-width: 100% !important;
+    }
+
     @media (max-width: 991.98px) {
         #main-sidebar {
             border-bottom: 1px solid #e2e8f0 !important;

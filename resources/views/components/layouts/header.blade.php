@@ -1,5 +1,5 @@
 <div class="page-header d-print-none">
-    <div class="container-xl">
+    <div class="container-fluid">
         <div class="row g-2 align-items-center">
             <div class="col">
                 <div class="page-pretitle align-items-center">
@@ -26,17 +26,21 @@
                     </div>
                 </div>
                 <script>
-                    (function () {
+                    (function() {
                         var timeEl = document.getElementById('header-clock-time');
                         var dateEl = document.getElementById('header-clock-date');
 
                         var timeFmt = new Intl.DateTimeFormat('id-ID', {
-                            hour: '2-digit', minute: '2-digit',
-                            hour12: false, timeZone: 'Asia/Jakarta'
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                            timeZone: 'Asia/Jakarta'
                         });
                         var dateFmt = new Intl.DateTimeFormat('id-ID', {
-                            weekday: 'long', day: 'numeric',
-                            month: 'short', year: 'numeric',
+                            weekday: 'long',
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
                             timeZone: 'Asia/Jakarta'
                         });
 
