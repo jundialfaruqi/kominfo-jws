@@ -270,10 +270,12 @@
             <td class="info-label">Nama Pengelola</td>
             <td class="info-value">{{ $user->name }}</td>
         </tr>
-        <tr>
-            <td class="info-label">Nama Masjid / Instansi</td>
-            <td class="info-value">{{ $user->profil->name ?? '-' }}</td>
-        </tr>
+        @if (filled(trim((string) ($user->profil?->name ?? ''))))
+            <tr>
+                <td class="info-label">Nama Masjid / Instansi</td>
+                <td class="info-value">{{ $user->profil->name }}</td>
+            </tr>
+        @endif
         <tr>
             <td class="info-label">Email Login</td>
             <td class="info-value">{{ $user->email }}</td>
