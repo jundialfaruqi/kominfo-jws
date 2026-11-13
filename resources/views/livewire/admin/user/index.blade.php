@@ -256,6 +256,9 @@
     {{-- Delete Modal --}}
     @include('livewire.admin.user.delete')
 
+    {{-- PDF Progress Modal --}}
+    @include('livewire.admin.user.pdf-progress-modal')
+
     {{-- Scripts --}}
     @script
         <script>
@@ -293,6 +296,274 @@
                     position: 'topRight'
                 });
             });
+
+            if (!window.__userPdfGeneratorBound) {
+                window.__userPdfGeneratorBound = true;
+
+                let pdfAbortController = null;
+                let pdfCreepTimer = null;
+                let lastPdfRequest = null;
+
+                const stopCreep = () => {
+                    if (pdfCreepTimer) {
+                        clearInterval(pdfCreepTimer);
+                        pdfCreepTimer = null;
+                    }
+                };
+
+                const setStepState = (activeStep, isDone, isError) => {
+                    const modalEl = document.getElementById('pdfProgressModal');
+                    if (!modalEl) return;
+
+                    modalEl.querySelectorAll('[data-pdf-step]').forEach((row) => {
+                        const stepNum = parseInt(row.getAttribute('data-pdf-step'), 10);
+                        const badge = row.querySelector('.badge');
+                        if (!badge) return;
+
+                        row.classList.remove('text-muted', 'text-dark', 'text-success', 'text-danger', 'fw-medium');
+                        badge.className = 'badge rounded-pill';
+
+                        if (isDone || stepNum < activeStep) {
+                            row.classList.add('text-success');
+                            badge.classList.add('bg-success-lt');
+                            badge.textContent = '✓';
+                        } else if (stepNum === activeStep) {
+                            if (isError) {
+                                row.classList.add('text-danger', 'fw-medium');
+                                badge.classList.add('bg-danger-lt');
+                                badge.textContent = '!';
+                            } else {
+                                row.classList.add('text-dark', 'fw-medium');
+                                badge.classList.add('bg-primary-lt');
+                                badge.textContent = String(stepNum);
+                            }
+                        } else {
+                            row.classList.add('text-muted');
+                            badge.classList.add('bg-secondary-lt');
+                            badge.textContent = String(stepNum);
+                        }
+                    });
+                };
+
+                const startPdfGeneration = async (payload) => {
+                    const modalEl = document.getElementById('pdfProgressModal');
+                    if (!modalEl) return;
+
+                    lastPdfRequest = payload;
+
+                    if (pdfAbortController) {
+                        pdfAbortController.abort();
+                    }
+                    stopCreep();
+
+                    pdfAbortController = new AbortController();
+
+                    const userNameEl = document.getElementById('pdfModalUserName');
+                    const userEmailEl = document.getElementById('pdfModalUserEmail');
+                    const userMosqueEl = document.getElementById('pdfModalUserMosque');
+                    const statusEl = document.getElementById('pdfProgressStatus');
+                    const percentEl = document.getElementById('pdfProgressPercent');
+                    const barEl = document.getElementById('pdfProgressBar');
+                    const successBox = document.getElementById('pdfSuccessBox');
+                    const fileMetaEl = document.getElementById('pdfFileMeta');
+                    const errorBox = document.getElementById('pdfErrorBox');
+                    const errorMsgEl = document.getElementById('pdfErrorMessage');
+                    const retryBtn = document.getElementById('pdfRetryBtn');
+                    const downloadLink = document.getElementById('pdfDownloadLink');
+
+                    userNameEl.textContent = payload.userName || '-';
+                    userEmailEl.textContent = payload.userEmail || '-';
+                    userMosqueEl.textContent = payload.userMosque && payload.userMosque !== '-'
+                        ? 'Masjid / Instansi: ' + payload.userMosque
+                        : 'Masjid / Instansi: -';
+
+                    let displayProgress = 5;
+                    let serverCeiling = 90;
+                    let currentStep = 1;
+
+                    const updateBar = (pct, mode = 'primary') => {
+                        const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+                        barEl.style.width = clamped + '%';
+                        barEl.setAttribute('aria-valuenow', String(clamped));
+                        percentEl.textContent = clamped + '%';
+
+                        barEl.classList.remove('bg-primary', 'bg-success', 'bg-danger', 'progress-bar-striped', 'progress-bar-animated');
+                        percentEl.classList.remove('bg-primary-lt', 'bg-success-lt', 'bg-danger-lt');
+
+                        if (mode === 'success') {
+                            barEl.classList.add('bg-success');
+                            percentEl.classList.add('bg-success-lt');
+                        } else if (mode === 'error') {
+                            barEl.classList.add('bg-danger');
+                            percentEl.classList.add('bg-danger-lt');
+                        } else {
+                            barEl.classList.add('bg-primary', 'progress-bar-striped', 'progress-bar-animated');
+                            percentEl.classList.add('bg-primary-lt');
+                        }
+                    };
+
+                    statusEl.textContent = 'Memulai proses generate PDF...';
+                    updateBar(displayProgress, 'primary');
+                    setStepState(1, false, false);
+
+                    successBox.classList.add('d-none');
+                    errorBox.classList.add('d-none');
+                    retryBtn.classList.add('d-none');
+                    downloadLink.classList.add('d-none');
+                    downloadLink.setAttribute('href', '#');
+                    downloadLink.removeAttribute('download');
+
+                    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+                    modalInstance.show();
+
+                    // Smooth realtime animation while waiting for server stream chunks
+                    pdfCreepTimer = setInterval(() => {
+                        if (displayProgress < serverCeiling) {
+                            const remaining = serverCeiling - displayProgress;
+                            const step = remaining > 20 ? 3 : (remaining > 8 ? 2 : 1);
+                            displayProgress = Math.min(serverCeiling, displayProgress + step);
+                            updateBar(displayProgress, 'primary');
+                        }
+                    }, 180);
+
+                    const showError = (msg) => {
+                        stopCreep();
+                        updateBar(displayProgress, 'error');
+                        setStepState(currentStep, false, true);
+                        statusEl.textContent = 'Proses generate PDF gagal.';
+                        errorMsgEl.textContent = msg || 'Terjadi kesalahan saat memproses PDF.';
+                        errorBox.classList.remove('d-none');
+                        retryBtn.classList.remove('d-none');
+                    };
+
+                    try {
+                        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                        const response = await fetch(payload.generateUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/x-ndjson',
+                                'X-CSRF-TOKEN': csrfToken,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin',
+                            signal: pdfAbortController.signal
+                        });
+
+                        if (!response.ok || !response.body) {
+                            throw new Error('Server mengembalikan status HTTP ' + response.status);
+                        }
+
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder('utf-8');
+                        let buffer = '';
+                        let completedPayload = null;
+
+                        const processLine = (line) => {
+                            const trimmed = line.trim();
+                            if (!trimmed) return;
+
+                            let chunk = null;
+                            try {
+                                chunk = JSON.parse(trimmed);
+                            } catch (e) {
+                                return;
+                            }
+
+                            if (chunk.error) {
+                                throw new Error(chunk.message || 'Gagal memproses file PDF.');
+                            }
+
+                            if (chunk.step) {
+                                currentStep = chunk.step;
+                            }
+
+                            if (chunk.message) {
+                                statusEl.textContent = chunk.message;
+                            }
+
+                            if (typeof chunk.progress === 'number') {
+                                if (chunk.progress > displayProgress) {
+                                    displayProgress = chunk.progress;
+                                }
+                                if (chunk.done) {
+                                    serverCeiling = 100;
+                                    completedPayload = chunk;
+                                } else {
+                                    serverCeiling = Math.max(serverCeiling, Math.min(94, chunk.progress + 18));
+                                    setStepState(currentStep, false, false);
+                                    updateBar(displayProgress, 'primary');
+                                }
+                            }
+                        };
+
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+                            buffer += decoder.decode(value, { stream: true });
+                            const lines = buffer.split('\n');
+                            buffer = lines.pop() || '';
+                            for (const line of lines) {
+                                processLine(line);
+                            }
+                        }
+
+                        if (buffer.trim()) {
+                            processLine(buffer);
+                        }
+
+                        if (!completedPayload || !completedPayload.download_url) {
+                            throw new Error('Respon generate PDF tidak lengkap.');
+                        }
+
+                        stopCreep();
+                        displayProgress = 100;
+                        updateBar(100, 'success');
+                        setStepState(5, true, false);
+                        statusEl.textContent = completedPayload.message || 'File PDF selesai dibuat.';
+                        fileMetaEl.textContent = `${completedPayload.filename} (${completedPayload.size_kb} KB)`;
+                        successBox.classList.remove('d-none');
+
+                        downloadLink.setAttribute('href', completedPayload.download_url);
+                        downloadLink.setAttribute('download', completedPayload.filename);
+                        downloadLink.classList.remove('d-none');
+                    } catch (err) {
+                        if (err && err.name === 'AbortError') {
+                            stopCreep();
+                            return;
+                        }
+                        showError(err ? err.message : 'Terjadi kesalahan jaringan.');
+                    }
+                };
+
+                document.addEventListener('click', (event) => {
+                    const btn = event.target.closest('[data-pdf-generate-btn]');
+                    if (btn) {
+                        startPdfGeneration({
+                            generateUrl: btn.getAttribute('data-generate-url'),
+                            userName: btn.getAttribute('data-user-name'),
+                            userEmail: btn.getAttribute('data-user-email'),
+                            userMosque: btn.getAttribute('data-user-mosque')
+                        });
+                        return;
+                    }
+
+                    if (event.target.closest('#pdfRetryBtn') && lastPdfRequest) {
+                        startPdfGeneration(lastPdfRequest);
+                    }
+                });
+
+                document.addEventListener('hidden.bs.modal', (event) => {
+                    if (event.target && event.target.id === 'pdfProgressModal') {
+                        if (pdfAbortController) {
+                            pdfAbortController.abort();
+                            pdfAbortController = null;
+                        }
+                        stopCreep();
+                    }
+                });
+            }
         </script>
     @endscript
 </div>

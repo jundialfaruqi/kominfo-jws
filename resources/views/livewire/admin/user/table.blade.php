@@ -89,6 +89,7 @@
                     </td>
                     <td class="text-end">
                         <div class="d-inline-flex align-items-center gap-1">
+                            <span class="user-skeleton-box rounded-4" style="width: 112px; height: 32px;"></span>
                             <span class="user-skeleton-box rounded-4" style="width: 68px; height: 32px;"></span>
                             <span class="user-skeleton-box rounded-4" style="width: 74px; height: 32px;"></span>
                         </div>
@@ -239,16 +240,43 @@
                         @php
                             $canEdit = false;
                             $canDelete = false;
+                            $canDownloadPdf = false;
                             $currentUserRole = auth()->user()->role;
 
                             if ($currentUserRole === 'Super Admin') {
                                 $canEdit = true;
                                 $canDelete = $users->id !== auth()->id();
+                                $canDownloadPdf = true;
                             } elseif ($currentUserRole === 'Admin') {
                                 $canEdit = $users->role === 'User';
                                 $canDelete = $users->role === 'User';
+                                $canDownloadPdf = $users->role === 'User';
                             }
                         @endphp
+
+                        @if ($canDownloadPdf)
+                            <button type="button"
+                                class="btn py-2 px-2 rounded-4 shadow-sm"
+                                data-pdf-generate-btn
+                                data-generate-url="{{ route('admin.user.account-pdf.generate', $users->id) }}"
+                                data-user-name="{{ $users->name }}"
+                                data-user-email="{{ $users->email }}"
+                                data-user-mosque="{{ $users->profil->name ?? '-' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf text-danger me-0">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                                    <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                                    <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                                    <path d="M17 18h2" />
+                                    <path d="M20 15h-3v6" />
+                                    <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                                </svg>
+                                Download PDF
+                            </button>
+                        @endif
 
                         @if ($canEdit)
                             <button wire:click="edit('{{ $users->id }}')"
@@ -301,7 +329,7 @@
                             </button>
                         @endif
 
-                        @if (!$canEdit && !$canDelete)
+                        @if (!$canEdit && !$canDelete && !$canDownloadPdf)
                             <span class="text-muted small">-</span>
                         @endif
                     </td>
