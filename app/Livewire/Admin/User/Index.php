@@ -166,12 +166,14 @@ class Index extends Component
             ]
         );
 
+        $plainPassword = (string) $this->password;
+
         $user = new User();
         $user->name     = $this->name;
         $user->email    = $this->email;
         $user->phone    = $this->phone;
         $user->address  = $this->address;
-        $user->password = bcrypt($this->password);
+        $user->password = bcrypt($plainPassword);
         $user->role     = $this->role;
         $user->status   = $this->status;
         $user->save();
@@ -181,8 +183,17 @@ class Index extends Component
             $user->assignRole($this->selectedRoles);
         }
 
+        $pdfPayload = [
+            'generateUrl' => route('admin.user.account-pdf.generate', $user->id),
+            'userName' => $user->name,
+            'userEmail' => $user->email,
+            'userMosque' => $user->profil->name ?? '-',
+            'password' => $plainPassword,
+        ];
+
         $this->dispatch('success', 'Data user berhasil ditambahkan');
         $this->dispatch('closeCreateModal');
+        $this->dispatch('generateCreatedUserPdf', payload: $pdfPayload);
         $this->cancel();
     }
 

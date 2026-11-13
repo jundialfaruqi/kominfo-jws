@@ -279,7 +279,7 @@
             <td class="info-value">{{ $user->email }}</td>
         </tr>
         <tr>
-            <td class="info-label">Password Default</td>
+            <td class="info-label">Password</td>
             <td class="info-value">
                 <span class="password-badge">{{ $defaultPassword }}</span>
             </td>

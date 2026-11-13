@@ -62,8 +62,10 @@ class UserPdfController extends Controller
         }
 
         $user->load(['profil', 'roles']);
+        $inputPassword = (string) $request->input('password', '');
+        $pdfPassword = $inputPassword !== '' ? $inputPassword : 'jwskominfopku@123';
 
-        return response()->stream(function () use ($actor, $user) {
+        return response()->stream(function () use ($actor, $user, $pdfPassword) {
             $emit = static function (array $payload): void {
                 echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
                 if (ob_get_level() > 0) {
@@ -98,7 +100,7 @@ class UserPdfController extends Controller
                 $displayUrl = $user->profil?->slug ? route('firdaus', $user->profil->slug) : null;
                 $viewData = [
                     'user' => $user,
-                    'defaultPassword' => 'jwskominfopku@123',
+                    'defaultPassword' => $pdfPassword,
                     'loginUrl' => route('login'),
                     'displayUrl' => $displayUrl,
                     'logoDataUri' => $logoDataUri,

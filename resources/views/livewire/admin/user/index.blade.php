@@ -56,27 +56,20 @@
                             </h3>
                             <div class="card-actions">
                                 @if (auth()->user()->role === 'Super Admin' || auth()->user()->role === 'Admin')
-                                    <button wire:loading.attr="disabled" wire:click="add" type="button"
+                                    <button type="button"
                                         class="btn btn-primary py-2 rounded-4 shadow-sm" data-bs-toggle="modal"
                                         data-bs-target="#createModal">
-                                        <span wire:loading.remove wire:target="add">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-plus">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                                                <path d="M13.5 6.5l4 4" />
-                                                <path d="M16 19h6" />
-                                                <path d="M19 16v6" />
-                                            </svg>
-                                            Tambah User Baru
-                                        </span>
-                                        <span wire:loading wire:target="add">
-                                            <span class="spinner-border spinner-border-sm" role="status"
-                                                aria-hidden="true"></span>
-                                            Loading...
-                                        </span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="icon icon-tabler icons-tabler-outline icon-tabler-pencil-plus">
+                                            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                            <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                                            <path d="M13.5 6.5l4 4" />
+                                            <path d="M16 19h6" />
+                                            <path d="M19 16v6" />
+                                        </svg>
+                                        Tambah User Baru
                                     </button>
                                 @endif
                             </div>
@@ -444,9 +437,13 @@
                             method: 'POST',
                             headers: {
                                 'Accept': 'application/x-ndjson',
+                                'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': csrfToken,
                                 'X-Requested-With': 'XMLHttpRequest'
                             },
+                            body: JSON.stringify({
+                                password: payload.password || ''
+                            }),
                             credentials: 'same-origin',
                             signal: pdfAbortController.signal
                         });
@@ -537,6 +534,8 @@
                     }
                 };
 
+                window.__startUserAccountPdfGeneration = startPdfGeneration;
+
                 document.addEventListener('click', (event) => {
                     const btn = event.target.closest('[data-pdf-generate-btn]');
                     if (btn) {
@@ -564,6 +563,26 @@
                     }
                 });
             }
+
+            $wire.on('generateCreatedUserPdf', (eventData) => {
+                const payload = eventData?.payload ?? (Array.isArray(eventData) ? eventData[0] : eventData);
+                if (!payload || !payload.generateUrl || !window.__startUserAccountPdfGeneration) {
+                    return;
+                }
+
+                const createModalEl = document.getElementById('createModal');
+                if (createModalEl && createModalEl.classList.contains('show')) {
+                    createModalEl.addEventListener('hidden.bs.modal', () => {
+                        window.__startUserAccountPdfGeneration(payload);
+                    }, { once: true });
+                    const modal = bootstrap.Modal.getInstance(createModalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
+                } else {
+                    window.__startUserAccountPdfGeneration(payload);
+                }
+            });
         </script>
     @endscript
 </div>
