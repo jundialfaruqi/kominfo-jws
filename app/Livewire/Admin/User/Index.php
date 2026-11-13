@@ -45,17 +45,22 @@ class Index extends Component
 
     public function render()
     {
+        $searchTerm = trim((string) $this->search);
+
         $query = User::with(['roles', 'profil']) // Tambahkan relasi profil
-            ->select('id', 'name', 'phone', 'email', 'role', 'status', 'last_activity_at')
-            ->where(function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%')
-                    ->orWhere('role', 'like', '%' . $this->search . '%')
-                    ->orWhere('status', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('profil', function ($q) { // Pencarian di tabel Profil
-                        $q->where('name', 'like', '%' . $this->search . '%');
+            ->select('id', 'name', 'phone', 'email', 'role', 'status', 'last_activity_at');
+
+        if (mb_strlen($searchTerm) >= 3) {
+            $query->where(function ($query) use ($searchTerm) {
+                $query->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('email', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('role', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('status', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('profil', function ($q) use ($searchTerm) { // Pencarian di tabel Profil
+                        $q->where('name', 'like', '%' . $searchTerm . '%');
                     });
             });
+        }
 
         // Filter users based on current user's role
         if (!$this->isSuperAdmin()) {

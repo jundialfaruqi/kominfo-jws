@@ -1,4 +1,28 @@
 <div class="table-responsive">
+    <style>
+        .user-skeleton-box {
+            display: inline-block;
+            border-radius: 0.375rem;
+            background: linear-gradient(
+                90deg,
+                rgba(148, 163, 184, 0.18) 25%,
+                rgba(148, 163, 184, 0.36) 50%,
+                rgba(148, 163, 184, 0.18) 75%
+            );
+            background-size: 200% 100%;
+            animation: userSkeletonShimmer 1.35s ease-in-out infinite;
+        }
+
+        @keyframes userSkeletonShimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+    </style>
     <table class="table card-table table-vcenter table-striped table-hover text-nowrap datatable">
         <thead>
             <tr>
@@ -13,8 +37,68 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
-            @foreach ($user as $users)
+
+        {{-- Skeleton Shimmer saat memproses pencarian / ubah jumlah baris / pindah halaman --}}
+        <tbody class="d-none" wire:loading.class.remove="d-none"
+            wire:target="search,paginate,gotoPage,nextPage,previousPage" aria-hidden="true">
+            @php
+                $skeletonRows = [
+                    ['name' => '165px', 'email' => '195px', 'phone' => '115px', 'mosque' => '180px', 'url' => '240px', 'activity' => '145px', 'role' => '105px'],
+                    ['name' => '140px', 'email' => '175px', 'phone' => '125px', 'mosque' => '160px', 'url' => '215px', 'activity' => '125px', 'role' => '95px'],
+                    ['name' => '185px', 'email' => '205px', 'phone' => '110px', 'mosque' => '195px', 'url' => '250px', 'activity' => '155px', 'role' => '110px'],
+                    ['name' => '150px', 'email' => '185px', 'phone' => '120px', 'mosque' => '170px', 'url' => '230px', 'activity' => '135px', 'role' => '100px'],
+                    ['name' => '170px', 'email' => '190px', 'phone' => '115px', 'mosque' => '185px', 'url' => '235px', 'activity' => '140px', 'role' => '105px'],
+                    ['name' => '145px', 'email' => '180px', 'phone' => '120px', 'mosque' => '165px', 'url' => '220px', 'activity' => '130px', 'role' => '95px'],
+                ];
+            @endphp
+            @foreach ($skeletonRows as $sk)
+                <tr>
+                    <td class="text-center">
+                        <span class="user-skeleton-box" style="width: 24px; height: 14px;"></span>
+                    </td>
+                    <td>
+                        <div class="mb-1">
+                            <span class="user-skeleton-box" style="width: {{ $sk['name'] }}; height: 15px;"></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1 mb-1">
+                            <span class="user-skeleton-box" style="width: 15px; height: 14px;"></span>
+                            <span class="user-skeleton-box" style="width: {{ $sk['email'] }}; height: 13px;"></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="user-skeleton-box" style="width: 15px; height: 14px;"></span>
+                            <span class="user-skeleton-box" style="width: {{ $sk['phone'] }}; height: 13px;"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="mb-1">
+                            <span class="user-skeleton-box" style="width: {{ $sk['mosque'] }}; height: 15px;"></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="user-skeleton-box" style="width: 15px; height: 14px;"></span>
+                            <span class="user-skeleton-box" style="width: {{ $sk['url'] }}; height: 13px;"></span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="user-skeleton-box" style="width: {{ $sk['activity'] }}; height: 22px;"></span>
+                    </td>
+                    <td>
+                        <span class="user-skeleton-box" style="width: {{ $sk['role'] }}; height: 22px;"></span>
+                    </td>
+                    <td>
+                        <span class="user-skeleton-box" style="width: 74px; height: 22px;"></span>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-inline-flex align-items-center gap-1">
+                            <span class="user-skeleton-box rounded-4" style="width: 68px; height: 32px;"></span>
+                            <span class="user-skeleton-box rounded-4" style="width: 74px; height: 32px;"></span>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+
+        <tbody wire:loading.class="d-none" wire:target="search,paginate,gotoPage,nextPage,previousPage">
+            @forelse ($user as $users)
                 <tr>
                     <td class="text-center text-muted">
                         {{ $loop->iteration + ($user->currentPage() - 1) * $user->perPage() }}</td>
@@ -222,7 +306,13 @@
                         @endif
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        Data user tidak ditemukan.
+                    </td>
+                </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

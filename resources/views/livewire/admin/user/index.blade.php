@@ -165,24 +165,60 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12 col-md-auto ms-md-auto">
+                                <div class="col-12 col-md-auto ms-md-auto"
+                                    x-data="{
+                                        query: @js($search ?? ''),
+                                        lastSynced: @js($search ?? ''),
+                                        timer: null,
+                                        syncSearch(immediate = false) {
+                                            clearTimeout(this.timer);
+                                            const run = () => {
+                                                const trimmed = (this.query || '').trim();
+                                                if (trimmed.length >= 3) {
+                                                    if (this.lastSynced !== trimmed) {
+                                                        this.lastSynced = trimmed;
+                                                        $wire.set('search', trimmed);
+                                                    }
+                                                } else if (this.lastSynced !== '') {
+                                                    this.lastSynced = '';
+                                                    $wire.set('search', '');
+                                                }
+                                            };
+                                            if (immediate) {
+                                                run();
+                                            } else {
+                                                this.timer = setTimeout(run, 350);
+                                            }
+                                        }
+                                    }">
                                     <div class="input-group align-items-center rounded-4 w-100 w-md-auto">
                                         <span class="input-group-text rounded-start-4 gap-1">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="icon icon-tabler icons-tabler-outline icon-tabler-search">
-                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                                <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                                                <path d="M21 21l-6 -6" />
-                                            </svg>
+                                            <span wire:loading.remove wire:target="search">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                    class="icon icon-tabler icons-tabler-outline icon-tabler-search">
+                                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                    <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
+                                                    <path d="M21 21l-6 -6" />
+                                                </svg>
+                                            </span>
+                                            <span wire:loading wire:target="search">
+                                                <span class="spinner-border spinner-border-sm text-primary"
+                                                    role="status" aria-hidden="true"></span>
+                                            </span>
                                             Cari
                                         </span>
-                                        <input wire:model.live="search" type="search" name="search_user_query"
-                                            class="form-control rounded-end-4" placeholder="Ketik disini"
-                                            autocomplete="off" autocorrect="off" autocapitalize="off"
-                                            spellcheck="false" readonly
+                                        <input wire:ignore x-model="query" x-on:input="syncSearch()" x-on:search="syncSearch(true)"
+                                            x-on:keydown.enter.prevent="syncSearch(true)" type="search"
+                                            name="search_user_query" class="form-control rounded-end-4"
+                                            placeholder="Ketik min. 3 huruf" autocomplete="off" autocorrect="off"
+                                            autocapitalize="off" spellcheck="false" readonly
                                             onfocus="this.removeAttribute('readonly');" />
+                                    </div>
+                                    <div x-cloak x-show="query.trim().length > 0 && query.trim().length < 3"
+                                        class="text-muted small mt-1 ps-1">
+                                        Ketik minimal 3 huruf untuk mulai mencari
                                     </div>
                                 </div>
                             </div>
