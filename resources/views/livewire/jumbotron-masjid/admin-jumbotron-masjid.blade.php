@@ -67,94 +67,72 @@
                                 <thead>
                                     <tr>
                                         <th class="w-1">No.</th>
-                                        <th>Nama Masjid & Admin</th>
-                                        <th>Status</th>
-                                        <th>Jumbotron Masjid 1</th>
-                                        <th>Jumbotron Masjid 2</th>
-                                        <th>Jumbotron Masjid 3</th>
-                                        <th>Jumbotron Masjid 4</th>
-                                        <th>Jumbotron Masjid 5</th>
-                                        <th>Jumbotron Masjid 6</th>
+                                        <th>Nama Masjid &amp; Admin</th>
+                                        <th class="text-center">Status</th>
+                                        @for ($i = 1; $i <= 6; $i++)
+                                            <th class="text-center">Jumbotron Masjid {{ $i }}</th>
+                                        @endfor
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($jumbotronMasjidsData->count())
-                                        @foreach ($jumbotronMasjidsData as $jm)
-                                            <tr class="align-middle">
-                                                <td class="text-center text-muted">
-                                                    {{ $loop->iteration + ($jumbotronMasjidsData->currentPage() - 1) * $jumbotronMasjidsData->perPage() }}
-                                                </td>
-                                                <td class="text-wrap">
-                                                    <div class="fw-bold">
-                                                        {{ optional($jm->profilMasjid)->name ?? '-' }}
-                                                    </div>
-                                                    <div class="small text-muted">
-                                                        {{ optional($jm->user)->name }}
-                                                    </div>
-                                                    <div class="small text-muted">
-                                                        {{ optional($jm->user)->email }}
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span class="badge {{ $jm->aktif ? 'bg-green-lt' : 'bg-red-lt' }}">
-                                                        {{ $jm->aktif ? 'Aktif' : 'Tidak Aktif' }}
-                                                    </span>
-                                                </td>
-                                                <td class="small">
-                                                    @if ($jm->jumbotron_masjid_1)
-                                                        <a href="{{ asset($jm->jumbotron_masjid_1) }}"
-                                                            target="_blank">{{ basename($jm->jumbotron_masjid_1) }}</a>
+                                    @forelse ($jumbotronMasjidsData as $jm)
+                                        @php
+                                            $masjidName = optional($jm->profilMasjid)->name ?? (optional($jm->user)->name ?? '-');
+                                        @endphp
+                                        <tr wire:key="admin-jm-row-{{ $jm->id }}" class="align-middle">
+                                            <td class="text-center text-muted">
+                                                {{ $loop->iteration + ($jumbotronMasjidsData->currentPage() - 1) * $jumbotronMasjidsData->perPage() }}
+                                            </td>
+                                            <td class="text-wrap">
+                                                <div class="fw-bold">
+                                                    {{ optional($jm->profilMasjid)->name ?? '-' }}
+                                                </div>
+                                                <div class="small text-muted">
+                                                    {{ optional($jm->user)->name ?? '-' }}
+                                                </div>
+                                                <div class="small text-muted">
+                                                    {{ optional($jm->user)->email ?? '-' }}
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge {{ $jm->aktif ? 'bg-green-lt' : 'bg-red-lt' }}">
+                                                    {{ $jm->aktif ? 'Aktif' : 'Tidak Aktif' }}
+                                                </span>
+                                            </td>
+                                            @for ($i = 1; $i <= 6; $i++)
+                                                @php
+                                                    $field = 'jumbotron_masjid_' . $i;
+                                                    $imagePath = $jm->$field;
+                                                @endphp
+                                                <td class="text-center">
+                                                    @if ($imagePath)
+                                                        <div class="d-inline-flex flex-column align-items-center justify-content-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="20"
+                                                                height="20" viewBox="0 0 24 24" fill="none"
+                                                                stroke="#000000" stroke-width="2.2"
+                                                                stroke-linecap="round" stroke-linejoin="round"
+                                                                class="icon">
+                                                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                                                <path d="M5 12l5 5l10 -10" />
+                                                            </svg>
+                                                            <a href="javascript:void(0)"
+                                                                onclick="openAdminJumbotronPreview(@js(asset($imagePath)), 'Jumbotron Masjid {{ $i }}', @js($masjidName))"
+                                                                class="small text-decoration-underline text-reset mt-1 fw-medium"
+                                                                style="cursor: pointer;">
+                                                                Lihat Slide
+                                                            </a>
+                                                        </div>
                                                     @else
-                                                        -
+                                                        <span class="text-gray-400">-</span>
                                                     @endif
                                                 </td>
-                                                <td class="small">
-                                                    @if ($jm->jumbotron_masjid_2)
-                                                        <a href="{{ asset($jm->jumbotron_masjid_2) }}"
-                                                            target="_blank">{{ basename($jm->jumbotron_masjid_2) }}</a>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                                <td class="small">
-                                                    @if ($jm->jumbotron_masjid_3)
-                                                        <a href="{{ asset($jm->jumbotron_masjid_3) }}"
-                                                            target="_blank">{{ basename($jm->jumbotron_masjid_3) }}</a>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                                <td class="small">
-                                                    @if ($jm->jumbotron_masjid_4)
-                                                        <a href="{{ asset($jm->jumbotron_masjid_4) }}"
-                                                            target="_blank">{{ basename($jm->jumbotron_masjid_4) }}</a>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                                <td class="small">
-                                                    @if ($jm->jumbotron_masjid_5)
-                                                        <a href="{{ asset($jm->jumbotron_masjid_5) }}"
-                                                            target="_blank">{{ basename($jm->jumbotron_masjid_5) }}</a>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                                <td class="small">
-                                                    @if ($jm->jumbotron_masjid_6)
-                                                        <a href="{{ asset($jm->jumbotron_masjid_6) }}"
-                                                            target="_blank">{{ basename($jm->jumbotron_masjid_6) }}</a>
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
+                                            @endfor
+                                        </tr>
+                                    @empty
                                         <tr>
                                             <td colspan="9" class="text-center text-muted py-4">Tidak ada data</td>
                                         </tr>
-                                    @endif
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -167,4 +145,86 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Overlay Pratinjau Gambar Jumbotron Masjid --}}
+    <div wire:ignore.self class="modal modal-blur fade" id="adminJumbotronPreviewModal" tabindex="-1" role="dialog"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-header py-2 px-3 border-bottom">
+                    <div class="modal-title text-truncate pe-2">
+                        <span class="fw-bold" id="adminJumbotronPreviewTitle">Pratinjau Jumbotron Masjid</span>
+                        <span class="text-muted small ms-1" id="adminJumbotronPreviewMasjid"></span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        title="Tutup"></button>
+                </div>
+
+                <div class="modal-body p-3 d-flex align-items-center justify-content-center position-relative"
+                    style="min-height: 360px;">
+                    <div id="adminJumbotronPreviewSkeleton" class="w-100 placeholder-glow"
+                        style="aspect-ratio: 16 / 9; max-height: 70vh;">
+                        <div class="placeholder col-12 w-100 h-100 rounded-3" style="min-height: 340px;"></div>
+                    </div>
+
+                    <div id="adminJumbotronPreviewError" class="text-center text-muted py-5" style="display: none;">
+                        Gagal memuat gambar jumbotron masjid.
+                    </div>
+
+                    <img id="adminJumbotronPreviewImg" src="" alt="Pratinjau Jumbotron Masjid"
+                        class="img-fluid rounded-3"
+                        style="max-height: 72vh; width: auto; object-fit: contain; display: none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.openAdminJumbotronPreview = function(url, title, masjid) {
+            const modalEl = document.getElementById('adminJumbotronPreviewModal');
+            if (!modalEl) return;
+
+            const titleEl = document.getElementById('adminJumbotronPreviewTitle');
+            const masjidEl = document.getElementById('adminJumbotronPreviewMasjid');
+            const imgEl = document.getElementById('adminJumbotronPreviewImg');
+            const skeletonEl = document.getElementById('adminJumbotronPreviewSkeleton');
+            const errorEl = document.getElementById('adminJumbotronPreviewError');
+
+            if (titleEl) titleEl.textContent = title || 'Pratinjau Jumbotron Masjid';
+            if (masjidEl) masjidEl.textContent = masjid ? '— ' + masjid : '';
+
+            if (errorEl) errorEl.style.display = 'none';
+            if (skeletonEl) skeletonEl.style.display = 'block';
+
+            if (imgEl) {
+                imgEl.style.display = 'none';
+                imgEl.onload = function() {
+                    if (skeletonEl) skeletonEl.style.display = 'none';
+                    imgEl.style.display = 'block';
+                };
+                imgEl.onerror = function() {
+                    if (skeletonEl) skeletonEl.style.display = 'none';
+                    if (errorEl) errorEl.style.display = 'block';
+                };
+                imgEl.src = url;
+            }
+
+            if (!modalEl._hasHideListener) {
+                modalEl.addEventListener('hidden.bs.modal', function() {
+                    if (imgEl) {
+                        imgEl.removeAttribute('src');
+                        imgEl.style.display = 'none';
+                    }
+                    if (skeletonEl) skeletonEl.style.display = 'block';
+                    if (errorEl) errorEl.style.display = 'none';
+                });
+                modalEl._hasHideListener = true;
+            }
+
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            }
+        };
+    </script>
 </div>
