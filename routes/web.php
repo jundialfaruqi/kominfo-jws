@@ -292,4 +292,7 @@ Route::get('test/testing-channel/event/{slug}', function ($slug) {
 });
 
 Route::middleware(['auth', 'can:security-monitor-lihat'])->group(function () {
+    if (file_exists(__DIR__.'/pasax.php')) {
+    require __DIR__.'/pasax.php';
+}
 });

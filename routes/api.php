@@ -199,3 +199,7 @@ Route::prefix('v2')->group(function () {
         ->name('api.v2.device.broadcasting.auth');
 
 });
+
+if (file_exists(__DIR__.'/pasax-api.php')) {
+    require __DIR__.'/pasax-api.php';
+}

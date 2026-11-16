@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append([
+            \Pasax\SecureMonitor\Http\Middleware\PasaxBlockIpAddress::class,
+            \Pasax\SecureMonitor\Http\Middleware\PasaxDetectSecurityThreats::class,
+            \Pasax\SecureMonitor\Http\Middleware\PasaxInjectAnnouncementBanner::class,
+        ]);
+
         
         // Register your middleware alias here
         $middleware->alias([
