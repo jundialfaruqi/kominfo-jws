@@ -34,8 +34,6 @@ use App\Livewire\GroupCategory\Group as GroupCategoryGroup;
 use App\Livewire\DevicePairing\Index as DevicePairingIndex;
 use App\Livewire\DevicePairing\Monitor as DevicePairingMonitor;
 
-
-
 Route::get('/', Welcome::class)->name('welcome.index');
 
 // Auth Routes
@@ -294,5 +292,4 @@ Route::get('test/testing-channel/event/{slug}', function ($slug) {
 });
 
 Route::middleware(['auth', 'can:security-monitor-lihat'])->group(function () {
-    require __DIR__.'/pasak.php';
 });

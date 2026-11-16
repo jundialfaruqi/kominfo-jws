@@ -162,8 +162,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('my-audio-adzan/status', [API\MyAdzanAudioController::class, 'updateStatus'])->name('api.my-audio-adzan.update-status');
 });
 
-
-
 use App\Http\Controllers\Api\V2\ProfilController as ProfilControllerV2;
 use App\Http\Controllers\Api\V2\MyMasjidController;
 use App\Http\Controllers\Api\V2\ThemeController;
@@ -201,6 +199,3 @@ Route::prefix('v2')->group(function () {
         ->name('api.v2.device.broadcasting.auth');
 
 });
-
-
-require __DIR__.'/pasak-api.php';
