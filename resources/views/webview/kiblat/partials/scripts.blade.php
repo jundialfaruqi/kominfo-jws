@@ -907,6 +907,7 @@
                 Object.keys(SCREENS).forEach(t => {
                     $(SCREENS[t]).hidden = (t !== tab);
                 });
+                if ($("aboutModal")) $("aboutModal").hidden = true;
                 document.querySelectorAll(".nav button").forEach(b =>
                     b.classList.toggle("active", b.dataset.tab === tab));
                 window.scrollTo({
@@ -960,6 +961,21 @@
 
             /* ================= init ================= */
             $("btnGps").addEventListener("click", useGPS);
+
+            if ($("btnAboutModal") && $("aboutModal") && $("aboutBlock") && $("aboutModalBody")) {
+                $("btnAboutModal").addEventListener("click", () => {
+                    $("aboutModalBody").innerHTML = $("aboutBlock").innerHTML;
+                    $("aboutModal").hidden = false;
+                });
+                if ($("btnCloseAboutModal")) {
+                    $("btnCloseAboutModal").addEventListener("click", () => {
+                        $("aboutModal").hidden = true;
+                    });
+                }
+                $("aboutModal").addEventListener("click", e => {
+                    if (e.target === $("aboutModal")) $("aboutModal").hidden = true;
+                });
+            }
 
             (function restore() {
                 updateDates();

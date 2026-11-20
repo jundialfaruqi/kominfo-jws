@@ -629,22 +629,23 @@
         .screen--light {
             background: #fff;
             color: var(--ink);
-            padding: 0 0 8px;
-            justify-content: space-between
+            padding: 0 0 clamp(4px, 1dvh, 8px);
+            justify-content: space-between;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         .set-wrap {
-            padding: 12px 18px 0;
+            padding: clamp(8px, 1.4dvh, 14px) 18px 0;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            flex: 1;
-            min-height: 0
+            gap: clamp(5px, .95dvh, 9px);
+            flex: 0 0 auto;
         }
 
         .set-wrap h1 {
             margin: 0;
-            font-size: 1.05rem;
+            font-size: clamp(.98rem, 2.2dvh, 1.08rem);
             color: var(--ink)
         }
 
@@ -658,29 +659,40 @@
             background: #fff;
             border: 1px solid var(--line);
             border-radius: 14px;
-            padding: 10px 12px;
+            padding: clamp(7px, 1.2dvh, 11px) 12px;
             margin-top: 0;
             box-shadow: 0 6px 18px rgba(11, 60, 93, .06);
         }
 
         .card h3 {
-            margin: 0 0 6px;
+            margin: 0 0 clamp(4px, .7dvh, 6px);
             font-size: .62rem;
             letter-spacing: .12em;
             text-transform: uppercase;
             color: var(--muted)
         }
 
+        .loc-selects {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(4px, .75dvh, 6px);
+            margin-top: clamp(4px, .75dvh, 6px);
+        }
+
         select {
             width: 100%;
+            min-width: 0;
             font: inherit;
             font-size: .82rem;
-            padding: 7px 32px 7px 10px;
+            padding: clamp(5px, .85dvh, 7px) 28px clamp(5px, .85dvh, 7px) 10px;
             border-radius: 10px;
             border: 1px solid #dbe6ee;
             background: #f7fafc;
             color: var(--ink);
             margin-top: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             appearance: none;
             -webkit-appearance: none;
             cursor: pointer;
@@ -688,6 +700,10 @@
             background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
             background-size: 5px 5px, 5px 5px;
             background-repeat: no-repeat;
+        }
+
+        .loc-selects select {
+            margin-top: 0;
         }
 
         select:disabled {
@@ -699,8 +715,8 @@
             font: inherit;
             font-size: .8rem;
             font-weight: 700;
-            margin-top: 6px;
-            padding: 8px 10px;
+            margin-top: clamp(4px, .75dvh, 6px);
+            padding: clamp(6px, .95dvh, 8px) 10px;
             border-radius: 10px;
             border: 1px solid #dbe6ee;
             background: #f5f9fc;
@@ -720,9 +736,9 @@
 
         .hint {
             font-size: .65rem;
-            line-height: 1.35;
+            line-height: 1.32;
             color: var(--muted);
-            margin: 6px 0 0
+            margin: clamp(4px, .7dvh, 6px) 0 0
         }
 
         .kv {
@@ -731,7 +747,7 @@
             gap: 12px;
             font-size: .74rem;
             color: #3d4f66;
-            padding: 5px 0;
+            padding: clamp(3px, .65dvh, 5px) 0;
             border-bottom: 1px solid var(--line)
         }
 
@@ -745,12 +761,161 @@
             text-align: right
         }
 
+        .about-block {
+            flex-shrink: 0;
+        }
+
         .about {
             font-size: .62rem;
-            line-height: 1.35;
+            line-height: 1.32;
             color: var(--muted);
-            padding: 4px 18px 0;
+            padding: clamp(2px, .5dvh, 4px) 18px 0;
             margin: 0
+        }
+
+        .about--credit {
+            padding-top: clamp(3px, .6dvh, 6px);
+        }
+
+        .about-trigger {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 18px 0;
+            padding: 6px 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #f7fafc;
+            font: inherit;
+            font-size: .68rem;
+            font-weight: 600;
+            color: var(--blue);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .about-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(4, 34, 63, .48);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        .about-modal[hidden] {
+            display: none;
+        }
+
+        .about-modal-card {
+            width: 100%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            box-shadow: 0 18px 40px rgba(4, 34, 63, .24);
+            padding: 14px 16px 16px;
+            color: var(--ink);
+        }
+
+        .about-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: .85rem;
+        }
+
+        .about-modal-close {
+            border: 0;
+            background: #f0f5f9;
+            color: var(--ink);
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .about-modal-body .about {
+            padding: 0;
+            font-size: .72rem;
+            line-height: 1.45;
+        }
+
+        .about-modal-body .about--credit {
+            padding-top: 8px;
+        }
+
+        /* Layar pendek (termasuk iPhone 13 Pro dalam WebView): gabungkan select jadi 2 kolom agar .about tetap tampil penuh tanpa overlap */
+        @media (max-height: 760px) {
+            .set-wrap {
+                padding: 8px 16px 0;
+                gap: 6px;
+            }
+
+            .card {
+                padding: 8px 11px;
+                border-radius: 12px;
+            }
+
+            .card h3 {
+                margin-bottom: 4px;
+            }
+
+            .loc-selects {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 4px;
+            }
+
+            select {
+                font-size: .76rem;
+                padding: 6px 24px 6px 8px;
+                background-position: calc(100% - 13px) 50%, calc(100% - 8px) 50%;
+            }
+
+            .btn {
+                font-size: .76rem;
+                padding: 6px 10px;
+                margin-top: 5px;
+            }
+
+            .hint {
+                font-size: .62rem;
+                line-height: 1.28;
+                margin-top: 4px;
+            }
+
+            .kv {
+                font-size: .7rem;
+                padding: 3.5px 0;
+            }
+
+            .about {
+                font-size: .59rem;
+                line-height: 1.28;
+                padding: 2px 16px 0;
+            }
+
+            .about--credit {
+                padding-top: 3px;
+            }
+        }
+
+        /* Fallback darurat hanya untuk layar sangat pendek (mis. iPhone SE / split screen) agar tetap bebas scroll & tidak bertumpuk */
+        @media (max-height: 600px) {
+            .about-block {
+                display: none;
+            }
+
+            .about-trigger {
+                display: flex;
+            }
         }
 
         /* ================= NAV ================= */

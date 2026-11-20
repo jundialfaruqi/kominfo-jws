@@ -6,8 +6,10 @@
 
                     <div class="card">
                         <h3>Lokasi</h3>
-                        <select id="provSelect" aria-label="Provinsi"></select>
-                        <select id="citySelect" aria-label="Kabupaten atau Kota" disabled></select>
+                        <div class="loc-selects">
+                            <select id="provSelect" aria-label="Provinsi"></select>
+                            <select id="citySelect" aria-label="Kabupaten atau Kota" disabled></select>
+                        </div>
                         <button class="btn primary" id="btnGps">📍 Lokasi Saya</button>
                         <p class="hint" id="gpsHint">Pilih provinsi lalu kabupaten/kota secara manual, atau tekan
                             <b>Lokasi Saya</b> untuk memakai GPS perangkat.
@@ -31,13 +33,31 @@
                     </div>
                 </div>
 
-                <p class="about">
-                    Arah kiblat dihitung dengan rumus <i>great-circle bearing</i> dari koordinat Anda ke Ka'bah
-                    (21,4225° LU / 39,8262° BT). Jadwal sholat bersumber dari API Kemenag melalui api.myquran.com
-                    dan disimpan di perangkat agar tetap terbaca saat offline. Arah kompas mengikuti utara magnetik;
-                    deklinasi di Indonesia kecil (&lt; 2°).
-                </p>
-                <p class="about" style="padding-top:6px">
-                    Foto Masjidil Haram: <b>Saudipics.com</b> — CC BY-SA 4.0, via Wikimedia Commons.
-                </p>
+                <div class="about-block" id="aboutBlock">
+                    <p class="about">
+                        Arah kiblat dihitung dengan rumus <i>great-circle bearing</i> dari koordinat Anda ke Ka'bah
+                        (21,4225° LU / 39,8262° BT). Jadwal sholat bersumber dari API Kemenag melalui api.myquran.com
+                        dan disimpan di perangkat agar tetap terbaca saat offline. Arah kompas mengikuti utara magnetik;
+                        deklinasi di Indonesia kecil (&lt; 2°).
+                    </p>
+                    <p class="about about--credit">
+                        Foto Masjidil Haram: <b>Saudipics.com</b> — CC BY-SA 4.0, via Wikimedia Commons.
+                    </p>
+                </div>
+
+                <button type="button" class="about-trigger" id="btnAboutModal">
+                    <span>ⓘ Rumus kiblat, sumber jadwal &amp; kredit foto</span>
+                </button>
+
+                <div class="about-modal" id="aboutModal" hidden role="dialog" aria-modal="true"
+                    aria-labelledby="aboutModalTitle">
+                    <div class="about-modal-card">
+                        <div class="about-modal-head">
+                            <strong id="aboutModalTitle">Informasi &amp; Sumber Data</strong>
+                            <button type="button" class="about-modal-close" id="btnCloseAboutModal"
+                                aria-label="Tutup">&times;</button>
+                        </div>
+                        <div class="about-modal-body" id="aboutModalBody"></div>
+                    </div>
+                </div>
             </section>
