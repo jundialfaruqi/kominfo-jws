@@ -69,7 +69,8 @@
             };
 
             const $ = id => document.getElementById(id);
-            const wrap = $("wrap"),
+            const scrKiblat = $("scrKiblat"),
+                wrap = $("wrap"),
                 dial = $("dial"),
                 needle = $("needle"),
                 verdict = $("verdict");
@@ -170,10 +171,14 @@
                     const off = norm(state.qibla - state.heading + 180) - 180;
                     const ok = Math.abs(off) < 5;
                     wrap.classList.toggle("aligned", ok);
+                    const kiblatActive = scrKiblat && !scrKiblat.hidden && document.visibilityState !== "hidden";
+                    if (!kiblatActive) {
+                        frame._buzz = false;
+                    }
                     if (Date.now() > state.msgUntil) {
                         if (ok) {
                             verdict.innerHTML = `<b>Arah kiblat tepat ✓</b> — panah hijau lurus ke atas layar.`;
-                            if (navigator.vibrate && !frame._buzz) {
+                            if (kiblatActive && navigator.vibrate && !frame._buzz) {
                                 frame._buzz = true;
                                 navigator.vibrate(60);
                             }
@@ -907,6 +912,7 @@
                 Object.keys(SCREENS).forEach(t => {
                     $(SCREENS[t]).hidden = (t !== tab);
                 });
+                if (tab !== "kiblat" && navigator.vibrate) navigator.vibrate(0);
                 if ($("aboutModal")) $("aboutModal").hidden = true;
                 document.querySelectorAll(".nav button").forEach(b =>
                     b.classList.toggle("active", b.dataset.tab === tab));
